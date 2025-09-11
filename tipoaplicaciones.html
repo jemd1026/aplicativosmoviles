@@ -1,0 +1,581 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tipos de Aplicaciones Móviles</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 40px;
+            font-size: 2.5em;
+        }
+        
+        .app-types {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+        
+        .app-type {
+            background: #f8f9fa;
+            border-radius: 20px;
+            padding: 30px;
+            border-top: 8px solid;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .app-type:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+        
+        .native { border-top-color: #e74c3c; }
+        .web { border-top-color: #3498db; }
+        .hybrid { border-top-color: #27ae60; }
+        
+        .app-type::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(45deg, transparent 20%, rgba(255,255,255,0.3) 50%, transparent 80%);
+            animation: shine 3s infinite;
+        }
+        
+        @keyframes shine {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+        
+        .type-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .type-icon {
+            font-size: 4em;
+            margin-bottom: 10px;
+        }
+        
+        .type-title {
+            font-size: 1.8em;
+            font-weight: bold;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+        
+        .type-subtitle {
+            color: #7f8c8d;
+            font-style: italic;
+        }
+        
+        .architecture-diagram {
+            background: #ecf0f1;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        .layer {
+            background: #fff;
+            margin: 8px 0;
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 4px solid;
+            font-weight: bold;
+        }
+        
+        .native .layer { border-left-color: #e74c3c; }
+        .web .layer { border-left-color: #3498db; }
+        .hybrid .layer { border-left-color: #27ae60; }
+        
+        .tech-stack {
+            background: #2c3e50;
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+        
+        .tech-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: inline-block;
+            margin: 5px;
+            font-size: 0.9em;
+        }
+        
+        .examples {
+            margin: 20px 0;
+        }
+        
+        .example-apps {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 15px 0;
+        }
+        
+        .app-example {
+            background: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            text-align: center;
+            min-width: 100px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .app-logo {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(45deg, #3498db, #2980b9);
+            border-radius: 12px;
+            margin: 0 auto 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 0.8em;
+        }
+        
+        .pros-cons {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .pros, .cons {
+            padding: 15px;
+            border-radius: 10px;
+        }
+        
+        .pros {
+            background: #d5f4e6;
+            border-left: 4px solid #27ae60;
+        }
+        
+        .cons {
+            background: #fadbd8;
+            border-left: 4px solid #e74c3c;
+        }
+        
+        .comparison-table {
+            background: #fff;
+            border-radius: 15px;
+            padding: 30px;
+            margin: 40px 0;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+        
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+            gap: 0;
+            border-radius: 10px;
+            overflow: hidden;
+            border: 2px solid #ecf0f1;
+        }
+        
+        .comparison-header, .comparison-item {
+            padding: 15px;
+            text-align: center;
+            border-right: 1px solid #ecf0f1;
+            border-bottom: 1px solid #ecf0f1;
+        }
+        
+        .comparison-header {
+            background: #34495e;
+            color: white;
+            font-weight: bold;
+        }
+        
+        .comparison-item {
+            background: #f8f9fa;
+        }
+        
+        .score {
+            font-size: 1.2em;
+            font-weight: bold;
+        }
+        
+        .score.high { color: #27ae60; }
+        .score.medium { color: #f39c12; }
+        .score.low { color: #e74c3c; }
+        
+        .flow-diagram {
+            background: #2c3e50;
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+        }
+        
+        .flow-step {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 10px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .decision-matrix {
+            background: linear-gradient(135deg, #f39c12, #e67e22);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 30px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📱 Tipos de Aplicaciones Móviles</h1>
+        
+        <div class="app-types">
+            <!-- APLICACIONES NATIVAS -->
+            <div class="app-type native">
+                <div class="type-header">
+                    <div class="type-icon">🏗️</div>
+                    <div class="type-title">APLICACIONES NATIVAS</div>
+                    <div class="type-subtitle">"Construidas para cada plataforma específica"</div>
+                </div>
+                
+                <div class="architecture-diagram">
+                    <h4>🏗️ Arquitectura</h4>
+                    <div class="layer">📱 App Android (.apk)</div>
+                    <div class="layer">⚙️ Sistema Operativo Android</div>
+                    <div class="layer">🔧 Hardware del Dispositivo</div>
+                </div>
+                
+                <div class="tech-stack">
+                    <h4>💻 Tecnologías</h4>
+                    <div class="tech-item">☕ Java</div>
+                    <div class="tech-item">🎯 Kotlin</div>
+                    <div class="tech-item">📱 Android Studio</div>
+                    <div class="tech-item">🍎 Swift (iOS)</div>
+                    <div class="tech-item">🔧 Objective-C</div>
+                    <div class="tech-item">💻 Xcode</div>
+                </div>
+                
+                <div class="examples">
+                    <h4>📱 Ejemplos Famosos</h4>
+                    <div class="example-apps">
+                        <div class="app-example">
+                            <div class="app-logo">WA</div>
+                            <div>WhatsApp</div>
+                        </div>
+                        <div class="app-example">
+                            <div class="app-logo">IG</div>
+                            <div>Instagram</div>
+                        </div>
+                        <div class="app-example">
+                            <div class="app-logo">YT</div>
+                            <div>YouTube</div>
+                        </div>
+                        <div class="app-example">
+                            <div class="app-logo">GM</div>
+                            <div>Gmail</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="pros-cons">
+                    <div class="pros">
+                        <h4>✅ VENTAJAS</h4>
+                        <ul>
+                            <li>🚀 Máximo rendimiento</li>
+                            <li>🔧 Acceso completo al hardware</li>
+                            <li>🎨 UI/UX nativa perfecta</li>
+                            <li>📵 Funciona sin internet</li>
+                            <li>🔐 Máxima seguridad</li>
+                        </ul>
+                    </div>
+                    <div class="cons">
+                        <h4>❌ DESVENTAJAS</h4>
+                        <ul>
+                            <li>💰 Más costosa de desarrollar</li>
+                            <li>⏰ Mayor tiempo de desarrollo</li>
+                            <li>👥 Necesitas equipos especializados</li>
+                            <li>🔄 Mantener 2 versiones (Android/iOS)</li>
+                            <li>📚 Curva de aprendizaje alta</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- APLICACIONES WEB -->
+            <div class="app-type web">
+                <div class="type-header">
+                    <div class="type-icon">🌐</div>
+                    <div class="type-title">APLICACIONES WEB</div>
+                    <div class="type-subtitle">"Sitios web que parecen apps"</div>
+                </div>
+                
+                <div class="architecture-diagram">
+                    <h4>🌐 Arquitectura</h4>
+                    <div class="layer">🌐 Navegador Web</div>
+                    <div class="layer">📱 Sistema Operativo</div>
+                    <div class="layer">🔧 Hardware del Dispositivo</div>
+                </div>
+                
+                <div class="tech-stack">
+                    <h4>💻 Tecnologías</h4>
+                    <div class="tech-item">🌐 HTML5</div>
+                    <div class="tech-item">🎨 CSS3</div>
+                    <div class="tech-item">⚡ JavaScript</div>
+                    <div class="tech-item">⚛️ React</div>
+                    <div class="tech-item">🅰️ Angular</div>
+                    <div class="tech-item">💚 Vue.js</div>
+                    <div class="tech-item">📱 PWA</div>
+                </div>
+                
+                <div class="examples">
+                    <h4>🌐 Ejemplos Famosos</h4>
+                    <div class="example-apps">
+                        <div class="app-example">
+                            <div class="app-logo">TW</div>
+                            <div>Twitter Lite</div>
+                        </div>
+                        <div class="app-example">
+                            <div class="app-logo">PI</div>
+                            <div>Pinterest</div>
+                        </div>
+                        <div class="app-example">
+                            <div class="app-logo">SP</div>
+                            <div>Spotify Web</div>
+                        </div>
+                        <div class="app-example">
+                            <div class="app-logo">FB</div>
+                            <div>Facebook Lite</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="pros-cons">
+                    <div class="pros">
+                        <h4>✅ VENTAJAS</h4>
+                        <ul>
+                            <li>💰 Muy económica</li>
+                            <li>🚀 Desarrollo rápido</li>
+                            <li>📱 Una sola versión para todo</li>
+                            <li>🔄 Actualizaciones instantáneas</li>
+                            <li>🌐 Accesible desde cualquier lugar</li>
+                        </ul>
+                    </div>
+                    <div class="cons">
+                        <h4>❌ DESVENTAJAS</h4>
+                        <ul>
+                            <li>📶 Necesita internet siempre</li>
+                            <li>🐌 Rendimiento limitado</li>
+                            <li>🔧 Acceso limitado al hardware</li>
+                            <li>🎨 UI menos nativa</li>
+                            <li>🔋 Mayor consumo de batería</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- APLICACIONES HÍBRIDAS -->
+            <div class="app-type hybrid">
+                <div class="type-header">
+                    <div class="type-icon">🔄</div>
+                    <div class="type-title">APLICACIONES HÍBRIDAS</div>
+                    <div class="type-subtitle">"Lo mejor de ambos mundos"</div>
+                </div>
+                
+                <div class="architecture-diagram">
+                    <h4>🔄 Arquitectura</h4>
+                    <div class="layer">📱 App Container Nativo</div>
+                    <div class="layer">🌐 WebView (Navegador interno)</div>
+                    <div class="layer">⚙️ Sistema Operativo</div>
+                    <div class="layer">🔧 Hardware del Dispositivo</div>
+                </div>
+                
+                <div class="tech-stack">
+                    <h4>💻 Tecnologías</h4>
+                    <div class="tech-item">🎯 Flutter (Dart)</div>
+                    <div class="tech-item">⚛️ React Native</div>
+                    <div class="tech-item">📱 Ionic</div>
+                    <div class="tech-item">⚡ Cordova/PhoneGap</div>
+                    <div class="tech-item">🌐 Xamarin</div>
+                    <div class="tech-item">🔧 Titanium</div>
+                </div>
+                
+                <div class="examples">
+                    <h4>🔄 Ejemplos Famosos</h4>
+                    <div class="example-apps">
+                        <div class="app-example">
+                            <div class="app-logo">UB</div>
+                            <div>Uber</div>
+                        </div>
+                        <div class="app-example">
+                            <div class="app-logo">WM</div>
+                            <div>Walmart</div>
+                        </div>
+                        <div class="app-example">
+                            <div class="app-logo">AI</div>
+                            <div>Airbnb</div>
+                        </div>
+                        <div class="app-example">
+                            <div class="app-logo">SK</div>
+                            <div>Skype</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="pros-cons">
+                    <div class="pros">
+                        <h4>✅ VENTAJAS</h4>
+                        <ul>
+                            <li>⚖️ Balance costo/rendimiento</li>
+                            <li>📱 Una base de código</li>
+                            <li>🔧 Acceso a funciones nativas</li>
+                            <li>🚀 Desarrollo más rápido que nativo</li>
+                            <li>📱 Distribución en App Stores</li>
+                        </ul>
+                    </div>
+                    <div class="cons">
+                        <h4>❌ DESVENTAJAS</h4>
+                        <ul>
+                            <li>🐌 Rendimiento intermedio</li>
+                            <li>🔧 Dependes del framework</li>
+                            <li>🎨 UI no 100% nativa</li>
+                            <li>🐛 Bugs específicos de cada plataforma</li>
+                            <li>📦 Archivo más pesado</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- TABLA COMPARATIVA -->
+        <div class="comparison-table">
+            <h2>📊 Comparación Directa</h2>
+            <div class="comparison-grid">
+                <div class="comparison-header">Aspecto</div>
+                <div class="comparison-header">🏗️ Nativa</div>
+                <div class="comparison-header">🌐 Web</div>
+                <div class="comparison-header">🔄 Híbrida</div>
+                
+                <div class="comparison-item">🚀 Rendimiento</div>
+                <div class="comparison-item"><span class="score high">★★★★★</span></div>
+                <div class="comparison-item"><span class="score low">★★☆☆☆</span></div>
+                <div class="comparison-item"><span class="score medium">★★★★☆</span></div>
+                
+                <div class="comparison-item">💰 Costo</div>
+                <div class="comparison-item"><span class="score low">★★☆☆☆</span></div>
+                <div class="comparison-item"><span class="score high">★★★★★</span></div>
+                <div class="comparison-item"><span class="score medium">★★★★☆</span></div>
+                
+                <div class="comparison-item">⏰ Tiempo desarrollo</div>
+                <div class="comparison-item"><span class="score low">★★☆☆☆</span></div>
+                <div class="comparison-item"><span class="score high">★★★★★</span></div>
+                <div class="comparison-item"><span class="score medium">★★★★☆</span></div>
+                
+                <div class="comparison-item">🔧 Acceso hardware</div>
+                <div class="comparison-item"><span class="score high">★★★★★</span></div>
+                <div class="comparison-item"><span class="score low">★★☆☆☆</span></div>
+                <div class="comparison-item"><span class="score medium">★★★★☆</span></div>
+                
+                <div class="comparison-item">🎨 Experiencia usuario</div>
+                <div class="comparison-item"><span class="score high">★★★★★</span></div>
+                <div class="comparison-item"><span class="score medium">★★★☆☆</span></div>
+                <div class="comparison-item"><span class="score medium">★★★★☆</span></div>
+            </div>
+        </div>
+        
+        <!-- CÓMO FUNCIONAN -->
+        <div class="flow-diagram">
+            <h2>🔄 ¿Cómo Funcionan Internamente?</h2>
+            
+            <div class="flow-step">
+                <h3>🏗️ APLICACIÓN NATIVA</h3>
+                <p><strong>Usuario toca app</strong> → <strong>SO ejecuta código nativo</strong> → <strong>Acceso directo al hardware</strong> → <strong>Respuesta inmediata</strong></p>
+                <p><em>Es como hablar directamente con el dispositivo en su idioma nativo</em></p>
+            </div>
+            
+            <div class="flow-step">
+                <h3>🌐 APLICACIÓN WEB</h3>
+                <p><strong>Usuario abre navegador</strong> → <strong>Descarga HTML/CSS/JS</strong> → <strong>Navegador interpreta código</strong> → <strong>Renderiza en pantalla</strong></p>
+                <p><em>Es como usar un traductor para comunicarte con el dispositivo</em></p>
+            </div>
+            
+            <div class="flow-step">
+                <h3>🔄 APLICACIÓN HÍBRIDA</h3>
+                <p><strong>Usuario toca app</strong> → <strong>Container nativo se ejecuta</strong> → <strong>WebView carga código web</strong> → <strong>Bridges conectan con funciones nativas</strong></p>
+                <p><em>Es como tener un asistente bilingüe que traduce cuando es necesario</em></p>
+            </div>
+        </div>
+        
+        <!-- DECISIÓN -->
+        <div class="decision-matrix">
+            <h2>🤔 ¿Cuál Elegir?</h2>
+            
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-top: 20px;">
+                <div style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 10px;">
+                    <h3>🏗️ Elige NATIVA si:</h3>
+                    <ul>
+                        <li>🎮 App de juegos</li>
+                        <li>📹 Edición de video</li>
+                        <li>🔒 Seguridad crítica</li>
+                        <li>💰 Tienes presupuesto</li>
+                        <li>⚡ Necesitas máximo rendimiento</li>
+                    </ul>
+                </div>
+                
+                <div style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 10px;">
+                    <h3>🌐 Elige WEB si:</h3>
+                    <ul>
+                        <li>💰 Presupuesto limitado</li>
+                        <li>🚀 Necesitas lanzar rápido</li>
+                        <li>📰 App de contenido/noticias</li>
+                        <li>🛒 E-commerce simple</li>
+                        <li>📊 Dashboard/reportes</li>
+                    </ul>
+                </div>
+                
+                <div style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 10px;">
+                    <h3>🔄 Elige HÍBRIDA si:</h3>
+                    <ul>
+                        <li>⚖️ Quieres balance</li>
+                        <li>📱 App empresarial</li>
+                        <li>🛒 E-commerce complejo</li>
+                        <li>📱 Social media</li>
+                        <li>🏦 Banca digital</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
