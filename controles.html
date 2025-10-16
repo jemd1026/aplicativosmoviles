@@ -1023,7 +1023,7 @@
         <div class="section">
           <div class="section-title">📝 1. CONTROLES DE TEXTO</div>
 
-          <div class="control-item">
+          <div class="control-item" id="text-textview">
             <div class="control-name">🔵 TextView</div>
             <div class="control-desc">Muestra texto en pantalla (NO editable). Similar a un &lt;p&gt; o &lt;span&gt; en HTML.</div>
             <div class="demo-area">
@@ -1032,7 +1032,7 @@
             <div class="code-example">&lt;TextView android:text="Hola Mundo" android:textSize="18sp"/&gt;</div>
           </div>
 
-          <div class="control-item">
+          <div class="control-item" id="text-plaintext">
             <div class="control-name">🟢 EditText (Plain Text)</div>
             <div class="control-desc">Caja de texto donde el usuario puede ESCRIBIR. Similar a &lt;input type="text"&gt;</div>
             <div class="demo-area">
@@ -1043,7 +1043,7 @@
             <div class="code-example">&lt;EditText android:hint="Escribe tu nombre" android:inputType="text"/&gt;</div>
           </div>
 
-          <div class="control-item">
+          <div class="control-item" id="text-password">
             <div class="control-name">🔐 Password</div>
             <div class="control-desc">Caja de texto que OCULTA lo que escribes (••••)</div>
             <div class="demo-area">
@@ -1053,37 +1053,7 @@
             <div class="code-example">&lt;EditText android:inputType="textPassword" android:hint="Contraseña"/&gt;</div>
           </div>
 
-          <div class="control-item">
-            <div class="control-name">🔢 Number</div>
-            <div class="control-desc">Solo permite escribir NÚMEROS</div>
-            <div class="demo-area">
-              <label class="demo-label">Tu edad:</label>
-              <input type="number" class="android-edittext" placeholder="Ej: 25" min="0" max="120" />
-            </div>
-            <div class="code-example">&lt;EditText android:inputType="number" android:hint="Tu edad"/&gt;</div>
-          </div>
-
-          <div class="control-item">
-            <div class="control-name">📧 E-mail</div>
-            <div class="control-desc">Facilita escribir correos electrónicos</div>
-            <div class="demo-area">
-              <label class="demo-label">Correo electrónico:</label>
-              <input type="email" class="android-edittext" placeholder="correo@ejemplo.com" />
-            </div>
-            <div class="code-example">&lt;EditText android:inputType="textEmailAddress" android:hint="correo@ejemplo.com"/&gt;</div>
-          </div>
-
-          <div class="control-item">
-            <div class="control-name">📱 Phone</div>
-            <div class="control-desc">Teclado optimizado para números telefónicos</div>
-            <div class="demo-area">
-              <label class="demo-label">Teléfono:</label>
-              <input type="tel" class="android-edittext" placeholder="999-999-999" />
-            </div>
-            <div class="code-example">&lt;EditText android:inputType="phone" android:hint="999-999-999"/&gt;</div>
-          </div>
-
-          <div class="control-item">
+          <div class="control-item" id="text-password-numeric">
             <div class="control-name">🔢 Password (Numeric)</div>
             <div class="control-desc">Contraseña que solo acepta NÚMEROS (para PIN)</div>
             <div class="demo-area">
@@ -1093,7 +1063,27 @@
             <div class="code-example">&lt;EditText android:inputType="numberPassword" android:hint="PIN de 4 dígitos"/&gt;</div>
           </div>
 
-          <div class="control-item">
+          <div class="control-item" id="text-email">
+            <div class="control-name">📧 E-mail</div>
+            <div class="control-desc">Facilita escribir correos electrónicos</div>
+            <div class="demo-area">
+              <label class="demo-label">Correo electrónico:</label>
+              <input type="email" class="android-edittext" placeholder="correo@ejemplo.com" />
+            </div>
+            <div class="code-example">&lt;EditText android:inputType="textEmailAddress" android:hint="correo@ejemplo.com"/&gt;</div>
+          </div>
+
+          <div class="control-item" id="text-phone">
+            <div class="control-name">📱 Phone</div>
+            <div class="control-desc">Teclado optimizado para números telefónicos</div>
+            <div class="demo-area">
+              <label class="demo-label">Teléfono:</label>
+              <input type="tel" class="android-edittext" placeholder="999-999-999" />
+            </div>
+            <div class="code-example">&lt;EditText android:inputType="phone" android:hint="999-999-999"/&gt;</div>
+          </div>
+
+          <div class="control-item" id="text-postal">
             <div class="control-name">🏠 Postal Address</div>
             <div class="control-desc">Optimizado para escribir direcciones postales</div>
             <div class="demo-area">
@@ -1143,8 +1133,8 @@
             <div class="code-example">&lt;EditText android:inputType="numberSigned" android:hint="Temperatura"/&gt;</div>
           </div>
 
-          <div class="control-item">
-            <div class="control-name">🔢 Number (Decimal)</div>
+          <div class="control-item" id="text-number-decimal">
+            <div class="control-name">➕➖ Number (Decimal)</div>
             <div class="control-desc">Números con DECIMALES</div>
             <div class="demo-area">
               <label class="demo-label">Precio ($):</label>
@@ -1153,7 +1143,7 @@
             <div class="code-example">&lt;EditText android:inputType="numberDecimal" android:hint="0.00"/&gt;</div>
           </div>
 
-          <div class="control-item">
+          <div class="control-item" id="text-autocomplete">
             <div class="control-name">🔍 AutoCompleteTextView</div>
             <div class="control-desc">Caja de texto con SUGERENCIAS mientras escribes</div>
             <div class="demo-area">
@@ -1176,8 +1166,8 @@
             </div>
           </div>
 
-          <div class="control-item">
-            <div class="control-name">🔍🔍 MultiAutoCompleteTextView</div>
+          <div class="control-item" id="text-multi-autocomplete">
+            <div class="control-name">🔍 MultiAutoCompleteTextView</div>
             <div class="control-desc">Autocompletar MÚLTIPLES valores separados por comas</div>
             <div class="demo-area">
               <label class="demo-label">Etiquetas (separa con comas):</label>
@@ -1187,8 +1177,8 @@
             <div class="code-example">&lt;MultiAutoCompleteTextView android:hint="Etiquetas"/&gt; // En Kotlin: multiAutoComplete.setTokenizer( MultiAutoCompleteTextView.CommaTokenizer() )</div>
           </div>
 
-          <div class="control-item">
-            <div class="control-name">✅ CheckedTextView</div>
+          <div class="control-item" id="text-checked">
+            <div class="control-name">☑️ CheckedTextView</div>
             <div class="control-desc">TextView con checkbox integrado</div>
             <div class="demo-area">
               <label class="demo-label">Selecciona opciones:</label>
@@ -1201,8 +1191,8 @@
             <div class="code-example">&lt;CheckedTextView android:text="Opción 1" android:checkMark="?android:attr/listChoiceIndicatorMultiple"/&gt;</div>
           </div>
 
-          <div class="control-item">
-            <div class="control-name">📋 TextInputLayout</div>
+          <div class="control-item" id="text-inputlayout">
+            <div class="control-name">🛡️ TextInputLayout</div>
             <div class="control-desc">Contenedor Material Design con etiqueta flotante y validación</div>
             <div class="demo-area">
               <div style="position: relative; margin-bottom: 20px;">
@@ -1312,23 +1302,21 @@
             <div class="demo-area">
               <label class="demo-label">Cambiar entre vistas animadas:</label>
               <div style="border: 2px solid #667eea; border-radius: 8px; overflow: hidden;">
-                <div id="viewSwitcherContainer" style="height: 200px; position: relative;">
-                  <div
-                    id="view1"
-                    style="position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; flex-direction: column; transition: all 0.3s;">
-                    <div style="font-size: 60px; margin-bottom: 10px;">☀️</div>
-                    <h2>Vista 1: Modo Día</h2>
-                  </div>
-                  <div
-                    id="view2"
-                    style="position: absolute; width: 100%; height: 100%; display: none; align-items: center; justify-content: center; background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); color: white; flex-direction: column; transition: all 0.3s;">
-                    <div style="font-size: 60px; margin-bottom: 10px;">🌙</div>
-                    <h2>Vista 2: Modo Noche</h2>
-                  </div>
+                <div
+                  id="view1"
+                  style="position: absolute; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; flex-direction: column; transition: all 0.3s;">
+                  <div style="font-size: 60px; margin-bottom: 10px;">☀️</div>
+                  <h2>Vista 1: Modo Día</h2>
                 </div>
-                <div style="padding: 15px; text-align: center; background: #f8f9fa;">
-                  <button class="android-button" onclick="switchView()">🔄 CAMBIAR VISTA</button>
+                <div
+                  id="view2"
+                  style="position: absolute; width: 100%; height: 100%; display: none; align-items: center; justify-content: center; background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); color: white; flex-direction: column; transition: all 0.3s;">
+                  <div style="font-size: 60px; margin-bottom: 10px;">🌙</div>
+                  <h2>Vista 2: Modo Noche</h2>
                 </div>
+              </div>
+              <div style="padding: 15px; text-align: center; background: #f8f9fa;">
+                <button class="android-button" onclick="switchView()">🔄 CAMBIAR VISTA</button>
               </div>
             </div>
             <div class="code-example">
@@ -1664,6 +1652,10 @@
             <div class="demo-area">
               <label class="demo-label">Selecciona una fecha:</label>
               <input type="date" class="android-edittext" id="calendarInput" onchange="mostrarFechaSeleccionada()" />
+              <div style="margin-top: 10px; display: flex; gap: 10px;">
+                <button class="android-button" onclick="cambiarFecha(-1)">◀ Día Anterior</button>
+                <button class="android-button" onclick="cambiarFecha(1)">Día Siguiente ▶</button>
+              </div>
               <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin-top: 10px;">
                 <div style="text-align: center; font-weight: bold; color: #667eea; margin-bottom: 10px;">Octubre 2025</div>
                 <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px; text-align: center;">
@@ -1815,17 +1807,17 @@
               <div style="display: flex; height: 100px; background: #f5f5f5; border-radius: 8px; padding: 20px; align-items: center; justify-content: space-around;">
                 <div style="flex: 1; text-align: center;">
                   <div style="font-size: 24px; font-weight: bold; color: #667eea;">123</div>
-                  <div>Posts</div>
+                  <div style="font-size: 12px; color: #666;">Posts</div>
                 </div>
                 <div style="width: 2px; height: 80%; background: linear-gradient(180deg, #667eea, #764ba2); border-radius: 2px;"></div>
                 <div style="flex: 1; text-align: center;">
                   <div style="font-size: 24px; font-weight: bold; color: #667eea;">456</div>
-                  <div>Seguidores</div>
+                  <div style="font-size: 12px; color: #666;">Seguidores</div>
                 </div>
                 <div style="width: 2px; height: 80%; background: linear-gradient(180deg, #667eea, #764ba2); border-radius: 2px;"></div>
                 <div style="flex: 1; text-align: center;">
                   <div style="font-size: 24px; font-weight: bold; color: #667eea;">789</div>
-                  <div>Siguiendo</div>
+                  <div style="font-size: 12px; color: #666;">Siguiendo</div>
                 </div>
               </div>
             </div>
@@ -2251,14 +2243,14 @@
                 <div style="position: absolute; right: 10px; top: 50%; transform: translateY(-50%); background: #f44336; color: white; padding: 10px 15px; border-radius: 5px;">NEXT ▶</div>
 
                 <!-- Center -->
-                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #FF9800; color: white; padding: 20px; border-radius: 8px; text-align: center;">
+                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #FF9800; color: white; padding: 15px 20px; border-radius: 5px; text-align: center;">
                   CONTENIDO<br />CENTRAL
                 </div>
 
                 <!-- Bottom Center -->
                 <div style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); background: #9C27B0; color: white; padding: 10px 30px; border-radius: 5px;">GUARDAR</div>
               </div>
-              <small style="color: #666; margin-top: 10px; display: block;">✅ Ventajas: Flexible, responsive, diseño visual fácil con Android Studio</small>
+              <small style="color: #FF9800; margin-top: 10px; display: block;">⚠️ LEGACY - Usa ConstraintLayout en proyectos nuevos</small>
             </div>
             <div class="code-example">
               &lt;androidx.constraintlayout.widget.ConstraintLayout android:layout_width="match_parent" android:layout_height="match_parent"&gt; &lt;TextView android:id="@+id/titulo"
@@ -2411,13 +2403,20 @@
             <div class="demo-area">
               <label class="demo-label">Posicionamiento relativo:</label>
               <div style="position: relative; height: 250px; background: #f8f9fa; border: 2px dashed #FF9800; border-radius: 8px; padding: 10px;">
-                <div style="position: absolute; top: 10px; right: 10px; background: #FF9800; color: white; padding: 8px 15px; border-radius: 5px;">alignParentTop<br />alignParentEnd</div>
+                <div style="position: absolute; top: 10px; right: 10px; background: #FF9800; color: white; padding: 8px 15px; border-radius: 5px; white-space: nowrap;">
+                  alignParentTop<br />alignParentEnd
+                </div>
 
-                <div style="position: absolute; bottom: 10px; left: 10px; background: #4CAF50; color: white; padding: 8px 15px; border-radius: 5px;">alignParentBottom<br />alignParentStart</div>
+                <div style="position: absolute; bottom: 10px; left: 10px; background: #4CAF50; color: white; padding: 8px 15px; border-radius: 5px; white-space: nowrap;">
+                  alignParentBottom<br />alignParentStart
+                </div>
 
                 <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #2196F3; color: white; padding: 15px 20px; border-radius: 5px; text-align: center;">
                   centerInParent
                 </div>
+
+                <!-- Bottom Center -->
+                <div style="position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); background: #9C27B0; color: white; padding: 10px 30px; border-radius: 5px;">GUARDAR</div>
               </div>
               <small style="color: #FF9800; margin-top: 10px; display: block;">⚠️ LEGACY - Usa ConstraintLayout en proyectos nuevos</small>
             </div>
@@ -2527,7 +2526,7 @@
             <div class="control-desc">Línea guía VERTICAL invisible para dividir la pantalla</div>
             <div class="demo-area">
               <label class="demo-label">Guideline al 50% (divide pantalla en 2):</label>
-              <div style="position: relative; height: 250px; background: #f8f9fa; border: 2px solid #667eea; border-radius: 8px;">
+              <div style="position: relative; height: 250px; background: #f8f9fa; border: 2px solid #667eea; border-radius: 8px; padding: 10px;">
                 <!-- Guideline vertical (50%) -->
                 <div style="position: absolute; left: 50%; top: 0; bottom: 0; width: 2px; background: #FF9800; border: 1px dashed #FF9800;">
                   <span style="position: absolute; left: 5px; top: 10px; background: #FF9800; color: white; padding: 2px 8px; border-radius: 3px; font-size: 12px; white-space: nowrap;"
@@ -2573,10 +2572,10 @@
               </div>
             </div>
             <div class="code-example">
-              &lt;androidx.constraintlayout.widget.Guideline android:id="@+id/guideline_vertical" android:layout_width="wrap_content" android:layout_height="wrap_content"
-              android:orientation="vertical" app:layout_constraintGuide_percent="0.5"/&gt; &lt;!-- Elemento a la izquierda --&gt; &lt;View app:layout_constraintStart_toStartOf="parent"
-              app:layout_constraintEnd_toStartOf="@id/guideline_vertical"/&gt; &lt;!-- Elemento a la derecha --&gt; &lt;View app:layout_constraintStart_toEndOf="@id/guideline_vertical"
-              app:layout_constraintEnd_toEndOf="parent"/&gt;
+              &lt;androidx.constraintlayout.widget.Guideline android:id="@+id/guideline_vertical" android:layout_width="wrap_content" android:layout_height="wrap_content" app:barrierDirection="end"
+              app:constraint_referenced_ids="labelNombre,labelEmail,labelTelefono"/&gt; &lt;!-- Los inputs se alinean después del label más ancho --&gt; &lt;EditText android:id="@+id/etNombre"
+              app:layout_constraintStart_toEndOf="@id/barrier_vertical" app:layout_constraintTop_toTopOf="@id/labelNombre"/&gt; &lt;!-- Perfecto para formularios con labels de diferente longitud
+              --&gt;
             </div>
           </div>
 
@@ -2597,7 +2596,9 @@
 
                 <!-- Línea del Barrier (se ajusta automáticamente) -->
                 <div id="barrierLine" style="position: absolute; left: 20px; right: 20px; height: 2px; background: #f44336; border: 1px dashed #f44336;">
-                  <span style="position: absolute; right: 0; top: -25px; background: #f44336; color: white; padding: 4px 10px; border-radius: 3px; font-size: 12px;">← Barrier</span>
+                  <span style="position: absolute; right: 0; top: -25px; background: #f44336; color: white; padding: 4px 10px; border-radius: 3px; font-size: 12px; white-space: nowrap;"
+                    >← Barrier</span
+                  >
                 </div>
 
                 <!-- Elemento debajo del barrier -->
@@ -2631,7 +2632,7 @@
 
                   <!-- Línea del Barrier vertical -->
                   <div style="width: 2px; background: #f44336; border: 1px dashed #f44336; position: relative;">
-                    <span style="position: absolute; left: 5px; top: -5px; background: #f44336; color: white; padding: 2px 8px; border-radius: 3px; font-size: 12px; white-space: nowrap;"
+                    <span style="position: absolute; left: 5px; top: 10px; background: #f44336; color: white; padding: 2px 8px; border-radius: 3px; font-size: 12px; white-space: nowrap;"
                       >Barrier</span
                     >
                   </div>
@@ -2831,7 +2832,7 @@
 
                 <div style="margin-top: 20px; padding: 15px; background: #fff8dc; border-left: 4px solid #FFD700; border-radius: 4px;">
                   <strong>💡 MockView es perfecto para:</strong>
-                  <ul style="margin: 10px 0 0 20px; padding: 0;">
+                  <ul style="margin: 10px 0; padding-left: 20px;">
                     <li>Prototipos rápidos sin contenido real</li>
                     <li>Mostrar estructura de la UI al equipo</li>
                     <li>Testing de layouts antes de tener assets</li>
@@ -2844,154 +2845,6 @@
               &lt;androidx.constraintlayout.utils.widget.MockView android:id="@+id/mockView" android:layout_width="200dp" android:layout_height="200dp" app:mock_label="Imagen"
               app:mock_showDiagonals="true" app:mock_showLabel="true"/&gt; &lt;!-- Durante desarrollo --&gt; &lt;MockView android:layout_width="match_parent"/&gt; &lt;!-- En producción, reemplazar
               con: --&gt; &lt;ImageView android:layout_width="match_parent"/&gt; // Útil para wireframing y prototipos
-            </div>
-          </div>
-        </div>
-        <div class="section" id="layouts">
-          <div class="section-title">📊 COMPARACIÓN: ¿Cuál Layout usar?</div>
-
-          <div class="control-item">
-            <div class="android-card" style="background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);">
-              <h3 style="color: #2E7D32; margin-bottom: 15px;">✅ LAYOUTS RECOMENDADOS (Modernos)</h3>
-
-              <table style="width: 100%; border-collapse: collapse;">
-                <thead>
-                  <tr style="background: #4CAF50; color: white;">
-                    <th style="padding: 12px; text-align: left;">Layout</th>
-                    <th style="padding: 12px; text-align: left;">Cuándo Usar</th>
-                    <th style="padding: 12px; text-align: center;">Dificultad</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr style="background: white;">
-                    <td style="padding: 10px; font-weight: bold; color: #4CAF50;">ConstraintLayout</td>
-                    <td style="padding: 10px;">Diseños complejos, pantallas completas, posicionamiento preciso</td>
-                    <td style="padding: 10px; text-align: center;">⭐⭐⭐</td>
-                  </tr>
-                  <tr style="background: #f1f8f4;">
-                    <td style="padding: 10px; font-weight: bold; color: #4CAF50;">LinearLayout</td>
-                    <td style="padding: 10px;">Listas simples verticales u horizontales</td>
-                    <td style="padding: 10px; text-align: center;">⭐</td>
-                  </tr>
-                  <tr style="background: white;">
-                    <td style="padding: 10px; font-weight: bold; color: #4CAF50;">FrameLayout</td>
-                    <td style="padding: 10px;">Superponer elementos (imagen + texto)</td>
-                    <td style="padding: 10px; text-align: center;">⭐</td>
-                  </tr>
-                  <tr style="background: #f1f8f4;">
-                    <td style="padding: 10px; font-weight: bold; color: #4CAF50;">TableLayout</td>
-                    <td style="padding: 10px;">Formularios organizados, datos tabulares estáticos</td>
-                    <td style="padding: 10px; text-align: center;">⭐⭐</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-
-            <div class="android-card" style="background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%); margin-top: 20px;">
-              <h3 style="color: #E65100; margin-bottom: 15px;">⚠️ LAYOUTS LEGACY (Evitar en proyectos nuevos)</h3>
-
-              <table style="width: 100%; border-collapse: collapse;">
-                <thead>
-                  <tr style="background: #FF9800; color: white;">
-                    <th style="padding: 12px; text-align: left;">Layout</th>
-                    <th style="padding: 12px; text-align: left;">Por qué evitarlo</th>
-                    <th style="padding: 12px; text-align: left;">Usar en su lugar</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr style="background: white;">
-                    <td style="padding: 10px; font-weight: bold; color: #FF9800;">RelativeLayout</td>
-                    <td style="padding: 10px;">Menos eficiente, más complejo</td>
-                    <td style="padding: 10px; color: #4CAF50; font-weight: bold;">ConstraintLayout</td>
-                  </tr>
-                  <tr style="background: #fff8f0;">
-                    <td style="padding: 10px; font-weight: bold; color: #FF9800;">GridLayout</td>
-                    <td style="padding: 10px;">No óptimo para listas dinámicas</td>
-                    <td style="padding: 10px; color: #4CAF50; font-weight: bold;">RecyclerView + GridLayoutManager</td>
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </div>
-
-        <!-- SECTION 7: EJEMPLO PRÁCTICO COMBINADO -->
-        <div class="section" id="profile">
-          <div class="section-title">🎯 EJEMPLO PRÁCTICO: Pantalla de Perfil</div>
-
-          <div class="control-item">
-            <div class="android-card" style="max-width: 400px; margin: 0 auto;">
-              <!-- Header con FrameLayout (imagen + badge) -->
-              <div style="position: relative; height: 150px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius: 10px 10px 0 0; margin: -20px -20px 20px -20px;">
-                <div
-                  style="position: absolute; bottom: -40px; left: 50%; transform: translateX(-50%); width: 80px; height: 80px; background: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 40px; box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
-                  👤
-                </div>
-                <div style="position: absolute; top: 10px; right: 10px; background: #4CAF50; color: white; padding: 5px 12px; border-radius: 15px; font-size: 12px; font-weight: bold;">
-                  ✓ VERIFICADO
-                </div>
-              </div>
-
-              <!-- Contenido con LinearLayout Vertical -->
-              <div style="text-align: center; margin-top: 50px;">
-                <h2 style="margin: 0; color: #333;">Juan Pérez</h2>
-                <p style="color: #666; margin: 5px 0;">Desarrollador Android</p>
-                <p style="color: #999; margin: 5px 0;">📍 Lima, Perú</p>
-              </div>
-
-              <!-- Estadísticas con TableLayout/Grid -->
-              <div style="display: flex; justify-content: space-around; margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 8px;">
-                <div style="text-align: center;">
-                  <div style="font-size: 24px; font-weight: bold; color: #667eea;">123</div>
-                  <div style="font-size: 12px; color: #666;">Posts</div>
-                </div>
-                <div style="width: 1px; background: #ddd;"></div>
-                <div style="text-align: center;">
-                  <div style="font-size: 24px; font-weight: bold; color: #667eea;">456</div>
-                  <div style="font-size: 12px; color: #666;">Seguidores</div>
-                </div>
-                <div style="width: 1px; background: #ddd;"></div>
-                <div style="text-align: center;">
-                  <div style="font-size: 24px; font-weight: bold; color: #667eea;">789</div>
-                  <div style="font-size: 12px; color: #666;">Siguiendo</div>
-                </div>
-              </div>
-
-              <!-- Botones con LinearLayout Horizontal -->
-              <div style="display: flex; gap: 10px;">
-                <button class="android-button" style="flex: 1;">➕ SEGUIR</button>
-                <button class="android-button" style="flex: 1; background: #9E9E9E;">💬 MENSAJE</button>
-              </div>
-
-              <!-- Información adicional con TableLayout -->
-              <div style="margin-top: 20px; background: #f8f9fa; padding: 15px; border-radius: 8px;">
-                <h4 style="margin: 0 0 10px 0; color: #667eea;">Información</h4>
-                <table style="width: 100%;">
-                  <tr>
-                    <td style="padding: 8px 0; color: #666; width: 100px;">📧 Email:</td>
-                    <td style="padding: 8px 0; font-weight: 500;">juan@ejemplo.com</td>
-                  </tr>
-                  <tr>
-                    <td style="padding: 8px 0; color: #666;">📱 Teléfono:</td>
-                    <td style="padding: 8px 0; font-weight: 500;">+51 999 888 777</td>
-                  </tr>
-                  <tr>
-                    <td style="padding: 8px 0; color: #666;">🌐 Web:</td>
-                    <td style="padding: 8px 0; font-weight: 500;">juanperez.dev</td>
-                  </tr>
-                </table>
-              </div>
-            </div>
-
-            <div style="margin-top: 20px; background: #e3f2fd; border-left: 4px solid #2196F3; padding: 15px; border-radius: 5px;">
-              <strong style="color: #1976D2;">💡 Esta pantalla combina:</strong>
-              <ul style="margin: 10px 0; padding-left: 20px;">
-                <li><strong>FrameLayout</strong> → Header con imagen + badge superpuesto</li>
-                <li><strong>LinearLayout Vertical</strong> → Contenido principal en columna</li>
-                <li><strong>LinearLayout Horizontal</strong> → Estadísticas y botones en fila</li>
-                <li><strong>TableLayout</strong> → Información organizada en tabla</li>
-                <li><strong>Space</strong> → Márgenes entre secciones</li>
-              </ul>
             </div>
           </div>
         </div>
