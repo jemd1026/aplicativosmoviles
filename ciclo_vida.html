@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ciclo de Vida de una Aplicación Android</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #3ddc84;
+            margin-bottom: 10px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 1.2em;
+        }
+
+        .intro {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-bottom: 40px;
+            font-size: 1.1em;
+            line-height: 1.6;
+        }
+
+        .lifecycle-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 40px 0;
+        }
+
+        .state-box {
+            width: 100%;
+            max-width: 600px;
+            padding: 25px;
+            margin: 15px 0;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .state-box:hover {
+            transform: translateY(-5px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .state-box h3 {
+            margin-bottom: 15px;
+            font-size: 1.8em;
+            display: flex;
+            align-items: center;
+        }
+
+        .state-box p {
+            line-height: 1.6;
+            font-size: 1.1em;
+        }
+
+        .icon {
+            font-size: 1.5em;
+            margin-right: 15px;
+        }
+
+        .arrow {
+            font-size: 3em;
+            color: #3ddc84;
+            text-align: center;
+            margin: 10px 0;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* Colores específicos para cada estado */
+        .create {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .start {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+            color: white;
+        }
+
+        .restart {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+        }
+
+        .resume {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            color: white;
+        }
+
+        .pause {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            color: white;
+        }
+
+        .stop {
+            background: linear-gradient(135deg, #ff9a56 0%, #ff6a88 100%);
+            color: white;
+        }
+
+        .destroy {
+            background: linear-gradient(135deg, #ff6b6b 0%, #c92a2a 100%);
+            color: white;
+        }
+
+        .code-example {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 0.95em;
+            line-height: 1.6;
+        }
+
+        .code-example .keyword {
+            color: #ff79c6;
+        }
+
+        .code-example .function {
+            color: #50fa7b;
+        }
+
+        .code-example .comment {
+            color: #6272a4;
+            font-style: italic;
+        }
+
+        .flow-diagram {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 40px 0;
+        }
+
+        .flow-diagram h2 {
+            color: #c92a2a;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .note {
+            background: #fff3bf;
+            border-left: 5px solid #ffd43b;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 5px;
+        }
+
+        .note strong {
+            color: #e67700;
+        }
+
+        .legend {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 30px 0;
+        }
+
+        .legend h3 {
+            color: #495057;
+            margin-bottom: 15px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin: 10px 0;
+            font-size: 1.05em;
+        }
+
+        .legend-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 5px;
+            margin-right: 15px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .state-box {
+                padding: 20px;
+            }
+
+            .state-box h3 {
+                font-size: 1.4em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🤖 Ciclo de Vida de una Aplicación Android</h1>
+        <p class="subtitle">Guía visual para principiantes</p>
+
+        <div class="intro">
+            <strong>¿Qué es el Ciclo de Vida?</strong><br>
+            El ciclo de vida de una actividad en Android es el conjunto de estados por los que pasa una aplicación desde que se crea hasta que se destruye. Cada estado tiene un método asociado que podemos programar para controlar el comportamiento de nuestra app.
+        </div>
+
+        <div class="legend">
+            <h3>📌 Leyenda de Estados</h3>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
+                <span><strong>Creación:</strong> La actividad nace</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);"></div>
+                <span><strong>Activa:</strong> El usuario puede interactuar</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);"></div>
+                <span><strong>Pausa:</strong> Parcialmente visible</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(135deg, #ff9a56 0%, #ff6a88 100%);"></div>
+                <span><strong>Detenida:</strong> No visible</span>
+            </div>
+            <div class="legend-item">
+                <div class="legend-color" style="background: linear-gradient(135deg, #ff6b6b 0%, #c92a2a 100%);"></div>
+                <span><strong>Destrucción:</strong> La actividad se elimina</span>
+            </div>
+        </div>
+
+        <div class="flow-diagram">
+            <h2>📊 Flujo del Ciclo de Vida</h2>
+            
+            <div class="lifecycle-container">
+                <!-- onCreate -->
+                <div class="state-box create">
+                    <h3><span class="icon">🎬</span>onCreate(Bundle)</h3>
+                    <p><strong>¿Cuándo ocurre?</strong> Cuando la actividad se crea por primera vez.</p>
+                    <p><strong>¿Qué hacer aquí?</strong> Inicializar variables, configurar la interfaz (setContentView), conectar bases de datos.</p>
+                    <p><strong>💡 Ejemplo:</strong> Es como encender tu teléfono por primera vez.</p>
+                </div>
+
+                <div class="arrow">⬇️</div>
+
+                <!-- onStart -->
+                <div class="state-box start">
+                    <h3><span class="icon">👁️</span>onStart()</h3>
+                    <p><strong>¿Cuándo ocurre?</strong> La actividad está a punto de ser visible en pantalla.</p>
+                    <p><strong>¿Qué hacer aquí?</strong> Preparar recursos que necesitan estar listos cuando el usuario vea la pantalla.</p>
+                    <p><strong>💡 Ejemplo:</strong> Es como abrir una cortina antes de que alguien entre a una habitación.</p>
+                </div>
+
+                <div class="arrow">⬇️</div>
+
+                <!-- onResume -->
+                <div class="state-box resume">
+                    <h3><span class="icon">▶️</span>onResume()</h3>
+                    <p><strong>¿Cuándo ocurre?</strong> La actividad está en primer plano y el usuario puede interactuar.</p>
+                    <p><strong>¿Qué hacer aquí?</strong> Iniciar animaciones, reproducir música, activar la cámara.</p>
+                    <p><strong>💡 Ejemplo:</strong> Es como cuando empiezas a usar tu app favorita.</p>
+                </div>
+
+                <div class="note">
+                    <strong>⚡ Estado Activo:</strong> Aquí es donde el usuario realmente usa tu aplicación. Todo debe funcionar perfectamente.
+                </div>
+
+                <div class="arrow">⬇️</div>
+
+                <!-- onPause -->
+                <div class="state-box pause">
+                    <h3><span class="icon">⏸️</span>onPause()</h3>
+                    <p><strong>¿Cuándo ocurre?</strong> Otra actividad va a tomar el control (como una llamada entrante).</p>
+                    <p><strong>¿Qué hacer aquí?</strong> Pausar animaciones, guardar datos importantes, liberar recursos pesados.</p>
+                    <p><strong>💡 Ejemplo:</strong> Es como cuando recibes una llamada mientras juegas.</p>
+                </div>
+
+                <div class="arrow">⬇️</div>
+
+                <!-- onStop -->
+                <div class="state-box stop">
+                    <h3><span class="icon">⏹️</span>onStop()</h3>
+                    <p><strong>¿Cuándo ocurre?</strong> La actividad ya no es visible para el usuario.</p>
+                    <p><strong>¿Qué hacer aquí?</strong> Liberar recursos que no se necesitan, cerrar conexiones.</p>
+                    <p><strong>💡 Ejemplo:</strong> Es como cuando presionas el botón HOME y tu app queda en segundo plano.</p>
+                </div>
+
+                <div class="arrow">⬇️</div>
+
+                <!-- onDestroy -->
+                <div class="state-box destroy">
+                    <h3><span class="icon">💥</span>onDestroy()</h3>
+                    <p><strong>¿Cuándo ocurre?</strong> La actividad va a ser completamente eliminada de la memoria.</p>
+                    <p><strong>¿Qué hacer aquí?</strong> Limpiar todos los recursos, cerrar conexiones finales.</p>
+                    <p><strong>💡 Ejemplo:</strong> Es como apagar tu teléfono completamente.</p>
+                </div>
+
+                <div class="note" style="background: #d3f9d8; border-left-color: #2b8a3e;">
+                    <strong>🔄 Ciclo Especial - onRestart():</strong> Se ejecuta cuando vuelves a una actividad que estaba detenida (después de onStop). Luego continúa con onStart().
+                </div>
+            </div>
+        </div>
+
+        <h2 style="color: #495057; margin: 40px 0 20px 0; text-align: center;">💻 Ejemplo de Código</h2>
+
+        <div class="code-example">
+<span class="keyword">public class</span> <span class="function">MainActivity</span> <span class="keyword">extends</span> AppCompatActivity {
+
+    <span class="comment">// Se ejecuta cuando la actividad se crea por primera vez</span>
+    <span class="keyword">@Override</span>
+    <span class="keyword">protected void</span> <span class="function">onCreate</span>(Bundle savedInstanceState) {
+        <span class="keyword">super</span>.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+        <span class="comment">// Inicializar componentes de la interfaz</span>
+        Log.d(<span class="function">"Ciclo"</span>, <span class="function">"🎬 onCreate - Actividad creada"</span>);
+    }
+
+    <span class="comment">// La actividad va a ser visible</span>
+    <span class="keyword">@Override</span>
+    <span class="keyword">protected void</span> <span class="function">onStart</span>() {
+        <span class="keyword">super</span>.onStart();
+        <span class="comment">// Preparar recursos visuales</span>
+        Log.d(<span class="function">"Ciclo"</span>, <span class="function">"👁️ onStart - Actividad visible"</span>);
+    }
+
+    <span class="comment">// El usuario puede interactuar</span>
+    <span class="keyword">@Override</span>
+    <span class="keyword">protected void</span> <span class="function">onResume</span>() {
+        <span class="keyword">super</span>.onResume();
+        <span class="comment">// Iniciar animaciones, reproducir música</span>
+        Log.d(<span class="function">"Ciclo"</span>, <span class="function">"▶️ onResume - Usuario puede interactuar"</span>);
+    }
+
+    <span class="comment">// La actividad pierde el foco</span>
+    <span class="keyword">@Override</span>
+    <span class="keyword">protected void</span> <span class="function">onPause</span>() {
+        <span class="keyword">super</span>.onPause();
+        <span class="comment">// Pausar operaciones, guardar datos</span>
+        Log.d(<span class="function">"Ciclo"</span>, <span class="function">"⏸️ onPause - Actividad pausada"</span>);
+    }
+
+    <span class="comment">// La actividad ya no es visible</span>
+    <span class="keyword">@Override</span>
+    <span class="keyword">protected void</span> <span class="function">onStop</span>() {
+        <span class="keyword">super</span>.onStop();
+        <span class="comment">// Liberar recursos pesados</span>
+        Log.d(<span class="function">"Ciclo"</span>, <span class="function">"⏹️ onStop - Actividad detenida"</span>);
+    }
+
+    <span class="comment">// Volver de onStop a onStart</span>
+    <span class="keyword">@Override</span>
+    <span class="keyword">protected void</span> <span class="function">onRestart</span>() {
+        <span class="keyword">super</span>.onRestart();
+        <span class="comment">// Restaurar estado antes de onStart</span>
+        Log.d(<span class="function">"Ciclo"</span>, <span class="function">"🔄 onRestart - Reiniciando actividad"</span>);
+    }
+
+    <span class="comment">// La actividad será destruida</span>
+    <span class="keyword">@Override</span>
+    <span class="keyword">protected void</span> <span class="function">onDestroy</span>() {
+        <span class="keyword">super</span>.onDestroy();
+        <span class="comment">// Limpiar todo</span>
+        Log.d(<span class="function">"Ciclo"</span>, <span class="function">"💥 onDestroy - Actividad destruida"</span>);
+    }
+}
+        </div>
+
+        <div class="note">
+            <strong>📚 Consejo para Principiantes:</strong> No necesitas implementar todos estos métodos en tu app. Solo usa los que realmente necesites. Lo más común es trabajar con onCreate(), onResume(), onPause() y onDestroy().
+        </div>
+
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 15px; margin-top: 40px; text-align: center;">
+            <h2 style="margin-bottom: 15px;">🎯 Resumen Rápido</h2>
+            <p style="font-size: 1.1em; line-height: 1.8;">
+                <strong>onCreate</strong> → Crear 🎬<br>
+                <strong>onStart</strong> → Preparar 👁️<br>
+                <strong>onResume</strong> → Usar ▶️<br>
+                <strong>onPause</strong> → Pausar ⏸️<br>
+                <strong>onStop</strong> → Ocultar ⏹️<br>
+                <strong>onDestroy</strong> → Eliminar 💥
+            </p>
+        </div>
+    </div>
+</body>
+</html>
