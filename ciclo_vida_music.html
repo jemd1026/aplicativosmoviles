@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ejemplo Práctico - Ciclo de Vida Android</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 15px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 1.3em;
+        }
+
+        .intro-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 40px;
+            text-align: center;
+            font-size: 1.2em;
+            line-height: 1.8;
+        }
+
+        .scenario {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+            border-left: 5px solid #667eea;
+        }
+
+        .scenario h2 {
+            color: #667eea;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .scenario-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+
+        .step-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            border: 3px solid transparent;
+        }
+
+        .step-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+        }
+
+        .step-card.create {
+            border-color: #667eea;
+        }
+
+        .step-card.start {
+            border-color: #f093fb;
+        }
+
+        .step-card.resume {
+            border-color: #43e97b;
+        }
+
+        .step-card.pause {
+            border-color: #fa709a;
+        }
+
+        .step-card.stop {
+            border-color: #ff9a56;
+        }
+
+        .step-card.destroy {
+            border-color: #ff6b6b;
+        }
+
+        .step-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .step-icon {
+            font-size: 3em;
+        }
+
+        .step-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .step-method {
+            background: #2d2d2d;
+            color: #50fa7b;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+
+        .step-description {
+            color: #666;
+            line-height: 1.6;
+            margin: 10px 0;
+        }
+
+        .step-action {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 15px;
+            font-weight: bold;
+            color: #c92a2a;
+        }
+
+        .code-section {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 30px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            line-height: 1.8;
+        }
+
+        .code-section .comment {
+            color: #6a9955;
+        }
+
+        .code-section .keyword {
+            color: #569cd6;
+        }
+
+        .code-section .function {
+            color: #dcdcaa;
+        }
+
+        .code-section .string {
+            color: #ce9178;
+        }
+
+        .code-section .annotation {
+            color: #9cdcfe;
+        }
+
+        .timeline {
+            position: relative;
+            padding: 30px 0;
+            margin: 40px 0;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(to bottom, #667eea, #764ba2);
+        }
+
+        .timeline-item {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 30px 0;
+            position: relative;
+        }
+
+        .timeline-content {
+            width: 45%;
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .timeline-item:nth-child(odd) .timeline-content {
+            margin-right: auto;
+            margin-left: 0;
+        }
+
+        .timeline-item:nth-child(even) .timeline-content {
+            margin-left: auto;
+            margin-right: 0;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 20px;
+            background: #667eea;
+            border-radius: 50%;
+            border: 4px solid white;
+            box-shadow: 0 0 0 4px #667eea;
+            z-index: 10;
+        }
+
+        .visual-flow {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            margin: 40px 0;
+            padding: 30px;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+        }
+
+        .flow-box {
+            background: white;
+            padding: 20px 40px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 1.1em;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            text-align: center;
+            min-width: 200px;
+        }
+
+        .flow-arrow {
+            font-size: 2.5em;
+            color: #667eea;
+        }
+
+        .tip-box {
+            background: linear-gradient(135deg, #fff3cd 0%, #ffe69c 100%);
+            border-left: 5px solid #ffc107;
+            padding: 20px;
+            border-radius: 10px;
+            margin: 20px 0;
+        }
+
+        .tip-box strong {
+            color: #856404;
+            font-size: 1.1em;
+        }
+
+        .example-app {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+        }
+
+        .example-app h3 {
+            color: #0d47a1;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .phone-mockup {
+            max-width: 300px;
+            margin: 20px auto;
+            background: #1e1e1e;
+            border-radius: 30px;
+            padding: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        .phone-screen {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .music-icon {
+            font-size: 4em;
+            margin: 20px 0;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .scenario-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .timeline::before {
+                left: 20px;
+            }
+
+            .timeline-content {
+                width: calc(100% - 60px);
+                margin-left: 40px !important;
+            }
+
+            .timeline-dot {
+                left: 20px;
+            }
+
+            .timeline-item:nth-child(odd) .timeline-content,
+            .timeline-item:nth-child(even) .timeline-content {
+                margin-left: 40px;
+                margin-right: 0;
+            }
+        }
+
+        .comparison-table {
+            width: 100%;
+            margin: 30px 0;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .comparison-table th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-size: 1.1em;
+        }
+
+        .comparison-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .comparison-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .comparison-table tr:hover {
+            background: #f5f5f5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎵 Ejemplo Práctico del Ciclo de Vida</h1>
+        <p class="subtitle">Aplicación de Reproductor de Música</p>
+
+        <div class="intro-box">
+            <strong>🎯 Aprende con un Ejemplo Real</strong><br>
+            Vamos a entender el ciclo de vida de Android usando una app de música.<br>
+            Verás cómo cada método del ciclo de vida tiene un propósito práctico.
+        </div>
+
+        <!-- Escenario Principal -->
+        <div class="scenario">
+            <h2>📱 Escenario: App de Reproductor de Música</h2>
+            <p style="font-size: 1.1em; line-height: 1.8; margin-top: 15px;">
+                Imagina que estás desarrollando <strong>MusicApp</strong>, un reproductor de música simple. 
+                El usuario puede reproducir canciones, pausarlas, y la música debe seguir sonando incluso 
+                cuando el usuario sale de la app para responder un mensaje de WhatsApp.
+            </p>
+        </div>
+
+        <!-- Mockup del teléfono -->
+        <div class="phone-mockup">
+            <div class="phone-screen">
+                <div class="music-icon">🎵</div>
+                <h3 style="color: #667eea; margin: 10px 0;">MusicApp</h3>
+                <p style="color: #666;">Reproduciendo: "Canción Favorita"</p>
+                <div style="margin-top: 20px;">
+                    <span style="font-size: 2em;">⏯️ ⏭️ ⏮️</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- Flujo Visual -->
+        <div class="visual-flow">
+            <h2 style="color: #495057; margin-bottom: 20px;">📊 Flujo de Interacción del Usuario</h2>
+            
+            <div class="flow-box" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                👤 Usuario abre MusicApp
+            </div>
+            <div class="flow-arrow">⬇️</div>
+            
+            <div class="flow-box" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%); color: white;">
+                🎵 Selecciona una canción
+            </div>
+            <div class="flow-arrow">⬇️</div>
+            
+            <div class="flow-box" style="background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%); color: white;">
+                ▶️ Música comienza a reproducirse
+            </div>
+            <div class="flow-arrow">⬇️</div>
+            
+            <div class="flow-box" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%); color: white;">
+                📱 Llega un mensaje de WhatsApp
+            </div>
+            <div class="flow-arrow">⬇️</div>
+            
+            <div class="flow-box" style="background: linear-gradient(135deg, #ff9a56 0%, #ff6a88 100%); color: white;">
+                💬 Usuario abre WhatsApp
+            </div>
+            <div class="flow-arrow">⬇️</div>
+            
+            <div class="flow-box" style="background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); color: white;">
+                🔙 Usuario regresa a MusicApp
+            </div>
+        </div>
+
+        <!-- Pasos del Ciclo de Vida -->
+        <h2 style="text-align: center; color: #667eea; margin: 40px 0 30px 0; font-size: 2em;">
+            🔄 ¿Qué Hace Cada Método del Ciclo de Vida?
+        </h2>
+
+        <div class="scenario-grid">
+            <!-- onCreate -->
+            <div class="step-card create">
+                <div class="step-header">
+                    <div class="step-icon">🎬</div>
+                    <div>
+                        <div class="step-title">Paso 1: Crear</div>
+                        <div class="step-method">onCreate()</div>
+                    </div>
+                </div>
+                <div class="step-description">
+                    <strong>¿Cuándo?</strong> Usuario abre la app por primera vez.
+                </div>
+                <div class="step-action">
+                    ✅ Cargar la lista de canciones<br>
+                    ✅ Inicializar el reproductor de música<br>
+                    ✅ Configurar los botones (Play, Pause, Next)
+                </div>
+            </div>
+
+            <!-- onStart -->
+            <div class="step-card start">
+                <div class="step-header">
+                    <div class="step-icon">👁️</div>
+                    <div>
+                        <div class="step-title">Paso 2: Mostrar</div>
+                        <div class="step-method">onStart()</div>
+                    </div>
+                </div>
+                <div class="step-description">
+                    <strong>¿Cuándo?</strong> La app va a ser visible en pantalla.
+                </div>
+                <div class="step-action">
+                    ✅ Actualizar la interfaz<br>
+                    ✅ Mostrar la canción actual<br>
+                    ✅ Preparar los controles
+                </div>
+            </div>
+
+            <!-- onResume -->
+            <div class="step-card resume">
+                <div class="step-header">
+                    <div class="step-icon">▶️</div>
+                    <div>
+                        <div class="step-title">Paso 3: Activar</div>
+                        <div class="step-method">onResume()</div>
+                    </div>
+                </div>
+                <div class="step-description">
+                    <strong>¿Cuándo?</strong> El usuario puede interactuar con la app.
+                </div>
+                <div class="step-action">
+                    ✅ Reproducir la música<br>
+                    ✅ Activar botones de control<br>
+                    ✅ Animar la visualización de audio
+                </div>
+            </div>
+
+            <!-- onPause -->
+            <div class="step-card pause">
+                <div class="step-header">
+                    <div class="step-icon">⏸️</div>
+                    <div>
+                        <div class="step-title">Paso 4: Pausar</div>
+                        <div class="step-method">onPause()</div>
+                    </div>
+                </div>
+                <div class="step-description">
+                    <strong>¿Cuándo?</strong> Usuario abre otra app (WhatsApp).
+                </div>
+                <div class="step-action">
+                    ⚠️ NO pausar la música aquí<br>
+                    ✅ Detener animaciones visuales<br>
+                    ✅ Guardar el tiempo de reproducción
+                </div>
+            </div>
+
+            <!-- onStop -->
+            <div class="step-card stop">
+                <div class="step-header">
+                    <div class="step-icon">⏹️</div>
+                    <div>
+                        <div class="step-title">Paso 5: Detener</div>
+                        <div class="step-method">onStop()</div>
+                    </div>
+                </div>
+                <div class="step-description">
+                    <strong>¿Cuándo?</strong> La app ya no es visible.
+                </div>
+                <div class="step-action">
+                    ✅ Continuar música en segundo plano<br>
+                    ✅ Liberar recursos visuales<br>
+                    ✅ Guardar el estado de reproducción
+                </div>
+            </div>
+
+            <!-- onDestroy -->
+            <div class="step-card destroy">
+                <div class="step-header">
+                    <div class="step-icon">💥</div>
+                    <div>
+                        <div class="step-title">Paso 6: Destruir</div>
+                        <div class="step-method">onDestroy()</div>
+                    </div>
+                </div>
+                <div class="step-description">
+                    <strong>¿Cuándo?</strong> Usuario cierra la app completamente.
+                </div>
+                <div class="step-action">
+                    ✅ Detener la música<br>
+                    ✅ Liberar el reproductor<br>
+                    ✅ Cerrar conexiones de audio
+                </div>
+            </div>
+        </div>
+
+        <!-- Código de Ejemplo -->
+        <h2 style="text-align: center; color: #667eea; margin: 50px 0 30px 0; font-size: 2em;">
+            💻 Código Completo del Ejemplo
+        </h2>
+
+        <div class="code-section">
+<span class="keyword">public class</span> <span class="function">MusicPlayerActivity</span> <span class="keyword">extends</span> AppCompatActivity {
+
+    <span class="keyword">private</span> MediaPlayer mediaPlayer;
+    <span class="keyword">private</span> Button btnPlay, btnPause;
+    <span class="keyword">private</span> TextView tvSongName;
+
+    <span class="comment">// 🎬 PASO 1: La app se crea por primera vez</span>
+    <span class="annotation">@Override</span>
+    <span class="keyword">protected void</span> <span class="function">onCreate</span>(Bundle savedInstanceState) {
+        <span class="keyword">super</span>.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_music_player);
+
+        <span class="comment">// Inicializar componentes de la interfaz</span>
+        btnPlay = findViewById(R.id.btnPlay);
+        btnPause = findViewById(R.id.btnPause);
+        tvSongName = findViewById(R.id.tvSongName);
+
+        <span class="comment">// Crear el reproductor de música</span>
+        mediaPlayer = MediaPlayer.create(<span class="keyword">this</span>, R.raw.cancion_favorita);
+
+        <span class="comment">// Configurar botones</span>
+        btnPlay.setOnClickListener(v -> mediaPlayer.start());
+        btnPause.setOnClickListener(v -> mediaPlayer.pause());
+
+        Log.d(<span class="string">"MusicApp"</span>, <span class="string">"🎬 onCreate: App creada e inicializada"</span>);
+    }
+
+    <span class="comment">// 👁️ PASO 2: La app va a ser visible</span>
+    <span class="annotation">@Override</span>
+    <span class="keyword">protected void</span> <span class="function">onStart</span>() {
+        <span class="keyword">super</span>.onStart();
+
+        <span class="comment">// Actualizar la interfaz con datos actuales</span>
+        tvSongName.setText(<span class="string">"🎵 Reproduciendo: Canción Favorita"</span>);
+
+        Log.d(<span class="string">"MusicApp"</span>, <span class="string">"👁️ onStart: App visible en pantalla"</span>);
+    }
+
+    <span class="comment">// ▶️ PASO 3: El usuario puede interactuar</span>
+    <span class="annotation">@Override</span>
+    <span class="keyword">protected void</span> <span class="function">onResume</span>() {
+        <span class="keyword">super</span>.onResume();
+
+        <span class="comment">// Si la música estaba pausada, reanudarla</span>
+        <span class="keyword">if</span> (mediaPlayer != <span class="keyword">null</span> && !mediaPlayer.isPlaying()) {
+            <span class="comment">// Opcional: reanudar automáticamente</span>
+            <span class="comment">// mediaPlayer.start();</span>
+        }
+
+        <span class="comment">// Activar animaciones de la interfaz</span>
+        <span class="comment">// startAudioVisualizer();</span>
+
+        Log.d(<span class="string">"MusicApp"</span>, <span class="string">"▶️ onResume: Usuario puede usar la app"</span>);
+    }
+
+    <span class="comment">// ⏸️ PASO 4: Otra app toma el control (WhatsApp)</span>
+    <span class="annotation">@Override</span>
+    <span class="keyword">protected void</span> <span class="function">onPause</span>() {
+        <span class="keyword">super</span>.onPause();
+
+        <span class="comment">// ⚠️ IMPORTANTE: NO pausar la música aquí</span>
+        <span class="comment">// Queremos que siga sonando en segundo plano</span>
+
+        <span class="comment">// Detener animaciones visuales para ahorrar batería</span>
+        <span class="comment">// stopAudioVisualizer();</span>
+
+        <span class="comment">// Guardar el progreso actual</span>
+        <span class="keyword">int</span> currentPosition = mediaPlayer.getCurrentPosition();
+        <span class="comment">// Guardar en SharedPreferences</span>
+
+        Log.d(<span class="string">"MusicApp"</span>, <span class="string">"⏸️ onPause: App en segundo plano, música continúa"</span>);
+    }
+
+    <span class="comment">// ⏹️ PASO 5: La app ya no es visible</span>
+    <span class="annotation">@Override</span>
+    <span class="keyword">protected void</span> <span class="function">onStop</span>() {
+        <span class="keyword">super</span>.onStop();
+
+        <span class="comment">// La música continúa reproduciéndose en segundo plano</span>
+        <span class="comment">// Liberar recursos pesados que no se necesitan</span>
+
+        Log.d(<span class="string">"MusicApp"</span>, <span class="string">"⏹️ onStop: App completamente oculta"</span>);
+    }
+
+    <span class="comment">// 🔄 PASO ESPECIAL: Volver a la app</span>
+    <span class="annotation">@Override</span>
+    <span class="keyword">protected void</span> <span class="function">onRestart</span>() {
+        <span class="keyword">super</span>.onRestart();
+
+        Log.d(<span class="string">"MusicApp"</span>, <span class="string">"🔄 onRestart: Usuario regresó a la app"</span>);
+    }
+
+    <span class="comment">// 💥 PASO 6: Cerrar completamente la app</span>
+    <span class="annotation">@Override</span>
+    <span class="keyword">protected void</span> <span class="function">onDestroy</span>() {
+        <span class="keyword">super</span>.onDestroy();
+
+        <span class="comment">// Liberar el reproductor de música</span>
+        <span class="keyword">if</span> (mediaPlayer != <span class="keyword">null</span>) {
+            <span class="keyword">if</span> (mediaPlayer.isPlaying()) {
+                mediaPlayer.stop();
+            }
+            mediaPlayer.release();
+            mediaPlayer = <span class="keyword">null</span>;
+        }
+
+        Log.d(<span class="string">"MusicApp"</span>, <span class="string">"💥 onDestroy: App destruida completamente"</span>);
+    }
+}
+        </div>
+
+        <!-- Tabla Comparativa -->
+        <h2 style="text-align: center; color: #667eea; margin: 50px 0 30px 0; font-size: 2em;">
+            📊 Tabla Comparativa de Acciones
+        </h2>
+
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th>Método</th>
+                    <th>¿Qué hace el usuario?</th>
+                    <th>¿Qué hace la app?</th>
+                    <th>¿La música suena?</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>onCreate()</strong></td>
+                    <td>Abre la app</td>
+                    <td>Carga la canción y prepara botones</td>
+                    <td>❌ No</td>
+                </tr>
+                <tr>
+                    <td><strong>onStart()</strong></td>
+                    <td>Ve la pantalla</td>
+                    <td>Muestra la interfaz</td>
+                    <td>❌ No</td>
+                </tr>
+                <tr>
+                    <td><strong>onResume()</strong></td>
+                    <td>Presiona Play</td>
+                    <td>Reproduce la música</td>
+                    <td>✅ Sí</td>
+                </tr>
+                <tr>
+                    <td><strong>onPause()</strong></td>
+                    <td>Abre WhatsApp</td>
+                    <td>Detiene animaciones</td>
+                    <td>✅ Sí (continúa)</td>
+                </tr>
+                <tr>
+                    <td><strong>onStop()</strong></td>
+                    <td>Usa WhatsApp</td>
+                    <td>Libera recursos visuales</td>
+                    <td>✅ Sí (en segundo plano)</td>
+                </tr>
+                <tr>
+                    <td><strong>onRestart()</strong></td>
+                    <td>Vuelve a la app</td>
+                    <td>Restaura la interfaz</td>
+                    <td>✅ Sí</td>
+                </tr>
+                <tr>
+                    <td><strong>onDestroy()</strong></td>
+                    <td>Cierra la app</td>
+                    <td>Detiene y libera todo</td>
+                    <td>❌ No</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <!-- Tips Importantes -->
+        <div class="tip-box">
+            <strong>💡 Tip #1:</strong> En <code>onPause()</code> NO detengas la música si quieres que siga sonando cuando el usuario cambie de app.
+        </div>
+
+        <div class="tip-box">
+            <strong>💡 Tip #2:</strong> Siempre libera recursos pesados (como MediaPlayer) en <code>onDestroy()</code> para evitar fugas de memoria.
+        </div>
+
+        <div class="tip-box">
+            <strong>💡 Tip #3:</strong> Usa <code>Log.d()</code> para ver en LogCat cuándo se ejecuta cada método mientras pruebas tu app.
+        </div>
+
+        <!-- Ejercicio Práctico -->
+        <div class="example-app">
+            <h3>🎯 Ejercicio Práctico para Ti</h3>
+            <p style="color: #0d47a1; line-height: 1.8; font-size: 1.05em;">
+                <strong>Reto:</strong> Modifica el código para que la música se pause automáticamente cuando el usuario reciba una llamada telefónica (en <code>onPause()</code>) pero continúe sonando cuando solo cambie de app.<br><br>
+                
+                <strong>Pista:</strong> Puedes usar un Service para reproducir música en segundo plano, o verificar el tipo de interrupción con AudioManager.
+            </p>
+        </div>
+
+        <!-- Resumen Final -->
+        <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 15px; margin-top: 40px; text-align: center;">
+            <h2 style="margin-bottom: 20px;">🎓 Resumen del Ejemplo</h2>
+            <p style="font-size: 1.2em; line-height: 2;">
+                <strong>onCreate:</strong> Preparar todo 🎬<br>
+                <strong>onStart:</strong> Mostrar interfaz 👁️<br>
+                <strong>onResume:</strong> Activar interacción ▶️<br>
+                <strong>onPause:</strong> Usuario cambia de app ⏸️<br>
+                <strong>onStop:</strong> App oculta ⏹️<br>
+                <strong>onRestart:</strong> Usuario regresa 🔄<br>
+                <strong>onDestroy:</strong> Limpiar todo 💥
+            </p>
+        </div>
+    </div>
+</body>
+</html>
