@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ejemplo Práctico - App de Chat</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            padding: 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+
+        h1 {
+            text-align: center;
+            color: #11998e;
+            margin-bottom: 15px;
+            font-size: 2.5em;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 40px;
+            font-size: 1.3em;
+        }
+
+        .intro-box {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 40px;
+            text-align: center;
+            font-size: 1.2em;
+            line-height: 1.8;
+        }
+
+        .scenario-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+            border-left: 5px solid #11998e;
+        }
+
+        .scenario-section h2 {
+            color: #11998e;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .chat-mockup {
+            max-width: 350px;
+            margin: 30px auto;
+            background: #1e1e1e;
+            border-radius: 30px;
+            padding: 15px;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.4);
+        }
+
+        .chat-screen {
+            background: #e5ddd5;
+            border-radius: 15px;
+            padding: 20px;
+            min-height: 400px;
+            position: relative;
+        }
+
+        .chat-header {
+            background: #075e54;
+            color: white;
+            padding: 15px;
+            border-radius: 10px 10px 0 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: -20px -20px 20px -20px;
+        }
+
+        .chat-avatar {
+            width: 40px;
+            height: 40px;
+            background: #25d366;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+        }
+
+        .message {
+            background: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            margin: 10px 0;
+            max-width: 80%;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            animation: slideIn 0.3s ease;
+        }
+
+        .message.sent {
+            background: #dcf8c6;
+            margin-left: auto;
+        }
+
+        .message.received {
+            background: white;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .typing-indicator {
+            display: flex;
+            gap: 5px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            width: fit-content;
+            margin-top: 10px;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background: #90949c;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% {
+                transform: translateY(0);
+            }
+            30% {
+                transform: translateY(-10px);
+            }
+        }
+
+        .lifecycle-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+        }
+
+        .lifecycle-card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            border: 3px solid transparent;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .lifecycle-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: linear-gradient(90deg, #11998e, #38ef7d);
+        }
+
+        .lifecycle-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .lifecycle-card.create::before {
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        .lifecycle-card.start::before {
+            background: linear-gradient(90deg, #f093fb, #f5576c);
+        }
+
+        .lifecycle-card.resume::before {
+            background: linear-gradient(90deg, #43e97b, #38f9d7);
+        }
+
+        .lifecycle-card.pause::before {
+            background: linear-gradient(90deg, #fa709a, #fee140);
+        }
+
+        .lifecycle-card.stop::before {
+            background: linear-gradient(90deg, #ff9a56, #ff6a88);
+        }
+
+        .lifecycle-card.destroy::before {
+            background: linear-gradient(90deg, #ff6b6b, #c92a2a);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .card-icon {
+            font-size: 3em;
+        }
+
+        .card-title {
+            flex: 1;
+        }
+
+        .card-title h3 {
+            font-size: 1.5em;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .card-method {
+            background: #2d2d2d;
+            color: #50fa7b;
+            padding: 5px 12px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            display: inline-block;
+        }
+
+        .card-scenario {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid #2196f3;
+        }
+
+        .card-scenario strong {
+            color: #1565c0;
+        }
+
+        .card-actions {
+            margin-top: 15px;
+        }
+
+        .action-item {
+            padding: 10px 0;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .action-item:last-child {
+            border-bottom: none;
+        }
+
+        .action-icon {
+            font-size: 1.2em;
+        }
+
+        .code-block {
+            background: #1e1e1e;
+            color: #d4d4d4;
+            padding: 25px;
+            border-radius: 15px;
+            margin: 30px 0;
+            overflow-x: auto;
+            font-family: 'Courier New', monospace;
+            line-height: 1.8;
+            font-size: 0.95em;
+        }
+
+        .code-block .keyword {
+            color: #569cd6;
+        }
+
+        .code-block .function {
+            color: #dcdcaa;
+        }
+
+        .code-block .string {
+            color: #ce9178;
+        }
+
+        .code-block .comment {
+            color: #6a9955;
+        }
+
+        .code-block .annotation {
+            color: #9cdcfe;
+        }
+
+        .code-block .number {
+            color: #b5cea8;
+        }
+
+        .comparison-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .comparison-card {
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .comparison-card h4 {
+            color: #11998e;
+            margin-bottom: 15px;
+            font-size: 1.2em;
+        }
+
+        .status-badge {
+            display: inline-block;
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+
+        .status-active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-inactive {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-background {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .timeline-flow {
+            position: relative;
+            padding: 40px 20px;
+            margin: 40px 0;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 15px;
+        }
+
+        .timeline-step {
+            display: flex;
+            align-items: center;
+            margin: 30px 0;
+            gap: 20px;
+        }
+
+        .timeline-number {
+            min-width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #11998e, #38ef7d);
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5em;
+            font-weight: bold;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .timeline-content {
+            flex: 1;
+            background: white;
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .timeline-content h4 {
+            color: #11998e;
+            margin-bottom: 10px;
+        }
+
+        .best-practices {
+            background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+            padding: 30px;
+            border-radius: 15px;
+            margin: 30px 0;
+        }
+
+        .best-practices h3 {
+            color: #c92a2a;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+        }
+
+        .practice-item {
+            background: white;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .practice-item strong {
+            color: #d9480f;
+        }
+
+        .alert-box {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+            display: flex;
+            align-items: start;
+            gap: 15px;
+        }
+
+        .alert-icon {
+            font-size: 2em;
+        }
+
+        .alert-content {
+            flex: 1;
+        }
+
+        .alert-content strong {
+            color: #856404;
+            font-size: 1.1em;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 20px;
+            }
+
+            h1 {
+                font-size: 1.8em;
+            }
+
+            .lifecycle-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>💬 Ejemplo Práctico - Ciclo de Vida</h1>
+        <p class="subtitle">Aplicación de Chat/Mensajería</p>
+
+        <div class="intro-box">
+            <strong>🎯 Segundo Ejemplo Práctico</strong><br>
+            Ahora aprenderás el ciclo de vida con una <strong>App de Chat</strong> similar a WhatsApp.<br>
+            Verás cómo gestionar conexiones, notificaciones y actualizaciones en tiempo real.
+        </div>
+
+        <!-- Escenario -->
+        <div class="scenario-section">
+            <h2>📱 Escenario: ChatApp - Tu Mensajero Personal</h2>
+            <p style="font-size: 1.1em; line-height: 1.8; margin-top: 15px;">
+                Estás desarrollando <strong>ChatApp</strong>, una aplicación de mensajería instantánea. 
+                La app debe mantener la conexión con el servidor, mostrar mensajes en tiempo real, 
+                enviar notificaciones cuando llegan nuevos mensajes, y marcar los mensajes como "leído" 
+                cuando el usuario los ve.
+            </p>
+        </div>
+
+        <!-- Mockup del Chat -->
+        <div class="chat-mockup">
+            <div class="chat-screen">
+                <div class="chat-header">
+                    <div class="chat-avatar">👤</div>
+                    <div>
+                        <div style="font-weight: bold;">Carlos Pérez</div>
+                        <div style="font-size: 0.8em; opacity: 0.8;">En línea</div>
+                    </div>
+                </div>
+
+                <div class="message received">
+                    <div>Hola! ¿Cómo estás? 👋</div>
+                    <div style="font-size: 0.7em; color: #999; text-align: right; margin-top: 5px;">10:30 AM</div>
+                </div>
+
+                <div class="message sent">
+                    <div>¡Muy bien! Trabajando en mi app de Android 💻</div>
+                    <div style="font-size: 0.7em; color: #666; text-align: right; margin-top: 5px;">10:32 AM ✓✓</div>
+                </div>
+
+                <div class="message received">
+                    <div>¡Qué genial! ¿Qué app estás haciendo?</div>
+                    <div style="font-size: 0.7em; color: #999; text-align: right; margin-top: 5px;">10:33 AM</div>
+                </div>
+
+                <div class="typing-indicator">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Timeline de Usuario -->
+        <div class="timeline-flow">
+            <h2 style="text-align: center; color: #495057; margin-bottom: 30px;">
+                🔄 Historia del Usuario con ChatApp
+            </h2>
+
+            <div class="timeline-step">
+                <div class="timeline-number">1</div>
+                <div class="timeline-content">
+                    <h4>Usuario abre ChatApp</h4>
+                    <p>Quiere ver si tiene mensajes nuevos de sus amigos</p>
+                </div>
+            </div>
+
+            <div class="timeline-step">
+                <div class="timeline-number">2</div>
+                <div class="timeline-content">
+                    <h4>Ve lista de conversaciones</h4>
+                    <p>Hay 3 mensajes nuevos sin leer de Carlos</p>
+                </div>
+            </div>
+
+            <div class="timeline-step">
+                <div class="timeline-number">3</div>
+                <div class="timeline-content">
+                    <h4>Abre el chat con Carlos</h4>
+                    <p>Los mensajes se marcan automáticamente como "leídos" ✓✓</p>
+                </div>
+            </div>
+
+            <div class="timeline-step">
+                <div class="timeline-number">4</div>
+                <div class="timeline-content">
+                    <h4>Llega una llamada telefónica</h4>
+                    <p>Usuario minimiza la app para contestar</p>
+                </div>
+            </div>
+
+            <div class="timeline-step">
+                <div class="timeline-number">5</div>
+                <div class="timeline-content">
+                    <h4>Mientras habla, llega mensaje nuevo</h4>
+                    <p>La app muestra una notificación 🔔</p>
+                </div>
+            </div>
+
+            <div class="timeline-step">
+                <div class="timeline-number">6</div>
+                <div class="timeline-content">
+                    <h4>Usuario vuelve a ChatApp</h4>
+                    <p>Ve el mensaje nuevo y responde</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Métodos del Ciclo de Vida -->
+        <h2 style="text-align: center; color: #11998e; margin: 50px 0 30px 0; font-size: 2em;">
+            🔄 Ciclo de Vida en ChatApp
+        </h2>
+
+        <div class="lifecycle-cards">
+            <!-- onCreate -->
+            <div class="lifecycle-card create">
+                <div class="card-header">
+                    <div class="card-icon">🎬</div>
+                    <div class="card-title">
+                        <h3>onCreate()</h3>
+                        <span class="card-method">onCreate(Bundle)</span>
+                    </div>
+                </div>
+                <div class="card-scenario">
+                    <strong>Situación:</strong> Usuario abre ChatApp por primera vez
+                </div>
+                <div class="card-actions">
+                    <div class="action-item">
+                        <span class="action-icon">🔌</span>
+                        <span>Conectar con el servidor WebSocket</span>
+                    </div>
+                    <div class="action-item">
+                        <span class="action-icon">💾</span>
+                        <span>Cargar conversaciones desde SQLite</span>
+                    </div>
+                    <div class="action-item">
+                        <span class="action-icon">🖼️</span>
+                        <span>Inicializar RecyclerView de mensajes</span>
+                    </div>
+                    <div class="action-item">
+                        <span class="action-icon">👤</span>
+                        <span>Obtener datos del usuario logueado</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- onStart -->
+            <div class="lifecycle-card start">
+                <div class="card-header">
+                    <div class="card-icon">👁️</div>
+                    <div class="card-title">
+                        <h3>onStart()</h3>
+                        <span class="card-method">onStart()</span>
+                    </div>
+                </div>
+                <div class="card-scenario">
+                    <strong>Situación:</strong> La pantalla de chat va a ser visible
+                </div>
+                <div class="card-actions">
+                    <div class="action-item">
+                        <span class="action-icon">📡</span>
+                        <span>Registrar listener de mensajes nuevos</span>
+                    </div>
+                    <div class="action-item">
+                        <span class="action-icon">🔄</span>
+                        <span>Sincronizar mensajes pendientes</span>
+                    </div>
+                    <div class="action-item">
+                        <span class="action-icon">🟢</span>
+                        <span>Actualizar estado a "En línea"</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- onResume -->
+            <div class="lifecycle-card resume">
+                <div class="card-header">
+                    <div class="card-icon">▶️</div>
+                    <div class="card-title">
+                        <h3>onResume()</h3>
+                        <span class="card-method">onResume()</span>
+                    </div>
+                </div>
+                <div class="card-scenario">
+                    <strong>Situación:</strong> Usuario está viendo y puede escribir mensajes
+                </div>
+                <div class="card-actions">
+                    <div class="action-item">
+                        <span class="action-icon">✓✓</span>
+                        <span>Marcar mensajes como "leídos"</span>
+                    </div>
+                    <div class="action-item">
+                        <span class="action-icon">🔕</span>
+                        <span>Cancelar notificaciones de este chat</span>
+                    </div>
+                    <div class="action-item">
+                        <span class="action-icon">⌨️</span>
+                        <span>Activar el teclado para escribir</span>
+                    </div>
+                    <div class="action-item">
+                        <span class="action-icon">📸</span>
+                        <span>Activar botones de foto/audio</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- onPause -->
+            <div class="lifecycle-card pause">
+                <div class="card-header">
+                    <div class="card-icon">⏸️</div>
+                    <div class="card-title">
+                        <h3>onPause()</h3>
+                        <span class="card-method">onPause()</span>
+                    </div>
+                </div>
+                <div class="card-scenario">
+                    <strong>Situación:</strong> Usuario recibe llamada o abre otra app
+                </div>
+                <div class="card-actions">
+                    <div class="action-item">
+                        <span class="action-icon">💾</span>
+                        <span>Guardar mensaje en borrador (si está escribiendo)</span>
+                    </div>
+                    <div class="action-item">
+                        <span class="action-icon">⌨️</span>
+                        <span>Ocultar el teclado</span>
+                    </div>
+                    <div class="action-item">
+                        <span class="action-icon">🔔</span>
+                        <span>Activar modo de notificaciones</span>
+                    </div>
+                    <div class="action-item">
+                        <span class="action-icon">💬</span>
+                        <span>Guardar posición del scroll</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- onStop -->
+            <div class="lifecycle-card stop">
+                <div class="card-header">
+                    <div class="card-icon">⏹️</div>
+                    <div class="card-title">
+                        <h3>onStop()</h3>
+                        <span class="card-method">onStop()</span>
+                    </div>
+                </div>
+                <div class="card-scenario">
+                    <strong>Situación:</strong> Chat completamente en segundo plano
+                </div>
+                <div class="card-actions">
+                    <div class="action-item">
+                        <span class="action-icon">⏰</span>
+                        <span>Cambiar estado a "Última vez..."</span>
+                    </div>
+                    <div class="action-item">
+                        <span class="action-icon">🔔</span>
+                        <span>Mostrar notificaciones si llegan mensajes</span>
+                    </div>
+                    <div class="action-item">
+                        <span class="action-icon">📡</span>
+                        <span>Mantener conexión WebSocket activa</span>
+                    </div>
+                    <div class="action-item">
+                        <span class="action-icon">🖼️</span>
+                        <span>Liberar imágenes en caché</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- onDestroy -->
+            <div class="lifecycle-card destroy">
+                <div class="card-header">
+                    <div class="card-icon">💥</div>
+                    <div class="card-title">
+                        <h3>onDestroy()</h3>
+                        <span class="card-method">onDestroy()</span>
+                    </div>
+                </div>
+                <div class="card-scenario">
+                    <strong>Situación:</strong> Usuario cierra completamente la app
+                </div>
+                <div class="card-actions">
+                    <div class="action-item">
+                        <span class="action-icon">🔌</span>
+                        <span>Desconectar WebSocket</span>
+                    </div>
+                    <div class="action-item">
+                        <span class="action-icon">🔴</span>
+                        <span>Actualizar estado a "Desconectado"</span>
+                    </div>
+                    <div class="action-item">
+                        <span class="action-icon">💾</span>
+                        <span>Cerrar conexión con base de datos</span>
+                    </div>
+                    <div class="action-item">
+                        <span class="action-icon">🧹</span>
+                        <span>Liberar todos los recursos</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Código Completo -->
+        <h2 style="text-align: center; color: #11998e; margin: 50px 0 30px 0; font-size: 2em;">
+            💻 Código Completo - ChatActivity
+        </h2>
+
+        <div class="code-block">
+<span class="keyword">public class</span> <span class="function">ChatActivity</span> <span class="keyword">extends</span> AppCompatActivity {
+
+    <span class="keyword">private</span> WebSocket webSocket;
+    <span class="keyword">private</span> RecyclerView recyclerMessages;
+    <span class="keyword">private</span> EditText editMessage;
+    <span class="keyword">private</span> Button btnSend;
+    <span class="keyword">private</span> DatabaseHelper dbHelper;
+    <span class="keyword">private</span> MessageAdapter messageAdapter;
+    <span class="keyword">private</span> String contactId;
+    <span class="keyword">private</span> NotificationManager notificationManager;
+
+    <span class="comment">// 🎬 PASO 1: Crear y preparar la actividad</span>
+    <span class="annotation">@Override</span>
+    <span class="keyword">protected void</span> <span class="function">onCreate</span>(Bundle savedInstanceState) {
+        <span class="keyword">super</span>.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_chat);
+
+        <span class="comment">// Obtener el ID del contacto</span>
+        contactId = getIntent().getStringExtra(<span class="string">"CONTACT_ID"</span>);
+
+        <span class="comment">// Inicializar vistas</span>
+        recyclerMessages = findViewById(R.id.recyclerMessages);
+        editMessage = findViewById(R.id.editMessage);
+        btnSend = findViewById(R.id.btnSend);
+
+        <span class="comment">// Configurar RecyclerView</span>
+        messageAdapter = <span class="keyword">new</span> MessageAdapter();
+        recyclerMessages.setAdapter(messageAdapter);
+        recyclerMessages.setLayoutManager(<span class="keyword">new</span> LinearLayoutManager(<span class="keyword">this</span>));
+
+        <span class="comment">// Inicializar base de datos local</span>
+        dbHelper = <span class="keyword">new</span> DatabaseHelper(<span class="keyword">this</span>);
+
+        <span class="comment">// Cargar mensajes guardados localmente</span>
+        loadMessagesFromDatabase();
+
+        <span class="comment">// Conectar con el servidor WebSocket</span>
+        connectWebSocket();
+
+        <span class="comment">// Configurar botón de enviar</span>
+        btnSend.setOnClickListener(v -> sendMessage());
+
+        <span class="comment">// Obtener NotificationManager</span>
+        notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+        Log.d(<span class="string">"ChatApp"</span>, <span class="string">"🎬 onCreate: Chat inicializado con "</span> + contactId);
+    }
+
+    <span class="comment">// 👁️ PASO 2: La pantalla va a ser visible</span>
+    <span class="annotation">@Override</span>
+    <span class="keyword">protected void</span> <span class="function">onStart</span>() {
+        <span class="keyword">super</span>.onStart();
+
+        <span class="comment">// Registrar listener para recibir mensajes en tiempo real</span>
+        <span class="keyword">if</span> (webSocket != <span class="keyword">null</span>) {
+            webSocket.setListener(<span class="keyword">new</span> MessageListener() {
+                <span class="annotation">@Override</span>
+                <span class="keyword">public void</span> <span class="function">onMessageReceived</span>(Message message) {
+                    runOnUiThread(() -> {
+                        messageAdapter.addMessage(message);
+                        scrollToBottom();
+                    });
+                }
+            });
+        }
+
+        <span class="comment">// Sincronizar mensajes que llegaron mientras la app estaba cerrada</span>
+        syncPendingMessages();
+
+        <span class="comment">// Actualizar estado del usuario a "En línea"</span>
+        updateUserStatus(<span class="string">"online"</span>);
+
+        Log.d(<span class="string">"ChatApp"</span>, <span class="string">"👁️ onStart: Usuario en línea, escuchando mensajes"</span>);
+    }
+
+    <span class="comment">// ▶️ PASO 3: Usuario está viendo activamente el chat</span>
+    <span class="annotation">@Override</span>
+    <span class="keyword">protected void</span> <span class="function">onResume</span>() {
+        <span class="keyword">super</span>.onResume();
+
+        <span class="comment">// Marcar todos los mensajes de este chat como "leídos"</span>
+        markMessagesAsRead(contactId);
+
+        <span class="comment">// Enviar confirmación de lectura al servidor</span>
+        sendReadReceipt(contactId);
+
+        <span class="comment">// Cancelar notificaciones de este chat específico</span>
+        cancelNotificationsForChat(contactId);
+
+        <span class="comment">// Restaurar borrador si existe</span>
+        String draft = getDraft(contactId);
+        <span class="keyword">if</span> (draft != <span class="keyword">null</span> && !draft.isEmpty()) {
+            editMessage.setText(draft);
+            editMessage.setSelection(draft.length());
+        }
+
+        Log.d(<span class="string">"ChatApp"</span>, <span class="string">"▶️ onResume: Mensajes marcados como leídos ✓✓"</span>);
+    }
+
+    <span class="comment">// ⏸️ PASO 4: Usuario minimiza o recibe una llamada</span>
+    <span class="annotation">@Override</span>
+    <span class="keyword">protected void</span> <span class="function">onPause</span>() {
+        <span class="keyword">super</span>.onPause();
+
+        <span class="comment">// Guardar el texto que estaba escribiendo como borrador</span>
+        String currentText = editMessage.getText().toString();
+        <span class="keyword">if</span> (!currentText.isEmpty()) {
+            saveDraft(contactId, currentText);
+        }
+
+        <span class="comment">// Ocultar el teclado</span>
+        hideKeyboard();
+
+        <span class="comment">// Activar modo de notificaciones</span>
+        <span class="comment">// Los mensajes nuevos mostrarán notificaciones</span>
+        enableNotifications(<span class="keyword">true</span>);
+
+        <span class="comment">// Guardar la posición actual del scroll</span>
+        <span class="keyword">int</span> scrollPosition = ((LinearLayoutManager) recyclerMessages
+                .getLayoutManager()).findLastVisibleItemPosition();
+        saveScrollPosition(scrollPosition);
+
+        Log.d(<span class="string">"ChatApp"</span>, <span class="string">"⏸️ onPause: Borrador guardado, notificaciones activadas"</span>);
+    }
+
+    <span class="comment">// ⏹️ PASO 5: El chat está completamente en segundo plano</span>
+    <span class="annotation">@Override</span>
+    <span class="keyword">protected void</span> <span class="function">onStop</span>() {
+        <span class="keyword">super</span>.onStop();
+
+        <span class="comment">// Actualizar estado a "Última vez hace X minutos"</span>
+        updateUserStatus(<span class="string">"away"</span>);
+
+        <span class="comment">// La conexión WebSocket se mantiene para recibir mensajes</span>
+        <span class="comment">// y mostrar notificaciones</span>
+
+        <span class="comment">// Liberar recursos de imágenes en caché para ahorrar memoria</span>
+        Glide.get(<span class="keyword">this</span>).clearMemory();
+
+        Log.d(<span class="string">"ChatApp"</span>, <span class="string">"⏹️ onStop: Usuario ausente, notificaciones activas"</span>);
+    }
+
+    <span class="comment">// 🔄 PASO ESPECIAL: Usuario regresa al chat</span>
+    <span class="annotation">@Override</span>
+    <span class="keyword">protected void</span> <span class="function">onRestart</span>() {
+        <span class="keyword">super</span>.onRestart();
+
+        <span class="comment">// Recargar mensajes nuevos que llegaron mientras estaba ausente</span>
+        loadNewMessages();
+
+        <span class="comment">// Restaurar posición del scroll</span>
+        <span class="keyword">int</span> position = getScrollPosition();
+        recyclerMessages.scrollToPosition(position);
+
+        Log.d(<span class="string">"ChatApp"</span>, <span class="string">"🔄 onRestart: Usuario regresó al chat"</span>);
+    }
+
+    <span class="comment">// 💥 PASO 6: Cerrar completamente</span>
+    <span class="annotation">@Override</span>
+    <span class="keyword">protected void</span> <span class="function">onDestroy</span>() {
+        <span class="keyword">super</span>.onDestroy();
+
+        <span class="comment">// Cerrar conexión WebSocket</span>
+        <span class="keyword">if</span> (webSocket != <span class="keyword">null</span>) {
+            webSocket.disconnect();
+            webSocket = <span class="keyword">null</span>;
+        }
+
+        <span class="comment">// Actualizar estado a "Desconectado"</span>
+        updateUserStatus(<span class="string">"offline"</span>);
+
+        <span class="comment">// Cerrar base de datos</span>
+        <span class="keyword">if</span> (dbHelper != <span class="keyword">null</span>) {
+            dbHelper.close();
+        }
+
+        <span class="comment">// Limpiar referencias para evitar memory leaks</span>
+        messageAdapter = <span class="keyword">null</span>;
+
+        Log.d(<span class="string">"ChatApp"</span>, <span class="string">"💥 onDestroy: Chat cerrado completamente"</span>);
+    }
+
+    <span class="comment">// ========== MÉTODOS AUXILIARES ==========</span>
+
+    <span class="keyword">private void</span> <span class="function">connectWebSocket</span>() {
+        String userId = getUserId();
+        String url = <span class="string">"wss://chat-server.com/ws?user="</span> + userId;
+        webSocket = <span class="keyword">new</span> WebSocket(url);
+        webSocket.connect();
+    }
+
+    <span class="keyword">private void</span> <span class="function">sendMessage</span>() {
+        String text = editMessage.getText().toString().trim();
+        <span class="keyword">if</span> (text.isEmpty()) <span class="keyword">return</span>;
+
+        Message message = <span class="keyword">new</span> Message(text, contactId);
+        webSocket.send(message);
+        messageAdapter.addMessage(message);
+        editMessage.setText(<span class="string">""</span>);
+        scrollToBottom();
+    }
+
+    <span class="keyword">private void</span> <span class="function">markMessagesAsRead</span>(String contactId) {
+        dbHelper.markAsRead(contactId);
+        <span class="comment">// Enviar confirmación al servidor</span>
+    }
+
+    <span class="keyword">private void</span> <span class="function">cancelNotificationsForChat</span>(String contactId) {
+        notificationManager.cancel(contactId.hashCode());
+    }
+
+    <span class="keyword">private void</span> <span class="function">saveDraft</span>(String contactId, String text) {
+        SharedPreferences prefs = getSharedPreferences(<span class="string">"drafts"</span>, MODE_PRIVATE);
+        prefs.edit().putString(contactId, text).apply();
+    }
+}
+        </div>
+
+        <!-- Comparación de Estados -->
+        <h2 style="text-align: center; color: #11998e; margin: 50px 0 30px 0; font-size: 2em;">
+            📊 Estados del Chat
+        </h2>
+
+        <div class="comparison-grid">
+            <div class="comparison-card">
+                <h4>Chat Activo</h4>
+                <div class="status-badge status-active">▶️ onResume()</div>
+                <p style="margin-top: 15px; color: #666;">
+                    ✅ Mensajes marcados como leídos<br>
+                    ✅ Notificaciones canceladas<br>
+                    ✅ Conexión WebSocket activa<br>
+                    ✅ Usuario puede escribir
+                </p>
+            </div>
+
+            <div class="comparison-card">
+                <h4>Chat en Segundo Plano</h4>
+                <div class="status-badge status-background">⏸️ onPause()</div>
+                <p style="margin-top: 15px; color: #666;">
+                    ⚠️ Borrador guardado<br>
+                    🔔 Notificaciones activadas<br>
+                    ✅ Conexión activa<br>
+                    ❌ Usuario no escribe
+                </p>
+            </div>
+
+            <div class="comparison-card">
+                <h4>Chat Cerrado</h4>
+                <div class="status-badge status-inactive">💥 onDestroy()</div>
+                <p style="margin-top: 15px; color: #666;">
+                    ❌ WebSocket desconectado<br>
+                    ❌ Base de datos cerrada<br>
+                    🔴 Estado: Offline<br>
+                    ❌ Todo liberado
+                </p>
+            </div>
+        </div>
+
+        <!-- Mejores Prácticas -->
+        <div class="best-practices">
+            <h3>✨ Mejores Prácticas para Apps de Chat</h3>
+            
+            <div class="practice-item">
+                <strong>💾 Siempre guarda borradores:</strong> En <code>onPause()</code>, guarda lo que el usuario estaba escribiendo. Es frustrante perder un mensaje largo por recibir una llamada.
+            </div>
+
+            <div class="practice-item">
+                <strong>✓✓ Marca como leído inteligentemente:</strong> Solo marca mensajes como "leídos" en <code>onResume()</code>, cuando el usuario realmente está viendo el chat.
+            </div>
+
+            <div class="practice-item">
+                <strong>🔔 Gestiona notificaciones correctamente:</strong> Cancela notificaciones cuando el usuario abre el chat (<code>onResume()</code>) y actívalas cuando sale (<code>onPause()</code>).
+            </div>
+
+            <div class="practice-item">
+                <strong>🔌 No cierres conexiones prematuramente:</strong> Mantén la conexión WebSocket activa incluso en <code>onStop()</code> para recibir mensajes en segundo plano.
+            </div>
+
+            <div class="practice-item">
+                <strong>💾 Guarda datos localmente:</strong> Usa SQLite para guardar mensajes. Así la app funciona sin internet y carga rápido.
+            </div>
+
+            <div class="practice-item">
+                <strong>🖼️ Libera memoria en onStop():</strong> Limpia cachés de imágenes con Glide o Picasso para no consumir demasiada RAM.
+            </div>
+        </div>
+
+        <!-- Alert Box -->
+        <div class="alert-box">
+            <div class="alert-icon">⚠️</div>
+            <div class="alert-content">
+                <strong>Cuidado con los Memory Leaks</strong><br>
+                En apps de chat es común tener memory leaks por:<br>
+                • No desconectar listeners de WebSocket<br>
+                • No cerrar cursores de base de datos<br>
+                • Referencias fuertes a contextos en listeners<br>
+                Siempre limpia en <code>onDestroy()</code>
+            </div>
+        </div>
+
+        <!-- Ejercicio Práctico -->
+        <div style="background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); padding: 30px; border-radius: 15px; margin: 30px 0;">
+            <h3 style="color: #0d47a1; margin-bottom: 20px; font-size: 1.5em;">🎯 Ejercicio Práctico</h3>
+            <p style="color: #1565c0; line-height: 1.8; font-size: 1.05em;">
+                <strong>Desafío:</strong> Implementa una funcionalidad que muestre "Usuario está escribiendo..." cuando el otro usuario está tecleando un mensaje.<br><br>
+                
+                <strong>Pistas:</strong><br>
+                1. Detecta cuando el usuario escribe en el EditText usando TextWatcher<br>
+                2. Envía un evento "typing" al servidor vía WebSocket<br>
+                3. Muestra el indicador cuando recibas el evento del otro usuario<br>
+                4. Oculta el indicador en <code>onPause()</code> si el usuario sale del chat<br>
+                5. Usa un Timer para ocultar el indicador después de 3 segundos de inactividad
+            </p>
+        </div>
+
+        <!-- Resumen Final -->
+        <div style="background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); color: white; padding: 40px; border-radius: 15px; margin-top: 40px;">
+            <h2 style="text-align: center; margin-bottom: 25px; font-size: 2em;">🎓 Resumen - ChatApp</h2>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; font-size: 1.1em; line-height: 2;">
+                <div>
+                    <strong>onCreate():</strong><br>
+                    🔌 Conectar WebSocket<br>
+                    💾 Cargar mensajes locales
+                </div>
+                <div>
+                    <strong>onStart():</strong><br>
+                    🟢 Estado "En línea"<br>
+                    📡 Registrar listeners
+                </div>
+                <div>
+                    <strong>onResume():</strong><br>
+                    ✓✓ Marcar como leído<br>
+                    🔕 Cancelar notificaciones
+                </div>
+                <div>
+                    <strong>onPause():</strong><br>
+                    💾 Guardar borrador<br>
+                    🔔 Activar notificaciones
+                </div>
+                <div>
+                    <strong>onStop():</strong><br>
+                    ⏰ Estado "Ausente"<br>
+                    🖼️ Liberar caché
+                </div>
+                <div>
+                    <strong>onDestroy():</strong><br>
+                    🔴 Desconectar todo<br>
+                    🧹 Liberar recursos
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
