@@ -1,0 +1,1563 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>RecyclerView en Android - Guía Completa</title>
+    <style>
+      * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+      }
+
+      body {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+          padding: 20px;
+          line-height: 1.6;
+      }
+
+      .container {
+          max-width: 1200px;
+          margin: 0 auto;
+          background: white;
+          border-radius: 20px;
+          box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+          overflow: hidden;
+      }
+
+      .header {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          padding: 40px;
+          text-align: center;
+      }
+
+      .header h1 {
+          font-size: 2.5em;
+          margin-bottom: 10px;
+          text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+      }
+
+      .header p {
+          font-size: 1.2em;
+      }
+
+      .schedule {
+          background: #f8f9fa;
+          padding: 30px;
+          border-bottom: 3px solid #667eea;
+      }
+
+      .schedule h2 {
+          color: #667eea;
+          margin-bottom: 20px;
+          font-size: 1.8em;
+      }
+
+      .schedule-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 15px;
+      }
+
+      .schedule-item {
+          background: white;
+          padding: 20px;
+          border-radius: 10px;
+          border-left: 5px solid #667eea;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+          transition: transform 0.3s;
+      }
+
+      .schedule-item:hover {
+          transform: translateX(5px);
+      }
+
+      .schedule-item h3 {
+          color: #667eea;
+          margin-bottom: 10px;
+      }
+
+      .section {
+          padding: 40px;
+          margin: 0;
+      }
+
+      .section:nth-child(odd) {
+          background: linear-gradient(135deg, #e8eaf6 0%, #c5cae9 100%);
+      }
+
+      .section:nth-child(even) {
+          background: linear-gradient(135deg, #e1f5fe 0%, #b3e5fc 100%);
+      }
+
+      .section:nth-child(3) {
+          background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+      }
+
+      .section:nth-child(4) {
+          background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+      }
+
+      .section:nth-child(5) {
+          background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%);
+      }
+
+      .section:nth-child(6) {
+          background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+      }
+
+      .section:nth-child(7) {
+          background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
+      }
+
+      .section h2 {
+          font-size: 2em;
+          margin-bottom: 20px;
+          border-bottom: 3px solid rgba(102,126,234,0.5);
+          padding-bottom: 10px;
+          color: #333;
+      }
+
+      .section h3 {
+          color: #444;
+          margin-top: 20px;
+          margin-bottom: 15px;
+      }
+
+      .theory {
+          background: rgba(255,255,255,0.7);
+          padding: 20px;
+          border-radius: 10px;
+          margin: 20px 0;
+          backdrop-filter: blur(10px);
+          border: 1px solid rgba(0,0,0,0.1);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+
+      .theory h3 {
+          margin-bottom: 10px;
+          font-size: 1.3em;
+          color: #333;
+      }
+
+      .theory h4 {
+          color: #555;
+          font-size: 1.2em;
+          margin: 15px 0 10px 0;
+      }
+
+      .theory p, .theory li {
+          color: #444;
+          font-size: 1.05em;
+      }
+
+      .visual-example {
+          background: rgba(0,0,0,0.05);
+          padding: 20px;
+          border-radius: 10px;
+          margin: 15px 0;
+          text-align: center;
+          border: 2px dashed rgba(0,0,0,0.2);
+      }
+
+      .visual-example h4 {
+          margin-bottom: 15px;
+          color: #555;
+      }
+
+      .code-section {
+          background: #1e1e1e;
+          color: #d4d4d4;
+          padding: 20px;
+          border-radius: 10px;
+          margin: 20px 0;
+          overflow-x: auto;
+      }
+
+      .code-section h4 {
+          color: #4ec9b0;
+          margin-bottom: 15px;
+          font-size: 1.1em;
+      }
+
+      pre {
+          margin: 0;
+          font-family: 'Courier New', monospace;
+          font-size: 0.9em;
+      }
+
+      .kotlin {
+          color: #ce9178;
+      }
+
+      .xml {
+          color: #9cdcfe;
+      }
+
+      .comment {
+          color: #6a9955;
+      }
+
+      .keyword {
+          color: #569cd6;
+      }
+
+      .string {
+          color: #ce9178;
+      }
+
+      .function {
+          color: #dcdcaa;
+      }
+
+      .exercise {
+          background: rgba(255,255,255,0.8);
+          padding: 20px;
+          border-radius: 10px;
+          margin: 20px 0;
+          border-left: 5px solid #ffa726;
+          border: 1px solid rgba(255,167,38,0.3);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+
+      .exercise h4 {
+          color: #f57c00;
+          margin-bottom: 10px;
+          font-size: 1.2em;
+      }
+
+      .exercise p, .exercise ul, .exercise li {
+          color: #444;
+          font-size: 1.05em;
+      }
+
+      .tips {
+          background: rgba(255,255,255,0.8);
+          padding: 15px;
+          border-radius: 10px;
+          margin: 15px 0;
+          border-left: 5px solid #66bb6a;
+          border: 1px solid rgba(102,187,106,0.3);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+
+      .tips strong {
+          color: #388e3c;
+      }
+
+      .tips p, .tips li, .tips td {
+          color: #444;
+          font-size: 1.05em;
+      }
+
+      .warning {
+          background: rgba(255,235,59,0.3);
+          padding: 15px;
+          border-radius: 10px;
+          margin: 15px 0;
+          border-left: 5px solid #fbc02d;
+          border: 1px solid rgba(251,192,45,0.3);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+
+      .warning strong {
+          color: #f57f17;
+      }
+
+      .note {
+          background: rgba(255, 255, 255, 0.8);
+          padding: 15px;
+          border-radius: 8px;
+          margin: 15px 0;
+          border-left: 5px solid #42a5f5;
+          border: 1px solid rgba(66,165,245,0.3);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+
+      .note strong {
+          color: #1976d2;
+      }
+
+      .note p, .note code {
+          color: #444;
+          font-size: 1.05em;
+      }
+
+      .highlight {
+          background: rgba(66,165,245,0.2);
+          padding: 2px 6px;
+          border-radius: 3px;
+          font-weight: bold;
+          color: #1565c0;
+      }
+
+      .comparison-table {
+          width: 100%;
+          margin: 20px 0;
+          border-collapse: collapse;
+          background: white;
+          border-radius: 10px;
+          overflow: hidden;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+
+      .comparison-table th {
+          background: #667eea;
+          color: white;
+          padding: 12px;
+          text-align: left;
+      }
+
+      .comparison-table td {
+          padding: 12px;
+          border-bottom: 1px solid #eee;
+          color: #444;
+      }
+
+      .comparison-table tr:hover {
+          background: #f5f5f5;
+      }
+
+      .architecture-box {
+          background: white;
+          padding: 20px;
+          border-radius: 10px;
+          margin: 20px 0;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      }
+
+      .architecture-box h4 {
+          color: #667eea;
+          margin-bottom: 15px;
+          font-size: 1.3em;
+      }
+
+      .flow-diagram {
+          display: flex;
+          align-items: center;
+          justify-content: space-around;
+          flex-wrap: wrap;
+          margin: 20px 0;
+      }
+
+      .flow-box {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          padding: 20px;
+          border-radius: 10px;
+          margin: 10px;
+          min-width: 150px;
+          text-align: center;
+          box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      }
+
+      .flow-arrow {
+          font-size: 2em;
+          color: #667eea;
+          margin: 0 10px;
+      }
+
+      .summary {
+          background: #f8f9fa;
+          padding: 40px;
+      }
+
+      .summary h2 {
+          color: #667eea;
+          font-size: 2em;
+          margin-bottom: 20px;
+      }
+
+      .checklist {
+          list-style: none;
+          padding: 0;
+      }
+
+      .checklist li {
+          padding: 15px;
+          margin: 10px 0;
+          background: white;
+          border-radius: 10px;
+          border-left: 5px solid #4ade80;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      }
+
+      .checklist li:before {
+          content: "✅ ";
+          font-size: 1.2em;
+      }
+
+      .resources {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          padding: 40px;
+      }
+
+      .resources h2 {
+          font-size: 2em;
+          margin-bottom: 20px;
+      }
+
+      @media (max-width: 768px) {
+          .header h1 {
+              font-size: 1.8em;
+          }
+
+          .schedule-grid {
+              grid-template-columns: 1fr;
+          }
+
+          .section {
+              padding: 20px;
+          }
+
+          .flow-diagram {
+              flex-direction: column;
+          }
+
+          .flow-arrow {
+              transform: rotate(90deg);
+          }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- HEADER -->
+      <div class="header">
+        <h1>♻️ RecyclerView en Android con Kotlin</h1>
+        <p>Guía Completa de Desarrollo Android Moderno</p>
+        <p>🎯 Nivel: Intermedio-Avanzado</p>
+      </div>
+
+      <!-- SCHEDULE -->
+      <div class="schedule">
+        <h2>📋 Contenido del Manual</h2>
+        <div class="schedule-grid">
+          <div class="schedule-item">
+            <h3>📚 Parte 1</h3>
+            <p><strong>¿Qué es RecyclerView?</strong></p>
+            <p>✅ Ventajas sobre ListView</p>
+          </div>
+          <div class="schedule-item">
+            <h3>🏗️ Parte 2</h3>
+            <p><strong>Arquitectura</strong></p>
+            <p>✅ ViewHolder Pattern</p>
+          </div>
+          <div class="schedule-item">
+            <h3>🛠️ Parte 3</h3>
+            <p><strong>Implementación Básica</strong></p>
+            <p>✅ Primer RecyclerView</p>
+          </div>
+          <div class="schedule-item">
+            <h3>🎨 Parte 4</h3>
+            <p><strong>LayoutManagers</strong></p>
+            <p>✅ Linear, Grid, Staggered</p>
+          </div>
+          <div class="schedule-item">
+            <h3>⚡ Parte 5</h3>
+            <p><strong>Eventos Click</strong></p>
+            <p>✅ onClick en items</p>
+          </div>
+          <div class="schedule-item">
+            <h3>🔧 Parte 6</h3>
+            <p><strong>CRUD Dinámico</strong></p>
+            <p>✅ Agregar, Editar, Eliminar</p>
+          </div>
+          <div class="schedule-item">
+            <h3>🚀 Parte 7</h3>
+            <p><strong>Casos Avanzados</strong></p>
+            <p>✅ Imágenes y diseños</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- PARTE 1 -->
+      <div class="section">
+        <h2>📚 PARTE 1: ¿Qué es RecyclerView?</h2>
+
+        <div class="theory">
+          <h3>Definición</h3>
+
+          <div style="margin-bottom: 20px;">
+            <p style="font-size: 1.1em; line-height: 1.8;">
+              <strong>RecyclerView</strong> es un componente avanzado de Android para mostrar grandes conjuntos de datos de manera eficiente. Es la evolución moderna de ListView, diseñado para
+              optimizar el rendimiento mediante el <strong>reciclaje de vistas</strong>.
+            </p>
+          </div>
+
+          <div class="visual-example">
+            <h4>🔄 Concepto de Reciclaje</h4>
+            <div style="text-align: left; max-width: 600px; margin: 0 auto;">
+              <p style="margin: 10px 0;"><strong>❌ ListView tradicional:</strong></p>
+              <p style="margin-left: 20px;">Crea una vista nueva para CADA item → 1000 items = 1000 vistas</p>
+
+              <p style="margin: 20px 0;"><strong>✅ RecyclerView:</strong></p>
+              <p style="margin-left: 20px;">Crea solo las vistas visibles en pantalla (~10 vistas)</p>
+              <p style="margin-left: 20px;">Cuando haces scroll, REUTILIZA esas vistas con nuevos datos</p>
+              <p style="margin-left: 20px;">1000 items = Solo 10-15 vistas creadas ♻️</p>
+            </div>
+          </div>
+
+          <h4>✅ Ventajas de RecyclerView</h4>
+          <ul style="margin-top: 10px;">
+            <li>🚀 <strong>Alto rendimiento:</strong> Recicla vistas eficientemente</li>
+            <li>💾 <strong>Menor consumo de memoria:</strong> Solo carga vistas visibles</li>
+            <li>🎨 <strong>Múltiples layouts:</strong> Linear, Grid, Staggered</li>
+            <li>✨ <strong>Animaciones integradas:</strong> Add, remove, move items</li>
+            <li>🔧 <strong>Altamente personalizable:</strong> ItemDecorator, ItemAnimator</li>
+            <li>🔄 <strong>ViewHolder obligatorio:</strong> Mejor organización del código</li>
+          </ul>
+
+          <h4>❌ Desventajas / Consideraciones</h4>
+          <ul style="margin-top: 10px;">
+            <li>📚 <strong>Más complejo:</strong> Requiere más código inicial</li>
+            <li>⚙️ <strong>Configuración manual:</strong> Necesitas LayoutManager</li>
+            <li>🎓 <strong>Curva de aprendizaje:</strong> Conceptos de Adapter y ViewHolder</li>
+          </ul>
+        </div>
+
+        <div class="tips">
+          <strong>💡 ¿Cuándo usar RecyclerView?</strong>
+          <table class="comparison-table" style="margin-top: 10px;">
+            <tr>
+              <th>Situación</th>
+              <th>ListView</th>
+              <th>RecyclerView</th>
+            </tr>
+            <tr>
+              <td>Lista pequeña (<50 items)</td>
+              <td>✅ OK</td>
+              <td>✅ Mejor</td>
+            </tr>
+            <tr>
+              <td>Lista grande (>100 items)</td>
+              <td>❌ Lento</td>
+              <td>✅✅ Excelente</td>
+            </tr>
+            <tr>
+              <td>Necesitas Grid/Horizontal</td>
+              <td>❌ Complicado</td>
+              <td>✅✅ Fácil</td>
+            </tr>
+            <tr>
+              <td>Animaciones</td>
+              <td>❌ Manual</td>
+              <td>✅✅ Integradas</td>
+            </tr>
+            <tr>
+              <td>Proyecto nuevo</td>
+              <td>❌ Legacy</td>
+              <td>✅✅ Recomendado</td>
+            </tr>
+          </table>
+        </div>
+
+        <div class="warning">
+          <strong>⚠️ Importante:</strong>
+          <p style="margin-top: 10px;">Google recomienda usar <strong>RecyclerView</strong> en lugar de ListView para todos los proyectos nuevos. ListView se considera legacy (obsoleto).</p>
+        </div>
+      </div>
+
+      <!-- PARTE 2 -->
+      <div class="section">
+        <h2>🏗️ PARTE 2: Arquitectura de RecyclerView</h2>
+
+        <div class="theory">
+          <h3>Componentes Principales</h3>
+
+          <div class="architecture-box">
+            <h4>1️⃣ RecyclerView</h4>
+            <p>El contenedor principal que muestra los items en pantalla</p>
+          </div>
+
+          <div class="architecture-box">
+            <h4>2️⃣ Adapter (Adaptador)</h4>
+            <p>Intermediario entre los datos y el RecyclerView</p>
+            <p><strong>Responsabilidades:</strong></p>
+            <ul>
+              <li>Crear ViewHolders cuando sea necesario</li>
+              <li>Vincular datos con ViewHolders</li>
+              <li>Indicar cuántos items hay</li>
+            </ul>
+          </div>
+
+          <div class="architecture-box">
+            <h4>3️⃣ ViewHolder</h4>
+            <p>Contenedor que guarda las referencias a las vistas de cada item</p>
+            <p><strong>Ventaja:</strong> Evita llamadas repetidas a findViewById()</p>
+          </div>
+
+          <div class="architecture-box">
+            <h4>4️⃣ LayoutManager</h4>
+            <p>Define cómo se organizan los items</p>
+            <p><strong>Tipos:</strong></p>
+            <ul>
+              <li><strong>LinearLayoutManager:</strong> Lista vertical u horizontal</li>
+              <li><strong>GridLayoutManager:</strong> Cuadrícula (como galería)</li>
+              <li><strong>StaggeredGridLayoutManager:</strong> Cuadrícula irregular (Pinterest)</li>
+            </ul>
+          </div>
+
+          <div class="architecture-box">
+            <h4>5️⃣ ItemDecoration (Opcional)</h4>
+            <p>Agrega decoraciones como separadores, márgenes, etc.</p>
+          </div>
+
+          <div class="architecture-box">
+            <h4>6️⃣ ItemAnimator (Opcional)</h4>
+            <p>Controla las animaciones al agregar/eliminar/mover items</p>
+          </div>
+        </div>
+
+        <div class="flow-diagram">
+          <div class="flow-box">📊 Datos<br />(ArrayList)</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box">🔌 Adapter</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box">📦 ViewHolder</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box">♻️ RecyclerView</div>
+          <div class="flow-arrow">→</div>
+          <div class="flow-box">📱 Pantalla</div>
+        </div>
+
+        <div class="theory">
+          <h3>🔄 Ciclo de Vida del RecyclerView</h3>
+
+          <div style="background: rgba(0,0,0,0.05); padding: 20px; border-radius: 10px; margin-top: 15px;">
+            <p style="margin-bottom: 10px;"><strong style="color: #667eea;">1. onCreateViewHolder()</strong></p>
+            <p style="margin-left: 20px; margin-bottom: 15px;">Se llama cuando RecyclerView necesita crear un nuevo ViewHolder. Aquí inflamos el layout del item.</p>
+
+            <p style="margin-bottom: 10px;"><strong style="color: #667eea;">2. onBindViewHolder()</strong></p>
+            <p style="margin-left: 20px; margin-bottom: 15px;">Se llama para vincular datos a un ViewHolder existente. Aquí asignamos los datos a las vistas.</p>
+
+            <p style="margin-bottom: 10px;"><strong style="color: #667eea;">3. getItemCount()</strong></p>
+            <p style="margin-left: 20px;">Retorna la cantidad total de items en la lista.</p>
+          </div>
+        </div>
+
+        <div class="tips">
+          <strong>💡 ViewHolder Pattern:</strong>
+          <p style="margin-top: 10px;">
+            El patrón ViewHolder es OBLIGATORIO en RecyclerView. Guarda las referencias a las vistas para reutilizarlas, evitando múltiples llamadas costosas a findViewById().
+          </p>
+
+          <div style="background: rgba(0,0,0,0.05); padding: 15px; border-radius: 8px; margin-top: 10px;">
+            <p><strong>❌ Sin ViewHolder (ListView antiguo):</strong></p>
+            <p style="margin: 10px 0 10px 20px;">findViewById() se llama cada vez que se muestra un item</p>
+            <p style="margin-left: 20px;">1000 scrolls = 1000 llamadas a findViewById() 🐌</p>
+
+            <p style="margin-top: 15px;"><strong>✅ Con ViewHolder (RecyclerView):</strong></p>
+            <p style="margin: 10px 0 10px 20px;">findViewById() solo se llama al crear el ViewHolder</p>
+            <p style="margin-left: 20px;">1000 scrolls = Solo ~10 llamadas iniciales 🚀</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- PARTE 3 -->
+      <div class="section">
+        <h2>🛠️ PARTE 3: Primer RecyclerView</h2>
+
+        <div class="warning">
+          <strong>⚠️ Prerequisito:</strong>
+          <p style="margin-top: 10px;">RecyclerView NO viene incluido por defecto. Debes agregar la dependencia en <code>build.gradle</code></p>
+        </div>
+
+        <div class="code-section">
+          <h4>📄 build.gradle (Module: app)</h4>
+          <pre><code class="kotlin">dependencies {
+    <span class="comment">// Agregar esta línea</span>
+    implementation <span class="string">'androidx.recyclerview:recyclerview:1.3.2'</span>
+    
+    <span class="comment">// ... otras dependencias ...</span>
+}</code></pre>
+        </div>
+
+        <div class="note"><strong>📝 Nota:</strong> Después de agregar la dependencia, haz click en <span class="highlight">"Sync Now"</span> en Android Studio.</div>
+
+        <h3>💻 Paso 1: Crear el Layout del Item</h3>
+
+        <div class="code-section">
+          <h4>📄 res/layout/item_fruta.xml (Nuevo archivo)</h4>
+          <pre><code class="xml">&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="4dp"&gt;
+
+    &lt;LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"&gt;
+
+        &lt;TextView
+            android:id="@+id/tvEmoji"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="🍎"
+            android:textSize="32sp"
+            android:layout_marginEnd="16dp"/&gt;
+
+        &lt;TextView
+            android:id="@+id/tvNombre"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Manzana"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_gravity="center_vertical"/&gt;
+
+    &lt;/LinearLayout&gt;
+
+&lt;/androidx.cardview.widget.CardView&gt;</code></pre>
+        </div>
+
+        <h3>💻 Paso 2: Crear la Clase de Datos</h3>
+
+        <div class="code-section">
+          <h4>📱 Fruta.kt (Nueva clase)</h4>
+          <pre><code class="kotlin"><span class="keyword">package</span> com.example.ucv_b
+
+<span class="keyword">data class</span> <span class="function">Fruta</span>(
+    <span class="keyword">val</span> emoji: String,
+    <span class="keyword">val</span> nombre: String
+)</code></pre>
+        </div>
+
+        <h3>💻 Paso 3: Crear el Adapter</h3>
+
+        <div class="code-section">
+          <h4>📱 FrutaAdapter.kt (Nueva clase)</h4>
+          <pre><code class="kotlin"><span class="keyword">package</span> com.example.ucv_b
+
+<span class="keyword">import</span> android.view.LayoutInflater
+<span class="keyword">import</span> android.view.View
+<span class="keyword">import</span> android.view.ViewGroup
+<span class="keyword">import</span> android.widget.TextView
+<span class="keyword">import</span> androidx.recyclerview.widget.RecyclerView
+
+<span class="keyword">class</span> <span class="function">FrutaAdapter</span>(
+    <span class="keyword">private val</span> frutas: List&lt;Fruta&gt;
+) : RecyclerView.Adapter&lt;FrutaAdapter.FrutaViewHolder&gt;() {
+
+    <span class="comment">// ViewHolder: Guarda referencias a las vistas</span>
+    <span class="keyword">class</span> <span class="function">FrutaViewHolder</span>(<span class="keyword">itemView</span>: View) : RecyclerView.ViewHolder(itemView) {
+        <span class="keyword">val</span> tvEmoji: TextView = itemView.findViewById(R.id.tvEmoji)
+        <span class="keyword">val</span> tvNombre: TextView = itemView.findViewById(R.id.tvNombre)
+    }
+
+    <span class="comment">// 1. Crear el ViewHolder (inflar el layout)</span>
+    <span class="keyword">override fun</span> <span class="function">onCreateViewHolder</span>(parent: ViewGroup, viewType: Int): FrutaViewHolder {
+        <span class="keyword">val</span> view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_fruta, parent, <span class="keyword">false</span>)
+        <span class="keyword">return</span> FrutaViewHolder(view)
+    }
+
+    <span class="comment">// 2. Vincular datos con el ViewHolder</span>
+    <span class="keyword">override fun</span> <span class="function">onBindViewHolder</span>(holder: FrutaViewHolder, position: Int) {
+        <span class="keyword">val</span> fruta = frutas[position]
+        holder.tvEmoji.text = fruta.emoji
+        holder.tvNombre.text = fruta.nombre
+    }
+
+    <span class="comment">// 3. Retornar cantidad de items</span>
+    <span class="keyword">override fun</span> <span class="function">getItemCount</span>(): Int = frutas.size
+}</code></pre>
+        </div>
+
+        <h3>💻 Paso 4: Configurar RecyclerView en Activity</h3>
+
+        <div class="code-section">
+          <h4>📄 activity_main.xml</h4>
+          <pre><code class="xml">&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;LinearLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"&gt;
+
+    &lt;TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Mi Primer RecyclerView"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp"/&gt;
+
+    &lt;androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/&gt;
+
+&lt;/LinearLayout&gt;</code></pre>
+        </div>
+
+        <div class="code-section">
+          <h4>📱 MainActivity.kt</h4>
+          <pre><code class="kotlin"><span class="keyword">package</span> com.example.ucv_b
+
+<span class="keyword">import</span> android.os.Bundle
+<span class="keyword">import</span> androidx.appcompat.app.AppCompatActivity
+<span class="keyword">import</span> androidx.recyclerview.widget.LinearLayoutManager
+<span class="keyword">import</span> androidx.recyclerview.widget.RecyclerView
+
+<span class="keyword">class</span> <span class="function">MainActivity</span> : AppCompatActivity() {
+    
+    <span class="keyword">override fun</span> <span class="function">onCreate</span>(savedInstanceState: Bundle?) {
+        <span class="keyword">super</span>.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        
+        <span class="comment">// 1. Referenciar RecyclerView</span>
+        <span class="keyword">val</span> recyclerView = findViewById&lt;RecyclerView&gt;(R.id.recyclerView)
+        
+        <span class="comment">// 2. Crear lista de datos</span>
+        <span class="keyword">val</span> frutas = listOf(
+            Fruta(<span class="string">"🍎"</span>, <span class="string">"Manzana"</span>),
+            Fruta(<span class="string">"🍌"</span>, <span class="string">"Plátano"</span>),
+            Fruta(<span class="string">"🍊"</span>, <span class="string">"Naranja"</span>),
+            Fruta(<span class="string">"🍇"</span>, <span class="string">"Uva"</span>),
+            Fruta(<span class="string">"🍉"</span>, <span class="string">"Sandía"</span>)
+        )
+        
+        <span class="comment">// 3. Crear y asignar adapter</span>
+        <span class="keyword">val</span> adapter = FrutaAdapter(frutas)
+        recyclerView.adapter = adapter
+        
+        <span class="comment">// 4. ⭐ Configurar LayoutManager (OBLIGATORIO)</span>
+        recyclerView.layoutManager = LinearLayoutManager(<span class="keyword">this</span>)
+    }
+}</code></pre>
+        </div>
+
+        <div class="tips">
+          <strong>💡 Pasos para crear RecyclerView:</strong>
+          <ol style="margin-top: 10px;">
+            <li>Agregar dependencia en build.gradle</li>
+            <li>Crear layout del item (item_fruta.xml)</li>
+            <li>Crear data class (Fruta.kt)</li>
+            <li>Crear Adapter con ViewHolder</li>
+            <li>Agregar RecyclerView al XML</li>
+            <li>Configurar RecyclerView + LayoutManager en Activity</li>
+          </ol>
+        </div>
+
+        <div class="exercise">
+          <h4>✏️ Ejercicio</h4>
+          <p>Crea un RecyclerView de <strong>países</strong> con:</p>
+          <ul>
+            <li>Emoji de la bandera</li>
+            <li>Nombre del país</li>
+            <li>Capital (agregar TextView adicional)</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- PARTE 4 -->
+      <div class="section">
+        <h2>🎨 PARTE 4: LayoutManagers</h2>
+
+        <div class="theory">
+          <h3>Tipos de LayoutManager</h3>
+          <p>El LayoutManager define cómo se organizan los items en el RecyclerView</p>
+        </div>
+
+        <h3>1️⃣ LinearLayoutManager (Lista Vertical u Horizontal)</h3>
+
+        <div class="code-section">
+          <h4>📱 Lista Vertical (Por defecto)</h4>
+          <pre><code class="kotlin"><span class="comment">// Lista vertical normal</span>
+recyclerView.layoutManager = LinearLayoutManager(<span class="keyword">this</span>)</code></pre>
+        </div>
+
+        <div class="code-section">
+          <h4>📱 Lista Horizontal</h4>
+          <pre><code class="kotlin"><span class="comment">// Lista horizontal (como carrusel)</span>
+recyclerView.layoutManager = LinearLayoutManager(
+    <span class="keyword">this</span>,
+    LinearLayoutManager.HORIZONTAL,
+    <span class="keyword">false</span>
+)</code></pre>
+        </div>
+
+        <div class="code-section">
+          <h4>📱 Lista Invertida (de abajo hacia arriba)</h4>
+          <pre><code class="kotlin"><span class="comment">// Lista invertida (útil para chats)</span>
+recyclerView.layoutManager = LinearLayoutManager(
+    <span class="keyword">this</span>,
+    LinearLayoutManager.VERTICAL,
+    <span class="keyword">true</span>  <span class="comment">// reverseLayout</span>
+)</code></pre>
+        </div>
+
+        <h3>2️⃣ GridLayoutManager (Cuadrícula)</h3>
+
+        <div class="code-section">
+          <h4>📱 Grid con 2 columnas</h4>
+          <pre><code class="kotlin"><span class="comment">// Cuadrícula de 2 columnas (galería)</span>
+recyclerView.layoutManager = GridLayoutManager(<span class="keyword">this</span>, 2)</code></pre>
+        </div>
+
+        <div class="code-section">
+          <h4>📱 Grid con 3 columnas</h4>
+          <pre><code class="kotlin"><span class="comment">// Cuadrícula de 3 columnas</span>
+recyclerView.layoutManager = GridLayoutManager(<span class="keyword">this</span>, 3)</code></pre>
+        </div>
+
+        <div class="code-section">
+          <h4>📱 Grid Horizontal</h4>
+          <pre><code class="kotlin"><span class="comment">// Cuadrícula horizontal</span>
+recyclerView.layoutManager = GridLayoutManager(
+    <span class="keyword">this</span>,
+    2,  <span class="comment">// filas</span>
+    GridLayoutManager.HORIZONTAL,
+    <span class="keyword">false</span>
+)</code></pre>
+        </div>
+
+        <h3>3️⃣ StaggeredGridLayoutManager (Grid Irregular)</h3>
+
+        <div class="code-section">
+          <h4>📱 Estilo Pinterest</h4>
+          <pre><code class="kotlin"><span class="comment">// Grid irregular (como Pinterest)</span>
+recyclerView.layoutManager = StaggeredGridLayoutManager(
+    2,  <span class="comment">// columnas</span>
+    StaggeredGridLayoutManager.VERTICAL
+)</code></pre>
+        </div>
+
+        <div class="visual-example">
+          <h4>📱 Comparación Visual</h4>
+          <div style="text-align: left; max-width: 800px; margin: 0 auto;">
+            <p><strong>LinearLayoutManager (Vertical):</strong></p>
+            <pre style="background: white; padding: 10px; border-radius: 5px; margin: 10px 0;">
+┌────────────┐
+│  Item 1    │
+├────────────┤
+│  Item 2    │
+├────────────┤
+│  Item 3    │
+└────────────┘</pre
+            >
+
+            <p><strong>GridLayoutManager (2 columnas):</strong></p>
+            <pre style="background: white; padding: 10px; border-radius: 5px; margin: 10px 0;">
+┌──────┬──────┐
+│ Item │ Item │
+│  1   │  2   │
+├──────┼──────┤
+│ Item │ Item │
+│  3   │  4   │
+└──────┴──────┘</pre
+            >
+
+            <p><strong>StaggeredGridLayoutManager:</strong></p>
+            <pre style="background: white; padding: 10px; border-radius: 5px; margin: 10px 0;">
+┌──────┬──────┐
+│ Item │ Item │
+│  1   │  2   │
+│      ├──────┤
+│      │ Item │
+├──────┤  4   │
+│ Item │      │
+│  3   ├──────┤
+│      │ Item │
+└──────┴──────┘</pre
+            >
+          </div>
+        </div>
+
+        <div class="exercise">
+          <h4>✏️ Ejercicio</h4>
+          <p><strong>Crear App "Mi Galería":</strong></p>
+          <ul>
+            <li>3 botones: "Lista", "Grid 2", "Grid 3"</li>
+            <li>Al hacer click, cambiar el LayoutManager</li>
+            <li>Usar emojis de diferentes categorías</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- PARTE 5 -->
+      <div class="section">
+        <h2>⚡ PARTE 5: Eventos Click en Items</h2>
+
+        <div class="warning">
+          <strong>⚠️ Diferencia importante:</strong>
+          <p style="margin-top: 10px;">RecyclerView NO tiene <code>setOnItemClickListener()</code> como ListView. Debes implementar el click manualmente.</p>
+        </div>
+
+        <h3>💻 Método 1: Click en el Adapter (Recomendado)</h3>
+
+        <div class="code-section">
+          <h4>📱 FrutaAdapter.kt (Con Click)</h4>
+          <pre><code class="kotlin"><span class="keyword">class</span> <span class="function">FrutaAdapter</span>(
+    <span class="keyword">private val</span> frutas: List&lt;Fruta&gt;,
+    <span class="keyword">private val</span> onItemClick: (Fruta) -> Unit  <span class="comment">// ⭐ Lambda para click</span>
+) : RecyclerView.Adapter&lt;FrutaAdapter.FrutaViewHolder&gt;() {
+
+    <span class="keyword">class</span> <span class="function">FrutaViewHolder</span>(<span class="keyword">itemView</span>: View) : RecyclerView.ViewHolder(itemView) {
+        <span class="keyword">val</span> tvEmoji: TextView = itemView.findViewById(R.id.tvEmoji)
+        <span class="keyword">val</span> tvNombre: TextView = itemView.findViewById(R.id.tvNombre)
+    }
+
+    <span class="keyword">override fun</span> <span class="function">onCreateViewHolder</span>(parent: ViewGroup, viewType: Int): FrutaViewHolder {
+        <span class="keyword">val</span> view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_fruta, parent, <span class="keyword">false</span>)
+        <span class="keyword">return</span> FrutaViewHolder(view)
+    }
+
+    <span class="keyword">override fun</span> <span class="function">onBindViewHolder</span>(holder: FrutaViewHolder, position: Int) {
+        <span class="keyword">val</span> fruta = frutas[position]
+        holder.tvEmoji.text = fruta.emoji
+        holder.tvNombre.text = fruta.nombre
+        
+        <span class="comment">// ⭐ Configurar click en el item completo</span>
+        holder.itemView.setOnClickListener {
+            onItemClick(fruta)
+        }
+    }
+
+    <span class="keyword">override fun</span> <span class="function">getItemCount</span>(): Int = frutas.size
+}</code></pre>
+        </div>
+
+        <div class="code-section">
+          <h4>📱 MainActivity.kt (Usar el Click)</h4>
+          <pre><code class="kotlin"><span class="keyword">import</span> android.widget.Toast
+
+<span class="keyword">class</span> <span class="function">MainActivity</span> : AppCompatActivity() {
+    
+    <span class="keyword">override fun</span> <span class="function">onCreate</span>(savedInstanceState: Bundle?) {
+        <span class="keyword">super</span>.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        
+        <span class="keyword">val</span> recyclerView = findViewById&lt;RecyclerView&gt;(R.id.recyclerView)
+        
+        <span class="keyword">val</span> frutas = listOf(
+            Fruta(<span class="string">"🍎"</span>, <span class="string">"Manzana"</span>),
+            Fruta(<span class="string">"🍌"</span>, <span class="string">"Plátano"</span>),
+            Fruta(<span class="string">"🍊"</span>, <span class="string">"Naranja"</span>)
+        )
+        
+        <span class="comment">// ⭐ Pasar lambda para manejar clicks</span>
+        <span class="keyword">val</span> adapter = FrutaAdapter(frutas) { fruta ->
+            Toast.makeText(
+                <span class="keyword">this</span>,
+                <span class="string">"Seleccionaste: ${fruta.nombre}"</span>,
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+        
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(<span class="keyword">this</span>)
+    }
+}</code></pre>
+        </div>
+
+        <h3>💻 Método 2: Click con Interface</h3>
+
+        <div class="code-section">
+          <h4>📱 OnItemClickListener.kt (Nueva interface)</h4>
+          <pre><code class="kotlin"><span class="keyword">interface</span> <span class="function">OnItemClickListener</span> {
+    <span class="keyword">fun</span> <span class="function">onItemClick</span>(fruta: Fruta, position: Int)
+}</code></pre>
+        </div>
+
+        <div class="code-section">
+          <h4>📱 FrutaAdapter.kt (Con Interface)</h4>
+          <pre><code class="kotlin"><span class="keyword">class</span> <span class="function">FrutaAdapter</span>(
+    <span class="keyword">private val</span> frutas: List&lt;Fruta&gt;,
+    <span class="keyword">private val</span> listener: OnItemClickListener
+) : RecyclerView.Adapter&lt;FrutaAdapter.FrutaViewHolder&gt;() {
+
+    <span class="comment">// ... ViewHolder ...</span>
+
+    <span class="keyword">override fun</span> <span class="function">onBindViewHolder</span>(holder: FrutaViewHolder, position: Int) {
+        <span class="keyword">val</span> fruta = frutas[position]
+        holder.tvEmoji.text = fruta.emoji
+        holder.tvNombre.text = fruta.nombre
+        
+        holder.itemView.setOnClickListener {
+            listener.onItemClick(fruta, position)
+        }
+    }
+    
+    <span class="comment">// ... resto del código ...</span>
+}</code></pre>
+        </div>
+
+        <h3>💻 Click en Elementos Específicos</h3>
+
+        <div class="code-section">
+          <h4>📱 Clicks en diferentes vistas del item</h4>
+          <pre><code class="kotlin"><span class="keyword">override fun</span> <span class="function">onBindViewHolder</span>(holder: FrutaViewHolder, position: Int) {
+    <span class="keyword">val</span> fruta = frutas[position]
+    holder.tvEmoji.text = fruta.emoji
+    holder.tvNombre.text = fruta.nombre
+    
+    <span class="comment">// Click en el item completo</span>
+    holder.itemView.setOnClickListener {
+        onItemClick(fruta)
+    }
+    
+    <span class="comment">// Click solo en el emoji</span>
+    holder.tvEmoji.setOnClickListener {
+        onEmojiClick(fruta)
+    }
+    
+    <span class="comment">// Long click en el item</span>
+    holder.itemView.setOnLongClickListener {
+        onItemLongClick(fruta)
+        <span class="keyword">true</span>
+    }
+}</code></pre>
+        </div>
+
+        <div class="exercise">
+          <h4>✏️ Ejercicio</h4>
+          <p><strong>Lista de Productos con Detalles:</strong></p>
+          <ul>
+            <li>RecyclerView de productos (nombre, precio)</li>
+            <li>Click normal: Ver detalles en AlertDialog</li>
+            <li>Long Click: Menú con opciones (Editar, Eliminar, Compartir)</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- PARTE 6 -->
+      <div class="section">
+        <h2>🔧 PARTE 6: CRUD Dinámico</h2>
+
+        <div class="theory">
+          <h3>Operaciones CRUD en RecyclerView</h3>
+          <p>A diferencia de ListView, RecyclerView requiere usar ArrayList (mutable) y notificar cambios específicos.</p>
+        </div>
+
+        <h3>💻 Agregar Items (Create)</h3>
+
+        <div class="code-section">
+          <h4>📱 Adapter con ArrayList Mutable</h4>
+          <pre><code class="kotlin"><span class="keyword">class</span> <span class="function">FrutaAdapter</span>(
+    <span class="keyword">private val</span> frutas: ArrayList&lt;Fruta&gt;  <span class="comment">// ⭐ ArrayList mutable</span>
+) : RecyclerView.Adapter&lt;FrutaAdapter.FrutaViewHolder&gt;() {
+
+    <span class="comment">// ... ViewHolder y métodos anteriores ...</span>
+    
+    <span class="comment">// ⭐ Método para agregar</span>
+    <span class="keyword">fun</span> <span class="function">agregarFruta</span>(fruta: Fruta) {
+        frutas.add(fruta)
+        notifyItemInserted(frutas.size - 1)  <span class="comment">// Notificar posición específica</span>
+    }
+}</code></pre>
+        </div>
+
+        <div class="code-section">
+          <h4>📱 MainActivity.kt - Agregar con diálogo</h4>
+          <pre><code class="kotlin"><span class="keyword">private lateinit var</span> adapter: FrutaAdapter
+<span class="keyword">private val</span> frutas = ArrayList&lt;Fruta&gt;()
+
+<span class="keyword">override fun</span> <span class="function">onCreate</span>(savedInstanceState: Bundle?) {
+    <span class="keyword">super</span>.onCreate(savedInstanceState)
+    setContentView(R.layout.activity_main)
+    
+    <span class="keyword">val</span> recyclerView = findViewById&lt;RecyclerView&gt;(R.id.recyclerView)
+    <span class="keyword">val</span> btnAgregar = findViewById&lt;Button&gt;(R.id.btnAgregar)
+    
+    <span class="comment">// Datos iniciales</span>
+    frutas.add(Fruta(<span class="string">"🍎"</span>, <span class="string">"Manzana"</span>))
+    frutas.add(Fruta(<span class="string">"🍌"</span>, <span class="string">"Plátano"</span>))
+    
+    adapter = FrutaAdapter(frutas)
+    recyclerView.adapter = adapter
+    recyclerView.layoutManager = LinearLayoutManager(<span class="keyword">this</span>)
+    
+    <span class="comment">// ⭐ Botón para agregar</span>
+    btnAgregar.setOnClickListener {
+        mostrarDialogoAgregar()
+    }
+}
+
+<span class="keyword">private fun</span> <span class="function">mostrarDialogoAgregar</span>() {
+    <span class="keyword">val</span> input = EditText(<span class="keyword">this</span>)
+    input.hint = <span class="string">"Nombre de la fruta"</span>
+    
+    AlertDialog.Builder(<span class="keyword">this</span>)
+        .setTitle(<span class="string">"Agregar Fruta"</span>)
+        .setView(input)
+        .setPositiveButton(<span class="string">"Agregar"</span>) { dialog, which ->
+            <span class="keyword">val</span> nombre = input.text.toString()
+            <span class="keyword">if</span> (nombre.isNotEmpty()) {
+                <span class="keyword">val</span> nuevaFruta = Fruta(<span class="string">"🍓"</span>, nombre)
+                adapter.agregarFruta(nuevaFruta)
+                Toast.makeText(<span class="keyword">this</span>, <span class="string">"Fruta agregada"</span>, Toast.LENGTH_SHORT).show()
+            }
+        }
+        .setNegativeButton(<span class="string">"Cancelar"</span>, <span class="keyword">null</span>)
+        .show()
+}</code></pre>
+        </div>
+
+        <h3>💻 Eliminar Items (Delete)</h3>
+
+        <div class="code-section">
+          <h4>📱 Adapter - Método eliminar</h4>
+          <pre><code class="kotlin"><span class="comment">// ⭐ Método para eliminar</span>
+<span class="keyword">fun</span> <span class="function">eliminarFruta</span>(position: Int) {
+    frutas.removeAt(position)
+    notifyItemRemoved(position)  <span class="comment">// Notificar posición eliminada</span>
+}</code></pre>
+        </div>
+
+        <div class="code-section">
+          <h4>📱 Implementar en onBindViewHolder</h4>
+          <pre><code class="kotlin"><span class="keyword">override fun</span> <span class="function">onBindViewHolder</span>(holder: FrutaViewHolder, position: Int) {
+    <span class="keyword">val</span> fruta = frutas[position]
+    holder.tvEmoji.text = fruta.emoji
+    holder.tvNombre.text = fruta.nombre
+    
+    <span class="comment">// Long click para eliminar</span>
+    holder.itemView.setOnLongClickListener {
+        AlertDialog.Builder(holder.itemView.context)
+            .setTitle(<span class="string">"Eliminar"</span>)
+            .setMessage(<span class="string">"¿Eliminar ${fruta.nombre}?"</span>)
+            .setPositiveButton(<span class="string">"Eliminar"</span>) { dialog, which ->
+                eliminarFruta(holder.adapterPosition)
+            }
+            .setNegativeButton(<span class="string">"Cancelar"</span>, <span class="keyword">null</span>)
+            .show()
+        <span class="keyword">true</span>
+    }
+}</code></pre>
+        </div>
+
+        <h3>💻 Actualizar Items (Update)</h3>
+
+        <div class="code-section">
+          <h4>📱 Adapter - Método actualizar</h4>
+          <pre><code class="kotlin"><span class="comment">// ⭐ Método para actualizar</span>
+<span class="keyword">fun</span> <span class="function">actualizarFruta</span>(position: Int, nuevaFruta: Fruta) {
+    frutas[position] = nuevaFruta
+    notifyItemChanged(position)  <span class="comment">// Notificar cambio específico</span>
+}</code></pre>
+        </div>
+
+        <div class="tips">
+          <strong>💡 Métodos de notificación importantes:</strong>
+          <table class="comparison-table" style="margin-top: 10px;">
+            <tr>
+              <th>Método</th>
+              <th>Uso</th>
+              <th>Animación</th>
+            </tr>
+            <tr>
+              <td><code>notifyDataSetChanged()</code></td>
+              <td>Actualizar todo</td>
+              <td>❌ No</td>
+            </tr>
+            <tr>
+              <td><code>notifyItemInserted(position)</code></td>
+              <td>Item agregado</td>
+              <td>✅ Sí</td>
+            </tr>
+            <tr>
+              <td><code>notifyItemRemoved(position)</code></td>
+              <td>Item eliminado</td>
+              <td>✅ Sí</td>
+            </tr>
+            <tr>
+              <td><code>notifyItemChanged(position)</code></td>
+              <td>Item modificado</td>
+              <td>✅ Sí</td>
+            </tr>
+            <tr>
+              <td><code>notifyItemMoved(from, to)</code></td>
+              <td>Item movido</td>
+              <td>✅ Sí</td>
+            </tr>
+          </table>
+        </div>
+
+        <div class="warning">
+          <strong>⚠️ Importante:</strong>
+          <p style="margin-top: 10px;">
+            Usa <code>notifyItemInserted()</code>, <code>notifyItemRemoved()</code>, etc. en lugar de <code>notifyDataSetChanged()</code> para obtener animaciones automáticas y mejor rendimiento.
+          </p>
+        </div>
+
+        <div class="exercise">
+          <h4>✏️ Proyecto CRUD Completo</h4>
+          <p><strong>"Gestor de Tareas":</strong></p>
+          <ul>
+            <li>RecyclerView de tareas</li>
+            <li>Botón "Agregar Tarea" con diálogo</li>
+            <li>Click: Marcar como completada (cambiar color/estilo)</li>
+            <li>Long Click: Menú con "Editar" y "Eliminar"</li>
+            <li>Guardar en SharedPreferences (opcional)</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- PARTE 7 -->
+      <div class="section">
+        <h2>🚀 PARTE 7: Casos Avanzados</h2>
+
+        <h3>💻 Ejemplo 1: RecyclerView con Imágenes</h3>
+
+        <div class="code-section">
+          <h4>📄 item_producto.xml</h4>
+          <pre><code class="xml">&lt;androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="6dp"&gt;
+
+    &lt;LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"&gt;
+
+        &lt;ImageView
+            android:id="@+id/ivProducto"
+            android:layout_width="match_parent"
+            android:layout_height="200dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/placeholder"/&gt;
+
+        &lt;TextView
+            android:id="@+id/tvNombre"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Producto"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:layout_marginTop="8dp"/&gt;
+
+        &lt;TextView
+            android:id="@+id/tvPrecio"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="S/. 0.00"
+            android:textSize="16sp"
+            android:textColor="#4CAF50"
+            android:layout_marginTop="4dp"/&gt;
+
+    &lt;/LinearLayout&gt;
+
+&lt;/androidx.cardview.widget.CardView&gt;</code></pre>
+        </div>
+
+        <h3>💻 Ejemplo 2: RecyclerView Horizontal (Carrusel)</h3>
+
+        <div class="code-section">
+          <h4>📱 MainActivity.kt</h4>
+          <pre><code class="kotlin"><span class="comment">// RecyclerView horizontal tipo carrusel</span>
+recyclerView.layoutManager = LinearLayoutManager(
+    <span class="keyword">this</span>,
+    LinearLayoutManager.HORIZONTAL,
+    <span class="keyword">false</span>
+)
+
+<span class="comment">// Opcional: Snap helper para centrar items</span>
+<span class="keyword">val</span> snapHelper = PagerSnapHelper()
+snapHelper.attachToRecyclerView(recyclerView)</code></pre>
+        </div>
+
+        <h3>💻 Ejemplo 3: Separadores entre Items</h3>
+
+        <div class="code-section">
+          <h4>📱 Agregar DividerItemDecoration</h4>
+          <pre><code class="kotlin"><span class="keyword">import</span> androidx.recyclerview.widget.DividerItemDecoration
+
+<span class="comment">// Agregar líneas separadoras</span>
+<span class="keyword">val</span> divider = DividerItemDecoration(
+    <span class="keyword">this</span>,
+    LinearLayoutManager.VERTICAL
+)
+recyclerView.addItemDecoration(divider)</code></pre>
+        </div>
+
+        <h3>💻 Ejemplo 4: RecyclerView Vacío</h3>
+
+        <div class="code-section">
+          <h4>📄 activity_main.xml</h4>
+          <pre><code class="xml">&lt;FrameLayout
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"&gt;
+
+    &lt;androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/&gt;
+
+    &lt;TextView
+        android:id="@+id/tvVacio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="No hay elementos"
+        android:textSize="18sp"
+        android:visibility="gone"/&gt;
+
+&lt;/FrameLayout&gt;</code></pre>
+        </div>
+
+        <div class="code-section">
+          <h4>📱 MainActivity.kt</h4>
+          <pre><code class="kotlin"><span class="keyword">private fun</span> <span class="function">actualizarVista</span>() {
+    <span class="keyword">if</span> (frutas.isEmpty()) {
+        recyclerView.visibility = View.GONE
+        tvVacio.visibility = View.VISIBLE
+    } <span class="keyword">else</span> {
+        recyclerView.visibility = View.VISIBLE
+        tvVacio.visibility = View.GONE
+    }
+}</code></pre>
+        </div>
+
+        <h3>💻 Ejemplo 5: Búsqueda/Filtrado</h3>
+
+        <div class="code-section">
+          <h4>📱 Adapter con filtro</h4>
+          <pre><code class="kotlin"><span class="keyword">class</span> <span class="function">FrutaAdapter</span>(
+    <span class="keyword">private var</span> frutas: ArrayList&lt;Fruta&gt;
+) : RecyclerView.Adapter&lt;FrutaAdapter.FrutaViewHolder&gt;() {
+
+    <span class="keyword">private var</span> frutasFiltradas = ArrayList&lt;Fruta&gt;(frutas)
+
+    <span class="comment">// ... ViewHolder y métodos anteriores ...</span>
+
+    <span class="keyword">fun</span> <span class="function">filtrar</span>(texto: String) {
+        frutasFiltradas.clear()
+        
+        <span class="keyword">if</span> (texto.isEmpty()) {
+            frutasFiltradas.addAll(frutas)
+        } <span class="keyword">else</span> {
+            <span class="keyword">val</span> busqueda = texto.lowercase()
+            <span class="keyword">for</span> (fruta <span class="keyword">in</span> frutas) {
+                <span class="keyword">if</span> (fruta.nombre.lowercase().contains(busqueda)) {
+                    frutasFiltradas.add(fruta)
+                }
+            }
+        }
+        
+        notifyDataSetChanged()
+    }
+
+    <span class="keyword">override fun</span> <span class="function">getItemCount</span>(): Int = frutasFiltradas.size
+}</code></pre>
+        </div>
+
+        <div class="exercise">
+          <h4>✏️ Proyecto Final Integrador</h4>
+          <p><strong>"App de Contactos Completa":</strong></p>
+          <ul>
+            <li>RecyclerView con foto, nombre, teléfono</li>
+            <li>LinearLayoutManager vertical</li>
+            <li>SearchView para filtrar</li>
+            <li>FloatingActionButton para agregar</li>
+            <li>Click: Ver detalles en nueva Activity</li>
+            <li>Long Click: Menú contextual (Editar/Eliminar)</li>
+            <li>DividerItemDecoration entre items</li>
+            <li>Mensaje cuando la lista está vacía</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- RESUMEN -->
+      <div class="summary">
+        <h2>📚 Resumen Completo</h2>
+        <ul class="checklist">
+          <li><strong>RecyclerView:</strong> Componente moderno para listas eficientes</li>
+          <li><strong>ViewHolder:</strong> Patrón obligatorio para reciclar vistas</li>
+          <li><strong>Adapter:</strong> Conecta datos con ViewHolder</li>
+          <li><strong>LayoutManager:</strong> Define organización (Linear, Grid, Staggered)</li>
+          <li><strong>Eventos:</strong> Click manual mediante lambdas o interfaces</li>
+          <li><strong>CRUD:</strong> notifyItemInserted/Removed/Changed para animaciones</li>
+          <li><strong>Avanzado:</strong> Filtros, separadores, vistas vacías</li>
+        </ul>
+
+        <div style="background: white; padding: 20px; border-radius: 10px; margin-top: 30px;">
+          <h3 style="color: #667eea;">RecyclerView vs ListView - Comparación Final</h3>
+          <table class="comparison-table">
+            <tr>
+              <th>Característica</th>
+              <th>ListView</th>
+              <th>RecyclerView</th>
+            </tr>
+            <tr>
+              <td>Rendimiento</td>
+              <td>⭐⭐ Regular</td>
+              <td>⭐⭐⭐⭐⭐ Excelente</td>
+            </tr>
+            <tr>
+              <td>ViewHolder</td>
+              <td>Opcional</td>
+              <td>Obligatorio</td>
+            </tr>
+            <tr>
+              <td>LayoutManager</td>
+              <td>Solo vertical</td>
+              <td>Linear, Grid, Staggered</td>
+            </tr>
+            <tr>
+              <td>Animaciones</td>
+              <td>Manual</td>
+              <td>Automáticas</td>
+            </tr>
+            <tr>
+              <td>Complejidad</td>
+              <td>Baja</td>
+              <td>Media-Alta</td>
+            </tr>
+            <tr>
+              <td>Líneas de código</td>
+              <td>~20</td>
+              <td>~60-80</td>
+            </tr>
+            <tr>
+              <td>Uso recomendado</td>
+              <td>Legacy</td>
+              <td>✅ Proyectos nuevos</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- RECURSOS -->
+      <div class="resources">
+        <h2>📦 Recursos Adicionales</h2>
+
+        <div style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 10px; margin-top: 30px;">
+          <h3>🔗 Enlaces Útiles:</h3>
+          <ul>
+            <li>
+              <a href="https://developer.android.com/reference/androidx/recyclerview/widget/RecyclerView" style="color: white; text-decoration: underline;">Documentación Oficial - RecyclerView</a>
+            </li>
+            <li><a href="https://developer.android.com/guide/topics/ui/layout/recyclerview" style="color: white; text-decoration: underline;">Android Developers Guide - RecyclerView</a></li>
+            <li><a href="https://kotlinlang.org/docs/home.html" style="color: white; text-decoration: underline;">Kotlin Documentation</a></li>
+          </ul>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 2px solid rgba(255,255,255,0.3);">
+          <p style="font-size: 1.2em; margin-bottom: 10px;">¡Manual Completado! 🎉</p>
+          <p style="opacity: 0.7; margin-top: 20px;">Desarrollado con ❤️ para estudiantes</p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
