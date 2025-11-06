@@ -1,0 +1,1264 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ListView en Android - Guía Completa</title>
+    <style>
+      * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+      }
+
+      body {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+          padding: 20px;
+          line-height: 1.6;
+      }
+
+      .container {
+          max-width: 1200px;
+          margin: 0 auto;
+          background: white;
+          border-radius: 20px;
+          box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+          overflow: hidden;
+      }
+
+      .header {
+          background: linear-gradient(135deg, #a8c0ff 0%, #93e4fc 100%);
+          color: #333;
+          padding: 40px;
+          text-align: center;
+      }
+
+      .header h1 {
+          font-size: 2.5em;
+          margin-bottom: 10px;
+          text-shadow: 1px 1px 2px rgba(255,255,255,0.5);
+          color: #1a237e;
+      }
+
+      .header p {
+          font-size: 1.2em;
+          color: #333;
+      }
+
+      .schedule {
+          background: #f8f9fa;
+          padding: 30px;
+          border-bottom: 3px solid #667eea;
+      }
+
+      .schedule h2 {
+          color: #667eea;
+          margin-bottom: 20px;
+          font-size: 1.8em;
+      }
+
+      .schedule-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 15px;
+      }
+
+      .schedule-item {
+          background: white;
+          padding: 20px;
+          border-radius: 10px;
+          border-left: 5px solid #667eea;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+          transition: transform 0.3s;
+      }
+
+      .schedule-item:hover {
+          transform: translateX(5px);
+      }
+
+      .schedule-item h3 {
+          color: #667eea;
+          margin-bottom: 10px;
+      }
+
+      .hour {
+          background: linear-gradient(135deg, #e8eaf6 0%, #c5cae9 100%);
+          color: #333;
+          padding: 40px;
+          margin: 0;
+      }
+
+      .hour:nth-child(even) {
+          background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%);
+      }
+
+      .hour:nth-child(3) {
+          background: linear-gradient(135deg, #e0f7fa 0%, #b2ebf2 100%);
+      }
+
+      .hour:nth-child(4) {
+          background: linear-gradient(135deg, #5559c4 0%, #55559d 100%);
+      }
+
+      .hour:nth-child(5) {
+          background: linear-gradient(135deg, #e1f5fe 0%, #b3e5fc 100%);
+      }
+
+      .hour:nth-child(6) {
+          background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+      }
+
+      .hour h2 {
+          font-size: 2em;
+          margin-bottom: 20px;
+          border-bottom: 3px solid rgba(0,0,0,0.2);
+          padding-bottom: 10px;
+          color: #333;
+      }
+
+      .hour h3 {
+          color: #444;
+          margin-top: 20px;
+          margin-bottom: 15px;
+      }
+
+      .theory {
+          background: rgba(255,255,255,0.7);
+          padding: 20px;
+          border-radius: 10px;
+          margin: 20px 0;
+          backdrop-filter: blur(10px);
+          border: 1px solid rgba(0,0,0,0.1);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+
+      .theory h3 {
+          margin-bottom: 10px;
+          font-size: 1.3em;
+          color: #333;
+      }
+
+      .theory p, .theory li {
+          color: #444;
+          font-size: 1.05em;
+      }
+
+      .theory h4 {
+          color: #555;
+      }
+
+      .code-section {
+          background: #1e1e1e;
+          color: #d4d4d4;
+          padding: 20px;
+          border-radius: 10px;
+          margin: 20px 0;
+          overflow-x: auto;
+      }
+
+      .code-section h4 {
+          color: #4ec9b0;
+          margin-bottom: 15px;
+          font-size: 1.1em;
+      }
+
+      pre {
+          margin: 0;
+          font-family: 'Courier New', monospace;
+          font-size: 0.9em;
+      }
+
+      .kotlin {
+          color: #ce9178;
+      }
+
+      .xml {
+          color: #9cdcfe;
+      }
+
+      .comment {
+          color: #6a9955;
+      }
+
+      .keyword {
+          color: #569cd6;
+      }
+
+      .string {
+          color: #ce9178;
+      }
+
+      .function {
+          color: #dcdcaa;
+      }
+
+      .exercise {
+          background: rgba(255,255,255,0.8);
+          padding: 20px;
+          border-radius: 10px;
+          margin: 20px 0;
+          border-left: 5px solid #ffa726;
+          border: 1px solid rgba(255,167,38,0.3);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+
+      .exercise h4 {
+          color: #f57c00;
+          margin-bottom: 10px;
+          font-size: 1.2em;
+      }
+
+      .exercise p, .exercise ul, .exercise li {
+          color: #444;
+          font-size: 1.05em;
+      }
+
+      .tips {
+          background: rgba(255,255,255,0.8);
+          padding: 15px;
+          border-radius: 10px;
+          margin: 15px 0;
+          border-left: 5px solid #66bb6a;
+          border: 1px solid rgba(102,187,106,0.3);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+
+      .tips strong {
+          color: #388e3c;
+      }
+
+      .tips p, .tips li, .tips td {
+          color: #444;
+          font-size: 1.05em;
+      }
+
+      .break {
+          background: linear-gradient(135deg, #fdcb6e 0%, #ffeaa7 100%);
+          color: #333;
+          padding: 30px;
+          text-align: center;
+          font-size: 1.5em;
+          text-shadow: 1px 1px 2px rgba(255,255,255,0.5);
+      }
+
+      .final-project {
+          background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+          padding: 40px;
+      }
+
+      .final-project h2 {
+          color: #667eea;
+          font-size: 2em;
+          margin-bottom: 20px;
+      }
+
+      .summary {
+          background: #f8f9fa;
+          padding: 40px;
+      }
+
+      .summary h2 {
+          color: #667eea;
+          font-size: 2em;
+          margin-bottom: 20px;
+      }
+
+      .checklist {
+          list-style: none;
+          padding: 0;
+      }
+
+      .checklist li {
+          padding: 15px;
+          margin: 10px 0;
+          background: white;
+          border-radius: 10px;
+          border-left: 5px solid #4ade80;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      }
+
+      .checklist li:before {
+          content: "✅ ";
+          font-size: 1.2em;
+      }
+
+      .resources {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          padding: 40px;
+      }
+
+      .resources h2 {
+          font-size: 2em;
+          margin-bottom: 20px;
+      }
+
+      .resource-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 20px;
+          margin-top: 20px;
+      }
+
+      .resource-card {
+          background: rgba(255,255,255,0.2);
+          padding: 20px;
+          border-radius: 10px;
+          backdrop-filter: blur(10px);
+      }
+
+      .resource-card h3 {
+          margin-bottom: 10px;
+          font-size: 1.3em;
+      }
+
+      @media (max-width: 768px) {
+          .header h1 {
+              font-size: 1.8em;
+          }
+
+          .schedule-grid {
+              grid-template-columns: 1fr;
+          }
+
+          .hour {
+              padding: 20px;
+          }
+      }
+
+      .note {
+          background: rgba(255, 255, 255, 0.8);
+          padding: 15px;
+          border-radius: 8px;
+          margin: 15px 0;
+          border-left: 5px solid #42a5f5;
+          border: 1px solid rgba(66,165,245,0.3);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+
+      .note strong {
+          color: #1976d2;
+      }
+
+      .note p, .note code {
+          color: #444;
+          font-size: 1.05em;
+      }
+
+      .highlight {
+          background: rgba(66,165,245,0.2);
+          padding: 2px 6px;
+          border-radius: 3px;
+          font-weight: bold;
+          color: #1565c0;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- HEADER -->
+      <div class="header">
+        <h1>📱 ListView en Android con Kotlin</h1>
+        <p>Guía Completa de Desarrollo Android</p>
+        <p>🎯 Nivel: Intermedio</p>
+      </div>
+
+      <!-- HORA 1 -->
+      <div class="hour">
+        <h2>⏰ HORA 1: Fundamentos de ListView</h2>
+
+        <div class="theory">
+          <h3>📚 Teoría</h3>
+
+          <div style="margin-bottom: 20px;">
+            <h4 style="font-size: 1.3em; margin-bottom: 10px; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">📱 ¿Qué es un ListView?</h4>
+            <p style="font-size: 1.1em; line-height: 1.8; text-shadow: 1px 1px 2px rgba(0,0,0,0.2);">
+              Un <strong>ListView</strong> es un componente de Android que permite mostrar una lista desplazable de elementos. Es ideal para presentar colecciones de datos como contactos, mensajes,
+              productos, o cualquier información que necesite ser visualizada en formato de lista vertical.
+            </p>
+          </div>
+
+          <div style="margin-bottom: 20px;">
+            <h4 style="font-size: 1.3em; margin-bottom: 10px; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">🧩 Componentes Principales</h4>
+            <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 8px; margin-top: 10px;">
+              <p style="font-size: 1.05em; margin-bottom: 10px;"><strong style="color: #555;">1. ListView:</strong> El contenedor visual que muestra los elementos en pantalla</p>
+              <p style="font-size: 1.05em; margin-bottom: 10px;"><strong style="color: #555;">2. Adapter:</strong> El intermediario que convierte los datos en vistas visuales</p>
+              <p style="font-size: 1.05em;"><strong style="color: #555;">3. Data Source:</strong> La fuente de datos (Array, ArrayList, Base de Datos, XML)</p>
+            </div>
+          </div>
+
+          <div>
+            <h4 style="font-size: 1.3em; margin-bottom: 10px; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">🔄 Flujo de Datos</h4>
+            <div style="background: rgba(0,0,0,0.2); padding: 20px; border-radius: 8px; text-align: center;">
+              <p style="font-size: 1.2em; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);">📊 Datos → 🔌 Adapter → 📱 ListView → 👁️ Pantalla</p>
+              <p style="font-size: 1em; margin-top: 10px; font-style: italic;">El Adapter toma cada elemento de los datos y crea una vista individual para mostrarlo en el ListView</p>
+            </div>
+          </div>
+        </div>
+
+        <h3>💻 Práctica 1: Tu Primer ListView</h3>
+
+        <div class="code-section">
+          <h4>📄 activity_list_view.xml</h4>
+          <pre><code class="xml">&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;LinearLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"&gt;
+
+    &lt;TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Mi Primera Lista"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp"/&gt;
+
+    &lt;ListView
+        android:id="@+id/listView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/&gt;
+
+&lt;/LinearLayout&gt;</code></pre>
+        </div>
+
+        <div class="code-section">
+          <h4>📱 ListViewActivity.kt</h4>
+          <pre><code class="kotlin"><span class="keyword">package</span> com.example.ucv_b
+
+<span class="keyword">import</span> android.os.Bundle
+<span class="keyword">import</span> android.widget.ArrayAdapter
+<span class="keyword">import</span> android.widget.ListView
+<span class="keyword">import</span> android.widget.Toast
+<span class="keyword">import</span> androidx.appcompat.app.AppCompatActivity
+
+<span class="keyword">class</span> <span class="function">ListViewActivity</span> : AppCompatActivity() {
+    
+    <span class="keyword">override fun</span> <span class="function">onCreate</span>(savedInstanceState: Bundle?) {
+        <span class="keyword">super</span>.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_list_view)
+        
+        <span class="comment">// 1. Referenciar el ListView</span>
+        <span class="keyword">val</span> listView = findViewById&lt;ListView&gt;(R.id.listView)
+        
+        <span class="comment">// 2. Datos hardcoded (en el código)</span>
+        <span class="keyword">val</span> frutas = arrayOf(
+            <span class="string">"🍎 Manzana"</span>,
+            <span class="string">"🍌 Plátano"</span>,
+            <span class="string">"🍊 Naranja"</span>,
+            <span class="string">"🍇 Uva"</span>,
+            <span class="string">"🍉 Sandía"</span>
+        )
+        
+        <span class="comment">// 3. Crear adapter</span>
+        <span class="keyword">val</span> adapter = ArrayAdapter(
+            <span class="keyword">this</span>,
+            android.R.layout.simple_list_item_1,
+            frutas
+        )
+        
+        <span class="comment">// 4. Conectar adapter con ListView</span>
+        listView.adapter = adapter
+    }
+}</code></pre>
+        </div>
+
+        <div class="exercise">
+          <h4>✏️ Ejercicio Rápido</h4>
+          <p>Modifica el código para mostrar una lista de <strong>nombres de estudiantes</strong> en lugar de frutas.</p>
+          <p>Ejemplo: "👨‍🎓 Juan", "👩‍🎓 María", "👨‍🎓 Carlos"</p>
+        </div>
+
+        <div class="tips">
+          <strong>💡 Tips:</strong>
+          <ul>
+            <li>El ID del ListView debe coincidir en XML y Kotlin</li>
+            <li>ArrayAdapter necesita 3 parámetros: contexto, layout, datos</li>
+            <li>simple_list_item_1 es el layout más básico (1 TextView)</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- HORA 2 -->
+      <div class="hour">
+        <h2>⏰ HORA 2: Datos desde Resources XML</h2>
+
+        <div class="theory">
+          <h3>📚 Teoría</h3>
+          <ul>
+            <li>✅ Ventaja: Separación de datos y lógica</li>
+            <li>✅ Archivo arrays.xml en res/values/</li>
+            <li>✅ Buenas prácticas de Android</li>
+            <li>✅ Facilita mantenimiento y traducción</li>
+          </ul>
+        </div>
+
+        <h3>💻 Práctica 2: Crear arrays.xml</h3>
+
+        <div class="note">
+          <strong>📝 Nota:</strong> Crear el archivo <span class="highlight">arrays.xml</span> en la ruta:
+          <code>res/values/arrays.xml</code>
+        </div>
+
+        <div class="code-section">
+          <h4>📄 res/values/arrays.xml (Archivo NUEVO)</h4>
+          <pre><code class="xml">&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;resources&gt;
+    <span class="comment">&lt;!-- Lista de Frutas --&gt;</span>
+    &lt;string-array name="lista_frutas"&gt;
+        &lt;item&gt;🍎 Manzana&lt;/item&gt;
+        &lt;item&gt;🍌 Plátano&lt;/item&gt;
+        &lt;item&gt;🍊 Naranja&lt;/item&gt;
+        &lt;item&gt;🍇 Uva&lt;/item&gt;
+        &lt;item&gt;🍉 Sandía&lt;/item&gt;
+        &lt;item&gt;🍓 Fresa&lt;/item&gt;
+    &lt;/string-array&gt;
+    
+    <span class="comment">&lt;!-- Lista de Países --&gt;</span>
+    &lt;string-array name="lista_paises"&gt;
+        &lt;item&gt;🇵🇪 Perú&lt;/item&gt;
+        &lt;item&gt;🇨🇴 Colombia&lt;/item&gt;
+        &lt;item&gt;🇦🇷 Argentina&lt;/item&gt;
+        &lt;item&gt;🇨🇱 Chile&lt;/item&gt;
+        &lt;item&gt;🇲🇽 México&lt;/item&gt;
+        &lt;item&gt;🇧🇷 Brasil&lt;/item&gt;
+    &lt;/string-array&gt;
+    
+    <span class="comment">&lt;!-- Lista de Colores --&gt;</span>
+    &lt;string-array name="lista_colores"&gt;
+        &lt;item&gt;🔴 Rojo&lt;/item&gt;
+        &lt;item&gt;🔵 Azul&lt;/item&gt;
+        &lt;item&gt;🟢 Verde&lt;/item&gt;
+        &lt;item&gt;🟡 Amarillo&lt;/item&gt;
+        &lt;item&gt;🟣 Morado&lt;/item&gt;
+    &lt;/string-array&gt;
+&lt;/resources&gt;</code></pre>
+        </div>
+
+        <div class="code-section">
+          <h4>📱 ListViewActivity.kt (Modificado)</h4>
+          <pre><code class="kotlin"><span class="keyword">class</span> <span class="function">ListViewActivity</span> : AppCompatActivity() {
+    
+    <span class="keyword">override fun</span> <span class="function">onCreate</span>(savedInstanceState: Bundle?) {
+        <span class="keyword">super</span>.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_list_view)
+        
+        <span class="keyword">val</span> listView = findViewById&lt;ListView&gt;(R.id.listView)
+        
+        <span class="comment">// ⭐ Cargar datos desde arrays.xml</span>
+        <span class="keyword">val</span> items = resources.getStringArray(R.array.lista_frutas)
+        
+        <span class="keyword">val</span> adapter = ArrayAdapter(
+            <span class="keyword">this</span>,
+            android.R.layout.simple_list_item_1,
+            items
+        )
+        
+        listView.adapter = adapter
+    }
+}</code></pre>
+        </div>
+
+        <div class="exercise">
+          <h4>✏️ Ejercicio</h4>
+          <p><strong>Paso 1:</strong> Crea un array llamado <code>lista_colores</code> con 5 colores</p>
+          <p><strong>Paso 2:</strong> Muéstralo en el ListView</p>
+          <p><strong>Paso 3:</strong> Agrega 3 botones para cambiar entre frutas/países/colores</p>
+        </div>
+
+        <div class="tips">
+          <strong>💡 Comparación:</strong>
+          <table style="width:100%; color: white; margin-top: 10px;">
+            <tr style="background: rgba(0,0,0,0.2);">
+              <th style="padding: 10px;">❌ Hardcoded</th>
+              <th style="padding: 10px;">✅ Resources XML</th>
+            </tr>
+            <tr>
+              <td style="padding: 10px;">Difícil de mantener</td>
+              <td style="padding: 10px;">Fácil de actualizar</td>
+            </tr>
+            <tr style="background: rgba(0,0,0,0.2);">
+              <td style="padding: 10px;">Mezclado con código</td>
+              <td style="padding: 10px;">Datos separados</td>
+            </tr>
+            <tr>
+              <td style="padding: 10px;">No multiidioma</td>
+              <td style="padding: 10px;">Fácil traducir</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- HORA 3 -->
+      <div class="hour">
+        <h2>⏰ HORA 3: Layouts Predefinidos</h2>
+
+        <div class="theory">
+          <h3>📚 Teoría</h3>
+          <p><strong>Layouts Predefinidos de Android:</strong></p>
+          <ul>
+            <li><code>simple_list_item_1</code> → 1 TextView</li>
+            <li><code>simple_list_item_2</code> → 2 TextViews (título + subtítulo)</li>
+            <li><code>simple_list_item_checked</code> → TextView + CheckBox</li>
+            <li><code>simple_list_item_single_choice</code> → TextView + RadioButton</li>
+          </ul>
+        </div>
+
+        <h3>💻 Práctica 3A: simple_list_item_2</h3>
+
+        <div class="code-section">
+          <h4>📄 arrays.xml (Agregar estos arrays)</h4>
+          <pre><code class="xml">&lt;string-array name="productos_nombres"&gt;
+    &lt;item&gt;💻 Laptop HP&lt;/item&gt;
+    &lt;item&gt;📱 iPhone 15&lt;/item&gt;
+    &lt;item&gt;🎧 AirPods Pro&lt;/item&gt;
+&lt;/string-array&gt;
+
+&lt;string-array name="productos_precios"&gt;
+    &lt;item&gt;S/. 3,500&lt;/item&gt;
+    &lt;item&gt;S/. 5,200&lt;/item&gt;
+    &lt;item&gt;S/. 1,100&lt;/item&gt;
+&lt;/string-array&gt;</code></pre>
+        </div>
+
+        <div class="code-section">
+          <h4>📱 ListViewActivity.kt</h4>
+          <pre><code class="kotlin"><span class="keyword">import</span> android.widget.SimpleAdapter
+
+<span class="keyword">class</span> <span class="function">ListViewActivity</span> : AppCompatActivity() {
+    
+    <span class="keyword">override fun</span> <span class="function">onCreate</span>(savedInstanceState: Bundle?) {
+        <span class="keyword">super</span>.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_list_view)
+        
+        <span class="keyword">val</span> listView = findViewById&lt;ListView&gt;(R.id.listView)
+        
+        <span class="keyword">val</span> nombres = resources.getStringArray(R.array.productos_nombres)
+        <span class="keyword">val</span> precios = resources.getStringArray(R.array.productos_precios)
+        
+        <span class="comment">// Combinar en HashMaps</span>
+        <span class="keyword">val</span> productos = mutableListOf&lt;HashMap&lt;String, String&gt;&gt;()
+        
+        <span class="keyword">for</span> (i <span class="keyword">in</span> nombres.indices) {
+            <span class="keyword">val</span> producto = HashMap&lt;String, String&gt;()
+            producto[<span class="string">"nombre"</span>] = nombres[i]
+            producto[<span class="string">"precio"</span>] = precios[i]
+            productos.add(producto)
+        }
+        
+        <span class="comment">// SimpleAdapter para 2 TextViews</span>
+        <span class="keyword">val</span> adapter = SimpleAdapter(
+            <span class="keyword">this</span>,
+            productos,
+            android.R.layout.simple_list_item_2,
+            arrayOf(<span class="string">"nombre"</span>, <span class="string">"precio"</span>),
+            intArrayOf(android.R.id.text1, android.R.id.text2)
+        )
+        
+        listView.adapter = adapter
+    }
+}</code></pre>
+        </div>
+
+        <h3>💻 Práctica 3B: simple_list_item_checked</h3>
+
+        <div class="code-section">
+          <h4>📄 arrays.xml (Agregar)</h4>
+          <pre><code class="xml">&lt;string-array name="lista_compras"&gt;
+    &lt;item&gt;🛒 Leche&lt;/item&gt;
+    &lt;item&gt;🛒 Pan&lt;/item&gt;
+    &lt;item&gt;🛒 Huevos&lt;/item&gt;
+    &lt;item&gt;🛒 Queso&lt;/item&gt;
+    &lt;item&gt;🛒 Frutas&lt;/item&gt;
+&lt;/string-array&gt;</code></pre>
+        </div>
+
+        <div class="code-section">
+          <h4>📄 activity_list_view.xml (Modificar)</h4>
+          <pre><code class="xml">&lt;LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"&gt;
+
+    &lt;ListView
+        android:id="@+id/listView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"/&gt;
+
+    &lt;Button
+        android:id="@+id/btnMostrar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Mostrar Seleccionados"/&gt;
+
+&lt;/LinearLayout&gt;</code></pre>
+        </div>
+
+        <div class="code-section">
+          <h4>📱 ListViewActivity.kt</h4>
+          <pre><code class="kotlin"><span class="keyword">import</span> android.widget.Button
+
+<span class="keyword">class</span> <span class="function">ListViewActivity</span> : AppCompatActivity() {
+    
+    <span class="keyword">private lateinit var</span> listView: ListView
+    <span class="keyword">private lateinit var</span> items: Array&lt;String&gt;
+    
+    <span class="keyword">override fun</span> <span class="function">onCreate</span>(savedInstanceState: Bundle?) {
+        <span class="keyword">super</span>.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_list_view)
+        
+        listView = findViewById(R.id.listView)
+        <span class="keyword">val</span> btnMostrar = findViewById&lt;Button&gt;(R.id.btnMostrar)
+        
+        items = resources.getStringArray(R.array.lista_compras)
+        
+        <span class="keyword">val</span> adapter = ArrayAdapter(
+            <span class="keyword">this</span>,
+            android.R.layout.simple_list_item_checked,
+            items
+        )
+        
+        listView.adapter = adapter
+        listView.choiceMode = ListView.CHOICE_MODE_MULTIPLE
+        
+        btnMostrar.setOnClickListener {
+            mostrarSeleccionados()
+        }
+    }
+    
+    <span class="keyword">private fun</span> <span class="function">mostrarSeleccionados</span>() {
+        <span class="keyword">val</span> checked = listView.checkedItemPositions
+        <span class="keyword">val</span> seleccionados = mutableListOf&lt;String&gt;()
+        
+        <span class="keyword">for</span> (i <span class="keyword">in</span> 0 <span class="keyword">until</span> checked.size()) {
+            <span class="keyword">if</span> (checked.valueAt(i)) {
+                seleccionados.add(items[checked.keyAt(i)])
+            }
+        }
+        
+        <span class="keyword">if</span> (seleccionados.isEmpty()) {
+            Toast.makeText(<span class="keyword">this</span>, <span class="string">"No hay seleccionados"</span>, Toast.LENGTH_SHORT).show()
+        } <span class="keyword">else</span> {
+            <span class="keyword">val</span> mensaje = <span class="string">"Seleccionados:\n${seleccionados.joinToString("\n")}"</span>
+            Toast.makeText(<span class="keyword">this</span>, mensaje, Toast.LENGTH_LONG).show()
+        }
+    }
+}</code></pre>
+        </div>
+
+        <div class="exercise">
+          <h4>✏️ Ejercicio</h4>
+          <p>Crea una lista de <strong>tareas pendientes</strong> con CheckBox.</p>
+          <p>Al hacer click en "Contar Completadas", muestra cuántas están marcadas.</p>
+        </div>
+      </div>
+
+      <!-- BREAK -->
+      <div class="break">☕ DESCANSO ☕</div>
+
+      <!-- HORA 4 -->
+      <div class="hour">
+        <h2>⏰ HORA 4: Eventos - OnItemClickListener</h2>
+
+        <div class="theory">
+          <h3>📚 Teoría</h3>
+          <p><strong>OnItemClickListener:</strong> Se activa al hacer click en un item</p>
+          <p><strong>Parámetros:</strong></p>
+          <ul>
+            <li><code>parent</code> → El ListView</li>
+            <li><code>view</code> → La vista del item</li>
+            <li><code>position</code> → Posición (0, 1, 2...)</li>
+            <li><code>id</code> → ID del item</li>
+          </ul>
+        </div>
+
+        <h3>💻 Práctica 4: Click con AlertDialog</h3>
+
+        <div class="code-section">
+          <h4>📄 arrays.xml (Agregar)</h4>
+          <pre><code class="xml">&lt;string-array name="paises_nombres"&gt;
+    &lt;item&gt;🇵🇪 Perú&lt;/item&gt;
+    &lt;item&gt;🇨🇴 Colombia&lt;/item&gt;
+    &lt;item&gt;🇦🇷 Argentina&lt;/item&gt;
+    &lt;item&gt;🇨🇱 Chile&lt;/item&gt;
+&lt;/string-array&gt;
+
+&lt;string-array name="paises_capitales"&gt;
+    &lt;item&gt;Lima&lt;/item&gt;
+    &lt;item&gt;Bogotá&lt;/item&gt;
+    &lt;item&gt;Buenos Aires&lt;/item&gt;
+    &lt;item&gt;Santiago&lt;/item&gt;
+&lt;/string-array&gt;
+
+&lt;string-array name="paises_poblacion"&gt;
+    &lt;item&gt;33 millones&lt;/item&gt;
+    &lt;item&gt;51 millones&lt;/item&gt;
+    &lt;item&gt;46 millones&lt;/item&gt;
+    &lt;item&gt;19 millones&lt;/item&gt;
+&lt;/string-array&gt;</code></pre>
+        </div>
+
+        <div class="code-section">
+          <h4>📱 ListViewActivity.kt</h4>
+          <pre><code class="kotlin"><span class="keyword">import</span> androidx.appcompat.app.AlertDialog
+
+<span class="keyword">class</span> <span class="function">ListViewActivity</span> : AppCompatActivity() {
+    
+    <span class="keyword">override fun</span> <span class="function">onCreate</span>(savedInstanceState: Bundle?) {
+        <span class="keyword">super</span>.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_list_view)
+        
+        <span class="keyword">val</span> listView = findViewById&lt;ListView&gt;(R.id.listView)
+        
+        <span class="keyword">val</span> paises = resources.getStringArray(R.array.paises_nombres)
+        <span class="keyword">val</span> capitales = resources.getStringArray(R.array.paises_capitales)
+        <span class="keyword">val</span> poblaciones = resources.getStringArray(R.array.paises_poblacion)
+        
+        <span class="keyword">val</span> adapter = ArrayAdapter(
+            <span class="keyword">this</span>,
+            android.R.layout.simple_list_item_1,
+            paises
+        )
+        
+        listView.adapter = adapter
+        
+        <span class="comment">// ⭐ Click listener con AlertDialog</span>
+        listView.setOnItemClickListener { parent, view, position, id ->
+            <span class="keyword">val</span> mensaje = <span class="string">"""
+                Capital: ${capitales[position]}
+                Población: ${poblaciones[position]}
+            """</span>.trimIndent()
+            
+            AlertDialog.Builder(<span class="keyword">this</span>)
+                .setTitle(paises[position])
+                .setMessage(mensaje)
+                .setPositiveButton(<span class="string">"OK"</span>, <span class="keyword">null</span>)
+                .setIcon(android.R.drawable.ic_dialog_info)
+                .show()
+        }
+    }
+}</code></pre>
+        </div>
+
+        <div class="note">
+          <strong>📝 Formas de obtener el item clickeado:</strong>
+          <pre style="color: white; margin-top: 10px;"><code>// Opción 1: Array original
+val item = paises[position]
+
+// Opción 2: getItemAtPosition
+val item = parent.getItemAtPosition(position) as String
+
+// Opción 3: Adapter
+val item = adapter.getItem(position)</code></pre>
+        </div>
+
+        <div class="exercise">
+          <h4>✏️ Ejercicio</h4>
+          <p>Crea una lista de <strong>películas</strong> con:</p>
+          <ul>
+            <li>Título de la película</li>
+            <li>Año de estreno</li>
+            <li>Director</li>
+          </ul>
+          <p>Al hacer click, muestra la información en un AlertDialog</p>
+        </div>
+      </div>
+
+      <!-- HORA 5 -->
+      <div class="hour">
+        <h2>⏰ HORA 5: Eventos - OnItemLongClickListener</h2>
+
+        <div class="theory">
+          <h3>📚 Teoría</h3>
+          <p><strong>OnItemLongClickListener:</strong> Se activa al mantener presionado un item</p>
+          <p><strong>⚠️ Importante:</strong></p>
+          <ul>
+            <li><code>return true</code> → Evento consumido (no se propaga)</li>
+            <li><code>return false</code> → Evento continúa propagándose</li>
+            <li>Se usa ArrayList para poder modificar datos</li>
+            <li><code>adapter.notifyDataSetChanged()</code> actualiza la vista</li>
+          </ul>
+        </div>
+
+        <h3>💻 Práctica 5: Eliminar items</h3>
+
+        <div class="code-section">
+          <h4>📄 arrays.xml (Agregar)</h4>
+          <pre><code class="xml">&lt;string-array name="lista_tareas"&gt;
+    &lt;item&gt;📝 Estudiar Android&lt;/item&gt;
+    &lt;item&gt;🏋️ Ir al gimnasio&lt;/item&gt;
+    &lt;item&gt;🛒 Comprar víveres&lt;/item&gt;
+    &lt;item&gt;📚 Leer un libro&lt;/item&gt;
+    &lt;item&gt;💼 Terminar proyecto&lt;/item&gt;
+&lt;/string-array&gt;</code></pre>
+        </div>
+
+        <div class="code-section">
+          <h4>📱 ListViewActivity.kt</h4>
+          <pre><code class="kotlin"><span class="keyword">import</span> androidx.appcompat.app.AlertDialog
+
+<span class="keyword">class</span> <span class="function">ListViewActivity</span> : AppCompatActivity() {
+    
+    <span class="keyword">private lateinit var</span> listView: ListView
+    <span class="keyword">private lateinit var</span> tareas: ArrayList&lt;String&gt;
+    <span class="keyword">private lateinit var</span> adapter: ArrayAdapter&lt;String&gt;
+    
+    <span class="keyword">override fun</span> <span class="function">onCreate</span>(savedInstanceState: Bundle?) {
+        <span class="keyword">super</span>.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_list_view)
+        
+        listView = findViewById(R.id.listView)
+        
+        <span class="comment">// Convertir a ArrayList para poder modificar</span>
+        <span class="keyword">val</span> tareasArray = resources.getStringArray(R.array.lista_tareas)
+        tareas = ArrayList(tareasArray.toList())
+        
+        adapter = ArrayAdapter(
+            <span class="keyword">this</span>,
+            android.R.layout.simple_list_item_1,
+            tareas
+        )
+        
+        listView.adapter = adapter
+        
+        <span class="comment">// Click normal - Ver tarea</span>
+        listView.setOnItemClickListener { parent, view, position, id ->
+            Toast.makeText(<span class="keyword">this</span>, <span class="string">"Tarea: ${tareas[position]}"</span>, Toast.LENGTH_SHORT).show()
+        }
+        
+        <span class="comment">// ⭐ Long Click - Eliminar tarea</span>
+        listView.setOnItemLongClickListener { parent, view, position, id ->
+            eliminarTarea(position)
+            <span class="keyword">true</span> <span class="comment">// Consumir el evento</span>
+        }
+    }
+    
+    <span class="keyword">private fun</span> <span class="function">eliminarTarea</span>(position: Int) {
+        <span class="keyword">val</span> tarea = tareas[position]
+        
+        AlertDialog.Builder(<span class="keyword">this</span>)
+            .setTitle(<span class="string">"❌ Eliminar Tarea"</span>)
+            .setMessage(<span class="string">"¿Eliminar:\n$tarea?"</span>)
+            .setPositiveButton(<span class="string">"Eliminar"</span>) { dialog, which ->
+                <span class="comment">// Eliminar del ArrayList</span>
+                tareas.removeAt(position)
+                
+                <span class="comment">// Notificar cambios al adapter</span>
+                adapter.notifyDataSetChanged()
+                
+                Toast.makeText(<span class="keyword">this</span>, <span class="string">"✅ Tarea eliminada"</span>, Toast.LENGTH_SHORT).show()
+            }
+            .setNegativeButton(<span class="string">"Cancelar"</span>, <span class="keyword">null</span>)
+            .show()
+    }
+}</code></pre>
+        </div>
+
+        <div class="tips">
+          <strong>💡 Pasos para eliminar items:</strong>
+          <ol style="color: white; margin-top: 10px;">
+            <li>Convertir Array a ArrayList: <code>ArrayList(array.toList())</code></li>
+            <li>Eliminar del ArrayList: <code>tareas.removeAt(position)</code></li>
+            <li>Actualizar vista: <code>adapter.notifyDataSetChanged()</code></li>
+          </ol>
+        </div>
+
+        <div class="exercise">
+          <h4>✏️ Ejercicio Avanzado</h4>
+          <p><strong>Menú Contextual Completo:</strong></p>
+          <p>Al hacer long click, mostrar un menú con opciones:</p>
+          <ul>
+            <li>✏️ Editar (mostrar EditText en AlertDialog)</li>
+            <li>❌ Eliminar</li>
+            <li>ℹ️ Ver Información</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- HORA 6 -->
+      <div class="hour">
+        <h2>⏰ HORA 6: Navegación entre Activities</h2>
+
+        <div class="theory">
+          <h3>📚 Teoría</h3>
+          <p><strong>Intent y Extras:</strong></p>
+          <ul>
+            <li><code>Intent</code> → Objeto para navegar entre Activities</li>
+            <li><code>putExtra()</code> → Enviar datos</li>
+            <li><code>getStringExtra()</code> → Recibir datos</li>
+            <li><code>startActivity()</code> → Iniciar Activity</li>
+          </ul>
+          <p><strong>Flujo:</strong> MainActivity (ListView) → Click → DetalleActivity</p>
+        </div>
+
+        <h3>💻 Práctica 6: Lista → Detalle</h3>
+
+        <div class="code-section">
+          <h4>📄 arrays.xml (Agregar)</h4>
+          <pre><code class="xml">&lt;string-array name="productos_detalle_nombres"&gt;
+    &lt;item&gt;💻 Laptop Dell Inspiron&lt;/item&gt;
+    &lt;item&gt;📱 iPhone 15 Pro Max&lt;/item&gt;
+    &lt;item&gt;🎧 AirPods Pro 2&lt;/item&gt;
+&lt;/string-array&gt;
+
+&lt;string-array name="productos_detalle_precios"&gt;
+    &lt;item&gt;S/. 3,500&lt;/item&gt;
+    &lt;item&gt;S/. 5,200&lt;/item&gt;
+    &lt;item&gt;S/. 1,100&lt;/item&gt;
+&lt;/string-array&gt;
+
+&lt;string-array name="productos_detalle_descripciones"&gt;
+    &lt;item&gt;Intel Core i7, 16GB RAM, 512GB SSD&lt;/item&gt;
+    &lt;item&gt;256GB, Titanio Natural, Cámara 48MP&lt;/item&gt;
+    &lt;item&gt;Cancelación de ruido activa, USB-C&lt;/item&gt;
+&lt;/string-array&gt;</code></pre>
+        </div>
+
+        <div class="code-section">
+          <h4>📱 MainActivity.kt</h4>
+          <pre><code class="kotlin"><span class="keyword">import</span> android.content.Intent
+
+<span class="keyword">class</span> <span class="function">MainActivity</span> : AppCompatActivity() {
+    
+    <span class="keyword">override fun</span> <span class="function">onCreate</span>(savedInstanceState: Bundle?) {
+        <span class="keyword">super</span>.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        
+        <span class="keyword">val</span> listView = findViewById&lt;ListView&gt;(R.id.listView)
+        
+        <span class="keyword">val</span> nombres = resources.getStringArray(R.array.productos_detalle_nombres)
+        <span class="keyword">val</span> precios = resources.getStringArray(R.array.productos_detalle_precios)
+        <span class="keyword">val</span> descripciones = resources.getStringArray(R.array.productos_detalle_descripciones)
+        
+        <span class="keyword">val</span> adapter = ArrayAdapter(
+            <span class="keyword">this</span>,
+            android.R.layout.simple_list_item_1,
+            nombres
+        )
+        
+        listView.adapter = adapter
+        
+        <span class="comment">// ⭐ Click para ir a DetalleActivity</span>
+        listView.setOnItemClickListener { parent, view, position, id ->
+            <span class="comment">// 1. Crear Intent</span>
+            <span class="keyword">val</span> intent = Intent(<span class="keyword">this</span>, DetalleActivity::<span class="keyword">class</span>.java)
+            
+            <span class="comment">// 2. Agregar datos extras</span>
+            intent.putExtra(<span class="string">"NOMBRE"</span>, nombres[position])
+            intent.putExtra(<span class="string">"PRECIO"</span>, precios[position])
+            intent.putExtra(<span class="string">"DESCRIPCION"</span>, descripciones[position])
+            
+            <span class="comment">// 3. Iniciar Activity</span>
+            startActivity(intent)
+        }
+    }
+}</code></pre>
+        </div>
+
+        <div class="code-section">
+          <h4>📄 activity_detalle.xml (Crear nuevo archivo)</h4>
+          <pre><code class="xml">&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp"&gt;
+
+    &lt;TextView
+        android:id="@+id/tvNombre"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Nombre"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp"/&gt;
+
+    &lt;TextView
+        android:id="@+id/tvPrecio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Precio"
+        android:textSize="20sp"
+        android:textColor="#4CAF50"
+        android:textStyle="bold"
+        android:layout_marginBottom="24dp"/&gt;
+
+    &lt;TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Descripción:"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp"/&gt;
+
+    &lt;TextView
+        android:id="@+id/tvDescripcion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Descripción"
+        android:textSize="16sp"
+        android:layout_marginBottom="24dp"/&gt;
+
+    &lt;Button
+        android:id="@+id/btnVolver"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="← Volver"/&gt;
+
+&lt;/LinearLayout&gt;</code></pre>
+        </div>
+
+        <div class="code-section">
+          <h4>📱 DetalleActivity.kt (Crear nuevo archivo)</h4>
+          <pre><code class="kotlin"><span class="keyword">import</span> android.os.Bundle
+<span class="keyword">import</span> android.widget.Button
+<span class="keyword">import</span> android.widget.TextView
+<span class="keyword">import</span> androidx.appcompat.app.AppCompatActivity
+
+<span class="keyword">class</span> <span class="function">DetalleActivity</span> : AppCompatActivity() {
+    
+    <span class="keyword">override fun</span> <span class="function">onCreate</span>(savedInstanceState: Bundle?) {
+        <span class="keyword">super</span>.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_detalle)
+        
+        <span class="keyword">val</span> tvNombre = findViewById&lt;TextView&gt;(R.id.tvNombre)
+        <span class="keyword">val</span> tvPrecio = findViewById&lt;TextView&gt;(R.id.tvPrecio)
+        <span class="keyword">val</span> tvDescripcion = findViewById&lt;TextView&gt;(R.id.tvDescripcion)
+        <span class="keyword">val</span> btnVolver = findViewById&lt;Button&gt;(R.id.btnVolver)
+        
+        <span class="comment">// ⭐ Recibir datos del Intent</span>
+        <span class="keyword">val</span> nombre = intent.getStringExtra(<span class="string">"NOMBRE"</span>)
+        <span class="keyword">val</span> precio = intent.getStringExtra(<span class="string">"PRECIO"</span>)
+        <span class="keyword">val</span> descripcion = intent.getStringExtra(<span class="string">"DESCRIPCION"</span>)
+        
+        <span class="comment">// Mostrar datos</span>
+        tvNombre.text = nombre
+        tvPrecio.text = precio
+        tvDescripcion.text = descripcion
+        
+        <span class="comment">// Botón volver</span>
+        btnVolver.setOnClickListener {
+            finish() <span class="comment">// Cierra esta Activity</span>
+        }
+    }
+}</code></pre>
+        </div>
+
+        <div class="note">
+          <strong>📝 No olvidar:</strong> Registrar <code>DetalleActivity</code> en <code>AndroidManifest.xml</code>
+          <pre style="color: white; margin-top: 10px;"><code>&lt;activity android:name=".DetalleActivity"
+    android:parentActivityName=".MainActivity"/&gt;</code></pre>
+        </div>
+
+        <div class="tips">
+          <strong>💡 Métodos para pasar datos:</strong>
+          <table style="width:100%; color: white; margin-top: 10px;">
+            <tr style="background: rgba(0,0,0,0.2);">
+              <th style="padding: 10px;">Enviar (MainActivity)</th>
+              <th style="padding: 10px;">Recibir (DetalleActivity)</th>
+            </tr>
+            <tr>
+              <td style="padding: 10px;"><code>putExtra("CLAVE", valor)</code></td>
+              <td style="padding: 10px;"><code>getStringExtra("CLAVE")</code></td>
+            </tr>
+            <tr style="background: rgba(0,0,0,0.2);">
+              <td style="padding: 10px;"><code>putExtra("NUM", 123)</code></td>
+              <td style="padding: 10px;"><code>getIntExtra("NUM", 0)</code></td>
+            </tr>
+            <tr>
+              <td style="padding: 10px;"><code>putExtra("FLAG", true)</code></td>
+              <td style="padding: 10px;"><code>getBooleanExtra("FLAG", false)</code></td>
+            </tr>
+          </table>
+        </div>
+
+        <div class="exercise">
+          <h4>✏️ Ejercicio Final</h4>
+          <p><strong>App de Ciudades del Perú:</strong></p>
+          <ul>
+            <li>MainActivity: Lista de ciudades</li>
+            <li>DetalleActivity: Mostrar población, altura, y descripción</li>
+            <li>Datos desde arrays.xml</li>
+            <li>Bonus: Agregar una imagen de la ciudad</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- PROYECTO FINAL -->
+      <div class="final-project">
+        <h2>🎯 Proyecto Final</h2>
+        <h3>"Catálogo de Películas Completo"</h3>
+
+        <div style="background: white; padding: 20px; border-radius: 10px; margin-top: 20px;">
+          <h4 style="color: #667eea;">Requerimientos:</h4>
+          <ul style="color: #333;">
+            <li>✅ MainActivity con ListView de películas</li>
+            <li>✅ Datos desde arrays.xml (título, año, director, sinopsis, rating)</li>
+            <li>✅ Click normal: Ir a DetalleActivity</li>
+            <li>✅ Long Click: Agregar a favoritos (usar SharedPreferences)</li>
+            <li>✅ DetalleActivity: Mostrar toda la información</li>
+            <li>✅ Botón para volver a MainActivity</li>
+          </ul>
+
+          <h4 style="color: #667eea; margin-top: 20px;">Ejemplo de datos:</h4>
+          <pre style="background: #1e1e1e; color: #d4d4d4; padding: 15px; border-radius: 8px; overflow-x: auto;"><code>&lt;string-array name="peliculas_titulos"&gt;
+    &lt;item&gt;🎬 El Padrino&lt;/item&gt;
+    &lt;item&gt;🎬 Forrest Gump&lt;/item&gt;
+    &lt;item&gt;🎬 Inception&lt;/item&gt;
+&lt;/string-array&gt;
+
+&lt;string-array name="peliculas_anos"&gt;
+    &lt;item&gt;1972&lt;/item&gt;
+    &lt;item&gt;1994&lt;/item&gt;
+    &lt;item&gt;2010&lt;/item&gt;
+&lt;/string-array&gt;
+
+&lt;string-array name="peliculas_directores"&gt;
+    &lt;item&gt;Francis Ford Coppola&lt;/item&gt;
+    &lt;item&gt;Robert Zemeckis&lt;/item&gt;
+    &lt;item&gt;Christopher Nolan&lt;/item&gt;
+&lt;/string-array&gt;</code></pre>
+        </div>
+      </div>
+
+      <!-- RESUMEN -->
+      <div class="summary">
+        <h2>📚 Resumen de la Sesión</h2>
+        <ul class="checklist">
+          <li><strong>Hora 1:</strong> ListView básico con datos hardcoded</li>
+          <li><strong>Hora 2:</strong> Separar datos en arrays.xml</li>
+          <li><strong>Hora 3:</strong> Layouts predefinidos (item_1, item_2, checked)</li>
+          <li><strong>Hora 4:</strong> Eventos - Click + Toast + AlertDialog</li>
+          <li><strong>Hora 5:</strong> Eventos - Long Click + Eliminar items</li>
+          <li><strong>Hora 6:</strong> Navegación entre Activities con Intent</li>
+        </ul>
+      </div>
+
+      <!-- RECURSOS -->
+      <div class="resources">
+        <h2>� Recursos Adicionales</h2>
+
+        <div style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 10px; margin-top: 30px;">
+          <h3>🔗 Enlaces Útiles:</h3>
+          <ul>
+            <li><a href="https://developer.android.com/reference/android/widget/ListView" style="color: white; text-decoration: underline;">Documentación Oficial - ListView</a></li>
+            <li><a href="https://kotlinlang.org/docs/home.html" style="color: white; text-decoration: underline;">Kotlin Documentation</a></li>
+            <li><a href="https://developer.android.com/guide/topics/ui/layout/listview" style="color: white; text-decoration: underline;">Android Developers Guide</a></li>
+          </ul>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 2px solid rgba(255,255,255,0.3);">
+          <p style="font-size: 1.2em; margin-bottom: 10px;">¡Felicitaciones por completar el curso! 🎉</p>
+          <p style="opacity: 0.7; margin-top: 20px;">Desarrollado con ❤️ para estudiantes</p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
