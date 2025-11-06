@@ -618,6 +618,7 @@
         
         <span class="comment">// 1. Referenciar el Spinner</span>
         <span class="keyword">val</span> spinner = findViewById&lt;Spinner&gt;(R.id.spinner)
+        <span class="keyword">val</span> tvSeleccion: TextView = findViewById(R.id.tvSeleccion)
         
         <span class="comment">// 2. Datos hardcoded</span>
         <span class="keyword">val</span> frutas = arrayOf(
@@ -640,6 +641,18 @@
         
         <span class="comment">// 5. Conectar adapter con Spinner</span>
         spinner.adapter = adapter
+        
+        <span class="comment">// 6. ⭐ Agregar listener para eventos</span>
+        spinner.onItemSelectedListener = <span class="keyword">object</span> : AdapterView.OnItemSelectedListener {
+            <span class="keyword">override fun</span> <span class="function">onItemSelected</span>(parent: AdapterView&lt;*&gt;, view: View?, position: Int, id: Long) {
+                <span class="keyword">val</span> frutaSeleccionada = parent.getItemAtPosition(position).toString()
+                tvSeleccion.text = <span class="string">"Selección: $frutaSeleccionada"</span>
+            }
+
+            <span class="keyword">override fun</span> <span class="function">onNothingSelected</span>(parent: AdapterView&lt;*&gt;) {
+                tvSeleccion.text = <span class="string">"Selección: Ninguna"</span>
+            }
+        }
     }
 }</code></pre>
         </div>
