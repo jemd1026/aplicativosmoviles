@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>GridView en Android - Guía Completa</title>
+    <style>
+      * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+      }
+
+      body {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          background: linear-gradient(135deg, #d299c2 0%, #fef9d7 100%);
+          padding: 20px;
+          line-height: 1.6;
+      }
+
+      .container {
+          max-width: 1200px;
+          margin: 0 auto;
+          background: white;
+          border-radius: 20px;
+          box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+          overflow: hidden;
+      }
+
+      .header {
+          background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+          color: white;
+          padding: 40px;
+          text-align: center;
+      }
+
+      .header h1 {
+          font-size: 2.5em;
+          margin-bottom: 10px;
+          text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+      }
+
+      .header p {
+          font-size: 1.2em;
+      }
+
+      .schedule {
+          background: #f8f9fa;
+          padding: 30px;
+          border-bottom: 3px solid #fa709a;
+      }
+
+      .schedule h2 {
+          color: #fa709a;
+          margin-bottom: 20px;
+          font-size: 1.8em;
+      }
+
+      .schedule-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 15px;
+      }
+
+      .schedule-item {
+          background: white;
+          padding: 20px;
+          border-radius: 10px;
+          border-left: 5px solid #fa709a;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+          transition: transform 0.3s;
+      }
+
+      .schedule-item:hover {
+          transform: translateX(5px);
+      }
+
+      .schedule-item h3 {
+          color: #fa709a;
+          margin-bottom: 10px;
+      }
+
+      .section {
+          padding: 40px;
+          margin: 0;
+      }
+
+      .section:nth-child(odd) {
+          background: linear-gradient(135deg, #fff5f7 0%, #ffe4e9 100%);
+      }
+
+      .section:nth-child(even) {
+          background: linear-gradient(135deg, #fffbea 0%, #fff4cc 100%);
+      }
+
+      .section:nth-child(3) {
+          background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+      }
+
+      .section:nth-child(4) {
+          background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+      }
+
+      .section:nth-child(5) {
+          background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
+      }
+
+      .section:nth-child(6) {
+          background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
+      }
+
+      .section h2 {
+          font-size: 2em;
+          margin-bottom: 20px;
+          border-bottom: 3px solid rgba(250,112,154,0.5);
+          padding-bottom: 10px;
+          color: #333;
+      }
+
+      .section h3 {
+          color: #444;
+          margin-top: 20px;
+          margin-bottom: 15px;
+      }
+
+      .theory {
+          background: rgba(255,255,255,0.7);
+          padding: 20px;
+          border-radius: 10px;
+          margin: 20px 0;
+          backdrop-filter: blur(10px);
+          border: 1px solid rgba(0,0,0,0.1);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+
+      .theory h3 {
+          margin-bottom: 10px;
+          font-size: 1.3em;
+          color: #333;
+      }
+
+      .theory h4 {
+          color: #555;
+          font-size: 1.2em;
+          margin: 15px 0 10px 0;
+      }
+
+      .theory p, .theory li {
+          color: #444;
+          font-size: 1.05em;
+      }
+
+      .visual-example {
+          background: rgba(0,0,0,0.05);
+          padding: 20px;
+          border-radius: 10px;
+          margin: 15px 0;
+          text-align: center;
+          border: 2px dashed rgba(0,0,0,0.2);
+      }
+
+      .visual-example h4 {
+          margin-bottom: 15px;
+          color: #555;
+      }
+
+      .grid-visual {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          gap: 10px;
+          max-width: 400px;
+          margin: 20px auto;
+      }
+
+      .grid-item {
+          background: white;
+          padding: 20px;
+          border-radius: 8px;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+          text-align: center;
+          font-size: 1.5em;
+      }
+
+      .code-section {
+          background: #1e1e1e;
+          color: #d4d4d4;
+          padding: 20px;
+          border-radius: 10px;
+          margin: 20px 0;
+          overflow-x: auto;
+      }
+
+      .code-section h4 {
+          color: #4ec9b0;
+          margin-bottom: 15px;
+          font-size: 1.1em;
+      }
+
+      pre {
+          margin: 0;
+          font-family: 'Courier New', monospace;
+          font-size: 0.9em;
+      }
+
+      .kotlin {
+          color: #ce9178;
+      }
+
+      .xml {
+          color: #9cdcfe;
+      }
+
+      .comment {
+          color: #6a9955;
+      }
+
+      .keyword {
+          color: #569cd6;
+      }
+
+      .string {
+          color: #ce9178;
+      }
+
+      .function {
+          color: #dcdcaa;
+      }
+
+      .exercise {
+          background: rgba(255,255,255,0.8);
+          padding: 20px;
+          border-radius: 10px;
+          margin: 20px 0;
+          border-left: 5px solid #ffa726;
+          border: 1px solid rgba(255,167,38,0.3);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+
+      .exercise h4 {
+          color: #f57c00;
+          margin-bottom: 10px;
+          font-size: 1.2em;
+      }
+
+      .exercise p, .exercise ul, .exercise li {
+          color: #444;
+          font-size: 1.05em;
+      }
+
+      .tips {
+          background: rgba(255,255,255,0.8);
+          padding: 15px;
+          border-radius: 10px;
+          margin: 15px 0;
+          border-left: 5px solid #66bb6a;
+          border: 1px solid rgba(102,187,106,0.3);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+
+      .tips strong {
+          color: #388e3c;
+      }
+
+      .tips p, .tips li, .tips td {
+          color: #444;
+          font-size: 1.05em;
+      }
+
+      .warning {
+          background: rgba(255,235,59,0.3);
+          padding: 15px;
+          border-radius: 10px;
+          margin: 15px 0;
+          border-left: 5px solid #fbc02d;
+          border: 1px solid rgba(251,192,45,0.3);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+
+      .warning strong {
+          color: #f57f17;
+      }
+
+      .note {
+          background: rgba(255, 255, 255, 0.8);
+          padding: 15px;
+          border-radius: 8px;
+          margin: 15px 0;
+          border-left: 5px solid #42a5f5;
+          border: 1px solid rgba(66,165,245,0.3);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+
+      .note strong {
+          color: #1976d2;
+      }
+
+      .note p, .note code {
+          color: #444;
+          font-size: 1.05em;
+      }
+
+      .highlight {
+          background: rgba(66,165,245,0.2);
+          padding: 2px 6px;
+          border-radius: 3px;
+          font-weight: bold;
+          color: #1565c0;
+      }
+
+      .comparison-table {
+          width: 100%;
+          margin: 20px 0;
+          border-collapse: collapse;
+          background: white;
+          border-radius: 10px;
+          overflow: hidden;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+
+      .comparison-table th {
+          background: #fa709a;
+          color: white;
+          padding: 12px;
+          text-align: left;
+      }
+
+      .comparison-table td {
+          padding: 12px;
+          border-bottom: 1px solid #eee;
+          color: #444;
+      }
+
+      .comparison-table tr:hover {
+          background: #f5f5f5;
+      }
+
+      .summary {
+          background: #f8f9fa;
+          padding: 40px;
+      }
+
+      .summary h2 {
+          color: #fa709a;
+          font-size: 2em;
+          margin-bottom: 20px;
+      }
+
+      .checklist {
+          list-style: none;
+          padding: 0;
+      }
+
+      .checklist li {
+          padding: 15px;
+          margin: 10px 0;
+          background: white;
+          border-radius: 10px;
+          border-left: 5px solid #4ade80;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      }
+
+      .checklist li:before {
+          content: "✅ ";
+          font-size: 1.2em;
+      }
+
+      .resources {
+          background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+          color: white;
+          padding: 40px;
+      }
+
+      .resources h2 {
+          font-size: 2em;
+          margin-bottom: 20px;
+      }
+
+      @media (max-width: 768px) {
+          .header h1 {
+              font-size: 1.8em;
+          }
+
+          .schedule-grid {
+              grid-template-columns: 1fr;
+          }
+
+          .section {
+              padding: 20px;
+          }
+
+          .grid-visual {
+              grid-template-columns: repeat(2, 1fr);
+          }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- HEADER -->
+      <div class="header">
+        <h1>📊 GridView en Android con Kotlin</h1>
+        <p>Guía Completa de Desarrollo Android</p>
+        <p>🎯 Nivel: Básico-Intermedio</p>
+      </div>
+
+      <!-- SCHEDULE -->
+      <div class="schedule">
+        <h2>📋 Contenido del Manual</h2>
+        <div class="schedule-grid">
+          <div class="schedule-item">
+            <h3>📚 Parte 1</h3>
+            <p><strong>¿Qué es GridView?</strong></p>
+            <p>✅ Concepto y casos de uso</p>
+          </div>
+          <div class="schedule-item">
+            <h3>🛠️ Parte 2</h3>
+            <p><strong>Primer GridView</strong></p>
+            <p>✅ Implementación básica</p>
+          </div>
+          <div class="schedule-item">
+            <h3>🎨 Parte 3</h3>
+            <p><strong>Personalización</strong></p>
+            <p>✅ Columnas y espaciado</p>
+          </div>
+          <div class="schedule-item">
+            <h3>💾 Parte 4</h3>
+            <p><strong>Datos desde XML</strong></p>
+            <p>✅ Arrays resources</p>
+          </div>
+          <div class="schedule-item">
+            <h3>⚡ Parte 5</h3>
+            <p><strong>Eventos Click</strong></p>
+            <p>✅ OnItemClickListener</p>
+          </div>
+          <div class="schedule-item">
+            <h3>🚀 Parte 6</h3>
+            <p><strong>Casos Prácticos</strong></p>
+            <p>✅ Galerías e interfaces</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- PARTE 1 -->
+      <div class="section">
+        <h2>📚 PARTE 1: ¿Qué es GridView?</h2>
+
+        <div class="theory">
+          <h3>Definición</h3>
+          
+          <div style="margin-bottom: 20px;">
+            <p style="font-size: 1.1em; line-height: 1.8;">
+              <strong>GridView</strong> es un componente de Android que muestra elementos en una cuadrícula bidimensional desplazable (filas y columnas).
+              Es ideal para presentar colecciones de datos de forma visual, como galerías de fotos, catálogos de productos, iconos de aplicaciones, etc.
+            </p>
+          </div>
+
+          <div class="visual-example">
+            <h4>📱 Apariencia Visual de GridView</h4>
+            <div class="grid-visual">
+              <div class="grid-item">📷</div>
+              <div class="grid-item">🎨</div>
+              <div class="grid-item">🎮</div>
+              <div class="grid-item">🎵</div>
+              <div class="grid-item">📱</div>
+              <div class="grid-item">💻</div>
+              <div class="grid-item">🎬</div>
+              <div class="grid-item">📚</div>
+              <div class="grid-item">🏀</div>
+            </div>
+            <p style="margin-top: 15px; color: #666;">GridView de 3 columnas</p>
+          </div>
+
+          <h4>✅ ¿Cuándo usar GridView?</h4>
+          <ul style="margin-top: 10px;">
+            <li>📸 <strong>Galerías de imágenes:</strong> Fotos, avatares, miniaturas</li>
+            <li>🛍️ <strong>Catálogos de productos:</strong> Tiendas online, e-commerce</li>
+            <li>🎯 <strong>Menús visuales:</strong> Aplicaciones, categorías, opciones</li>
+            <li>📱 <strong>Iconos de apps:</strong> Launchers, organizadores</li>
+            <li>🎨 <strong>Paletas de colores:</strong> Selectores, editores</li>
+            <li>🔢 <strong>Calculadoras:</strong> Teclados numéricos</li>
+            <li>📅 <strong>Calendarios:</strong> Vista mensual</li>
+            <li>🎲 <strong>Juegos:</strong> Tableros, mosaicos</li>
+          </ul>
+
+          <h4>❌ ¿Cuándo NO usar GridView?</h4>
+          <ul style="margin-top: 10px;">
+            <li>📝 <strong>Listas largas de texto:</strong> Mejor ListView</li>
+            <li>📊 <strong>Datos tabulares complejos:</strong> Mejor TableLayout</li>
+            <li>🔄 <strong>Items de diferentes tamaños:</strong> Mejor RecyclerView con StaggeredGrid</li>
+            <li>⚡ <strong>Listas muy grandes (>1000 items):</strong> Mejor RecyclerView por rendimiento</li>
+          </ul>
+
+          <h4>🆚 GridView vs Otros Componentes</h4>
+          <div style="background: rgba(0,0,0,0.05); padding: 15px; border-radius: 8px; margin-top: 10px;">
+            <p style="margin-bottom: 10px;"><strong style="color: #fa709a;">GridView:</strong></p>
+            <p style="margin-left: 20px; margin-bottom: 15px;">Cuadrícula simple, múltiples columnas, todos los items del mismo tamaño</p>
+
+            <p style="margin-bottom: 10px;"><strong style="color: #fa709a;">ListView:</strong></p>
+            <p style="margin-left: 20px; margin-bottom: 15px;">Lista vertical, una columna, mejor para texto</p>
+
+            <p style="margin-bottom: 10px;"><strong style="color: #fa709a;">RecyclerView + GridLayoutManager:</strong></p>
+            <p style="margin-left: 20px;">Más eficiente, mayor flexibilidad, recomendado para proyectos nuevos</p>
+          </div>
+        </div>
+
+        <div class="tips">
+          <strong>💡 Ventajas del GridView:</strong>
+          <ul style="margin-top: 10px;">
+            <li>✅ Fácil de implementar (más simple que RecyclerView)</li>
+            <li>✅ Perfecto para galerías de imágenes</li>
+            <li>✅ Diseño visual atractivo</li>
+            <li>✅ Aprovecha mejor el espacio horizontal</li>
+            <li>✅ Ideal para items cuadrados o uniformes</li>
+          </ul>
+        </div>
+
+        <div class="warning">
+          <strong>⚠️ Limitaciones:</strong>
+          <ul style="margin-top: 10px;">
+            <li>❌ Todos los items deben tener el mismo tamaño</li>
+            <li>❌ Solo scroll vertical (no horizontal)</li>
+            <li>❌ Menos eficiente que RecyclerView para listas grandes</li>
+            <li>❌ ViewHolder opcional (afecta rendimiento)</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- PARTE 2 -->
+      <div class="section">
+        <h2>🛠️ PARTE 2: Primer GridView</h2>
+
+        <div class="theory">
+          <h3>📚 Componentes Necesarios</h3>
+          <ul>
+            <li><strong>GridView:</strong> El contenedor de la cuadrícula</li>
+            <li><strong>Adapter:</strong> Conecta los datos con el GridView</li>
+            <li><strong>Layout del item:</strong> Diseño de cada celda</li>
+            <li><strong>Datos:</strong> Array o lista de elementos</li>
+          </ul>
+        </div>
+
+        <h3>💻 Paso 1: Layout del Activity</h3>
+
+        <div class="code-section">
+          <h4>📄 activity_main.xml</h4>
+          <pre><code class="xml">&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;LinearLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"&gt;
+
+    &lt;TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Mi Primer GridView"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp"/&gt;
+
+    &lt;GridView
+        android:id="@+id/gridView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:numColumns="3"
+        android:horizontalSpacing="8dp"
+        android:verticalSpacing="8dp"
+        android:stretchMode="columnWidth"
+        android:padding="8dp"/&gt;
+
+&lt;/LinearLayout&gt;</code></pre>
+        </div>
+
+        <div class="note">
+          <strong>📝 Atributos importantes del GridView:</strong>
+          <ul style="margin-top: 10px;">
+            <li><code>numColumns</code> → Número de columnas (ej: 2, 3, 4, auto_fit)</li>
+            <li><code>horizontalSpacing</code> → Espacio horizontal entre items</li>
+            <li><code>verticalSpacing</code> → Espacio vertical entre items</li>
+            <li><code>stretchMode</code> → Cómo se estiran las columnas</li>
+            <li><code>columnWidth</code> → Ancho de cada columna (cuando usas auto_fit)</li>
+          </ul>
+        </div>
+
+        <h3>💻 Paso 2: MainActivity con Datos Simples</h3>
+
+        <div class="code-section">
+          <h4>📱 MainActivity.kt (Con ArrayAdapter simple)</h4>
+          <pre><code class="kotlin"><span class="keyword">package</span> com.example.ucv_b
+
+<span class="keyword">import</span> android.os.Bundle
+<span class="keyword">import</span> android.widget.ArrayAdapter
+<span class="keyword">import</span> android.widget.GridView
+<span class="keyword">import</span> android.widget.Toast
+<span class="keyword">import</span> androidx.appcompat.app.AppCompatActivity
+
+<span class="keyword">class</span> <span class="function">MainActivity</span> : AppCompatActivity() {
+    
+    <span class="keyword">override fun</span> <span class="function">onCreate</span>(savedInstanceState: Bundle?) {
+        <span class="keyword">super</span>.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        
+        <span class="comment">// 1. Referenciar el GridView</span>
+        <span class="keyword">val</span> gridView = findViewById&lt;GridView&gt;(R.id.gridView)
+        
+        <span class="comment">// 2. Datos hardcoded</span>
+        <span class="keyword">val</span> emojis = arrayOf(
+            <span class="string">"😀"</span>, <span class="string">"😃"</span>, <span class="string">"😄"</span>, <span class="string">"😁"</span>, <span class="string">"😆"</span>,
+            <span class="string">"😅"</span>, <span class="string">"😂"</span>, <span class="string">"🤣"</span>, <span class="string">"😊"</span>, <span class="string">"😇"</span>,
+            <span class="string">"🙂"</span>, <span class="string">"🙃"</span>, <span class="string">"😉"</span>, <span class="string">"😌"</span>, <span class="string">"😍"</span>,
+            <span class="string">"🥰"</span>, <span class="string">"😘"</span>, <span class="string">"😗"</span>, <span class="string">"😙"</span>, <span class="string">"😚"</span>
+        )
+        
+        <span class="comment">// 3. Crear adapter</span>
+        <span class="keyword">val</span> adapter = ArrayAdapter(
+            <span class="keyword">this</span>,
+            android.R.layout.simple_list_item_1,
+            emojis
+        )
+        
+        <span class="comment">// 4. Conectar adapter con GridView</span>
+        gridView.adapter = adapter
+        
+        <span class="comment">// 5. Agregar listener de click</span>
+        gridView.setOnItemClickListener { parent, view, position, id ->
+            Toast.makeText(
+                <span class="keyword">this</span>,
+                <span class="string">"Seleccionaste: ${emojis[position]}"</span>,
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+}</code></pre>
+        </div>
+
+        <div class="tips">
+          <strong>💡 Resultado:</strong>
+          <p style="margin-top: 10px;">Este código crea un GridView de 3 columnas con emojis. Al hacer click en cualquier emoji, muestra un Toast con el emoji seleccionado.</p>
+        </div>
+
+        <div class="exercise">
+          <h4>✏️ Ejercicio Rápido</h4>
+          <p>Modifica el código para mostrar:</p>
+          <ul>
+            <li><strong>Opción 1:</strong> Números del 1 al 20 en un GridView de 4 columnas</li>
+            <li><strong>Opción 2:</strong> Emojis de animales (🐶, 🐱, 🐭, etc.) en 3 columnas</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- PARTE 3 -->
+      <div class="section">
+        <h2>🎨 PARTE 3: Personalización del GridView</h2>
+
+        <div class="theory">
+          <h3>Configuración de Columnas</h3>
+        </div>
+
+        <h3>💻 Método 1: Número Fijo de Columnas</h3>
+
+        <div class="code-section">
+          <h4>📄 XML - Columnas fijas</h4>
+          <pre><code class="xml"><span class="comment">&lt;!-- 2 columnas --&gt;</span>
+&lt;GridView
+    android:id="@+id/gridView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:numColumns="2"/&gt;
+
+<span class="comment">&lt;!-- 3 columnas --&gt;</span>
+&lt;GridView
+    android:numColumns="3"/&gt;
+
+<span class="comment">&lt;!-- 4 columnas --&gt;</span>
+&lt;GridView
+    android:numColumns="4"/&gt;</code></pre>
+        </div>
+
+        <h3>💻 Método 2: Auto Fit (Ajuste Automático)</h3>
+
+        <div class="code-section">
+          <h4>📄 XML - Columnas automáticas</h4>
+          <pre><code class="xml">&lt;GridView
+    android:id="@+id/gridView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:numColumns="auto_fit"
+    android:columnWidth="100dp"
+    android:horizontalSpacing="8dp"
+    android:verticalSpacing="8dp"
+    android:stretchMode="columnWidth"/&gt;</code></pre>
+        </div>
+
+        <div class="note">
+          <strong>📝 auto_fit:</strong>
+          <p style="margin-top: 10px;">Con <code>numColumns="auto_fit"</code> y <code>columnWidth="100dp"</code>, el GridView calcula automáticamente cuántas columnas caben según el ancho de la pantalla.</p>
+          <p style="margin-top: 10px;"><strong>Ventaja:</strong> Se adapta a diferentes tamaños de pantalla (teléfonos, tablets)</p>
+        </div>
+
+        <h3>💻 Personalizar Espaciado y Padding</h3>
+
+        <div class="code-section">
+          <h4>📄 XML - Espaciado completo</h4>
+          <pre><code class="xml">&lt;GridView
+    android:id="@+id/gridView"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:numColumns="3"
+    android:horizontalSpacing="16dp"
+    android:verticalSpacing="16dp"
+    android:padding="16dp"
+    android:stretchMode="columnWidth"
+    android:gravity="center"/&gt;</code></pre>
+        </div>
+
+        <div class="visual-example">
+          <h4>📐 Comparación de Espaciados</h4>
+          <div style="text-align: left; max-width: 600px; margin: 0 auto;">
+            <p><strong>Sin espaciado (0dp):</strong></p>
+            <pre style="background: white; padding: 10px; border-radius: 5px; margin: 10px 0;">
+┌───┬───┬───┐
+│ 1 │ 2 │ 3 │
+├───┼───┼───┤
+│ 4 │ 5 │ 6 │
+└───┴───┴───┘</pre>
+
+            <p><strong>Con espaciado (8dp):</strong></p>
+            <pre style="background: white; padding: 10px; border-radius: 5px; margin: 10px 0;">
+┌───┐ ┌───┐ ┌───┐
+│ 1 │ │ 2 │ │ 3 │
+└───┘ └───┘ └───┘
+
+┌───┐ ┌───┐ ┌───┐
+│ 4 │ │ 5 │ │ 6 │
+└───┘ └───┘ └───┘</pre>
+
+            <p><strong>Con padding (16dp):</strong></p>
+            <pre style="background: white; padding: 10px; border-radius: 5px; margin: 10px 0;">
+    ┌───┐ ┌───┐ ┌───┐
+    │ 1 │ │ 2 │ │ 3 │
+    └───┘ └───┘ └───┘
+    
+    ┌───┐ ┌───┐ ┌───┐
+    │ 4 │ │ 5 │ │ 6 │
+    └───┘ └───┘ └───┘</pre>
+          </div>
+        </div>
+
+        <h3>💻 Modos de Estiramiento (stretchMode)</h3>
+
+        <div class="code-section">
+          <h4>📄 Opciones de stretchMode</h4>
+          <pre><code class="xml"><span class="comment">&lt;!-- Estirar ancho de columnas --&gt;</span>
+android:stretchMode="columnWidth"
+
+<span class="comment">&lt;!-- Estirar espaciado entre columnas --&gt;</span>
+android:stretchMode="spacingWidth"
+
+<span class="comment">&lt;!-- Estirar espaciado con ancho uniforme --&gt;</span>
+android:stretchMode="spacingWidthUniform"
+
+<span class="comment">&lt;!-- No estirar --&gt;</span>
+android:stretchMode="none"</code></pre>
+        </div>
+
+        <div class="tips">
+          <strong>💡 Recomendación:</strong>
+          <p style="margin-top: 10px;">Usa <code>stretchMode="columnWidth"</code> para la mayoría de casos. Las columnas se ajustarán al espacio disponible.</p>
+        </div>
+
+        <div class="exercise">
+          <h4>✏️ Ejercicio</h4>
+          <p><strong>Crear GridView Responsive:</strong></p>
+          <ul>
+            <li>Usar <code>numColumns="auto_fit"</code></li>
+            <li>Definir <code>columnWidth="120dp"</code></li>
+            <li>Agregar espaciado de 12dp</li>
+            <li>Probar en modo vertical y horizontal</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- PARTE 4 -->
+      <div class="section">
+        <h2>💾 PARTE 4: Datos desde Resources XML</h2>
+
+        <div class="theory">
+          <h3>📚 Ventajas de usar arrays.xml</h3>
+          <ul>
+            <li>✅ Separación de datos y lógica</li>
+            <li>✅ Fácil mantenimiento</li>
+            <li>✅ Reutilización de datos</li>
+            <li>✅ Multiidioma</li>
+          </ul>
+        </div>
+
+        <h3>💻 Crear arrays.xml</h3>
+
+        <div class="code-section">
+          <h4>📄 res/values/arrays.xml</h4>
+          <pre><code class="xml">&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;resources&gt;
+    <span class="comment">&lt;!-- Emojis de Animales --&gt;</span>
+    &lt;string-array name="animales"&gt;
+        &lt;item&gt;🐶&lt;/item&gt;
+        &lt;item&gt;🐱&lt;/item&gt;
+        &lt;item&gt;🐭&lt;/item&gt;
+        &lt;item&gt;🐹&lt;/item&gt;
+        &lt;item&gt;🐰&lt;/item&gt;
+        &lt;item&gt;🦊&lt;/item&gt;
+        &lt;item&gt;🐻&lt;/item&gt;
+        &lt;item&gt;🐼&lt;/item&gt;
+        &lt;item&gt;🐨&lt;/item&gt;
+        &lt;item&gt;🐯&lt;/item&gt;
+        &lt;item&gt;🦁&lt;/item&gt;
+        &lt;item&gt;🐮&lt;/item&gt;
+    &lt;/string-array&gt;
+    
+    <span class="comment">&lt;!-- Emojis de Frutas --&gt;</span>
+    &lt;string-array name="frutas"&gt;
+        &lt;item&gt;🍎&lt;/item&gt;
+        &lt;item&gt;🍌&lt;/item&gt;
+        &lt;item&gt;🍊&lt;/item&gt;
+        &lt;item&gt;🍇&lt;/item&gt;
+        &lt;item&gt;🍉&lt;/item&gt;
+        &lt;item&gt;🍓&lt;/item&gt;
+        &lt;item&gt;🍑&lt;/item&gt;
+        &lt;item&gt;🥝&lt;/item&gt;
+        &lt;item&gt;🍍&lt;/item&gt;
+        &lt;item&gt;🥭&lt;/item&gt;
+        &lt;item&gt;🍒&lt;/item&gt;
+        &lt;item&gt;🥥&lt;/item&gt;
+    &lt;/string-array&gt;
+    
+    <span class="comment">&lt;!-- Emojis de Deportes --&gt;</span>
+    &lt;string-array name="deportes"&gt;
+        &lt;item&gt;⚽&lt;/item&gt;
+        &lt;item&gt;🏀&lt;/item&gt;
+        &lt;item&gt;🏈&lt;/item&gt;
+        &lt;item&gt;⚾&lt;/item&gt;
+        &lt;item&gt;🎾&lt;/item&gt;
+        &lt;item&gt;🏐&lt;/item&gt;
+        &lt;item&gt;🏓&lt;/item&gt;
+        &lt;item&gt;🏸&lt;/item&gt;
+        &lt;item&gt;🥊&lt;/item&gt;
+        &lt;item&gt;⛳&lt;/item&gt;
+        &lt;item&gt;🏊&lt;/item&gt;
+        &lt;item&gt;🚴&lt;/item&gt;
+    &lt;/string-array&gt;
+    
+    <span class="comment">&lt;!-- Colores --&gt;</span>
+    &lt;string-array name="colores_nombres"&gt;
+        &lt;item&gt;Rojo&lt;/item&gt;
+        &lt;item&gt;Azul&lt;/item&gt;
+        &lt;item&gt;Verde&lt;/item&gt;
+        &lt;item&gt;Amarillo&lt;/item&gt;
+        &lt;item&gt;Morado&lt;/item&gt;
+        &lt;item&gt;Naranja&lt;/item&gt;
+        &lt;item&gt;Rosa&lt;/item&gt;
+        &lt;item&gt;Café&lt;/item&gt;
+        &lt;item&gt;Negro&lt;/item&gt;
+        &lt;item&gt;Blanco&lt;/item&gt;
+        &lt;item&gt;Gris&lt;/item&gt;
+        &lt;item&gt;Cyan&lt;/item&gt;
+    &lt;/string-array&gt;
+&lt;/resources&gt;</code></pre>
+        </div>
+
+        <div class="code-section">
+          <h4>📱 MainActivity.kt (Con arrays.xml)</h4>
+          <pre><code class="kotlin"><span class="keyword">class</span> <span class="function">MainActivity</span> : AppCompatActivity() {
+    
+    <span class="keyword">override fun</span> <span class="function">onCreate</span>(savedInstanceState: Bundle?) {
+        <span class="keyword">super</span>.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        
+        <span class="keyword">val</span> gridView = findViewById&lt;GridView&gt;(R.id.gridView)
+        
+        <span class="comment">// ⭐ Cargar datos desde arrays.xml</span>
+        <span class="keyword">val</span> animales = resources.getStringArray(R.array.animales)
+        
+        <span class="keyword">val</span> adapter = ArrayAdapter(
+            <span class="keyword">this</span>,
+            android.R.layout.simple_list_item_1,
+            animales
+        )
+        
+        gridView.adapter = adapter
+        
+        gridView.setOnItemClickListener { parent, view, position, id ->
+            Toast.makeText(
+                <span class="keyword">this</span>,
+                <span class="string">"Animal: ${animales[position]}"</span>,
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+}</code></pre>
+        </div>
+
+        <h3>💻 GridView con Botones para Cambiar Categorías</h3>
+
+        <div class="code-section">
+          <h4>📄 activity_main.xml (Con botones)</h4>
+          <pre><code class="xml">&lt;LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"&gt;
+
+    &lt;LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginBottom="16dp"&gt;
+        
+        &lt;Button
+            android:id="@+id/btnAnimales"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Animales"
+            android:layout_margin="4dp"/&gt;
+        
+        &lt;Button
+            android:id="@+id/btnFrutas"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Frutas"
+            android:layout_margin="4dp"/&gt;
+        
+        &lt;Button
+            android:id="@+id/btnDeportes"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Deportes"
+            android:layout_margin="4dp"/&gt;
+    &lt;/LinearLayout&gt;
+
+    &lt;TextView
+        android:id="@+id/tvCategoria"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Categoría: Animales"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp"/&gt;
+
+    &lt;GridView
+        android:id="@+id/gridView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:numColumns="4"
+        android:horizontalSpacing="8dp"
+        android:verticalSpacing="8dp"
+        android:stretchMode="columnWidth"/&gt;
+
+&lt;/LinearLayout&gt;</code></pre>
+        </div>
+
+        <div class="code-section">
+          <h4>📱 MainActivity.kt (Con cambio de categorías)</h4>
+          <pre><code class="kotlin"><span class="keyword">class</span> <span class="function">MainActivity</span> : AppCompatActivity() {
+    
+    <span class="keyword">private lateinit var</span> gridView: GridView
+    <span class="keyword">private lateinit var</span> tvCategoria: TextView
+    
+    <span class="keyword">override fun</span> <span class="function">onCreate</span>(savedInstanceState: Bundle?) {
+        <span class="keyword">super</span>.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        
+        gridView = findViewById(R.id.gridView)
+        tvCategoria = findViewById(R.id.tvCategoria)
+        <span class="keyword">val</span> btnAnimales = findViewById&lt;Button&gt;(R.id.btnAnimales)
+        <span class="keyword">val</span> btnFrutas = findViewById&lt;Button&gt;(R.id.btnFrutas)
+        <span class="keyword">val</span> btnDeportes = findViewById&lt;Button&gt;(R.id.btnDeportes)
+        
+        <span class="comment">// Botón Animales</span>
+        btnAnimales.setOnClickListener {
+            cargarCategoria(<span class="string">"Animales"</span>, R.array.animales)
+        }
+        
+        <span class="comment">// Botón Frutas</span>
+        btnFrutas.setOnClickListener {
+            cargarCategoria(<span class="string">"Frutas"</span>, R.array.frutas)
+        }
+        
+        <span class="comment">// Botón Deportes</span>
+        btnDeportes.setOnClickListener {
+            cargarCategoria(<span class="string">"Deportes"</span>, R.array.deportes)
+        }
+        
+        <span class="comment">// Cargar animales por defecto</span>
+        cargarCategoria(<span class="string">"Animales"</span>, R.array.animales)
+    }
+    
+    <span class="keyword">private fun</span> <span class="function">cargarCategoria</span>(nombre: String, arrayId: Int) {
+        tvCategoria.text = <span class="string">"Categoría: $nombre"</span>
+        
+        <span class="keyword">val</span> items = resources.getStringArray(arrayId)
+        
+        <span class="keyword">val</span> adapter = ArrayAdapter(
+            <span class="keyword">this</span>,
+            android.R.layout.simple_list_item_1,
+            items
+        )
+        
+        gridView.adapter = adapter
+        
+        gridView.setOnItemClickListener { parent, view, position, id ->
+            Toast.makeText(
+                <span class="keyword">this</span>,
+                <span class="string">"$nombre: ${items[position]}"</span>,
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+}</code></pre>
+        </div>
+
+        <div class="exercise">
+          <h4>✏️ Ejercicio</h4>
+          <p><strong>Selector de Emojis Completo:</strong></p>
+          <ul>
+            <li>5 categorías: Caras, Animales, Frutas, Deportes, Banderas</li>
+            <li>GridView de 4 columnas</li>
+            <li>Al hacer click, copiar emoji al portapapeles (opcional)</li>
+            <li>Contador de clicks por categoría</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- PARTE 5 -->
+      <div class="section">
+        <h2>⚡ PARTE 5: Eventos y Clicks</h2>
+
+        <div class="theory">
+          <h3>📚 OnItemClickListener</h3>
+          <p>GridView usa el mismo listener que ListView para detectar clicks en los items.</p>
+        </div>
+
+        <h3>💻 Click Simple con Toast</h3>
+
+        <div class="code-section">
+          <h4>📱 Click básico</h4>
+          <pre><code class="kotlin">gridView.setOnItemClickListener { parent, view, position, id ->
+    <span class="keyword">val</span> item = items[position]
+    Toast.makeText(<span class="keyword">this</span>, <span class="string">"Seleccionaste: $item"</span>, Toast.LENGTH_SHORT).show()
+}</code></pre>
+        </div>
+
+        <h3>💻 Click con AlertDialog</h3>
+
+        <div class="code-section">
+          <h4>📱 Mostrar información detallada</h4>
+          <pre><code class="kotlin"><span class="keyword">import</span> androidx.appcompat.app.AlertDialog
+
+gridView.setOnItemClickListener { parent, view, position, id ->
+    <span class="keyword">val</span> item = items[position]
+    
+    AlertDialog.Builder(<span class="keyword">this</span>)
+        .setTitle(<span class="string">"Item Seleccionado"</span>)
+        .setMessage(<span class="string">"Posición: $position\nItem: $item"</span>)
+        .setPositiveButton(<span class="string">"OK"</span>, <span class="keyword">null</span>)
+        .show()
+}</code></pre>
+        </div>
+
+        <h3>💻 Long Click (Mantener Presionado)</h3>
+
+        <div class="code-section">
+          <h4>📱 OnItemLongClickListener</h4>
+          <pre><code class="kotlin">gridView.setOnItemLongClickListener { parent, view, position, id ->
+    <span class="keyword">val</span> item = items[position]
+    
+    AlertDialog.Builder(<span class="keyword">this</span>)
+        .setTitle(<span class="string">"Opciones"</span>)
+        .setMessage(<span class="string">"¿Qué deseas hacer con $item?"</span>)
+        .setPositiveButton(<span class="string">"Compartir"</span>) { dialog, which ->
+            <span class="comment">// Acción compartir</span>
+            Toast.makeText(<span class="keyword">this</span>, <span class="string">"Compartir: $item"</span>, Toast.LENGTH_SHORT).show()
+        }
+        .setNegativeButton(<span class="string">"Cancelar"</span>, <span class="keyword">null</span>)
+        .show()
+    
+    <span class="keyword">true</span> <span class="comment">// Retornar true para consumir el evento</span>
+}</code></pre>
+        </div>
+
+        <h3>💻 Pasar Datos a Otra Activity</h3>
+
+        <div class="code-section">
+          <h4>📱 Navegación con Intent</h4>
+          <pre><code class="kotlin">gridView.setOnItemClickListener { parent, view, position, id ->
+    <span class="keyword">val</span> item = items[position]
+    
+    <span class="comment">// Crear Intent</span>
+    <span class="keyword">val</span> intent = Intent(<span class="keyword">this</span>, DetalleActivity::<span class="keyword">class</span>.java)
+    intent.putExtra(<span class="string">"ITEM"</span>, item)
+    intent.putExtra(<span class="string">"POSICION"</span>, position)
+    
+    <span class="comment">// Iniciar Activity</span>
+    startActivity(intent)
+}</code></pre>
+        </div>
+
+        <h3>💻 Ejemplo Completo: Galería con Detalles</h3>
+
+        <div class="code-section">
+          <h4>📄 arrays.xml</h4>
+          <pre><code class="xml">&lt;string-array name="productos_nombres"&gt;
+    &lt;item&gt;Laptop&lt;/item&gt;
+    &lt;item&gt;Smartphone&lt;/item&gt;
+    &lt;item&gt;Tablet&lt;/item&gt;
+    &lt;item&gt;Smartwatch&lt;/item&gt;
+    &lt;item&gt;Audífonos&lt;/item&gt;
+    &lt;item&gt;Cámara&lt;/item&gt;
+&lt;/string-array&gt;
+
+&lt;string-array name="productos_precios"&gt;
+    &lt;item&gt;S/. 3,500&lt;/item&gt;
+    &lt;item&gt;S/. 2,200&lt;/item&gt;
+    &lt;item&gt;S/. 1,500&lt;/item&gt;
+    &lt;item&gt;S/. 1,200&lt;/item&gt;
+    &lt;item&gt;S/. 450&lt;/item&gt;
+    &lt;item&gt;S/. 2,800&lt;/item&gt;
+&lt;/string-array&gt;
+
+&lt;string-array name="productos_emojis"&gt;
+    &lt;item&gt;💻&lt;/item&gt;
+    &lt;item&gt;📱&lt;/item&gt;
+    &lt;item&gt;📲&lt;/item&gt;
+    &lt;item&gt;⌚&lt;/item&gt;
+    &lt;item&gt;🎧&lt;/item&gt;
+    &lt;item&gt;📷&lt;/item&gt;
+&lt;/string-array&gt;</code></pre>
+        </div>
+
+        <div class="code-section">
+          <h4>📱 MainActivity.kt</h4>
+          <pre><code class="kotlin"><span class="keyword">class</span> <span class="function">MainActivity</span> : AppCompatActivity() {
+    
+    <span class="keyword">override fun</span> <span class="function">onCreate</span>(savedInstanceState: Bundle?) {
+        <span class="keyword">super</span>.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        
+        <span class="keyword">val</span> gridView = findViewById&lt;GridView&gt;(R.id.gridView)
+        
+        <span class="keyword">val</span> emojis = resources.getStringArray(R.array.productos_emojis)
+        <span class="keyword">val</span> nombres = resources.getStringArray(R.array.productos_nombres)
+        <span class="keyword">val</span> precios = resources.getStringArray(R.array.productos_precios)
+        
+        <span class="keyword">val</span> adapter = ArrayAdapter(
+            <span class="keyword">this</span>,
+            android.R.layout.simple_list_item_1,
+            emojis
+        )
+        
+        gridView.adapter = adapter
+        
+        gridView.setOnItemClickListener { parent, view, position, id ->
+            <span class="keyword">val</span> mensaje = <span class="string">"""
+                ${emojis[position]} ${nombres[position]}
+                
+                Precio: ${precios[position]}
+            """</span>.trimIndent()
+            
+            AlertDialog.Builder(<span class="keyword">this</span>)
+                .setTitle(<span class="string">"Detalle del Producto"</span>)
+                .setMessage(mensaje)
+                .setPositiveButton(<span class="string">"Comprar"</span>) { dialog, which ->
+                    Toast.makeText(
+                        <span class="keyword">this</span>,
+                        <span class="string">"Agregado al carrito: ${nombres[position]}"</span>,
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+                .setNegativeButton(<span class="string">"Cancelar"</span>, <span class="keyword">null</span>)
+                .show()
+        }
+    }
+}</code></pre>
+        </div>
+
+        <div class="exercise">
+          <h4>✏️ Ejercicio</h4>
+          <p><strong>Calculadora Visual:</strong></p>
+          <ul>
+            <li>GridView de 4 columnas con números del 0-9 y operadores (+, -, ×, ÷)</li>
+            <li>TextView arriba para mostrar la operación</li>
+            <li>Click en número: agregar a la operación</li>
+            <li>Click en operador: realizar cálculo</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- PARTE 6 -->
+      <div class="section">
+        <h2>🚀 PARTE 6: Casos Prácticos Avanzados</h2>
+
+        <h3>💻 Ejemplo 1: Galería de Fotos con Custom Adapter</h3>
+
+        <div class="code-section">
+          <h4>📄 item_galeria.xml (Layout del item)</h4>
+          <pre><code class="xml">&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="4dp"&gt;
+
+    &lt;LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="8dp"&gt;
+
+        &lt;ImageView
+            android:id="@+id/ivImagen"
+            android:layout_width="match_parent"
+            android:layout_height="120dp"
+            android:scaleType="centerCrop"
+            android:src="@drawable/placeholder"/&gt;
+
+        &lt;TextView
+            android:id="@+id/tvTitulo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Foto"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:layout_marginTop="4dp"
+            android:layout_gravity="center"/&gt;
+
+    &lt;/LinearLayout&gt;
+
+&lt;/androidx.cardview.widget.CardView&gt;</code></pre>
+        </div>
+
+        <h3>💻 Ejemplo 2: Selector de Colores</h3>
+
+        <div class="code-section">
+          <h4>📱 ColorAdapter.kt</h4>
+          <pre><code class="kotlin"><span class="keyword">class</span> <span class="function">ColorAdapter</span>(
+    <span class="keyword">private val</span> context: Context,
+    <span class="keyword">private val</span> colores: IntArray
+) : BaseAdapter() {
+
+    <span class="keyword">override fun</span> <span class="function">getCount</span>(): Int = colores.size
+
+    <span class="keyword">override fun</span> <span class="function">getItem</span>(position: Int): Any = colores[position]
+
+    <span class="keyword">override fun</span> <span class="function">getItemId</span>(position: Int): Long = position.toLong()
+
+    <span class="keyword">override fun</span> <span class="function">getView</span>(position: Int, convertView: View?, parent: ViewGroup?): View {
+        <span class="keyword">val</span> view = View(context)
+        view.layoutParams = ViewGroup.LayoutParams(200, 200)
+        view.setBackgroundColor(colores[position])
+        <span class="keyword">return</span> view
+    }
+}</code></pre>
+        </div>
+
+        <div class="code-section">
+          <h4>📱 MainActivity.kt (Usando ColorAdapter)</h4>
+          <pre><code class="kotlin"><span class="keyword">import</span> android.graphics.Color
+
+<span class="keyword">val</span> colores = intArrayOf(
+    Color.RED,
+    Color.BLUE,
+    Color.GREEN,
+    Color.YELLOW,
+    Color.MAGENTA,
+    Color.CYAN,
+    Color.BLACK,
+    Color.WHITE,
+    Color.GRAY,
+    Color.DKGRAY,
+    Color.LTGRAY,
+    Color.parseColor(<span class="string">"#FF6B6B"</span>)
+)
+
+<span class="keyword">val</span> adapter = ColorAdapter(<span class="keyword">this</span>, colores)
+gridView.adapter = adapter
+
+gridView.setOnItemClickListener { parent, view, position, id ->
+    <span class="keyword">val</span> colorSeleccionado = colores[position]
+    
+    <span class="comment">// Cambiar color de fondo</span>
+    findViewById&lt;View&gt;(R.id.vistaColor).setBackgroundColor(colorSeleccionado)
+    
+    <span class="comment">// Mostrar código hexadecimal</span>
+    <span class="keyword">val</span> hex = String.format(<span class="string">"#%06X"</span>, (0xFFFFFF and colorSeleccionado))
+    Toast.makeText(<span class="keyword">this</span>, <span class="string">"Color: $hex"</span>, Toast.LENGTH_SHORT).show()
+}</code></pre>
+        </div>
+
+        <h3>💻 Ejemplo 3: Menú de Aplicaciones (Launcher Style)</h3>
+
+        <div class="code-section">
+          <h4>📄 item_app.xml</h4>
+          <pre><code class="xml">&lt;LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:gravity="center"&gt;
+
+    &lt;TextView
+        android:id="@+id/tvIcono"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="📱"
+        android:textSize="48sp"/&gt;
+
+    &lt;TextView
+        android:id="@+id/tvNombre"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="App"
+        android:textSize="12sp"
+        android:layout_marginTop="4dp"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:gravity="center"/&gt;
+
+&lt;/LinearLayout&gt;</code></pre>
+        </div>
+
+        <h3>💻 Ejemplo 4: Teclado Numérico</h3>
+
+        <div class="code-section">
+          <h4>📱 MainActivity.kt</h4>
+          <pre><code class="kotlin"><span class="keyword">class</span> <span class="function">MainActivity</span> : AppCompatActivity() {
+    
+    <span class="keyword">private lateinit var</span> tvDisplay: TextView
+    
+    <span class="keyword">override fun</span> <span class="function">onCreate</span>(savedInstanceState: Bundle?) {
+        <span class="keyword">super</span>.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        
+        <span class="keyword">val</span> gridView = findViewById&lt;GridView&gt;(R.id.gridView)
+        tvDisplay = findViewById(R.id.tvDisplay)
+        
+        <span class="comment">// Teclado numérico</span>
+        <span class="keyword">val</span> teclas = arrayOf(
+            <span class="string">"1"</span>, <span class="string">"2"</span>, <span class="string">"3"</span>,
+            <span class="string">"4"</span>, <span class="string">"5"</span>, <span class="string">"6"</span>,
+            <span class="string">"7"</span>, <span class="string">"8"</span>, <span class="string">"9"</span>,
+            <span class="string">"⌫"</span>, <span class="string">"0"</span>, <span class="string">"✓"</span>
+        )
+        
+        <span class="keyword">val</span> adapter = ArrayAdapter(
+            <span class="keyword">this</span>,
+            android.R.layout.simple_list_item_1,
+            teclas
+        )
+        
+        gridView.adapter = adapter
+        
+        gridView.setOnItemClickListener { parent, view, position, id ->
+            <span class="keyword">val</span> tecla = teclas[position]
+            <span class="keyword">val</span> textoActual = tvDisplay.text.toString()
+            
+            <span class="keyword">when</span> (tecla) {
+                <span class="string">"⌫"</span> -> {
+                    <span class="keyword">if</span> (textoActual.isNotEmpty()) {
+                        tvDisplay.text = textoActual.dropLast(1)
+                    }
+                }
+                <span class="string">"✓"</span> -> {
+                    Toast.makeText(<span class="keyword">this</span>, <span class="string">"Número: $textoActual"</span>, Toast.LENGTH_SHORT).show()
+                }
+                <span class="keyword">else</span> -> {
+                    tvDisplay.text = textoActual + tecla
+                }
+            }
+        }
+    }
+}</code></pre>
+        </div>
+
+        <div class="exercise">
+          <h4>✏️ Proyecto Final Integrador</h4>
+          <p><strong>"App de Tienda Completa":</strong></p>
+          <ul>
+            <li>GridView de productos con imagen (emoji), nombre y precio</li>
+            <li>Custom Adapter para diseño personalizado</li>
+            <li>3-4 categorías con botones</li>
+            <li>Click: Ver detalles en AlertDialog o nueva Activity</li>
+            <li>Botón "Agregar al Carrito"</li>
+            <li>Contador de items en el carrito</li>
+            <li>Uso de CardView para cada producto</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- RESUMEN -->
+      <div class="summary">
+        <h2>📚 Resumen Completo</h2>
+        <ul class="checklist">
+          <li><strong>GridView:</strong> Componente para mostrar elementos en cuadrícula</li>
+          <li><strong>numColumns:</strong> Define cantidad de columnas (fijo o auto_fit)</li>
+          <li><strong>Spacing:</strong> horizontalSpacing y verticalSpacing para separación</li>
+          <li><strong>Adapter:</strong> ArrayAdapter o Custom Adapter</li>
+          <li><strong>Eventos:</strong> setOnItemClickListener y setOnItemLongClickListener</li>
+          <li><strong>Datos XML:</strong> arrays.xml para separar datos</li>
+          <li><strong>Casos de uso:</strong> Galerías, calculadoras, selectores, catálogos</li>
+        </ul>
+
+        <div style="background: white; padding: 20px; border-radius: 10px; margin-top: 30px;">
+          <h3 style="color: #fa709a;">GridView - Comparación con Otros Componentes</h3>
+          <table class="comparison-table">
+            <tr>
+              <th>Característica</th>
+              <th>GridView</th>
+              <th>ListView</th>
+              <th>RecyclerView</th>
+            </tr>
+            <tr>
+              <td>Orientación</td>
+              <td>Cuadrícula vertical</td>
+              <td>Lista vertical</td>
+              <td>Cualquiera</td>
+            </tr>
+            <tr>
+              <td>Columnas</td>
+              <td>Múltiples</td>
+              <td>1</td>
+              <td>Flexible</td>
+            </tr>
+            <tr>
+              <td>Complejidad</td>
+              <td>Baja</td>
+              <td>Baja</td>
+              <td>Alta</td>
+            </tr>
+            <tr>
+              <td>Rendimiento</td>
+              <td>⭐⭐⭐</td>
+              <td>⭐⭐</td>
+              <td>⭐⭐⭐⭐⭐</td>
+            </tr>
+            <tr>
+              <td>Mejor para</td>
+              <td>Galerías, iconos</td>
+              <td>Listas de texto</td>
+              <td>Todo (recomendado)</td>
+            </tr>
+            <tr>
+              <td>Items variables</td>
+              <td>❌ No</td>
+              <td>✅ Sí</td>
+              <td>✅ Sí</td>
+            </tr>
+          </table>
+        </div>
+      </div>
+
+      <!-- RECURSOS -->
+      <div class="resources">
+        <h2>📦 Recursos Adicionales</h2>
+
+        <div style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 10px; margin-top: 30px;">
+          <h3>🔗 Enlaces Útiles:</h3>
+          <ul>
+            <li><a href="https://developer.android.com/reference/android/widget/GridView" style="color: white; text-decoration: underline;">Documentación Oficial - GridView</a></li>
+            <li><a href="https://developer.android.com/guide/topics/ui/layout/gridview" style="color: white; text-decoration: underline;">Android Developers Guide - GridView</a></li>
+            <li><a href="https://kotlinlang.org/docs/home.html" style="color: white; text-decoration: underline;">Kotlin Documentation</a></li>
+          </ul>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 2px solid rgba(255,255,255,0.3);">
+          <p style="font-size: 1.2em; margin-bottom: 10px;">¡Manual Completado! 🎉</p>
+          <p style="opacity: 0.7; margin-top: 20px;">Desarrollado con ❤️ para estudiantes</p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
