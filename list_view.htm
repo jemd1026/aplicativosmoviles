@@ -1037,6 +1037,33 @@ val item = adapter.getItem(position)</code></pre>
         <h3>💻 Práctica 6: Lista → Detalle</h3>
 
         <div class="code-section">
+          <h4>📄 activity_main.xml</h4>
+          <pre><code class="xml">&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;LinearLayout
+    android:id="@+id/main"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"&gt;
+
+    &lt;TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Mi Primera Lista"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp"/&gt;
+
+    &lt;ListView
+        android:id="@+id/listView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/&gt;
+
+&lt;/LinearLayout&gt;</code></pre>
+        </div>
+
+        <div class="code-section">
           <h4>📄 arrays.xml (Agregar)</h4>
           <pre><code class="xml">&lt;string-array name="productos_detalle_nombres"&gt;
     &lt;item&gt;💻 Laptop Dell Inspiron&lt;/item&gt;
