@@ -1,0 +1,1597 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Fragments en Android - Guía Completa</title>
+    <style>
+      * {
+          margin: 0;
+          padding: 0;
+          box-sizing: border-box;
+      }
+
+      body {
+          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+          background: linear-gradient(135deg, #fbc2eb 0%, #a6c1ee 100%);
+          padding: 20px;
+          line-height: 1.6;
+      }
+
+      .container {
+          max-width: 1200px;
+          margin: 0 auto;
+          background: white;
+          border-radius: 20px;
+          box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+          overflow: hidden;
+      }
+
+      .header {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          padding: 40px;
+          text-align: center;
+      }
+
+      .header h1 {
+          font-size: 2.5em;
+          margin-bottom: 10px;
+          text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+      }
+
+      .header p {
+          font-size: 1.2em;
+      }
+
+      .schedule {
+          background: #f8f9fa;
+          padding: 30px;
+          border-bottom: 3px solid #667eea;
+      }
+
+      .schedule h2 {
+          color: #667eea;
+          margin-bottom: 20px;
+          font-size: 1.8em;
+      }
+
+      .schedule-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 15px;
+      }
+
+      .schedule-item {
+          background: white;
+          padding: 20px;
+          border-radius: 10px;
+          border-left: 5px solid #667eea;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+          transition: transform 0.3s;
+      }
+
+      .schedule-item:hover {
+          transform: translateX(5px);
+      }
+
+      .schedule-item h3 {
+          color: #667eea;
+          margin-bottom: 10px;
+      }
+
+      .section {
+          padding: 40px;
+          margin: 0;
+      }
+
+      .section:nth-child(odd) {
+          background: linear-gradient(135deg, #e8eaf6 0%, #c5cae9 100%);
+      }
+
+      .section:nth-child(even) {
+          background: linear-gradient(135deg, #e1f5fe 0%, #b3e5fc 100%);
+      }
+
+      .section:nth-child(3) {
+          background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+      }
+
+      .section:nth-child(4) {
+          background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+      }
+
+      .section:nth-child(5) {
+          background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%);
+      }
+
+      .section:nth-child(6) {
+          background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+      }
+
+      .section:nth-child(7) {
+          background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
+      }
+
+      .section h2 {
+          font-size: 2em;
+          margin-bottom: 20px;
+          border-bottom: 3px solid rgba(102,126,234,0.5);
+          padding-bottom: 10px;
+          color: #333;
+      }
+
+      .section h3 {
+          color: #444;
+          margin-top: 20px;
+          margin-bottom: 15px;
+      }
+
+      .theory {
+          background: rgba(255,255,255,0.7);
+          padding: 20px;
+          border-radius: 10px;
+          margin: 20px 0;
+          backdrop-filter: blur(10px);
+          border: 1px solid rgba(0,0,0,0.1);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+
+      .theory h3 {
+          margin-bottom: 10px;
+          font-size: 1.3em;
+          color: #333;
+      }
+
+      .theory h4 {
+          color: #555;
+          font-size: 1.2em;
+          margin: 15px 0 10px 0;
+      }
+
+      .theory p, .theory li {
+          color: #444;
+          font-size: 1.05em;
+      }
+
+      .visual-example {
+          background: rgba(0,0,0,0.05);
+          padding: 20px;
+          border-radius: 10px;
+          margin: 15px 0;
+          text-align: center;
+          border: 2px dashed rgba(0,0,0,0.2);
+      }
+
+      .visual-example h4 {
+          margin-bottom: 15px;
+          color: #555;
+      }
+
+      .code-section {
+          background: #1e1e1e;
+          color: #d4d4d4;
+          padding: 20px;
+          border-radius: 10px;
+          margin: 20px 0;
+          overflow-x: auto;
+      }
+
+      .code-section h4 {
+          color: #4ec9b0;
+          margin-bottom: 15px;
+          font-size: 1.1em;
+      }
+
+      pre {
+          margin: 0;
+          font-family: 'Courier New', monospace;
+          font-size: 0.9em;
+      }
+
+      .kotlin {
+          color: #ce9178;
+      }
+
+      .xml {
+          color: #9cdcfe;
+      }
+
+      .comment {
+          color: #6a9955;
+      }
+
+      .keyword {
+          color: #569cd6;
+      }
+
+      .string {
+          color: #ce9178;
+      }
+
+      .function {
+          color: #dcdcaa;
+      }
+
+      .exercise {
+          background: rgba(255,255,255,0.8);
+          padding: 20px;
+          border-radius: 10px;
+          margin: 20px 0;
+          border-left: 5px solid #ffa726;
+          border: 1px solid rgba(255,167,38,0.3);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+
+      .exercise h4 {
+          color: #f57c00;
+          margin-bottom: 10px;
+          font-size: 1.2em;
+      }
+
+      .exercise p, .exercise ul, .exercise li {
+          color: #444;
+          font-size: 1.05em;
+      }
+
+      .tips {
+          background: rgba(255,255,255,0.8);
+          padding: 15px;
+          border-radius: 10px;
+          margin: 15px 0;
+          border-left: 5px solid #66bb6a;
+          border: 1px solid rgba(102,187,106,0.3);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+
+      .tips strong {
+          color: #388e3c;
+      }
+
+      .tips p, .tips li, .tips td {
+          color: #444;
+          font-size: 1.05em;
+      }
+
+      .warning {
+          background: rgba(255,235,59,0.3);
+          padding: 15px;
+          border-radius: 10px;
+          margin: 15px 0;
+          border-left: 5px solid #fbc02d;
+          border: 1px solid rgba(251,192,45,0.3);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+
+      .warning strong {
+          color: #f57f17;
+      }
+
+      .note {
+          background: rgba(255, 255, 255, 0.8);
+          padding: 15px;
+          border-radius: 8px;
+          margin: 15px 0;
+          border-left: 5px solid #42a5f5;
+          border: 1px solid rgba(66,165,245,0.3);
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+
+      .note strong {
+          color: #1976d2;
+      }
+
+      .note p, .note code {
+          color: #444;
+          font-size: 1.05em;
+      }
+
+      .highlight {
+          background: rgba(66,165,245,0.2);
+          padding: 2px 6px;
+          border-radius: 3px;
+          font-weight: bold;
+          color: #1565c0;
+      }
+
+      .comparison-table {
+          width: 100%;
+          margin: 20px 0;
+          border-collapse: collapse;
+          background: white;
+          border-radius: 10px;
+          overflow: hidden;
+          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+      }
+
+      .comparison-table th {
+          background: #667eea;
+          color: white;
+          padding: 12px;
+          text-align: left;
+      }
+
+      .comparison-table td {
+          padding: 12px;
+          border-bottom: 1px solid #eee;
+          color: #444;
+      }
+
+      .comparison-table tr:hover {
+          background: #f5f5f5;
+      }
+
+      .architecture-box {
+          background: white;
+          padding: 20px;
+          border-radius: 10px;
+          margin: 20px 0;
+          box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      }
+
+      .architecture-box h4 {
+          color: #667eea;
+          margin-bottom: 15px;
+          font-size: 1.3em;
+      }
+
+      .flow-diagram {
+          display: flex;
+          align-items: center;
+          justify-content: space-around;
+          flex-wrap: wrap;
+          margin: 20px 0;
+      }
+
+      .flow-box {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          padding: 20px;
+          border-radius: 10px;
+          margin: 10px;
+          min-width: 150px;
+          text-align: center;
+          box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+      }
+
+      .flow-arrow {
+          font-size: 2em;
+          color: #667eea;
+          margin: 0 10px;
+      }
+
+      .summary {
+          background: #f8f9fa;
+          padding: 40px;
+      }
+
+      .summary h2 {
+          color: #667eea;
+          font-size: 2em;
+          margin-bottom: 20px;
+      }
+
+      .checklist {
+          list-style: none;
+          padding: 0;
+      }
+
+      .checklist li {
+          padding: 15px;
+          margin: 10px 0;
+          background: white;
+          border-radius: 10px;
+          border-left: 5px solid #4ade80;
+          box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      }
+
+      .checklist li:before {
+          content: "✅ ";
+          font-size: 1.2em;
+      }
+
+      .resources {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          padding: 40px;
+      }
+
+      .resources h2 {
+          font-size: 2em;
+          margin-bottom: 20px;
+      }
+
+      @media (max-width: 768px) {
+          .header h1 {
+              font-size: 1.8em;
+          }
+
+          .schedule-grid {
+              grid-template-columns: 1fr;
+          }
+
+          .section {
+              padding: 20px;
+          }
+
+          .flow-diagram {
+              flex-direction: column;
+          }
+
+          .flow-arrow {
+              transform: rotate(90deg);
+          }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- HEADER -->
+      <div class="header">
+        <h1>🧩 Fragments en Android con Kotlin</h1>
+        <p>Guía Completa de Desarrollo Android Moderno</p>
+        <p>🎯 Nivel: Intermedio</p>
+      </div>
+
+      <!-- SCHEDULE -->
+      <div class="schedule">
+        <h2>📋 Contenido del Manual</h2>
+        <div class="schedule-grid">
+          <div class="schedule-item">
+            <h3>📚 Parte 1</h3>
+            <p><strong>¿Qué son los Fragments?</strong></p>
+            <p>✅ Concepto y Ciclo de Vida</p>
+          </div>
+          <div class="schedule-item">
+            <h3>🏗️ Parte 2</h3>
+            <p><strong>Primer Fragment</strong></p>
+            <p>✅ Implementación Básica</p>
+          </div>
+          <div class="schedule-item">
+            <h3>🔄 Parte 3</h3>
+            <p><strong>Comunicación</strong></p>
+            <p>✅ Fragment ↔ Activity</p>
+          </div>
+          <div class="schedule-item">
+            <h3>🎨 Parte 4</h3>
+            <p><strong>Master-Detail</strong></p>
+            <p>✅ Lista + Detalles</p>
+          </div>
+          <div class="schedule-item">
+            <h3>📱 Parte 5</h3>
+            <p><strong>ViewPager + Tabs</strong></p>
+            <p>✅ Navegación por pestañas</p>
+          </div>
+          <div class="schedule-item">
+            <h3>🚀 Parte 6</h3>
+            <p><strong>Casos Avanzados</strong></p>
+            <p>✅ BackStack y Transacciones</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- PARTE 1 -->
+      <div class="section">
+        <h2>📚 PARTE 1: ¿Qué son los Fragments?</h2>
+
+        <div class="theory">
+          <h3>Definición</h3>
+
+          <div style="margin-bottom: 20px;">
+            <p style="font-size: 1.1em; line-height: 1.8;">
+              Un <strong>Fragment</strong> es una porción modular de la interfaz de usuario que representa una parte reutilizable de una Activity. Piensa en ellos como
+              <strong>"mini-Activities"</strong> que pueden ser combinados, reutilizados y que tienen su propio ciclo de vida.
+            </p>
+          </div>
+
+          <div class="visual-example">
+            <h4>🖼️ Analogía Visual</h4>
+            <div style="text-align: left; max-width: 600px; margin: 0 auto;">
+              <p><strong>Activity = Casa completa</strong></p>
+              <p><strong>Fragments = Habitaciones dentro de la casa</strong></p>
+              <pre style="background: white; padding: 15px; border-radius: 5px; margin-top: 10px;">
+┌─────────────────────────────┐
+│      Activity (Casa)        │
+│  ┌──────────┐  ┌──────────┐ │
+│  │Fragment1 │  │Fragment2 │ │
+│  │ (Sala)   │  │ (Cocina) │ │
+│  └──────────┘  └──────────┘ │
+│  ┌─────────────────────────┐│
+│  │    Fragment3 (Comedor)  ││
+│  └─────────────────────────┘│
+└─────────────────────────────┘</pre
+              >
+            </div>
+          </div>
+
+          <h4>✅ Ventajas de usar Fragments</h4>
+          <ul style="margin-top: 10px;">
+            <li>📱 <strong>Modularidad:</strong> Divide tu UI en componentes reutilizables</li>
+            <li>🔄 <strong>Reutilización:</strong> Usa el mismo Fragment en múltiples Activities</li>
+            <li>📐 <strong>Layouts adaptativos:</strong> Diferentes diseños para tablets y móviles</li>
+            <li>⚡ <strong>Transiciones suaves:</strong> Cambio de contenido sin cambiar Activity</li>
+            <li>💾 <strong>Ciclo de vida propio:</strong> Gestionan su estado independientemente</li>
+            <li>🗂️ <strong>BackStack:</strong> Navegación con botón atrás entre Fragments</li>
+          </ul>
+
+          <h4>❌ ¿Cuándo NO usar Fragments?</h4>
+          <ul style="margin-top: 10px;">
+            <li>📄 <strong>UI muy simple:</strong> Una sola pantalla estática</li>
+            <li>🎯 <strong>Activity única:</strong> Si no necesitas reutilizar código UI</li>
+            <li>📱 <strong>Jetpack Compose:</strong> En proyectos modernos, Compose es preferido</li>
+          </ul>
+        </div>
+
+        <div class="theory">
+          <h3>🔄 Ciclo de Vida del Fragment</h3>
+
+          <div class="visual-example">
+            <h4>📊 Estados del Fragment</h4>
+            <pre style="text-align: left; background: white; padding: 15px; border-radius: 5px; margin-top: 10px;">
+┌──────────────────┐
+│   onAttach()     │ ← Fragment se adjunta a Activity
+├──────────────────┤
+│   onCreate()     │ ← Inicialización básica
+├──────────────────┤
+│ onCreateView()   │ ⭐ Inflar el layout del Fragment
+├──────────────────┤
+│onViewCreated()   │ ⭐ Configurar las vistas
+├──────────────────┤
+│   onStart()      │ ← Fragment visible
+├──────────────────┤
+│   onResume()     │ ← Fragment interactivo (usuario puede interactuar)
+│                  │
+│ [ FRAGMENT ACTIVO ]
+│                  │
+│   onPause()      │ → Pierde el foco
+├──────────────────┤
+│   onStop()       │ → Ya no es visible
+├──────────────────┤
+│ onDestroyView()  │ → Se destruye la vista
+├──────────────────┤
+│   onDestroy()    │ → Se limpia el Fragment
+├──────────────────┤
+│   onDetach()     │ → Se desvincula de la Activity
+└──────────────────┘</pre
+            >
+          </div>
+
+          <div style="margin-top: 20px;">
+            <h4>⭐ Métodos más importantes</h4>
+            <div style="background: rgba(0,0,0,0.05); padding: 15px; border-radius: 8px; margin-top: 10px;">
+              <p style="margin-bottom: 10px;"><strong style="color: #667eea;">1. onCreateView()</strong></p>
+              <p style="margin-left: 20px; margin-bottom: 15px;">Se usa para <strong>inflar el layout XML</strong> del Fragment. Aquí defines qué XML se verá.</p>
+
+              <p style="margin-bottom: 10px;"><strong style="color: #667eea;">2. onViewCreated()</strong></p>
+              <p style="margin-left: 20px; margin-bottom: 15px;">Se ejecuta después de crear la vista. Aquí haces <strong>findViewById()</strong> y configuraciones.</p>
+
+              <p style="margin-bottom: 10px;"><strong style="color: #667eea;">3. onDestroyView()</strong></p>
+              <p style="margin-left: 20px;">Se llama cuando la vista se destruye. Útil para <strong>limpiar listeners</strong>.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="tips">
+          <strong>💡 Diferencia clave: Fragment vs Activity</strong>
+          <table class="comparison-table" style="margin-top: 10px;">
+            <tr>
+              <th>Característica</th>
+              <th>Activity</th>
+              <th>Fragment</th>
+            </tr>
+            <tr>
+              <td><strong>Independiente</strong></td>
+              <td>✅ Sí</td>
+              <td>❌ Depende de Activity</td>
+            </tr>
+            <tr>
+              <td><strong>Reutilizable</strong></td>
+              <td>❌ No</td>
+              <td>✅ Sí</td>
+            </tr>
+            <tr>
+              <td><strong>Ciclo de vida</strong></td>
+              <td>Propio</td>
+              <td>Propio + dependiente de Activity</td>
+            </tr>
+            <tr>
+              <td><strong>Context</strong></td>
+              <td>Es un Context</td>
+              <td>requireContext() o activity</td>
+            </tr>
+            <tr>
+              <td><strong>Uso principal</strong></td>
+              <td>Pantalla completa</td>
+              <td>Porción de pantalla</td>
+            </tr>
+          </table>
+        </div>
+
+        <div class="warning">
+          <strong>⚠️ Importante:</strong>
+          <p style="margin-top: 10px;">
+            Un Fragment <strong>SIEMPRE</strong> debe estar dentro de una Activity. No puede existir solo. Si la Activity se destruye, todos sus Fragments también se destruyen.
+          </p>
+        </div>
+      </div>
+
+      <!-- PARTE 2 -->
+      <div class="section">
+        <h2>🏗️ PARTE 2: Tu Primer Fragment</h2>
+
+        <h3>💻 Paso 1: Crear el Layout del Fragment</h3>
+
+        <div class="code-section">
+          <h4>📄 res/layout/fragment_lista.xml (Nuevo archivo)</h4>
+          <pre><code class="xml">&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="#E3F2FD"&gt;
+
+    &lt;TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Fragment de Lista de Flores"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#1976D2"
+        android:layout_marginBottom="16dp"/&gt;
+
+    &lt;ListView
+        android:id="@+id/listView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/&gt;
+
+&lt;/LinearLayout&gt;</code></pre>
+        </div>
+
+        <h3>💻 Paso 2: Crear la Clase Fragment</h3>
+
+        <div class="code-section">
+          <h4>📱 ListaFloresFragment.kt (Nueva clase)</h4>
+          <pre><code class="kotlin"><span class="keyword">package</span> com.example.ucv_b
+
+<span class="keyword">import</span> android.os.Bundle
+<span class="keyword">import</span> android.view.LayoutInflater
+<span class="keyword">import</span> android.view.View
+<span class="keyword">import</span> android.view.ViewGroup
+<span class="keyword">import</span> android.widget.ArrayAdapter
+<span class="keyword">import</span> android.widget.ListView
+<span class="keyword">import</span> android.widget.Toast
+<span class="keyword">import</span> androidx.fragment.app.Fragment
+
+<span class="keyword">class</span> <span class="function">ListaFloresFragment</span> : Fragment() {
+
+    <span class="comment">// 1️⃣ onCreateView: Inflar el layout</span>
+    <span class="keyword">override fun</span> <span class="function">onCreateView</span>(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        <span class="comment">// Inflar el layout del Fragment</span>
+        <span class="keyword">return</span> inflater.inflate(R.layout.fragment_lista, container, <span class="keyword">false</span>)
+    }
+
+    <span class="comment">// 2️⃣ onViewCreated: Configurar las vistas</span>
+    <span class="keyword">override fun</span> <span class="function">onViewCreated</span>(view: View, savedInstanceState: Bundle?) {
+        <span class="keyword">super</span>.onViewCreated(view, savedInstanceState)
+
+        <span class="comment">// Referenciar el ListView</span>
+        <span class="keyword">val</span> listView = view.findViewById&lt;ListView&gt;(R.id.listView)
+
+        <span class="comment">// Datos para el ListView</span>
+        <span class="keyword">val</span> flores = arrayOf(
+            <span class="string">"🌸 Gardenia"</span>,
+            <span class="string">"🌺 Kalanchoe"</span>,
+            <span class="string">"🌹 Rosa"</span>,
+            <span class="string">"🌼 Margarita"</span>,
+            <span class="string">"🌻 Girasol"</span>,
+            <span class="string">"🏵️ Dalia"</span>,
+            <span class="string">"🌷 Tulipán"</span>
+        )
+
+        <span class="comment">// Crear y asignar adapter</span>
+        <span class="keyword">val</span> adapter = ArrayAdapter(
+            requireContext(),
+            android.R.layout.simple_list_item_1,
+            flores
+        )
+        listView.adapter = adapter
+
+        <span class="comment">// Configurar click en items</span>
+        listView.setOnItemClickListener { parent, view, position, id ->
+            <span class="keyword">val</span> florSeleccionada = flores[position]
+            Toast.makeText(
+                requireContext(),
+                <span class="string">"Seleccionaste: $florSeleccionada"</span>,
+                Toast.LENGTH_SHORT
+            ).show()
+        }
+    }
+}</code></pre>
+        </div>
+
+        <div class="theory">
+          <h3>📖 Explicación del Código</h3>
+
+          <h4>1️⃣ Herencia de Fragment</h4>
+          <div style="background: rgba(0,0,0,0.05); padding: 15px; border-radius: 8px; margin: 10px 0;">
+            <ul>
+              <li>Debe heredar de <code>androidx.fragment.app.Fragment</code></li>
+              <li>NO de <code>android.app.Fragment</code> (deprecado)</li>
+            </ul>
+          </div>
+
+          <h4>2️⃣ onCreateView()</h4>
+          <div style="background: rgba(0,0,0,0.05); padding: 15px; border-radius: 8px; margin: 10px 0;">
+            <ul>
+              <li><strong>inflater:</strong> Objeto para convertir XML en View</li>
+              <li><strong>container:</strong> El ViewGroup padre (la Activity)</li>
+              <li><strong>attachToRoot = false:</strong> NO adjuntar automáticamente (lo hace el FragmentManager)</li>
+            </ul>
+          </div>
+
+          <h4>3️⃣ onViewCreated()</h4>
+          <div style="background: rgba(0,0,0,0.05); padding: 15px; border-radius: 8px; margin: 10px 0;">
+            <ul>
+              <li>Se ejecuta DESPUÉS de onCreateView()</li>
+              <li>Aquí haces findViewById() y configuraciones</li>
+              <li><code>view</code> es la vista inflada en onCreateView()</li>
+            </ul>
+          </div>
+
+          <h4>4️⃣ requireContext()</h4>
+          <div style="background: rgba(0,0,0,0.05); padding: 15px; border-radius: 8px; margin: 10px 0;">
+            <ul>
+              <li>Obtiene el Context de la Activity</li>
+              <li>Lanza excepción si el Fragment no está adjunto (más seguro)</li>
+              <li>Alternativa: <code>context</code> (puede ser null)</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3>💻 Paso 3: Agregar el Fragment a una Activity</h3>
+
+        <div class="note">
+          <strong>📝 Hay 2 formas de agregar un Fragment a una Activity:</strong>
+          <ul style="margin-top: 10px;">
+            <li>Estática: En el XML de la Activity</li>
+            <li>Dinámica: Por código (más flexible y recomendada)</li>
+          </ul>
+        </div>
+
+        <h4>Método 1: Estático (XML)</h4>
+
+        <div class="code-section">
+          <h4>📄 activity_main.xml</h4>
+          <pre><code class="xml">&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"&gt;
+
+    <span class="comment">&lt;!-- Agregar Fragment estáticamente --&gt;</span>
+    &lt;fragment
+        android:id="@+id/fragmentLista"
+        android:name="com.example.ucv_b.ListaFloresFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/&gt;
+
+&lt;/LinearLayout&gt;</code></pre>
+        </div>
+
+        <div class="warning">
+          <strong>⚠️ Limitación del método estático:</strong>
+          <p style="margin-top: 10px;">No puedes reemplazar el Fragment dinámicamente. Está fijo en el XML.</p>
+        </div>
+
+        <h4>Método 2: Dinámico (Código) ⭐ RECOMENDADO</h4>
+
+        <div class="code-section">
+          <h4>📄 activity_main.xml</h4>
+          <pre><code class="xml">&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"&gt;
+
+    <span class="comment">&lt;!-- Contenedor para el Fragment --&gt;</span>
+    &lt;FrameLayout
+        android:id="@+id/fragmentContainer"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/&gt;
+
+&lt;/LinearLayout&gt;</code></pre>
+        </div>
+
+        <div class="code-section">
+          <h4>📱 MainActivity.kt</h4>
+          <pre><code class="kotlin"><span class="keyword">package</span> com.example.ucv_b
+
+<span class="keyword">import</span> android.os.Bundle
+<span class="keyword">import</span> androidx.appcompat.app.AppCompatActivity
+
+<span class="keyword">class</span> <span class="function">MainActivity</span> : AppCompatActivity() {
+
+    <span class="keyword">override fun</span> <span class="function">onCreate</span>(savedInstanceState: Bundle?) {
+        <span class="keyword">super</span>.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        <span class="comment">// ⭐ Agregar Fragment dinámicamente</span>
+        <span class="keyword">if</span> (savedInstanceState == <span class="keyword">null</span>) {
+            <span class="keyword">val</span> fragment = ListaFloresFragment()
+
+            supportFragmentManager.beginTransaction()
+                .add(R.id.fragmentContainer, fragment)
+                .commit()
+        }
+    }
+}</code></pre>
+        </div>
+
+        <div class="tips">
+          <strong>💡 FragmentTransaction - Operaciones importantes:</strong>
+          <ul style="margin-top: 10px;">
+            <li><code>add(containerId, fragment)</code> - Agregar Fragment</li>
+            <li><code>replace(containerId, fragment)</code> - Reemplazar Fragment</li>
+            <li><code>remove(fragment)</code> - Eliminar Fragment</li>
+            <li><code>addToBackStack(null)</code> - Agregar a pila de retroceso</li>
+            <li><code>commit()</code> - Ejecutar la transacción (obligatorio)</li>
+          </ul>
+        </div>
+
+        <div class="note">
+          <strong>🔍 ¿Por qué if (savedInstanceState == null)?</strong>
+          <p style="margin-top: 10px;">
+            Evita agregar el Fragment múltiples veces cuando la Activity se recrea (rotación de pantalla). Si savedInstanceState NO es null, significa que la Activity se está recreando y el Fragment
+            ya existe.
+          </p>
+        </div>
+
+        <div class="exercise">
+          <h4>✏️ Ejercicio</h4>
+          <p>Crea dos Fragments:</p>
+          <ul>
+            <li><strong>Fragment 1:</strong> Lista de países</li>
+            <li><strong>Fragment 2:</strong> Formulario con EditText y Button</li>
+            <li>Agrega un botón en MainActivity para alternar entre ambos Fragments</li>
+          </ul>
+        </div>
+      </div>
+
+      <!-- PARTE 3 -->
+      <div class="section">
+        <h2>🎨 PARTE 3: Master-Detail Pattern (Tablet)</h2>
+
+        <div class="theory">
+          <h3>¿Qué es Master-Detail?</h3>
+          <p style="font-size: 1.1em; line-height: 1.8;">
+            Es un patrón de diseño donde se muestra una <strong>lista (Master)</strong> y los <strong>detalles (Detail)</strong> de forma simultánea. Ideal para tablets y pantallas grandes.
+          </p>
+
+          <div class="visual-example">
+            <h4>📱 Diseño Master-Detail</h4>
+            <pre style="text-align: left; background: white; padding: 15px; border-radius: 5px;">
+┌────────────────────────────────────────┐
+│         Activity (Tablet)              │
+│  ┌─────────────┐  ┌──────────────────┐ │
+│  │  Fragment   │  │    Fragment      │ │
+│  │   MASTER    │  │    DETAIL        │ │
+│  │  (Lista)    │  │   (Detalles)     │ │
+│  │             │  │                  │ │
+│  │ 🌸 Gardenia │  │  [Imagen Grande] │ │
+│  │ 🌺 Kalanchoe│←─│  Nombre          │ │
+│  │ 🌹 Rosa     │  │  Descripción...  │ │
+│  │ 🌼 Margarita│  │  Familia: ...    │ │
+│  │             │  │                  │ │
+│  └─────────────┘  └──────────────────┘ │
+│     30% width         70% width        │
+└────────────────────────────────────────┘</pre
+            >
+          </div>
+        </div>
+
+        <h3>💻 Paso 1: Crear arrays.xml con los datos</h3>
+
+        <div class="note"><strong>📝 Crear archivo:</strong> <span class="highlight">res/values/arrays.xml</span></div>
+
+        <div class="code-section">
+          <h4>📄 res/values/arrays.xml</h4>
+          <pre><code class="xml">&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;resources&gt;
+    <span class="comment">&lt;!-- Emojis de las flores --&gt;</span>
+    &lt;string-array name="flores_emojis"&gt;
+        &lt;item&gt;🌼&lt;/item&gt;
+        &lt;item&gt;🌺&lt;/item&gt;
+        &lt;item&gt;🌹&lt;/item&gt;
+        &lt;item&gt;🌼&lt;/item&gt;
+        &lt;item&gt;🌸&lt;/item&gt;
+        &lt;item&gt;🌻&lt;/item&gt;
+        &lt;item&gt;🌷&lt;/item&gt;
+    &lt;/string-array&gt;
+
+    <span class="comment">&lt;!-- Nombres comunes --&gt;</span>
+    &lt;string-array name="flores_nombres"&gt;
+        &lt;item&gt;Gardenia&lt;/item&gt;
+        &lt;item&gt;Kalanchoe&lt;/item&gt;
+        &lt;item&gt;Rosa&lt;/item&gt;
+        &lt;item&gt;Margarita&lt;/item&gt;
+        &lt;item&gt;Dalia&lt;/item&gt;
+        &lt;item&gt;Girasol&lt;/item&gt;
+        &lt;item&gt;Tulipán&lt;/item&gt;
+    &lt;/string-array&gt;
+
+    <span class="comment">&lt;!-- Nombres científicos --&gt;</span>
+    &lt;string-array name="flores_cientificos"&gt;
+        &lt;item&gt;Gardenia jasminoides&lt;/item&gt;
+        &lt;item&gt;Kalanchoe blossfeldiana&lt;/item&gt;
+        &lt;item&gt;Rosa spp.&lt;/item&gt;
+        &lt;item&gt;Bellis perennis&lt;/item&gt;
+        &lt;item&gt;Dahlia pinnata&lt;/item&gt;
+        &lt;item&gt;Helianthus annuus&lt;/item&gt;
+        &lt;item&gt;Tulipa gesneriana&lt;/item&gt;
+    &lt;/string-array&gt;
+
+    <span class="comment">&lt;!-- Familias botánicas --&gt;</span>
+    &lt;string-array name="flores_familias"&gt;
+        &lt;item&gt;Rubiaceae&lt;/item&gt;
+        &lt;item&gt;Crassulaceae&lt;/item&gt;
+        &lt;item&gt;Rosaceae&lt;/item&gt;
+        &lt;item&gt;Asteraceae&lt;/item&gt;
+        &lt;item&gt;Asteraceae&lt;/item&gt;
+        &lt;item&gt;Asteraceae&lt;/item&gt;
+        &lt;item&gt;Liliaceae&lt;/item&gt;
+    &lt;/string-array&gt;
+
+    <span class="comment">&lt;!-- Descripciones --&gt;</span>
+    &lt;string-array name="flores_descripciones"&gt;
+        &lt;item&gt;Las gardenias son nativas de Asia y tienen un fuerte y agradable aroma. El género científico de la especie más común es Gardenia jasminoides. Hay 229 especies descritas y de estas, solo 74 están aceptadas.&lt;/item&gt;
+        &lt;item&gt;El Kalanchoe es una planta suculenta muy popular por sus coloridas flores. Es fácil de cuidar y puede florecer durante varios meses. Originaria de Madagascar, es perfecta para interiores.&lt;/item&gt;
+        &lt;item&gt;La rosa es una de las flores más populares del mundo, símbolo de amor y belleza. Existen más de 30,000 variedades cultivadas con una amplia gama de colores y fragancias.&lt;/item&gt;
+        &lt;item&gt;La margarita común es una flor simple pero hermosa. Su nombre científico significa belleza perenne. Es resistente y puede crecer en diversos climas.&lt;/item&gt;
+        &lt;item&gt;La dalia es la flor nacional de México. Presenta una gran variedad de formas y colores. Los aztecas usaban sus tubérculos como alimento y para tratar la epilepsia.&lt;/item&gt;
+        &lt;item&gt;El girasol es conocido por seguir el movimiento del sol (heliotropismo). Sus semillas son comestibles y ricas en nutrientes. Originario de América del Norte.&lt;/item&gt;
+        &lt;item&gt;El tulipán es originario de Asia Central. Es famoso en los Países Bajos donde se cultiva masivamente. Fue protagonista de la primera burbuja económica de la historia (Tulipomanía).&lt;/item&gt;
+    &lt;/string-array&gt;
+&lt;/resources&gt;</code></pre>
+        </div>
+
+        <h3>💻 Paso 2: Crear la Clase de Datos</h3>
+
+        <div class="code-section">
+          <h4>📱 Flor.kt (Nueva clase - Simple)</h4>
+          <pre><code class="kotlin"><span class="keyword">package</span> com.example.ucv_b
+
+<span class="keyword">data class</span> <span class="function">Flor</span>(
+    <span class="keyword">val</span> id: Int,
+    <span class="keyword">val</span> nombre: String,
+    <span class="keyword">val</span> nombreCientifico: String,
+    <span class="keyword">val</span> familia: String,
+    <span class="keyword">val</span> descripcion: String,
+    <span class="keyword">val</span> emoji: String
+)</code></pre>
+        </div>
+
+        <div class="tips">
+          <strong>💡 Ventajas de usar arrays.xml:</strong>
+          <ul style="margin-top: 10px;">
+            <li>✅ Separación de datos y lógica</li>
+            <li>✅ Fácil mantenimiento y actualización</li>
+            <li>✅ Soporte multiidioma (res/values-es, res/values-en)</li>
+            <li>✅ Reutilización en múltiples Activities/Fragments</li>
+            <li>✅ Patrón recomendado por Google</li>
+          </ul>
+        </div>
+
+        <h3>💻 Paso 2: Fragment Master (Lista)</h3>
+
+        <div class="code-section">
+          <h4>📄 res/layout/fragment_lista_flores.xml</h4>
+          <pre><code class="xml">&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="#F5F5F5"&gt;
+
+    &lt;TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="🌺 Lista de Flores"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:textColor="#667eea"
+        android:padding="16dp"
+        android:background="#FFFFFF"
+        android:elevation="4dp"/&gt;
+
+    &lt;ListView
+        android:id="@+id/listViewFlores"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:divider="#E0E0E0"
+        android:dividerHeight="1dp"/&gt;
+
+&lt;/LinearLayout&gt;</code></pre>
+        </div>
+
+        <div class="code-section">
+          <h4>📄 res/layout/item_flor.xml (Item de la lista)</h4>
+          <pre><code class="xml">&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:padding="16dp"
+    android:background="?android:attr/selectableItemBackground"&gt;
+
+    &lt;TextView
+        android:id="@+id/tvEmoji"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="🌸"
+        android:textSize="32sp"
+        android:layout_marginEnd="16dp"/&gt;
+
+    &lt;LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:orientation="vertical"&gt;
+
+        &lt;TextView
+            android:id="@+id/tvNombre"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Flor"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:textColor="#333"/&gt;
+
+        &lt;TextView
+            android:id="@+id/tvCientifico"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Nombre científico"
+            android:textSize="14sp"
+            android:textColor="#666"
+            android:fontFamily="serif"
+            android:textStyle="italic"/&gt;
+
+    &lt;/LinearLayout&gt;
+
+&lt;/LinearLayout&gt;</code></pre>
+        </div>
+
+        <div class="code-section">
+          <h4>📱 ListaFloresFragment.kt (Con arrays.xml)</h4>
+          <pre><code class="kotlin"><span class="keyword">package</span> com.example.ucv_b
+
+<span class="keyword">import</span> android.os.Bundle
+<span class="keyword">import</span> android.view.LayoutInflater
+<span class="keyword">import</span> android.view.View
+<span class="keyword">import</span> android.view.ViewGroup
+<span class="keyword">import</span> android.widget.ArrayAdapter
+<span class="keyword">import</span> android.widget.ListView
+<span class="keyword">import</span> android.widget.TextView
+<span class="keyword">import</span> androidx.fragment.app.Fragment
+
+<span class="keyword">class</span> <span class="function">ListaFloresFragment</span> : Fragment() {
+
+    <span class="comment">// Interface para comunicación con la Activity</span>
+    <span class="keyword">interface</span> <span class="function">OnFlorSeleccionadaListener</span> {
+        <span class="keyword">fun</span> <span class="function">onFlorSeleccionada</span>(flor: Flor)
+    }
+
+    <span class="keyword">private var</span> listener: OnFlorSeleccionadaListener? = <span class="keyword">null</span>
+    <span class="keyword">private lateinit var</span> flores: List&lt;Flor&gt;
+
+    <span class="keyword">override fun</span> <span class="function">onCreateView</span>(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        <span class="keyword">return</span> inflater.inflate(R.layout.fragment_lista_flores, container, <span class="keyword">false</span>)
+    }
+
+    <span class="keyword">override fun</span> <span class="function">onViewCreated</span>(view: View, savedInstanceState: Bundle?) {
+        <span class="keyword">super</span>.onViewCreated(view, savedInstanceState)
+
+        <span class="comment">// ⭐ Cargar datos desde arrays.xml</span>
+        flores = cargarFloresDesdeResources()
+
+        <span class="comment">// Configurar ListView</span>
+        <span class="keyword">val</span> listView = view.findViewById&lt;ListView&gt;(R.id.listViewFlores)
+
+        <span class="comment">// Adapter personalizado</span>
+        <span class="keyword">val</span> adapter = <span class="keyword">object</span> : ArrayAdapter&lt;Flor&gt;(
+            requireContext(),
+            R.layout.item_flor,
+            flores
+        ) {
+            <span class="keyword">override fun</span> <span class="function">getView</span>(position: Int, convertView: View?, parent: ViewGroup): View {
+                <span class="keyword">val</span> view = convertView ?: LayoutInflater.from(context)
+                    .inflate(R.layout.item_flor, parent, <span class="keyword">false</span>)
+
+                <span class="keyword">val</span> flor = getItem(position)
+
+                view.findViewById&lt;TextView&gt;(R.id.tvEmoji).text = flor?.emoji
+                view.findViewById&lt;TextView&gt;(R.id.tvNombre).text = flor?.nombre
+                view.findViewById&lt;TextView&gt;(R.id.tvCientifico).text = flor?.nombreCientifico
+
+                <span class="keyword">return</span> view
+            }
+        }
+
+        listView.adapter = adapter
+
+        <span class="comment">// ⭐ Click en item: Notificar a la Activity</span>
+        listView.setOnItemClickListener { parent, view, position, id ->
+            <span class="keyword">val</span> florSeleccionada = flores[position]
+            listener?.onFlorSeleccionada(florSeleccionada)
+        }
+    }
+
+    <span class="comment">// ⭐ Método para cargar flores desde arrays.xml</span>
+    <span class="keyword">private fun</span> <span class="function">cargarFloresDesdeResources</span>(): List&lt;Flor&gt; {
+        <span class="keyword">val</span> emojis = resources.getStringArray(R.array.flores_emojis)
+        <span class="keyword">val</span> nombres = resources.getStringArray(R.array.flores_nombres)
+        <span class="keyword">val</span> cientificos = resources.getStringArray(R.array.flores_cientificos)
+        <span class="keyword">val</span> familias = resources.getStringArray(R.array.flores_familias)
+        <span class="keyword">val</span> descripciones = resources.getStringArray(R.array.flores_descripciones)
+
+        <span class="keyword">val</span> listaFlores = mutableListOf&lt;Flor&gt;()
+
+        <span class="keyword">for</span> (i <span class="keyword">in</span> nombres.indices) {
+            listaFlores.add(
+                Flor(
+                    id = i + 1,
+                    nombre = nombres[i],
+                    nombreCientifico = cientificos[i],
+                    familia = familias[i],
+                    descripcion = descripciones[i],
+                    emoji = emojis[i]
+                )
+            )
+        }
+
+        <span class="keyword">return</span> listaFlores
+    }
+
+    <span class="comment">// ⭐ Método para vincular el listener (la Activity)</span>
+    <span class="keyword">fun</span> <span class="function">setOnFlorSeleccionadaListener</span>(listener: OnFlorSeleccionadaListener) {
+        <span class="keyword">this</span>.listener = listener
+    }
+}</code></pre>
+        </div>
+
+        <div class="theory">
+          <h3>📖 Explicación del método cargarFloresDesdeResources()</h3>
+
+          <div style="background: rgba(0,0,0,0.05); padding: 15px; border-radius: 8px; margin: 10px 0;">
+            <h4>1️⃣ Carga de Arrays</h4>
+            <ul style="margin-top: 10px;">
+              <li><code>resources.getStringArray(R.array.nombre_array)</code> - Obtiene un array del XML</li>
+              <li>Se cargan los 5 arrays separados (emojis, nombres, científicos, familias, descripciones)</li>
+            </ul>
+
+            <h4>2️⃣ Iteración con índices</h4>
+            <ul style="margin-top: 10px;">
+              <li><code>nombres.indices</code> - Genera rango 0 hasta nombres.size - 1</li>
+              <li>Todos los arrays deben tener la <strong>misma cantidad de elementos</strong></li>
+              <li>El índice <code>i</code> accede a la misma posición en todos los arrays</li>
+            </ul>
+
+            <h4>3️⃣ Creación de objetos Flor</h4>
+            <ul style="margin-top: 10px;">
+              <li>Combina los datos de los 5 arrays en un solo objeto</li>
+              <li><code>id = i + 1</code> - IDs empiezan en 1 (no en 0)</li>
+              <li>Se agrega cada flor a la lista mutable</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="warning">
+          <strong>⚠️ Importante - Sincronización de Arrays:</strong>
+          <p style="margin-top: 10px;">
+            Todos los arrays en <code>arrays.xml</code> DEBEN tener el <strong>mismo número de elementos</strong> y en el <strong>mismo orden</strong>. El índice 0 de todos los arrays representa la
+            misma flor.
+          </p>
+          <div style="background: rgba(0,0,0,0.05); padding: 10px; border-radius: 5px; margin-top: 10px;">
+            <p><strong>Ejemplo:</strong></p>
+            <p>flores_nombres[0] = "Gardenia"</p>
+            <p>flores_emojis[0] = "🌼"</p>
+            <p>flores_cientificos[0] = "Gardenia jasminoides"</p>
+            <p>✅ Todos representan la misma flor</p>
+          </div>
+        </div>
+
+        <h3>💻 Paso 3: Fragment Detail (Detalles)</h3>
+
+        <div class="code-section">
+          <h4>📄 res/layout/fragment_detalle_flor.xml</h4>
+          <pre><code class="xml">&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#FFFFFF"&gt;
+
+    &lt;LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp"&gt;
+
+        <span class="comment">&lt;!-- Placeholder cuando no hay selección --&gt;</span>
+        &lt;LinearLayout
+            android:id="@+id/layoutPlaceholder"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:padding="40dp"&gt;
+
+            &lt;TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🌼"
+                android:textSize="80sp"/&gt;
+
+            &lt;TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Selecciona una flor"
+                android:textSize="20sp"
+                android:textColor="#999"
+                android:layout_marginTop="16dp"/&gt;
+
+        &lt;/LinearLayout&gt;
+
+        <span class="comment">&lt;!-- Contenido de detalles --&gt;</span>
+        &lt;LinearLayout
+            android:id="@+id/layoutDetalles"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:visibility="gone"&gt;
+
+            <span class="comment">&lt;!-- Emoji grande --&gt;</span>
+            &lt;TextView
+                android:id="@+id/tvEmojiGrande"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="🌸"
+                android:textSize="120sp"
+                android:layout_gravity="center"
+                android:layout_marginBottom="24dp"/&gt;
+
+            <span class="comment">&lt;!-- Nombre --&gt;</span>
+            &lt;TextView
+                android:id="@+id/tvNombreDetalle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Gardenia"
+                android:textSize="32sp"
+                android:textStyle="bold"
+                android:textColor="#333"
+                android:layout_gravity="center"
+                android:layout_marginBottom="8dp"/&gt;
+
+            <span class="comment">&lt;!-- Nombre científico --&gt;</span>
+            &lt;TextView
+                android:id="@+id/tvCientificoDetalle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Gardenia jasminoides"
+                android:textSize="18sp"
+                android:textColor="#667eea"
+                android:fontFamily="serif"
+                android:textStyle="italic"
+                android:layout_gravity="center"
+                android:layout_marginBottom="24dp"/&gt;
+
+            <span class="comment">&lt;!-- Badge Familia --&gt;</span>
+            &lt;TextView
+                android:id="@+id/tvFamilia"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Familia: Rubiaceae"
+                android:textSize="14sp"
+                android:textColor="#FFFFFF"
+                android:background="@drawable/badge_background"
+                android:padding="8dp"
+                android:layout_gravity="center"
+                android:layout_marginBottom="24dp"/&gt;
+
+            <span class="comment">&lt;!-- Descripción --&gt;</span>
+            &lt;TextView
+                android:id="@+id/tvDescripcion"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Descripción de la flor..."
+                android:textSize="16sp"
+                android:textColor="#555"
+                android:lineSpacingExtra="4dp"
+                android:textAlignment="textStart"
+                android:background="#F5F5F5"
+                android:padding="16dp"
+                android:layout_marginTop="8dp"/&gt;
+
+        &lt;/LinearLayout&gt;
+
+    &lt;/LinearLayout&gt;
+
+&lt;/ScrollView&gt;</code></pre>
+        </div>
+
+        <div class="note">
+          <strong>📝 Crear drawable para el badge:</strong>
+          <p>res/drawable/badge_background.xml</p>
+        </div>
+
+        <div class="code-section">
+          <h4>📄 res/drawable/badge_background.xml (Nuevo archivo)</h4>
+          <pre><code class="xml">&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle"&gt;
+    
+    &lt;solid android:color="#667eea"/&gt;
+    
+    &lt;corners android:radius="20dp"/&gt;
+    
+&lt;/shape&gt;</code></pre>
+        </div>
+
+        <div class="code-section">
+          <h4>📱 DetalleFloresFragment.kt</h4>
+          <pre><code class="kotlin"><span class="keyword">package</span> com.example.ucv_b
+
+<span class="keyword">import</span> android.os.Bundle
+<span class="keyword">import</span> android.view.LayoutInflater
+<span class="keyword">import</span> android.view.View
+<span class="keyword">import</span> android.view.ViewGroup
+<span class="keyword">import</span> android.widget.LinearLayout
+<span class="keyword">import</span> android.widget.TextView
+<span class="keyword">import</span> androidx.fragment.app.Fragment
+
+<span class="keyword">class</span> <span class="function">DetalleFloresFragment</span> : Fragment() {
+
+    <span class="keyword">private lateinit var</span> layoutPlaceholder: LinearLayout
+    <span class="keyword">private lateinit var</span> layoutDetalles: LinearLayout
+    <span class="keyword">private lateinit var</span> tvEmojiGrande: TextView
+    <span class="keyword">private lateinit var</span> tvNombreDetalle: TextView
+    <span class="keyword">private lateinit var</span> tvCientificoDetalle: TextView
+    <span class="keyword">private lateinit var</span> tvFamilia: TextView
+    <span class="keyword">private lateinit var</span> tvDescripcion: TextView
+
+    <span class="keyword">override fun</span> <span class="function">onCreateView</span>(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View? {
+        <span class="keyword">return</span> inflater.inflate(R.layout.fragment_detalle_flor, container, <span class="keyword">false</span>)
+    }
+
+    <span class="keyword">override fun</span> <span class="function">onViewCreated</span>(view: View, savedInstanceState: Bundle?) {
+        <span class="keyword">super</span>.onViewCreated(view, savedInstanceState)
+
+        <span class="comment">// Referenciar vistas</span>
+        layoutPlaceholder = view.findViewById(R.id.layoutPlaceholder)
+        layoutDetalles = view.findViewById(R.id.layoutDetalles)
+        tvEmojiGrande = view.findViewById(R.id.tvEmojiGrande)
+        tvNombreDetalle = view.findViewById(R.id.tvNombreDetalle)
+        tvCientificoDetalle = view.findViewById(R.id.tvCientificoDetalle)
+        tvFamilia = view.findViewById(R.id.tvFamilia)
+        tvDescripcion = view.findViewById(R.id.tvDescripcion)
+    }
+
+    <span class="comment">// ⭐ Método público para actualizar los detalles</span>
+    <span class="keyword">fun</span> <span class="function">mostrarDetalles</span>(flor: Flor) {
+        <span class="comment">// Ocultar placeholder y mostrar detalles</span>
+        layoutPlaceholder.visibility = View.GONE
+        layoutDetalles.visibility = View.VISIBLE
+
+        <span class="comment">// Actualizar vistas con los datos de la flor</span>
+        tvEmojiGrande.text = flor.emoji
+        tvNombreDetalle.text = flor.nombre
+        tvCientificoDetalle.text = flor.nombreCientifico
+        tvFamilia.text = <span class="string">"Familia: ${flor.familia}"</span>
+        tvDescripcion.text = flor.descripcion
+    }
+}</code></pre>
+        </div>
+
+        <h3>💻 Paso 4: Activity con ambos Fragments</h3>
+
+        <div class="code-section">
+          <h4>📄 res/layout/activity_main.xml (Para Tablet)</h4>
+          <pre><code class="xml">&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"&gt;
+
+    <span class="comment">&lt;!-- Contenedor Fragment Master (Lista) - 30% --&gt;</span>
+    &lt;FrameLayout
+        android:id="@+id/fragmentListaContainer"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="3"/&gt;
+
+    <span class="comment">&lt;!-- Separador vertical --&gt;</span>
+    &lt;View
+        android:layout_width="2dp"
+        android:layout_height="match_parent"
+        android:background="#E0E0E0"/&gt;
+
+    <span class="comment">&lt;!-- Contenedor Fragment Detail (Detalles) - 70% --&gt;</span>
+    &lt;FrameLayout
+        android:id="@+id/fragmentDetalleContainer"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="7"/&gt;
+
+&lt;/LinearLayout&gt;</code></pre>
+        </div>
+
+        <div class="code-section">
+          <h4>📱 MainActivity.kt (Completa)</h4>
+          <pre><code class="kotlin"><span class="keyword">package</span> com.example.ucv_b
+
+<span class="keyword">import</span> android.os.Bundle
+<span class="keyword">import</span> androidx.appcompat.app.AppCompatActivity
+
+<span class="keyword">class</span> <span class="function">MainActivity</span> : AppCompatActivity(), 
+    ListaFloresFragment.OnFlorSeleccionadaListener {
+
+    <span class="keyword">private lateinit var</span> detalleFragment: DetalleFloresFragment
+
+    <span class="keyword">override fun</span> <span class="function">onCreate</span>(savedInstanceState: Bundle?) {
+        <span class="keyword">super</span>.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        <span class="keyword">if</span> (savedInstanceState == <span class="keyword">null</span>) {
+            <span class="comment">// ⭐ Crear Fragment Master (Lista)</span>
+            <span class="keyword">val</span> listaFragment = ListaFloresFragment()
+            listaFragment.setOnFlorSeleccionadaListener(<span class="keyword">this</span>)
+
+            <span class="comment">// ⭐ Crear Fragment Detail (Detalles)</span>
+            detalleFragment = DetalleFloresFragment()
+
+            <span class="comment">// ⭐ Agregar ambos fragments</span>
+            supportFragmentManager.beginTransaction()
+                .add(R.id.fragmentListaContainer, listaFragment)
+                .add(R.id.fragmentDetalleContainer, detalleFragment)
+                .commit()
+        }
+    }
+
+    <span class="comment">// ⭐ Implementar el método de la interface</span>
+    <span class="keyword">override fun</span> <span class="function">onFlorSeleccionada</span>(flor: Flor) {
+        <span class="comment">// Actualizar el fragment de detalles</span>
+        detalleFragment.mostrarDetalles(flor)
+    }
+}</code></pre>
+        </div>
+
+        <div class="theory">
+          <h3>🔄 Flujo de Comunicación</h3>
+
+          <div class="flow-diagram">
+            <div class="flow-box">Usuario<br />Click en<br />Lista</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box">Fragment<br />Lista</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box">Interface<br />Listener</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box">Activity</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box">Fragment<br />Detalle</div>
+            <div class="flow-arrow">→</div>
+            <div class="flow-box">Actualiza<br />UI</div>
+          </div>
+
+          <div style="margin-top: 20px;">
+            <h4>📋 Pasos del flujo:</h4>
+            <ol style="margin-left: 20px; margin-top: 10px;">
+              <li>Usuario hace click en una flor de la lista</li>
+              <li>ListaFloresFragment detecta el click</li>
+              <li>Llama a <code>listener.onFlorSeleccionada(flor)</code></li>
+              <li>La Activity recibe la notificación (implementa la interface)</li>
+              <li>La Activity llama a <code>detalleFragment.mostrarDetalles(flor)</code></li>
+              <li>DetalleFloresFragment actualiza sus vistas con los datos</li>
+            </ol>
+          </div>
+        </div>
+
+        <div class="tips">
+          <strong>💡 Puntos Clave del Patrón Master-Detail:</strong>
+          <ul style="margin-top: 10px;">
+            <li><strong>Interface:</strong> Los Fragments NO se comunican directamente</li>
+            <li><strong>Activity como mediador:</strong> Recibe eventos y coordina</li>
+            <li><strong>Layout horizontal:</strong> Los dos contenedores están lado a lado</li>
+            <li><strong>Layout weights:</strong> 30% para lista, 70% para detalles</li>
+            <li><strong>Separador visual:</strong> View de 2dp entre los fragments</li>
+          </ul>
+        </div>
+
+        <div class="warning">
+          <strong>⚠️ Para probar en Android Studio:</strong>
+          <ul style="margin-top: 10px;">
+            <li>Crear un AVD (Android Virtual Device) tipo <strong>Tablet</strong></li>
+            <li>Opciones: Pixel Tablet, Nexus 10, o Medium Tablet</li>
+            <li>O rotar un dispositivo móvil a modo <strong>horizontal</strong></li>
+          </ul>
+        </div>
+
+        <div class="exercise">
+          <h4>✏️ Ejercicio Completo</h4>
+          <p><strong>App "Catálogo de Productos":</strong></p>
+          <ul>
+            <li>Clase Producto(nombre, precio, categoría, descripción, emoji)</li>
+            <li>Fragment Master: Lista de productos con RecyclerView</li>
+            <li>Fragment Detail: Detalles con imagen grande, precio destacado</li>
+            <li>Agregar botón "Agregar al carrito" en el detalle</li>
+            <li>Mostrar Toast al agregar producto</li>
+          </ul>
+        </div>
+
+        <div class="note">
+          <strong>🎯 Resultado Final:</strong>
+          <p style="margin-top: 10px;">
+            Tendrás una app tipo la imagen de Gardenia que compartiste: lista a la izquierda, detalles a la derecha, y al hacer click se actualiza automáticamente. ¡Perfecto para tablets! 📱✨
+          </p>
+        </div>
+      </div>
+
+      <!-- RESUMEN -->
+      <div class="summary">
+        <h2>📚 Resumen Completo</h2>
+        <ul class="checklist">
+          <li><strong>Fragment:</strong> Porción modular y reutilizable de UI</li>
+          <li><strong>Ciclo de vida:</strong> onCreateView() y onViewCreated() son clave</li>
+          <li><strong>Agregarlo:</strong> Estático (XML) o Dinámico (código recomendado)</li>
+          <li><strong>FragmentTransaction:</strong> add(), replace(), commit()</li>
+          <li><strong>Context:</strong> Usar requireContext() o requireActivity()</li>
+          <li><strong>Ventajas:</strong> Modularidad, reutilización, layouts adaptativos</li>
+        </ul>
+      </div>
+
+      <!-- RECURSOS -->
+      <div class="resources">
+        <h2>📦 Recursos Adicionales</h2>
+
+        <div style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 10px; margin-top: 30px;">
+          <h3>🔗 Enlaces Útiles:</h3>
+          <ul>
+            <li><a href="https://developer.android.com/guide/fragments" style="color: white; text-decoration: underline;">Documentación Oficial - Fragments</a></li>
+            <li><a href="https://developer.android.com/guide/fragments/lifecycle" style="color: white; text-decoration: underline;">Fragment Lifecycle</a></li>
+            <li><a href="https://kotlinlang.org/docs/home.html" style="color: white; text-decoration: underline;">Kotlin Documentation</a></li>
+          </ul>
+        </div>
+
+        <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 2px solid rgba(255,255,255,0.3);">
+          <p style="font-size: 1.2em; margin-bottom: 10px;">¡Manual en Progreso! 🎉</p>
+          <p style="font-size: 0.9em; opacity: 0.9; margin-top: 10px;">
+            Este es un manual básico de Fragments. Puedes expandirlo con más secciones:<br />
+            - Comunicación entre Fragments<br />
+            - Master-Detail Pattern<br />
+            - ViewPager con Tabs<br />
+            - Navigation Component
+          </p>
+          <p style="opacity: 0.7; margin-top: 20px;">Desarrollado con ❤️ para estudiantes</p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
