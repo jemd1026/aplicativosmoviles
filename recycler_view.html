@@ -775,6 +775,91 @@
 }</code></pre>
         </div>
 
+        <div class="theory">
+          <h3>📖 Explicación Detallada del Adapter</h3>
+
+          <h4>1️⃣ Declaración de la clase</h4>
+          <div style="background: rgba(0,0,0,0.05); padding: 15px; border-radius: 8px; margin: 10px 0;">
+            <ul style="margin-top: 10px;">
+              <li>Recibe la lista de frutas como parámetro</li>
+              <li>Hereda de <code>RecyclerView.Adapter</code> (clase base obligatoria)</li>
+              <li>Especifica que usará <code>FrutaViewHolder</code> como contenedor de vistas</li>
+            </ul>
+          </div>
+
+          <h4>🔍 Desglosando List&lt;Fruta&gt;:</h4>
+          <div style="background: rgba(0,0,0,0.05); padding: 15px; border-radius: 8px; margin: 10px 0;">
+            <p><strong>1. List</strong> - Interfaz de Kotlin</p>
+            <ul style="margin-left: 20px; margin-top: 5px;">
+              <li>Es una interfaz <strong>built-in</strong> (incorporada) de Kotlin</li>
+              <li>Viene incluida en el lenguaje, no necesitas declararla</li>
+              <li>Representa una lista inmutable (solo lectura)</li>
+            </ul>
+
+            <p style="margin-top: 15px;"><strong>2. &lt;Fruta&gt;</strong> - Tipo genérico</p>
+            <ul style="margin-left: 20px; margin-top: 5px;">
+              <li>Los <code>&lt; &gt;</code> indican <strong>genéricos</strong> (qué tipo de objetos contiene la lista)</li>
+              <li><code>Fruta</code> es tu clase que se declara en <code>Fruta.kt</code></li>
+              <li>Significa: "Esta es una lista de objetos tipo Fruta"</li>
+            </ul>
+
+            <div style="background: #1e1e1e; color: #d4d4d4; padding: 10px; border-radius: 5px; margin-top: 10px; font-family: 'Courier New', monospace;">
+              <div style="color: #6a9955;">// Ejemplos de genéricos:</div>
+              <div>List&lt;String&gt; <span style="color: #6a9955;">// Lista de Strings</span></div>
+              <div>List&lt;Int&gt; <span style="color: #6a9955;">// Lista de enteros</span></div>
+              <div>List&lt;Fruta&gt; <span style="color: #6a9955;">// Lista de Frutas (tu clase)</span></div>
+              <div>List&lt;Persona&gt; <span style="color: #6a9955;">// Lista de Personas (si tuvieras esa clase)</span></div>
+            </div>
+          </div>
+
+          <h4>2️⃣ FrutaViewHolder (Clase interna)</h4>
+          <div style="background: rgba(0,0,0,0.05); padding: 15px; border-radius: 8px; margin: 10px 0;">
+            <ul>
+              <li><strong>Función:</strong> Guarda las referencias a los <code>TextView</code> del layout</li>
+              <li><strong>Por qué:</strong> Evita hacer <code>findViewById</code> repetidamente (más eficiente)</li>
+              <li><strong>Analogía:</strong> Es como marcar con post-its los lugares importantes en un libro para no buscarlos cada vez</li>
+            </ul>
+          </div>
+
+          <h4>3️⃣ onCreateViewHolder() - CREA la vista</h4>
+          <div style="background: rgba(0,0,0,0.05); padding: 15px; border-radius: 8px; margin: 10px 0;">
+            <ul>
+              <li><strong>Cuándo se llama:</strong> Solo cuando se necesita crear una nueva vista (12-15 veces)</li>
+              <li><strong>Qué hace:</strong> Infla el layout <code>item_fruta.xml</code> y crea un <code>ViewHolder</code></li>
+              <li><strong>Analogía:</strong> Construye el molde físico de la galleta</li>
+            </ul>
+          </div>
+
+          <h4>4️⃣ onBindViewHolder() - RELLENA con datos</h4>
+          <div style="background: rgba(0,0,0,0.05); padding: 15px; border-radius: 8px; margin: 10px 0;">
+            <ul>
+              <li><strong>Cuándo se llama:</strong> Cada vez que un item se va a mostrar (miles de veces al hacer scroll)</li>
+              <li><strong>Qué hace:</strong> Toma la fruta en la posición indicada y asigna sus datos a los <code>TextView</code></li>
+              <li><strong>Analogía:</strong> Rellena el molde con la masa (datos específicos)</li>
+            </ul>
+          </div>
+
+          <h4>5️⃣ getItemCount() - CUENTA total</h4>
+          <div style="background: rgba(0,0,0,0.05); padding: 15px; border-radius: 8px; margin: 10px 0;">
+            <ul>
+              <li><strong>Qué hace:</strong> Devuelve cuántos items hay en total (5 en tu caso, o 5000 si tuvieras más)</li>
+              <li><strong>Para qué:</strong> RecyclerView sabe cuándo dejar de hacer scroll</li>
+            </ul>
+          </div>
+
+          <h4>🔄 Proceso Completo</h4>
+          <div style="background: rgba(102,126,234,0.1); padding: 15px; border-radius: 8px; margin: 10px 0; border-left: 4px solid #667eea;">
+            <ol style="margin-left: 20px;">
+              <li><code>getItemCount()</code> → "Tengo 5 frutas"</li>
+              <li><code>onCreateViewHolder()</code> → "Creo 12 vistas físicas" (solo al inicio)</li>
+              <li><code>onBindViewHolder(position=0)</code> → "Relleno vista 1 con 🍎 Manzana"</li>
+              <li><code>onBindViewHolder(position=1)</code> → "Relleno vista 2 con 🍌 Plátano"</li>
+              <li><strong>[Usuario hace scroll]</strong></li>
+              <li><code>onBindViewHolder(position=5)</code> → "Reciclo vista 1, ahora tiene otros datos"</li>
+            </ol>
+          </div>
+        </div>
+
         <h3>💻 Paso 4: Configurar RecyclerView en Activity</h3>
 
         <div class="code-section">
