@@ -985,9 +985,21 @@ spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
         </div>
 
         <div class="code-section">
-          <h4>📱 MainActivity.kt</h4>
-          <pre><code class="kotlin"><span class="keyword">class</span> <span class="function">MainActivity</span> : AppCompatActivity() {
+          <h4>📱 MainActivity.kt (Completo)</h4>
+          <pre><code class="kotlin"><span class="keyword">package</span> com.example.ucv_b
+
+<span class="keyword">import</span> android.os.Bundle
+<span class="keyword">import</span> android.view.View
+<span class="keyword">import</span> android.widget.AdapterView
+<span class="keyword">import</span> android.widget.ArrayAdapter
+<span class="keyword">import</span> android.widget.ListView
+<span class="keyword">import</span> android.widget.Spinner
+<span class="keyword">import</span> android.widget.Toast
+<span class="keyword">import</span> androidx.appcompat.app.AppCompatActivity
+
+<span class="keyword">class</span> <span class="function">MainActivity</span> : AppCompatActivity() {
     
+    <span class="keyword">private lateinit var</span> spinnerCategoria: Spinner
     <span class="keyword">private lateinit var</span> listView: ListView
     <span class="keyword">private lateinit var</span> listAdapter: ArrayAdapter&lt;String&gt;
     
@@ -995,10 +1007,11 @@ spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
         <span class="keyword">super</span>.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         
-        <span class="keyword">val</span> spinnerCategoria = findViewById&lt;Spinner&gt;(R.id.spinnerCategoria)
+        <span class="comment">// 1. Referenciar las vistas</span>
+        spinnerCategoria = findViewById(R.id.spinnerCategoria)
         listView = findViewById(R.id.listView)
         
-        <span class="comment">// Configurar Spinner</span>
+        <span class="comment">// 2. Configurar Spinner de Categorías</span>
         <span class="keyword">val</span> categorias = resources.getStringArray(R.array.categorias)
         <span class="keyword">val</span> spinnerAdapter = ArrayAdapter(
             <span class="keyword">this</span>,
@@ -1008,7 +1021,7 @@ spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerCategoria.adapter = spinnerAdapter
         
-        <span class="comment">// ⭐ Listener para filtrar ListView</span>
+        <span class="comment">// 3. ⭐ Listener para filtrar ListView según categoría</span>
         spinnerCategoria.onItemSelectedListener = <span class="keyword">object</span> : AdapterView.OnItemSelectedListener {
             <span class="keyword">override fun</span> <span class="function">onItemSelected</span>(
                 parent: AdapterView&lt;*&gt;?,
@@ -1019,24 +1032,41 @@ spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
                 actualizarListView(position)
             }
             
-            <span class="keyword">override fun</span> <span class="function">onNothingSelected</span>(parent: AdapterView&lt;*&gt;?) {}
+            <span class="keyword">override fun</span> <span class="function">onNothingSelected</span>(parent: AdapterView&lt;*&gt;?) {
+                <span class="comment">// Limpiar ListView si no hay selección</span>
+                listView.adapter = <span class="keyword">null</span>
+            }
+        }
+        
+        <span class="comment">// 4. ⭐ Listener de click en items del ListView</span>
+        listView.setOnItemClickListener { parent, view, position, id ->
+            <span class="keyword">val</span> productoSeleccionado = parent.getItemAtPosition(position).toString()
+            <span class="keyword">val</span> categoriaActual = categorias[spinnerCategoria.selectedItemPosition]
+            
+            Toast.makeText(
+                <span class="keyword">this</span>,
+                <span class="string">"Seleccionaste: $productoSeleccionado\nCategoría: $categoriaActual"</span>,
+                Toast.LENGTH_SHORT
+            ).show()
         }
     }
     
+    <span class="comment">// 5. ⭐ Función para actualizar el ListView según la categoría</span>
     <span class="keyword">private fun</span> <span class="function">actualizarListView</span>(categoria: Int) {
         <span class="keyword">val</span> productos = <span class="keyword">when</span> (categoria) {
-            0 -> { <span class="comment">// Todos</span>
+            0 -> { <span class="comment">// Todos los productos</span>
                 <span class="keyword">val</span> frutas = resources.getStringArray(R.array.productos_frutas)
                 <span class="keyword">val</span> verduras = resources.getStringArray(R.array.productos_verduras)
                 <span class="keyword">val</span> carnes = resources.getStringArray(R.array.productos_carnes)
                 frutas + verduras + carnes
             }
-            1 -> resources.getStringArray(R.array.productos_frutas)
-            2 -> resources.getStringArray(R.array.productos_verduras)
-            3 -> resources.getStringArray(R.array.productos_carnes)
+            1 -> resources.getStringArray(R.array.productos_frutas)  <span class="comment">// Solo Frutas</span>
+            2 -> resources.getStringArray(R.array.productos_verduras)  <span class="comment">// Solo Verduras</span>
+            3 -> resources.getStringArray(R.array.productos_carnes)  <span class="comment">// Solo Carnes</span>
             <span class="keyword">else</span> -> emptyArray()
         }
         
+        <span class="comment">// Crear y asignar nuevo adapter al ListView</span>
         listAdapter = ArrayAdapter(
             <span class="keyword">this</span>,
             android.R.layout.simple_list_item_1,
@@ -1045,6 +1075,28 @@ spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
         listView.adapter = listAdapter
     }
 }</code></pre>
+        </div>
+
+        <div class="tips">
+          <strong>💡 Puntos clave del código:</strong>
+          <ul style="margin-top: 10px;">
+            <li><strong>actualizarListView():</strong> Función separada para organizar mejor el código</li>
+            <li><strong>when (categoria):</strong> Selecciona qué array cargar según la posición del Spinner</li>
+            <li><strong>frutas + verduras + carnes:</strong> Concatena arrays para la opción "Todos"</li>
+            <li><strong>setOnItemClickListener:</strong> Maneja clicks en items del ListView</li>
+            <li><strong>lateinit var:</strong> Variables que se inicializan en onCreate()</li>
+          </ul>
+        </div>
+
+        <div class="note">
+          <strong>🎯 Flujo de la aplicación:</strong>
+          <ol style="margin-top: 10px;">
+            <li>Usuario selecciona categoría en el Spinner</li>
+            <li>Se ejecuta onItemSelected() → llama a actualizarListView()</li>
+            <li>Se cargan los productos correspondientes según la categoría</li>
+            <li>Se actualiza el ListView con los nuevos productos</li>
+            <li>Usuario hace click en un producto → Muestra Toast con información</li>
+          </ol>
         </div>
 
         <div class="exercise">
@@ -1062,86 +1114,377 @@ spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
       <div class="section">
         <h2>🚀 PARTE 6: Ejemplos Avanzados</h2>
 
-        <h3>💻 Ejemplo 1: Múltiples Spinners Dependientes</h3>
+        <h3>💻 Ejemplo Completo: Múltiples Spinners Dependientes</h3>
 
         <div class="theory">
-          <p>Caso común: Selector de País → Ciudades de ese país</p>
+          <h3>📚 Caso de uso real: Selector País → Ciudades</h3>
+          <p>
+            Este ejemplo muestra cómo crear spinners dependientes donde la selección del primer Spinner (País) determina las opciones del segundo Spinner (Ciudad). Es un patrón muy común en
+            formularios de registro.
+          </p>
         </div>
 
         <div class="code-section">
-          <h4>📄 arrays.xml</h4>
-          <pre><code class="xml">&lt;string-array name="paises"&gt;
-    &lt;item&gt;Perú&lt;/item&gt;
-    &lt;item&gt;Colombia&lt;/item&gt;
-&lt;/string-array&gt;
+          <h4>📄 activity_main.xml</h4>
+          <pre><code class="xml">&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;LinearLayout 
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"&gt;
 
-&lt;string-array name="ciudades_peru"&gt;
-    &lt;item&gt;Lima&lt;/item&gt;
-    &lt;item&gt;Arequipa&lt;/item&gt;
-    &lt;item&gt;Cusco&lt;/item&gt;
-&lt;/string-array&gt;
+    &lt;TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Spinners Dependientes"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="24dp"/&gt;
 
-&lt;string-array name="ciudades_colombia"&gt;
-    &lt;item&gt;Bogotá&lt;/item&gt;
-    &lt;item&gt;Medellín&lt;/item&gt;
-    &lt;item&gt;Cali&lt;/item&gt;
-&lt;/string-array&gt;</code></pre>
+    &lt;TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Selecciona tu país:"
+        android:textSize="16sp"
+        android:layout_marginBottom="8dp"/&gt;
+
+    &lt;Spinner
+        android:id="@+id/spinnerPais"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="12dp"
+        android:layout_marginBottom="16dp"/&gt;
+
+    &lt;TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Selecciona tu ciudad:"
+        android:textSize="16sp"
+        android:layout_marginBottom="8dp"/&gt;
+
+    &lt;Spinner
+        android:id="@+id/spinnerCiudad"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="12dp"
+        android:layout_marginBottom="24dp"/&gt;
+
+    &lt;TextView
+        android:id="@+id/tvUbicacion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ubicación: -"
+        android:textSize="16sp"
+        android:textColor="#ff6a88"
+        android:textStyle="bold"/&gt;
+
+&lt;/LinearLayout&gt;</code></pre>
         </div>
 
         <div class="code-section">
-          <h4>📱 MainActivity.kt</h4>
-          <pre><code class="kotlin"><span class="keyword">val</span> spinnerPais = findViewById&lt;Spinner&gt;(R.id.spinnerPais)
-<span class="keyword">val</span> spinnerCiudad = findViewById&lt;Spinner&gt;(R.id.spinnerCiudad)
+          <h4>📄 res/values/arrays.xml</h4>
+          <pre><code class="xml">&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;resources&gt;
+    <span class="comment">&lt;!-- Lista de Países --&gt;</span>
+    &lt;string-array name="paises"&gt;
+        &lt;item&gt;🇵🇪 Perú&lt;/item&gt;
+        &lt;item&gt;🇨🇴 Colombia&lt;/item&gt;
+    &lt;/string-array&gt;
 
-spinnerPais.onItemSelectedListener = <span class="keyword">object</span> : AdapterView.OnItemSelectedListener {
-    <span class="keyword">override fun</span> <span class="function">onItemSelected</span>(
-        parent: AdapterView&lt;*&gt;?,
-        view: View?,
-        position: Int,
-        id: Long
-    ) {
-        <span class="comment">// Cargar ciudades según el país seleccionado</span>
-        <span class="keyword">val</span> ciudades = <span class="keyword">when</span> (position) {
-            0 -> resources.getStringArray(R.array.ciudades_peru)
-            1 -> resources.getStringArray(R.array.ciudades_colombia)
-            <span class="keyword">else</span> -> emptyArray()
+    <span class="comment">&lt;!-- Ciudades de Perú --&gt;</span>
+    &lt;string-array name="ciudades_peru"&gt;
+        &lt;item&gt;Lima&lt;/item&gt;
+        &lt;item&gt;Arequipa&lt;/item&gt;
+        &lt;item&gt;Cusco&lt;/item&gt;
+        &lt;item&gt;Trujillo&lt;/item&gt;
+        &lt;item&gt;Chiclayo&lt;/item&gt;
+    &lt;/string-array&gt;
+
+    <span class="comment">&lt;!-- Ciudades de Colombia --&gt;</span>
+    &lt;string-array name="ciudades_colombia"&gt;
+        &lt;item&gt;Bogotá&lt;/item&gt;
+        &lt;item&gt;Medellín&lt;/item&gt;
+        &lt;item&gt;Cali&lt;/item&gt;
+        &lt;item&gt;Barranquilla&lt;/item&gt;
+        &lt;item&gt;Cartagena&lt;/item&gt;
+    &lt;/string-array&gt;
+&lt;/resources&gt;</code></pre>
+        </div>
+
+        <div class="code-section">
+          <h4>📱 MainActivity.kt (Completo)</h4>
+          <pre><code class="kotlin"><span class="keyword">package</span> com.example.ucv_b
+
+<span class="keyword">import</span> android.os.Bundle
+<span class="keyword">import</span> android.view.View
+<span class="keyword">import</span> android.widget.AdapterView
+<span class="keyword">import</span> android.widget.ArrayAdapter
+<span class="keyword">import</span> android.widget.Spinner
+<span class="keyword">import</span> android.widget.TextView
+<span class="keyword">import</span> androidx.appcompat.app.AppCompatActivity
+
+<span class="keyword">class</span> <span class="function">MainActivity</span> : AppCompatActivity() {
+    
+    <span class="keyword">private lateinit var</span> spinnerPais: Spinner
+    <span class="keyword">private lateinit var</span> spinnerCiudad: Spinner
+    <span class="keyword">private lateinit var</span> tvUbicacion: TextView
+    
+    <span class="keyword">override fun</span> <span class="function">onCreate</span>(savedInstanceState: Bundle?) {
+        <span class="keyword">super</span>.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        
+        <span class="comment">// 1. Referenciar las vistas</span>
+        spinnerPais = findViewById(R.id.spinnerPais)
+        spinnerCiudad = findViewById(R.id.spinnerCiudad)
+        tvUbicacion = findViewById(R.id.tvUbicacion)
+        
+        <span class="comment">// 2. Configurar Spinner de Países</span>
+        <span class="keyword">val</span> paises = resources.getStringArray(R.array.paises)
+        <span class="keyword">val</span> paisAdapter = ArrayAdapter(
+            <span class="keyword">this</span>,
+            android.R.layout.simple_spinner_item,
+            paises
+        )
+        paisAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerPais.adapter = paisAdapter
+        
+        <span class="comment">// 3. ⭐ Listener del Spinner de Países (Actualiza ciudades)</span>
+        spinnerPais.onItemSelectedListener = <span class="keyword">object</span> : AdapterView.OnItemSelectedListener {
+            <span class="keyword">override fun</span> <span class="function">onItemSelected</span>(
+                parent: AdapterView&lt;*&gt;?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                <span class="comment">// Cargar ciudades según el país seleccionado</span>
+                <span class="keyword">val</span> ciudades = <span class="keyword">when</span> (position) {
+                    0 -> resources.getStringArray(R.array.ciudades_peru)
+                    1 -> resources.getStringArray(R.array.ciudades_colombia)
+                    <span class="keyword">else</span> -> emptyArray()
+                }
+                
+                <span class="comment">// Actualizar el Spinner de Ciudades</span>
+                <span class="keyword">val</span> ciudadAdapter = ArrayAdapter(
+                    <span class="keyword">this@MainActivity</span>,
+                    android.R.layout.simple_spinner_item,
+                    ciudades
+                )
+                ciudadAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                spinnerCiudad.adapter = ciudadAdapter
+            }
+            
+            <span class="keyword">override fun</span> <span class="function">onNothingSelected</span>(parent: AdapterView&lt;*&gt;?) {
+                tvUbicacion.text = <span class="string">"Ubicación: -"</span>
+            }
         }
         
-        <span class="keyword">val</span> ciudadAdapter = ArrayAdapter(
-            <span class="keyword">this@MainActivity</span>,
-            android.R.layout.simple_spinner_item,
-            ciudades
-        )
-        ciudadAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        spinnerCiudad.adapter = ciudadAdapter
+        <span class="comment">// 4. ⭐ Listener del Spinner de Ciudades (Muestra ubicación completa)</span>
+        spinnerCiudad.onItemSelectedListener = <span class="keyword">object</span> : AdapterView.OnItemSelectedListener {
+            <span class="keyword">override fun</span> <span class="function">onItemSelected</span>(
+                parent: AdapterView&lt;*&gt;?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                <span class="keyword">val</span> paisSeleccionado = spinnerPais.selectedItem.toString()
+                <span class="keyword">val</span> ciudadSeleccionada = parent?.getItemAtPosition(position).toString()
+                
+                tvUbicacion.text = <span class="string">"Ubicación: $ciudadSeleccionada, $paisSeleccionado"</span>
+            }
+            
+            <span class="keyword">override fun</span> <span class="function">onNothingSelected</span>(parent: AdapterView&lt;*&gt;?) {
+                <span class="keyword">val</span> paisSeleccionado = spinnerPais.selectedItem.toString()
+                tvUbicacion.text = <span class="string">"Ubicación: $paisSeleccionado"</span>
+            }
+        }
     }
-    
-    <span class="keyword">override fun</span> <span class="function">onNothingSelected</span>(parent: AdapterView&lt;*&gt;?) {}
 }</code></pre>
         </div>
 
-        <h3>💻 Ejemplo 2: Guardar Selección con SharedPreferences</h3>
-
-        <div class="code-section">
-          <h4>📱 Guardar y Cargar Selección</h4>
-          <pre><code class="kotlin"><span class="comment">// Guardar selección</span>
-spinnerIdioma.onItemSelectedListener = <span class="keyword">object</span> : AdapterView.OnItemSelectedListener {
-    <span class="keyword">override fun</span> <span class="function">onItemSelected</span>(...) {
-        <span class="keyword">val</span> prefs = getSharedPreferences(<span class="string">"config"</span>, MODE_PRIVATE)
-        prefs.edit().putInt(<span class="string">"idioma_seleccionado"</span>, position).apply()
-    }
-    ...
-}
-
-<span class="comment">// Cargar selección guardada</span>
-<span class="keyword">val</span> prefs = getSharedPreferences(<span class="string">"config"</span>, MODE_PRIVATE)
-<span class="keyword">val</span> idiomaGuardado = prefs.getInt(<span class="string">"idioma_seleccionado"</span>, 0)
-spinnerIdioma.setSelection(idiomaGuardado)</code></pre>
+        <div class="tips">
+          <strong>💡 Puntos clave del código:</strong>
+          <ul style="margin-top: 10px;">
+            <li><strong>lateinit var:</strong> Variables que se inicializan después en onCreate()</li>
+            <li><strong>when (position):</strong> Estructura similar a switch para cargar ciudades según país</li>
+            <li><strong>this@MainActivity:</strong> Referencia al contexto de la Activity dentro del listener</li>
+            <li><strong>selectedItem:</strong> Obtiene el item actualmente seleccionado en el Spinner</li>
+            <li><strong>Cascada de eventos:</strong> Cambiar país → Actualiza ciudades → Actualiza TextView</li>
+          </ul>
         </div>
 
-        <h3>💻 Ejemplo 3: Spinner Personalizado con Imágenes</h3>
+        <div class="note">
+          <strong>⚠️ Nota importante sobre el primer evento:</strong>
+          <p style="margin-top: 10px;">
+            Cuando se carga la Activity, <code>onItemSelected()</code> se ejecuta automáticamente en ambos Spinners con la posición 0. Esto puede causar que el TextView se actualice dos veces al
+            inicio. Es un comportamiento normal de Android.
+          </p>
+        </div>
 
-        <div class="note"><strong>📝 Nota:</strong> Para mostrar imágenes en el Spinner, necesitas crear un <strong>Custom Adapter</strong>. Esto es un tema más avanzado.</div>
+        <h3 style="margin-top: 40px;">💻 Ejemplo 2: Países y Ciudades con SharedPreferences</h3>
+
+        <div class="theory">
+          <h3>📚 Persistencia de datos</h3>
+          <p>
+            Extendemos el ejemplo anterior agregando SharedPreferences para <strong>guardar y recordar</strong> la ubicación seleccionada (país y ciudad) del usuario. Al cerrar y volver a abrir la
+            app, los Spinners mostrarán la última selección guardada.
+          </p>
+        </div>
+
+        <div class="code-section">
+          <h4>📱 MainActivity.kt (Con SharedPreferences)</h4>
+          <pre><code class="kotlin"><span class="keyword">package</span> com.example.ucv_b
+
+<span class="keyword">import</span> android.os.Bundle
+<span class="keyword">import</span> android.view.View
+<span class="keyword">import</span> android.widget.AdapterView
+<span class="keyword">import</span> android.widget.ArrayAdapter
+<span class="keyword">import</span> android.widget.Spinner
+<span class="keyword">import</span> android.widget.TextView
+<span class="keyword">import</span> androidx.appcompat.app.AppCompatActivity
+
+<span class="keyword">class</span> <span class="function">MainActivity</span> : AppCompatActivity() {
+    
+    <span class="keyword">private lateinit var</span> spinnerPais: Spinner
+    <span class="keyword">private lateinit var</span> spinnerCiudad: Spinner
+    <span class="keyword">private lateinit var</span> tvUbicacion: TextView
+    <span class="keyword">private var</span> isFirstLoad = <span class="keyword">true</span>  <span class="comment">// Evitar guardar en la carga inicial</span>
+    
+    <span class="keyword">override fun</span> <span class="function">onCreate</span>(savedInstanceState: Bundle?) {
+        <span class="keyword">super</span>.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        
+        <span class="comment">// 1. Referenciar las vistas</span>
+        spinnerPais = findViewById(R.id.spinnerPais)
+        spinnerCiudad = findViewById(R.id.spinnerCiudad)
+        tvUbicacion = findViewById(R.id.tvUbicacion)
+        
+        <span class="comment">// 2. ⭐ Obtener SharedPreferences</span>
+        <span class="keyword">val</span> prefs = getSharedPreferences(<span class="string">"UbicacionPrefs"</span>, MODE_PRIVATE)
+        
+        <span class="comment">// 3. Configurar Spinner de Países</span>
+        <span class="keyword">val</span> paises = resources.getStringArray(R.array.paises)
+        <span class="keyword">val</span> paisAdapter = ArrayAdapter(
+            <span class="keyword">this</span>,
+            android.R.layout.simple_spinner_item,
+            paises
+        )
+        paisAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerPais.adapter = paisAdapter
+        
+        <span class="comment">// 4. ⭐ Cargar país guardado</span>
+        <span class="keyword">val</span> paisGuardado = prefs.getInt(<span class="string">"pais_seleccionado"</span>, 0)
+        spinnerPais.setSelection(paisGuardado)
+        
+        <span class="comment">// 5. Listener del Spinner de Países</span>
+        spinnerPais.onItemSelectedListener = <span class="keyword">object</span> : AdapterView.OnItemSelectedListener {
+            <span class="keyword">override fun</span> <span class="function">onItemSelected</span>(
+                parent: AdapterView&lt;*&gt;?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                <span class="comment">// Cargar ciudades según el país</span>
+                <span class="keyword">val</span> ciudades = <span class="keyword">when</span> (position) {
+                    0 -> resources.getStringArray(R.array.ciudades_peru)
+                    1 -> resources.getStringArray(R.array.ciudades_colombia)
+                    <span class="keyword">else</span> -> emptyArray()
+                }
+                
+                <span class="comment">// Actualizar Spinner de Ciudades</span>
+                <span class="keyword">val</span> ciudadAdapter = ArrayAdapter(
+                    <span class="keyword">this@MainActivity</span>,
+                    android.R.layout.simple_spinner_item,
+                    ciudades
+                )
+                ciudadAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+                spinnerCiudad.adapter = ciudadAdapter
+                
+                <span class="comment">// ⭐ Cargar ciudad guardada (solo en primera carga)</span>
+                <span class="keyword">if</span> (isFirstLoad) {
+                    <span class="keyword">val</span> ciudadGuardada = prefs.getInt(<span class="string">"ciudad_seleccionada"</span>, 0)
+                    spinnerCiudad.setSelection(ciudadGuardada)
+                    isFirstLoad = <span class="keyword">false</span>
+                }
+                
+                <span class="comment">// ⭐ Guardar país seleccionado</span>
+                prefs.edit().putInt(<span class="string">"pais_seleccionado"</span>, position).apply()
+            }
+            
+            <span class="keyword">override fun</span> <span class="function">onNothingSelected</span>(parent: AdapterView&lt;*&gt;?) {
+                tvUbicacion.text = <span class="string">"Ubicación: -"</span>
+            }
+        }
+        
+        <span class="comment">// 6. Listener del Spinner de Ciudades</span>
+        spinnerCiudad.onItemSelectedListener = <span class="keyword">object</span> : AdapterView.OnItemSelectedListener {
+            <span class="keyword">override fun</span> <span class="function">onItemSelected</span>(
+                parent: AdapterView&lt;*&gt;?,
+                view: View?,
+                position: Int,
+                id: Long
+            ) {
+                <span class="keyword">val</span> paisSeleccionado = spinnerPais.selectedItem.toString()
+                <span class="keyword">val</span> ciudadSeleccionada = parent?.getItemAtPosition(position).toString()
+                
+                tvUbicacion.text = <span class="string">"Ubicación: $ciudadSeleccionada, $paisSeleccionado"</span>
+                
+                <span class="comment">// ⭐ Guardar ciudad seleccionada</span>
+                prefs.edit().putInt(<span class="string">"ciudad_seleccionada"</span>, position).apply()
+            }
+            
+            <span class="keyword">override fun</span> <span class="function">onNothingSelected</span>(parent: AdapterView&lt;*&gt;?) {
+                <span class="keyword">val</span> paisSeleccionado = spinnerPais.selectedItem.toString()
+                tvUbicacion.text = <span class="string">"Ubicación: $paisSeleccionado"</span>
+            }
+        }
+    }
+}</code></pre>
+        </div>
+
+        <div class="tips">
+          <strong>💡 Explicación del código de SharedPreferences:</strong>
+          <ul style="margin-top: 10px;">
+            <li><strong>getSharedPreferences("UbicacionPrefs", MODE_PRIVATE):</strong> Crea/abre archivo de preferencias privado</li>
+            <li><strong>prefs.getInt("clave", valorPorDefecto):</strong> Lee un valor guardado (0 si no existe)</li>
+            <li><strong>prefs.edit().putInt("clave", valor).apply():</strong> Guarda un valor de forma asíncrona</li>
+            <li><strong>isFirstLoad:</strong> Flag para evitar sobrescribir la ciudad al cargar el país guardado</li>
+            <li><strong>setSelection(position):</strong> Establece el item seleccionado programáticamente</li>
+          </ul>
+        </div>
+
+        <div class="note">
+          <strong>🎯 Flujo completo:</strong>
+          <ol style="margin-top: 10px;">
+            <li>App se abre → Lee país y ciudad guardados</li>
+            <li>Usuario selecciona país → Se guarda automáticamente</li>
+            <li>Usuario selecciona ciudad → Se guarda automáticamente</li>
+            <li>Usuario cierra la app</li>
+            <li>Usuario vuelve a abrir → Ve su última selección ✅</li>
+          </ol>
+        </div>
+
+        <h3 style="margin-top: 40px;">💻 Ejemplo 3: Generar Array Dinámicamente (Años)</h3>
+
+        <div class="code-section">
+          <h4>📱 Spinner con años 1950-2024</h4>
+          <pre><code class="kotlin"><span class="keyword">val</span> spinnerAnio = findViewById&lt;Spinner&gt;(R.id.spinnerAnio)
+
+<span class="comment">// ⭐ Generar array de años dinámicamente</span>
+<span class="keyword">val</span> anios = (1950..2024).map { it.toString() }.toTypedArray()
+
+<span class="keyword">val</span> adapter = ArrayAdapter(
+    <span class="keyword">this</span>,
+    android.R.layout.simple_spinner_item,
+    anios
+)
+adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+spinnerAnio.adapter = adapter
+
+<span class="comment">// Seleccionar 2000 por defecto</span>
+<span class="keyword">val</span> posicion2000 = anios.indexOf(<span class="string">"2000"</span>)
+spinnerAnio.setSelection(posicion2000)</code></pre>
+        </div>
 
         <div class="exercise">
           <h4>✏️ Proyecto Final</h4>
