@@ -1,0 +1,1447 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>API REST en Android - Teoría y Práctica</title>
+    <style>
+      body {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          font-family: 'Segoe UI', Tahoma, sans-serif;
+          margin: 0;
+          padding: 20px;
+          min-height: 100vh;
+      }
+
+      .container {
+          max-width: 1400px;
+          margin: 0 auto;
+          background: #ffffff;
+          border-radius: 15px;
+          box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+          overflow: hidden;
+      }
+
+      .header {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          padding: 40px;
+          text-align: center;
+      }
+
+      .header h1 {
+          margin: 0;
+          font-size: 2.5em;
+          text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+      }
+
+      .header p {
+          margin-top: 10px;
+          font-size: 1.2em;
+          opacity: 0.95;
+      }
+
+      .content {
+          padding: 40px;
+      }
+
+      h2 {
+          color: #5a67d8;
+          font-size: 2em;
+          margin-top: 40px;
+          margin-bottom: 20px;
+          padding-bottom: 10px;
+          border-bottom: 3px solid #5a67d8;
+      }
+
+      h3 {
+          color: #764ba2;
+          font-size: 1.5em;
+          margin-top: 30px;
+          margin-bottom: 15px;
+      }
+
+      h4 {
+          color: #667eea;
+          font-size: 1.2em;
+          margin-top: 20px;
+          margin-bottom: 10px;
+      }
+
+      /* Tarjetas de conceptos */
+      .concept-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+          gap: 20px;
+          margin: 30px 0;
+      }
+
+      .concept-card {
+          background: #f7fafc;
+          border: 2px solid #e2e8f0;
+          border-radius: 10px;
+          padding: 20px;
+          transition: all 0.3s ease;
+      }
+
+      .concept-card:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+          border-color: #667eea;
+      }
+
+      .concept-card h4 {
+          color: #5a67d8;
+          margin-top: 0;
+      }
+
+      .concept-card ul {
+          margin: 10px 0;
+          padding-left: 20px;
+      }
+
+      /* Métodos HTTP */
+      .http-methods {
+          display: flex;
+          justify-content: space-around;
+          flex-wrap: wrap;
+          gap: 15px;
+          margin: 30px 0;
+      }
+
+      .http-method {
+          flex: 1;
+          min-width: 200px;
+          padding: 15px;
+          border-radius: 8px;
+          text-align: center;
+          color: white;
+          font-weight: bold;
+          box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      }
+
+      .method-get { background: #48bb78; }
+      .method-post { background: #4299e1; }
+      .method-put { background: #ed8936; }
+      .method-delete { background: #f56565; }
+
+      /* Diagramas de flujo */
+      .flow-diagram {
+          background: #f7fafc;
+          border: 2px solid #e2e8f0;
+          border-radius: 10px;
+          padding: 30px;
+          margin: 30px 0;
+          text-align: center;
+      }
+
+      .flow-step {
+          background: white;
+          border: 2px solid #5a67d8;
+          border-radius: 10px;
+          padding: 15px;
+          margin: 15px auto;
+          max-width: 600px;
+          position: relative;
+      }
+
+      .flow-step::after {
+          content: "↓";
+          position: absolute;
+          bottom: -30px;
+          left: 50%;
+          transform: translateX(-50%);
+          font-size: 24px;
+          color: #5a67d8;
+      }
+
+      .flow-step:last-child::after {
+          display: none;
+      }
+
+      .flow-step-number {
+          display: inline-block;
+          background: #5a67d8;
+          color: white;
+          width: 30px;
+          height: 30px;
+          line-height: 30px;
+          border-radius: 50%;
+          margin-right: 10px;
+          font-weight: bold;
+      }
+
+      /* Arquitectura */
+      .architecture {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          border-radius: 10px;
+          padding: 30px;
+          margin: 30px 0;
+      }
+
+      .architecture-layer {
+          background: rgba(255,255,255,0.1);
+          backdrop-filter: blur(10px);
+          border: 2px solid rgba(255,255,255,0.3);
+          border-radius: 8px;
+          padding: 15px;
+          margin: 10px 0;
+          transition: all 0.3s ease;
+      }
+
+      .architecture-layer:hover {
+          background: rgba(255,255,255,0.2);
+          transform: scale(1.02);
+      }
+
+      /* Componentes */
+      .component-list {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+          gap: 20px;
+          margin: 20px 0;
+      }
+
+      .component-item {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          padding: 20px;
+          border-radius: 10px;
+          text-align: center;
+          box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+      }
+
+      .component-item h5 {
+          margin: 0 0 10px 0;
+          font-size: 1.2em;
+      }
+
+      .component-item p {
+          margin: 0;
+          font-size: 0.9em;
+          opacity: 0.95;
+      }
+
+      /* Tabla comparativa */
+      .comparison-table {
+          width: 100%;
+          border-collapse: collapse;
+          margin: 20px 0;
+          box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+          border-radius: 8px;
+          overflow: hidden;
+      }
+
+      .comparison-table th {
+          background: #5a67d8;
+          color: white;
+          padding: 15px;
+          text-align: left;
+      }
+
+      .comparison-table td {
+          padding: 12px 15px;
+          border-bottom: 1px solid #e2e8f0;
+          background: white;
+      }
+
+      .comparison-table tr:nth-child(even) td {
+          background: #f7fafc;
+      }
+
+      /* Código */
+      .code-block {
+        background: #1a202c;
+        border-radius: 8px;
+        margin: 20px 0;
+        overflow-x: auto;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        padding: 0;
+        /* Permitir selección de texto en todos los navegadores */
+        -webkit-user-select: text;
+        -moz-user-select: text;
+        -ms-user-select: text;
+        user-select: text;
+      }
+
+      .code-header {
+        background: #2d3748;
+        color: #fbd38d;
+        padding: 10px 15px;
+        font-weight: bold;
+        font-size: 0.9em;
+        border-top-left-radius: 8px;
+        border-top-right-radius: 8px;
+        user-select: none;
+      }
+
+      pre {
+        margin: 0;
+        padding: 20px;
+        overflow-x: auto;
+        color: #e2e8f0;
+        font-size: 14px;
+        line-height: 1.6;
+        background: none;
+        white-space: pre;
+        word-break: normal;
+        /* Permitir selección de texto */
+        -webkit-user-select: text;
+        -moz-user-select: text;
+        -ms-user-select: text;
+        user-select: text;
+      }
+
+      code {
+        font-family: 'Cascadia Code', 'Fira Code', Consolas, monospace;
+        background: none;
+        color: inherit;
+        white-space: pre;
+        /* Permitir selección de texto */
+        -webkit-user-select: text;
+        -moz-user-select: text;
+        -ms-user-select: text;
+        user-select: text;
+      }
+
+      /* Mejorar responsividad y evitar superposición */
+      .code-block, pre, code {
+        max-width: 100%;
+        box-sizing: border-box;
+      }
+
+      /* Eliminar cualquier sombra o fondo blanco de los popups de imagen o texto flotante */
+      .code-block img, .code-block .popup, .code-block .floating {
+        display: none !important;
+      }
+
+      /* Alertas */
+      .alert {
+          padding: 15px 20px;
+          border-radius: 8px;
+          margin: 20px 0;
+          border-left: 4px solid;
+      }
+
+      .alert-info {
+          background: #ebf8ff;
+          border-left-color: #4299e1;
+          color: #2b6cb8;
+      }
+
+      .alert-success {
+          background: #f0fff4;
+          border-left-color: #48bb78;
+          color: #22543d;
+      }
+
+      .alert-warning {
+          background: #fffaf0;
+          border-left-color: #ed8936;
+          color: #7c2d12;
+      }
+
+      .alert-tip {
+          background: #faf5ff;
+          border-left-color: #9f7aea;
+          color: #44337a;
+      }
+
+      /* Iconos */
+      .icon {
+          display: inline-block;
+          width: 24px;
+          height: 24px;
+          margin-right: 8px;
+          vertical-align: middle;
+      }
+
+      /* Responsive */
+      @media (max-width: 768px) {
+          .header h1 {
+              font-size: 2em;
+          }
+
+          .content {
+              padding: 20px;
+          }
+
+          .concept-grid {
+              grid-template-columns: 1fr;
+          }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>🚀 API REST en Android</h1>
+        <p>Guía Completa: Teoría y Práctica con MySQL + PHP + Retrofit + RecyclerView</p>
+      </div>
+
+      <div class="content">
+        <!-- SECCIÓN TEÓRICA -->
+        <h2>📚 PARTE I: FUNDAMENTOS TEÓRICOS</h2>
+
+        <h3>¿Qué vamos a construir?</h3>
+        <p>
+          Desarrollaremos una aplicación Android completa que consume datos de un servidor web mediante una API REST. La app mostrará un listado de productos obtenidos desde una base de datos MySQL a
+          través de un backend PHP.
+        </p>
+
+        <div class="architecture">
+          <h4 style="color: white; text-align: center; margin-bottom: 20px;">🏗️ Arquitectura del Sistema</h4>
+          <div class="architecture-layer">
+              • RecyclerView para mostrar lista de productos<br />
+              • Activities y Layouts XML<br />
+              • Adaptadores para vincular datos
+            </p>
+          </div>
+          <div class="architecture-layer">
+            <strong>Capa de Red (Retrofit)</strong>
+            <p>
+              • Cliente HTTP para Android<br />
+              • Conversión automática JSON ↔ Objetos Kotlin<br />
+              • Manejo de peticiones asíncronas
+            </p>
+            <div class="code-header">Kotlin - models/Producto.kt</div>
+            <pre><code>package com.example.api_php
+          </div>
+          <div class="architecture-layer">
+            <strong>Capa de Servicio (API REST PHP)</strong>
+            <p>
+              • Endpoints HTTP para operaciones CRUD<br />
+              • Respuestas en formato JSON<br />
+              • Validación y procesamiento de datos
+            </p>
+          </div>
+          <div class="architecture-layer">
+            <strong>Capa de Datos (MySQL)</strong>
+            <p>
+              • Base de datos relacional<br />
+              • Tabla de productos<br />
+              • Consultas SQL
+            </p>
+          </div>
+        </div>
+
+        <h3>🔑 Conceptos Clave</h3>
+
+        <div class="concept-grid">
+          <div class="concept-card">
+            <h4>📡 API REST</h4>
+            <p><strong>Representational State Transfer</strong></p>
+            <ul>
+              <li>Interfaz para comunicación entre sistemas</li>
+              <li>Usa protocolo HTTP/HTTPS</li>
+              <li>Intercambio de datos en JSON</li>
+              <li>Sin estado (stateless)</li>
+              <li>Recursos identificados por URLs</li>
+            </ul>
+          </div>
+
+          <div class="concept-card">
+            <h4>🔄 Retrofit</h4>
+            <p><strong>Cliente HTTP para Android</strong></p>
+            <ul>
+              <li>Librería de Square</li>
+              <li>Convierte API HTTP en interfaz Java/Kotlin</li>
+              <li>Serialización automática con Gson</li>
+              <li>Manejo de callbacks asíncronos</li>
+              <li>Interceptores y logging</li>
+            </ul>
+          </div>
+
+          <div class="concept-card">
+            <h4>♻️ RecyclerView</h4>
+            <p><strong>Vista de lista avanzada</strong></p>
+            <ul>
+              <li>Reemplazo mejorado de ListView</li>
+              <li>Reciclaje eficiente de vistas</li>
+              <li>Layouts flexibles (Linear, Grid, etc.)</li>
+              <li>Animaciones incorporadas</li>
+              <li>ViewHolder pattern obligatorio</li>
+            </ul>
+          </div>
+
+          <div class="concept-card">
+            <h4>📦 JSON</h4>
+            <p><strong>JavaScript Object Notation</strong></p>
+            <ul>
+              <li>Formato ligero de intercambio de datos</li>
+              <li>Fácil de leer y escribir</li>
+              <li>Soportado nativamente en PHP</li>
+              <li>Estructura de pares clave-valor</li>
+              <li>Arrays y objetos anidados</li>
+            </ul>
+          </div>
+
+          <div class="concept-card">
+            <h4>🗄️ MySQL + PDO</h4>
+            <p><strong>Base de datos y conexión</strong></p>
+            <ul>
+              <li>MySQL: Sistema de gestión de BD</li>
+              <li>PDO: PHP Data Objects</li>
+              <li>Prepared statements (seguridad)</li>
+              <li>Prevención de SQL injection</li>
+              <li>Transacciones y manejo de errores</li>
+            </ul>
+          </div>
+
+          <div class="concept-card">
+            <h4>🎯 Patrón MVC</h4>
+            <p><strong>Model-View-Controller</strong></p>
+            <ul>
+              <li>Model: Clases de datos (Producto)</li>
+              <li>View: Layouts XML</li>
+              <li>Controller: Activities y Adapters</li>
+              <li>Separación de responsabilidades</li>
+              <li>Código más mantenible</li>
+            </ul>
+          </div>
+        </div>
+
+        <h3>🔤 Métodos HTTP en REST</h3>
+        <p>Los métodos HTTP definen la acción que queremos realizar sobre un recurso:</p>
+
+        <div class="http-methods">
+          <div class="http-method method-get">
+            <h5>GET</h5>
+            <p>Obtener datos</p>
+            <small>/productos/listar.php</small>
+          </div>
+          <div class="http-method method-post">
+            <h5>POST</h5>
+            <p>Crear nuevo recurso</p>
+            <small>/productos/crear.php</small>
+          </div>
+          <div class="http-method method-put">
+            <h5>PUT</h5>
+            <p>Actualizar recurso</p>
+            <small>/productos/actualizar.php</small>
+          </div>
+          <div class="http-method method-delete">
+            <h5>DELETE</h5>
+            <p>Eliminar recurso</p>
+            <small>/productos/eliminar.php</small>
+          </div>
+        </div>
+
+        <h3>📊 Flujo del Proceso</h3>
+
+        <div class="flow-diagram">
+          <h4>Flujo de Datos: De la Base de Datos a la Pantalla</h4>
+
+          <div class="flow-step">
+            <span class="flow-step-number">1</span>
+            <strong>Usuario abre la App</strong>
+            <p>MainActivity.onCreate() se ejecuta y configura el RecyclerView</p>
+          </div>
+
+          <div class="flow-step">
+            <span class="flow-step-number">2</span>
+            <strong>App solicita datos</strong>
+            <p>MainActivity llama a cargarProductos() que usa Retrofit</p>
+          </div>
+
+          <div class="flow-step">
+            <span class="flow-step-number">3</span>
+            <strong>Retrofit envía petición HTTP</strong>
+            <p>GET request a http://10.0.2.2/ucv_aplic_mov/productos/listar.php</p>
+          </div>
+
+          <div class="flow-step">
+            <span class="flow-step-number">4</span>
+            <strong>PHP recibe petición</strong>
+            <p>listar.php se ejecuta en el servidor Apache</p>
+          </div>
+
+          <div class="flow-step">
+            <span class="flow-step-number">5</span>
+            <strong>PHP consulta MySQL</strong>
+            <p>Ejecuta: SELECT * FROM productos usando PDO</p>
+          </div>
+
+          <div class="flow-step">
+            <span class="flow-step-number">6</span>
+            <strong>MySQL retorna datos</strong>
+            <p>Base de datos devuelve registros de productos</p>
+          </div>
+
+          <div class="flow-step">
+            <span class="flow-step-number">7</span>
+            <strong>PHP genera JSON</strong>
+            <p>Convierte array PHP a JSON y lo envía como respuesta</p>
+          </div>
+
+          <div class="flow-step">
+            <span class="flow-step-number">8</span>
+            <strong>Retrofit recibe JSON</strong>
+            <p>Gson convierte automáticamente JSON a objetos Kotlin</p>
+          </div>
+
+          <div class="flow-step">
+            <span class="flow-step-number">9</span>
+            <strong>Adapter actualiza datos</strong>
+            <p>ProductoAdapter recibe la lista de productos</p>
+          </div>
+
+          <div class="flow-step">
+            <span class="flow-step-number">10</span>
+            <strong>RecyclerView muestra datos</strong>
+            <p>Se renderiza cada producto en la pantalla usando item_producto.xml</p>
+          </div>
+        </div>
+
+        <h3>🔧 Tecnologías y Herramientas</h3>
+
+        <table class="comparison-table">
+          <thead>
+            <tr>
+              <th>Componente</th>
+              <th>Tecnología</th>
+              <th>Propósito</th>
+              <th>Alternativas</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Base de Datos</strong></td>
+              <td>MySQL</td>
+              <td>Almacenar datos de productos</td>
+              <td>PostgreSQL, SQLite, MongoDB</td>
+            </tr>
+            <tr>
+              <td><strong>Backend</strong></td>
+              <td>PHP con PDO</td>
+              <td>Procesar peticiones y generar JSON</td>
+              <td>Node.js, Python Flask, Java Spring</td>
+            </tr>
+            <tr>
+              <td><strong>Servidor Web</strong></td>
+              <td>Apache (XAMPP)</td>
+              <td>Servir la API REST</td>
+              <td>Nginx, IIS, Tomcat</td>
+            </tr>
+            <tr>
+              <td><strong>Cliente HTTP</strong></td>
+              <td>Retrofit 2</td>
+              <td>Consumir API desde Android</td>
+              <td>Volley, OkHttp, HttpURLConnection</td>
+            </tr>
+            <tr>
+              <td><strong>Serialización</strong></td>
+              <td>Gson</td>
+              <td>Convertir JSON ↔ Objetos</td>
+              <td>Moshi, Jackson, kotlinx.serialization</td>
+            </tr>
+            <tr>
+              <td><strong>Lista de Datos</strong></td>
+              <td>RecyclerView</td>
+              <td>Mostrar lista de productos</td>
+              <td>ListView, Compose LazyColumn</td>
+            </tr>
+            <tr>
+              <td><strong>Lenguaje Android</strong></td>
+              <td>Kotlin</td>
+              <td>Desarrollo de la app</td>
+              <td>Java</td>
+            </tr>
+            <tr>
+              <td><strong>IDE</strong></td>
+              <td>Android Studio</td>
+              <td>Entorno de desarrollo</td>
+              <td>IntelliJ IDEA, VS Code</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>🎯 Ventajas de esta Arquitectura</h3>
+
+        <div class="component-list">
+          <div class="component-item">
+            <h5>📱 Escalabilidad</h5>
+            <p>La API puede servir a múltiples clientes (Android, iOS, Web)</p>
+          </div>
+          <div class="component-item">
+            <h5>🔐 Seguridad</h5>
+            <p>Separación entre cliente y servidor, datos protegidos en el backend</p>
+          </div>
+          <div class="component-item">
+            <h5>🔄 Mantenibilidad</h5>
+            <p>Cambios en el backend no requieren actualizar la app</p>
+          </div>
+          <div class="component-item">
+            <h5>⚡ Rendimiento</h5>
+            <p>RecyclerView optimiza memoria, Retrofit maneja caché</p>
+          </div>
+        </div>
+
+        <div class="alert alert-info">
+          <strong>💡 Concepto Importante:</strong> La arquitectura REST permite que diferentes aplicaciones (móviles, web, desktop) consuman los mismos datos desde una única fuente de verdad (la API),
+          garantizando consistencia y reduciendo duplicación de código.
+        </div>
+
+        <!-- SECCIÓN PRÁCTICA -->
+        <h2>💻 PARTE II: IMPLEMENTACIÓN PRÁCTICA</h2>
+
+        <h3>1️⃣ Base de Datos MySQL</h3>
+
+        <div class="code-block">
+          <div class="code-header">SQL - Crear base de datos y tabla productos</div>
+          <pre><code>CREATE DATABASE IF NOT EXISTS aplic_movil;
+USE aplic_movil;
+
+CREATE TABLE productos (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nombre VARCHAR(100) NOT NULL,
+    precio DECIMAL(10,2) NOT NULL,
+    categoria VARCHAR(50) NOT NULL
+);
+
+INSERT INTO productos (nombre, precio, categoria) VALUES
+('Paracetamol 500mg', 2.50, 'Medicamento'),
+('Ibuprofeno 400mg', 3.20, 'Medicamento'),
+('Shampoo Anticaspa', 12.90, 'Cuidado Personal'),
+('Crema Hidratante', 18.50, 'Cuidado Personal'),
+('Vitamina C 1g', 5.80, 'Suplemento'),
+('Alcohol en Gel 250ml', 4.30, 'Higiene');</code></pre>
+        </div>
+
+        <h3>2️⃣ Backend PHP: API REST</h3>
+
+        <div class="alert alert-warning">
+          <strong>📁 Estructura de carpetas:</strong><br />
+          htdocs/<br />
+          └── ucv_aplic_mov/<br />
+          &nbsp;&nbsp;&nbsp;&nbsp;├── config.php<br />
+          &nbsp;&nbsp;&nbsp;&nbsp;└── productos/<br />
+          &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;└── listar.php
+        </div>
+
+        <div class="code-block">
+          <div class="code-header">PHP - config.php (Conexión a la base de datos)</div>
+          <pre><code>&lt;?php
+$host = "localhost";
+$db = "aplic_movil";
+$user = "root";
+$pass = "";
+
+try {
+    $conexion = new PDO("mysql:host=$host;dbname=$db;charset=utf8", $user, $pass);
+    $conexion->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    echo json_encode([
+        "success" => false,
+        "message" => "Error de conexión: " . $e->getMessage()
+    ]);
+    exit;
+}
+?></code></pre>
+        </div>
+
+        <div class="code-block">
+          <div class="code-header">PHP - productos/listar.php</div>
+          <pre><code>&lt;?php
+// Incluir configuración
+require_once '../config.php';
+
+header('Content-Type: application/json; charset=utf-8');
+
+try {
+    // Consulta SQL para obtener todos los productos
+    $query = "SELECT * FROM productos ORDER BY nombre ASC";
+    $stmt = $conexion->prepare($query);
+    $stmt->execute();
+
+    // OJO: fetchAll(PDO::FETCH_ASSOC) elimina los índices numéricos
+    $productos = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+    // Devolver respuesta exitosa con los datos
+    echo json_encode([
+        "success" => true,
+        "message" => "Productos obtenidos correctamente",
+        "data" => $productos,
+        "total" => count($productos)
+    ], JSON_UNESCAPED_UNICODE);
+
+} catch (PDOException $e) {
+    // En caso de error
+    echo json_encode([
+        "success" => false,
+        "message" => "Error al obtener productos: " . $e->getMessage()
+    ]);
+}
+</code></pre>
+        </div>
+
+        <div class="alert alert-success">
+          <strong>✅ Prueba tu API:</strong><br />
+          Abre tu navegador y visita: <code>http://localhost/ucv_aplic_mov/productos/listar.php</code><br />
+          Deberías ver un JSON con los productos.
+        </div>
+
+        <h3>3️⃣ Aplicación Android</h3>
+
+        <h4>Configuración del Proyecto</h4>
+
+        <div class="code-block">
+          <div class="code-header">Gradle - app/build.gradle.kts (Dependencias)</div>
+          <pre><code>dependencies {
+    implementation("androidx.core:core-ktx:1.12.0")
+    implementation("androidx.appcompat:appcompat:1.6.1")
+    implementation("com.google.android.material:material:1.11.0")
+    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+    
+    // RecyclerView para listas
+    implementation("androidx.recyclerview:recyclerview:1.3.2")
+    
+    // Retrofit para consumir API REST
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+}</code></pre>
+        </div>
+
+        <div class="code-block">
+          <div class="code-header">XML - AndroidManifest.xml</div>
+          <pre><code>&lt;manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"&gt;
+
+    &lt;uses-permission android:name="android.permission.INTERNET" /&gt;
+
+    &lt;application
+        android:allowBackup="true"
+        android:usesCleartextTraffic="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Apiphp"&gt;
+
+        &lt;activity
+            android:name=".MainActivity"
+            android:exported="true"&gt;
+            &lt;intent-filter&gt;
+                &lt;action android:name="android.intent.action.MAIN" /&gt;
+                &lt;category android:name="android.intent.category.LAUNCHER" /&gt;
+            &lt;/intent-filter&gt;
+        &lt;/activity&gt;
+
+    &lt;/application&gt;
+&lt;/manifest&gt;</code></pre>
+        </div>
+
+        <h4>Layouts XML</h4>
+
+        <div class="code-block">
+          <div class="code-header">XML - res/layout/activity_main.xml</div>
+          <pre><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"&gt;
+
+    &lt;androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerProductos"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        tools:listitem="@layout/item_producto" /&gt;
+
+&lt;/androidx.constraintlayout.widget.ConstraintLayout&gt;</code></pre>
+        </div>
+
+        <div class="code-block">
+          <div class="code-header">XML - res/layout/item_producto.xml</div>
+          <pre><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="12dp"&gt;
+
+    &lt;TextView
+        android:id="@+id/tvNombre"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Nombre producto"
+        android:textStyle="bold"
+        android:textSize="16sp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" /&gt;
+
+    &lt;TextView
+        android:id="@+id/tvCategoria"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Categoría"
+        android:textSize="14sp"
+        app:layout_constraintTop_toBottomOf="@id/tvNombre"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" /&gt;
+
+    &lt;TextView
+        android:id="@+id/tvPrecio"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="S/ 0.00"
+        android:textSize="14sp"
+        app:layout_constraintTop_toBottomOf="@id/tvCategoria"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" /&gt;
+
+&lt;/androidx.constraintlayout.widget.ConstraintLayout&gt;</code></pre>
+        </div>
+
+        <div class="code-block">
+          <div class="code-header">XML - res/layout/activity_registrar.xml</div>
+          <pre><code>&lt;LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp"&gt;
+
+    &lt;EditText
+        android:id="@+id/etNombre"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nombre" /&gt;
+
+    &lt;EditText
+        android:id="@+id/etPrecio"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Precio" /&gt;
+
+    &lt;EditText
+        android:id="@+id/etCategoria"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Categoría" /&gt;
+
+    &lt;Button
+        android:id="@+id/btnGuardar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Guardar" /&gt;
+&lt;/LinearLayout&gt;</code></pre>
+        </div>
+
+        <h4>Modelos de Datos (Kotlin)</h4>
+
+        <div class="code-block">
+          <div class="code-header">Kotlin - models/Producto.kt</div>
+          <pre><code>package com.example.apirestapp.models
+
+data class Producto(
+    val id: Int,
+    val nombre: String,
+    val precio: String,
+    val categoria: String
+)
+
+data class ProductosResponse(
+    val success: Boolean,
+    val data: List&lt;Producto>
+)</code></pre>
+        </div>
+
+        <h4>Configuración de Retrofit</h4>
+
+        <div class="code-block">
+
+  import com.example.api_php.ProductosResponse
+import retrofit2.Call
+import retrofit2.http.GET
+
+interface ApiService {
+    @GET("productos/listar.php")
+    fun listarProductos(): Call&lt;ProductosResponse>
+    // BASE_URL = http://10.0.2.2/ucv_aplic_mov/
+    // URL final   =&gt; http://10.0.2.2/ucv_aplic_mov/productos/listar.php
+  }
+  </code></pre>
+        <div class="code-header">Kotlin - api/ApiService.kt</div>
+        <pre><code>package com.example.api_php
+
+}</code></pre>
+        </div>
+
+        <div class="code-block">
+          <div class="code-header">Kotlin - api/RetrofitClient.kt</div>
+          <pre><code>package com.example.apirestapp.api
+
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+
+object RetrofitClient {
+    // Para emulador: 10.0.2.2 apunta al localhost de tu PC
+    private const val BASE_URL = "http://10.0.2.2/ucv_aplic_mov/"
+
+    val instance: ApiService by lazy {
+        val retrofit = Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+        retrofit.create(ApiService::class.java)
+    }
+}</code></pre>
+        </div>
+            <div class="code-header">Kotlin - adapters/ProductoAdapter.kt</div>
+            <pre><code>package com.example.api_php
+
+        <h4>Adapter para RecyclerView</h4>
+
+        <div class="code-block">
+          <div class="code-header">Kotlin - adapters/ProductoAdapter.kt</div>
+          <pre><code>package com.example.apirestapp.adapters
+
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import com.example.apirestapp.R
+import com.example.apirestapp.models.Producto
+
+class ProductoAdapter(
+    private var items: List&lt;Producto>
+) : RecyclerView.Adapter&lt;ProductoAdapter.ProductoViewHolder>() {
+
+    inner class ProductoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val tvNombre: TextView = itemView.findViewById(R.id.tvNombre)
+        val tvCategoria: TextView = itemView.findViewById(R.id.tvCategoria)
+        val tvPrecio: TextView = itemView.findViewById(R.id.tvPrecio)
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductoViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_producto, parent, false)
+        return ProductoViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: ProductoViewHolder, position: Int) {
+        val producto = items[position]
+        holder.tvNombre.text = producto.nombre
+        holder.tvCategoria.text = "Categoría: ${producto.categoria}"
+        holder.tvPrecio.text = "S/ ${producto.precio}"
+    }
+      </code></pre>
+
+    override fun getItemCount(): Int = items.size
+
+    fun actualizarDatos(nuevos: List&lt;Producto>) {
+        items = nuevos
+        notifyDataSetChanged()
+    }
+}</code></pre>
+        </div>
+
+        <h4>Activity Principal</h4>
+
+        <div class="code-block">
+          <div class="code-header">Kotlin - MainActivity.kt</div>
+          <pre><code>package com.example.apirestapp
+
+import androidx.appcompat.app.AppCompatActivity
+import android.os.Bundle
+import android.widget.Button
+import android.widget.Toast
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.apirestapp.adapters.ProductoAdapter
+import com.example.apirestapp.api.RetrofitClient
+import com.example.apirestapp.models.ProductosResponse
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+
+class MainActivity : AppCompatActivity() {
+
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: ProductoAdapter
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        // Configurar RecyclerView
+        recyclerView = findViewById(R.id.recyclerProductos)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+
+        // Inicializar adapter con lista vacía
+        adapter = ProductoAdapter(emptyList())
+        recyclerView.adapter = adapter
+
+        // Cargar productos desde la API
+        cargarProductos()
+        ////////
+        val btnRegistrar = findViewById&lt;Button&gt;(R.id.btnRegistrar)
+        btnRegistrar.setOnClickListener {
+            val intent = Intent(this, RegistrarActivity::class.java)
+            startActivity(intent)
+        }
+    }
+
+    private fun cargarProductos() {
+        val call = RetrofitClient.instance.listarProductos()
+
+        call.enqueue(object : Callback&lt;ProductosResponse> {
+            override fun onResponse(
+                call: Call&lt;ProductosResponse>,
+                response: Response&lt;ProductosResponse>
+            ) {
+                val body = response.body()
+                if (response.isSuccessful && body != null && body.success) {
+                    // Actualizar el adapter con los datos recibidos
+                    adapter.actualizarDatos(body.data)
+                } else {
+                    Toast.makeText(
+                        this@MainActivity,
+                        "Error al cargar productos",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            }
+
+            override fun onFailure(call: Call&lt;ProductosResponse>, t: Throwable) {
+                Toast.makeText(
+                    this@MainActivity,
+                    "Error de conexión: ${t.message}",
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        })
+    }
+}</code></pre>
+        </div>
+
+        <div class="alert alert-tip">
+          <strong>💡 Tips importantes:</strong><br />
+          • Usa <code>10.0.2.2</code> como IP para acceder a tu servidor local desde el emulador Android<br />
+          • Para dispositivo físico, usa la IP de tu PC en la red local (ej: 192.168.1.100)<br />
+          • Verifica que Apache/XAMPP esté ejecutándose antes de probar<br />
+          • Revisa los logs en Logcat de Android Studio para debug
+        </div>
+
+        <h3>🎯 Resumen del Flujo Completo</h3>
+
+        <div class="flow-diagram" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+          <h4 style="color: white;">Ciclo Completo de la Aplicación</h4>
+
+          <p style="text-align: left; padding: 20px;">
+            <strong>1. INICIO:</strong> El usuario abre la aplicación Android<br /><br />
+            <strong>2. PETICIÓN:</strong> MainActivity ejecuta cargarProductos() usando Retrofit<br /><br />
+            <strong>3. RED:</strong> Retrofit envía GET request a la API PHP<br /><br />
+            <strong>4. SERVIDOR:</strong> PHP recibe la petición y conecta con MySQL usando PDO<br /><br />
+            <strong>5. BASE DE DATOS:</strong> MySQL ejecuta SELECT y retorna los productos<br /><br />
+            <strong>6. PROCESAMIENTO:</strong> PHP convierte el array a JSON<br /><br />
+            <strong>7. RESPUESTA:</strong> El JSON viaja de vuelta a la app Android<br /><br />
+            <strong>8. CONVERSIÓN:</strong> Gson convierte el JSON a objetos Kotlin<br /><br />
+            <strong>9. ACTUALIZACIÓN:</strong> El Adapter recibe los datos y notifica cambios<br /><br />
+            <strong>10. VISUALIZACIÓN:</strong> RecyclerView renderiza cada producto en pantalla
+          </p>
+        </div>
+
+        <div class="alert alert-success" style="margin-top: 40px; text-align: center;">
+          <h3>🎊 ¡Felicidades!</h3>
+          <p>Ahora tienes una comprensión completa de cómo funciona una aplicación Android con API REST.</p>
+          <p>Has aprendido la teoría y tienes el código completo para implementarlo.</p>
+          <p><strong>¡Es hora de construir tu propia API REST! 🚀</strong></p>
+        </div>
+
+        <!-- SECCIÓN EXTRA: REGISTRO DE PRODUCTOS -->
+        <h2>📝 PARTE III: REGISTRO DE PRODUCTOS (INSERTAR)</h2>
+
+        <h3>1️⃣ Crear el endpoint registrar.php</h3>
+        <div class="alert alert-warning">
+          <strong>Paso 1:</strong> Crea un archivo nuevo llamado <code>registrar.php</code> en la misma carpeta donde está <code>listar.php</code>.<br>
+          <strong>Ruta:</strong> <code>htdocs/ucv_aplic_mov/productos/registrar.php</code>
+        </div>
+        <div class="code-block">
+          <div class="code-header">PHP - productos/registrar.php</div>
+          <pre><code>&lt;?php
+require_once '../config.php';
+
+header('Content-Type: application/json; charset=utf-8');
+
+// Obtener datos del POST
+$nombre = $_POST['nombre'] ?? '';
+$precio = $_POST['precio'] ?? '';
+$categoria = $_POST['categoria'] ?? '';
+
+if ($nombre && $precio && $categoria) {
+    try {
+        $query = "INSERT INTO productos (nombre, precio, categoria) VALUES (?, ?, ?)";
+        $stmt = $conexion->prepare($query);
+        $stmt->execute([$nombre, $precio, $categoria]);
+        echo json_encode([
+            "success" => true,
+            "message" => "Producto registrado correctamente"
+        ]);
+    } catch (PDOException $e) {
+        echo json_encode([
+            "success" => false,
+            "message" => "Error al registrar: " . $e->getMessage()
+        ]);
+    }
+} else {
+    echo json_encode([
+        "success" => false,
+        "message" => "Faltan datos obligatorios"
+    ]);
+}
+?></code></pre>
+        </div>
+
+        <h3>2️⃣ Agregar función en ApiService.kt</h3>
+        <div class="code-block">
+          <div class="code-header">Kotlin - ApiService.kt (agregar POST)</div>
+          <pre><code>import retrofit2.http.FormUrlEncoded
+import retrofit2.http.Field
+import retrofit2.http.POST
+
+interface ApiService {
+    // ...
+    @FormUrlEncoded
+    @POST("productos/registrar.php")
+    fun registrarProducto(
+        @Field("nombre") nombre: String,
+        @Field("precio") precio: String,
+        @Field("categoria") categoria: String
+    ): Call&lt;Map&lt;String, Any&gt;&gt;
+}
+</code></pre>
+        </div>
+
+        <h3>3️⃣ Lógica en Android para registrar</h3>
+        <div class="alert alert-info">
+          <strong>Paso 3:</strong> Puedes crear un método en tu <code>MainActivity</code> o en una nueva <code>Activity</code> para enviar los datos del producto usando <code>registrarProducto</code> de <code>ApiService</code>.<br>
+          Ejemplo básico:
+        </div>
+        <div class="code-block">
+          <div class="code-header">Kotlin - Registrar producto desde Android</div>
+          <pre><code>// ...
+val call = RetrofitClient.instance.registrarProducto("Paracetamol 500mg", "2.50", "Medicamento")
+call.enqueue(object : Callback&lt;Map&lt;String, Any&gt;&gt; {
+    override fun onResponse(
+        call: Call&lt;Map&lt;String, Any&gt;&gt;,
+        response: Response&lt;Map&lt;String, Any&gt;&gt;
+    ) {
+        val body = response.body()
+        if (body != null && body["success"] == true) {
+            Toast.makeText(this@MainActivity, "Registro exitoso", Toast.LENGTH_SHORT).show()
+        } else {
+            Toast.makeText(this@MainActivity, "Error: ${body?.get("message")}", Toast.LENGTH_SHORT).show()
+        }
+    }
+    override fun onFailure(call: Call&lt;Map&lt;String, Any&gt;&gt;, t: Throwable) {
+        Toast.makeText(this@MainActivity, "Error de red: ${t.message}", Toast.LENGTH_SHORT).show()
+    }
+})
+// ...
+</code></pre>
+        </div>
+
+        <div class="alert alert-success">
+          <strong>¡Listo!</strong> Ahora puedes registrar productos desde tu app Android usando el nuevo endpoint y función.
+        </div>
+
+        <!-- SECCIÓN EXTRA: BOTÓN Y FORMULARIO DE REGISTRO EN ANDROID -->
+        <h2>🟢 PARTE IV: BOTÓN Y FORMULARIO DE REGISTRO</h2>
+
+        <h3>1️⃣ Agregar botón en activity_main.xml</h3>
+        <div class="alert alert-warning">
+          <strong>Paso 1:</strong> Agrega un botón encima del RecyclerView en <code>activity_main.xml</code>:
+        </div>
+        <div class="code-block">
+          <div class="code-header">XML - res/layout/activity_main.xml (fragmento)</div>
+          <pre><code>&lt;Button
+    android:id="@+id/btnRegistrar"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="Registrar producto"
+    app:layout_constraintTop_toTopOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintEnd_toEndOf="parent" /&gt;
+
+&lt;androidx.recyclerview.widget.RecyclerView
+    android:id="@+id/recyclerProductos"
+    ...
+/&gt;
+</code></pre>
+        </div>
+
+        <h3>2️⃣ Crear RegistrarActivity y su layout</h3>
+        <div class="alert alert-warning">
+          <strong>Paso 2:</strong> Crea un nuevo archivo <code>RegistrarActivity.kt</code> y su layout <code>activity_registrar.xml</code>:
+        </div>
+        <div class="code-block">
+          <div class="code-header">Kotlin - RegistrarActivity.kt</div>
+          <pre><code>package com.example.api_php
+
+import android.os.Bundle
+import android.widget.Button
+import android.widget.EditText
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+
+class RegistrarActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_registrar)
+
+        val etNombre = findViewById&lt;EditText&gt;(R.id.etNombre)
+        val etPrecio = findViewById&lt;EditText&gt;(R.id.etPrecio)
+        val etCategoria = findViewById&lt;EditText&gt;(R.id.etCategoria)
+        val btnGuardar = findViewById&lt;Button&gt;(R.id.btnGuardar)
+
+        btnGuardar.setOnClickListener {
+            val nombre = etNombre.text.toString()
+            val precio = etPrecio.text.toString()
+            val categoria = etCategoria.text.toString()
+            if (nombre.isNotBlank() && precio.isNotBlank() && categoria.isNotBlank()) {
+                val call = RetrofitClient.instance.registrarProducto(nombre, precio, categoria)
+                call.enqueue(object : Callback<Map<String, Any>> {
+                    override fun onResponse(call: Call<Map<String, Any>>, response: Response<Map<String, Any>>) {
+                        val body = response.body()
+                        if (body != null && body["success"] == true) {
+                            Toast.makeText(this@RegistrarActivity, "Registro exitoso", Toast.LENGTH_SHORT).show()
+                            finish()
+                        } else {
+                            Toast.makeText(this@RegistrarActivity, "Error: ${body?.get("message")}", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                    override fun onFailure(call: Call<Map<String, Any>>, t: Throwable) {
+                        Toast.makeText(this@RegistrarActivity, "Error de red: ${t.message}", Toast.LENGTH_SHORT).show()
+                    }
+                })
+            } else {
+                Toast.makeText(this, "Completa todos los campos", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+}
+</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header">XML - res/layout/activity_registrar.xml</div>
+          <pre><code>&lt;LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp"&gt;
+
+    &lt;EditText
+        android:id="@+id/etNombre"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nombre" /&gt;
+
+    &lt;EditText
+        android:id="@+id/etPrecio"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Precio" /&gt;
+
+    &lt;EditText
+        android:id="@+id/etCategoria"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Categoría" /&gt;
+
+    &lt;Button
+        android:id="@+id/btnGuardar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Guardar" /&gt;
+&lt;/LinearLayout&gt;</code></pre>
+        </div>
+
+        <h3>3️⃣ Abrir RegistrarActivity desde MainActivity</h3>
+        <div class="alert alert-info">
+          <strong>Paso 3:</strong> En <code>MainActivity.kt</code>, abre el formulario al pulsar el botón:
+        </div>
+        <div class="code-block">
+          <div class="code-header">Kotlin - MainActivity.kt (fragmento)</div>
+          <pre><code>val btnRegistrar = findViewById&lt;Button&gt;(R.id.btnRegistrar)
+          btnRegistrar.setOnClickListener {
+            val intent = Intent(this, RegistrarActivity::class.java)
+            startActivity(intent)
+          }
+      </code></pre>
+        </div>
+
+        <div class="alert alert-success">
+          <strong>¡Listo!</strong> Ahora tienes un botón para registrar productos, un formulario y el flujo básico para insertar desde la app.
+        </div>
+
+        <!-- SECCIÓN EXTRA: BOTÓN FLOTANTE (FAB) PARA REGISTRAR -->
+        <h2>➕ BOTÓN FLOTANTE PARA REGISTRO</h2>
+        <div class="alert alert-warning">
+          <strong>Reemplaza el botón normal por un FloatingActionButton (FAB) en activity_main.xml:</strong>
+        </div>
+        <div class="code-block">
+          <div class="code-header">XML - res/layout/activity_main.xml (fragmento)</div>
+          <pre><code>&lt;androidx.coordinatorlayout.widget.CoordinatorLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"&gt;
+
+    &lt;androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerProductos"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" /&gt;
+
+    &lt;com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabRegistrar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="bottom|end"
+        android:layout_margin="24dp"
+        android:contentDescription="Registrar producto"
+        app:srcCompat="@android:drawable/ic_input_add" /&gt;
+
+&lt;/androidx.coordinatorlayout.widget.CoordinatorLayout&gt;
+</code></pre>
+        </div>
+        <div class="alert alert-info">
+          <strong>Recuerda:</strong> Debes tener la dependencia de Material Design en tu build.gradle:
+        </div>
+        <div class="code-block">
+          <div class="code-header">Gradle - app/build.gradle</div>
+          <pre><code>implementation 'com.google.android.material:material:1.11.0'
+</code></pre>
+        </div>
+        <h3>Acción en MainActivity</h3>
+        <div class="code-block">
+          <div class="code-header">Kotlin - MainActivity.kt (fragmento)</div>
+          <pre><code>val fabRegistrar = findViewById<FloatingActionButton>(R.id.fabRegistrar)
+fabRegistrar.setOnClickListener {
+    val intent = Intent(this, RegistrarActivity::class.java)
+    startActivity(intent)
+}
+</code></pre>
+        </div>
+        <div class="alert alert-success">
+          <strong>¡Listo!</strong> Ahora tienes un botón flotante con el ícono <b>+</b> en la esquina inferior derecha para registrar productos.
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
