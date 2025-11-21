@@ -220,40 +220,25 @@
           margin: 20px 0;
       }
 
-        .component-item {
+      .component-item {
           background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
           color: white;
           padding: 20px;
           border-radius: 10px;
           text-align: center;
           box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-          overflow-wrap: anywhere;
-          word-break: break-word;
-          min-width: 0;
-          max-width: 100%;
-          box-sizing: border-box;
-          height: auto;
-          display: flex;
-          flex-direction: column;
-          justify-content: flex-start;
-        }
+      }
 
-        .component-item h5 {
+      .component-item h5 {
           margin: 0 0 10px 0;
           font-size: 1.2em;
-          word-break: break-word;
-          overflow-wrap: anywhere;
-        }
+      }
 
-        .component-item p {
+      .component-item p {
           margin: 0;
           font-size: 0.9em;
           opacity: 0.95;
-          word-break: break-word;
-          overflow-wrap: anywhere;
-          white-space: normal;
-          display: block;
-        }
+      }
 
       /* Tabla comparativa */
       .comparison-table {
@@ -816,21 +801,11 @@ try {
 
         <h3>3️⃣ Aplicación Android</h3>
 
-        <h4>Configuración del Proyecto</h4>
+        <h4>Configuración de Retrofit</h4>
 
-        <div class="code-block">
-          <div class="code-header">Gradle - app/build.gradle.kts (Dependencias)</div>
-          <pre><code>dependencies {
-    implementation("androidx.core:core-ktx:1.12.0")
-    implementation("androidx.appcompat:appcompat:1.6.1")
-    implementation("com.google.android.material:material:1.11.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.1.4")
-    
-    // RecyclerView para listas
-    implementation("androidx.recyclerview:recyclerview:1.3.2")
-    
-    // Retrofit para consumir API REST
-    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+                <div class="code-block">
+                  <div class="code-header">Kotlin - api/ApiService.kt</div>
+                  <pre><code>import com.example.api_php.ProductosResponse
     implementation("com.squareup.retrofit2:converter-gson:2.9.0")
 }</code></pre>
         </div>
@@ -841,6 +816,7 @@ try {
     xmlns:tools="http://schemas.android.com/tools"&gt;
 
     &lt;uses-permission android:name="android.permission.INTERNET" /&gt;
+                </div>
 
     &lt;application
         android:allowBackup="true"
@@ -992,7 +968,10 @@ data class ProductosResponse(
         <h4>Configuración de Retrofit</h4>
 
         <div class="code-block">
+          <div class="code-header">Kotlin - api/ApiService.kt</div>
+        <pre><code>package com.example.api_php
 
+<pre><code>
   import com.example.api_php.ProductosResponse
 import retrofit2.Call
 import retrofit2.http.GET
@@ -1001,13 +980,11 @@ interface ApiService {
     @GET("productos/listar.php")
     fun listarProductos(): Call&lt;ProductosResponse>
     // BASE_URL = http://10.0.2.2/ucv_aplic_mov/
-    // URL final   =&gt; http://10.0.2.2/ucv_aplic_mov/productos/listar.php
+    // URL final   = http://10.0.2.2/ucv_aplic_mov/productos/listar.php
   }
   </code></pre>
-        <div class="code-header">Kotlin - api/ApiService.kt</div>
-        <pre><code>package com.example.api_php
-
-}</code></pre>
+        
+</code></pre>
         </div>
 
         <div class="code-block">
