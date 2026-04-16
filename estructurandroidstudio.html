@@ -1,611 +1,783 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Estructura de Proyecto Android Studio</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            margin: 0;
-            padding: 20px;
-            min-height: 100vh;
-        }
-        
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background: rgba(255, 255, 255, 0.95);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
-        }
-        
-        h1 {
-            text-align: center;
-            color: #2c3e50;
-            margin-bottom: 40px;
-            font-size: 2.5em;
-        }
-        
-        .section-header {
-            background: linear-gradient(135deg, #3498db, #2980b9);
-            color: white;
-            padding: 20px;
-            border-radius: 15px;
-            margin: 30px 0 20px 0;
-            text-align: center;
-            font-size: 1.5em;
-            font-weight: bold;
-        }
-        
-        .folder-tree {
-            background: #2c3e50;
-            color: #ecf0f1;
-            padding: 25px;
-            border-radius: 15px;
-            font-family: 'Courier New', monospace;
-            margin: 20px 0;
-            overflow-x: auto;
-        }
-        
-        .folder-structure {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 25px;
-            margin: 25px 0;
-        }
-        
-        .folder-card {
-            background: #f8f9fa;
-            border-radius: 15px;
-            padding: 20px;
-            border-left: 6px solid;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .folder-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
-        }
-        
-        .manifests { border-left-color: #e74c3c; }
-        .kotlin { border-left-color: #9b59b6; }
-        .res { border-left-color: #27ae60; }
-        .gradle { border-left-color: #f39c12; }
-        
-        .folder-icon {
-            font-size: 2.5em;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-        
-        .folder-title {
-            font-size: 1.3em;
-            font-weight: bold;
-            color: #2c3e50;
-            margin-bottom: 10px;
-            text-align: center;
-        }
-        
-        .folder-description {
-            color: #7f8c8d;
-            margin-bottom: 15px;
-            text-align: center;
-            font-style: italic;
-        }
-        
-        .file-list {
-            background: #ecf0f1;
-            padding: 15px;
-            border-radius: 10px;
-            margin: 15px 0;
-        }
-        
-        .file-item {
-            display: flex;
-            align-items: center;
-            padding: 8px 0;
-            border-bottom: 1px solid #bdc3c7;
-        }
-        
-        .file-item:last-child {
-            border-bottom: none;
-        }
-        
-        .file-icon {
-            margin-right: 10px;
-            font-size: 1.2em;
-        }
-        
-        .file-name {
-            font-weight: bold;
-            color: #2c3e50;
-            margin-right: 10px;
-        }
-        
-        .file-purpose {
-            color: #7f8c8d;
-            font-size: 0.9em;
-        }
-        
-        .code-example {
-            background: #2d3748;
-            color: #e2e8f0;
-            padding: 20px;
-            border-radius: 10px;
-            font-family: 'Courier New', monospace;
-            margin: 15px 0;
-            overflow-x: auto;
-        }
-        
-        .highlight {
-            background: #ffd700;
-            color: #2d3748;
-            padding: 2px 6px;
-            border-radius: 4px;
-        }
-        
-        .usage-example {
-            background: linear-gradient(135deg, #f39c12, #e67e22);
-            color: white;
-            padding: 20px;
-            border-radius: 12px;
-            margin: 20px 0;
-        }
-        
-        .visual-flow {
-            background: #34495e;
-            color: white;
-            padding: 25px;
-            border-radius: 15px;
-            margin: 25px 0;
-        }
-        
-        .flow-step {
-            background: rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            margin: 10px 0;
-            border-radius: 8px;
-            border-left: 4px solid #3498db;
-        }
-        
-        .important-note {
-            background: #e8f5e8;
-            border: 2px solid #27ae60;
-            padding: 20px;
-            border-radius: 12px;
-            margin: 20px 0;
-        }
-        
-        .warning-note {
-            background: #fef5e7;
-            border: 2px solid #f39c12;
-            padding: 20px;
-            border-radius: 12px;
-            margin: 20px 0;
-        }
-        
-        .tabs {
-            display: flex;
-            background: #ecf0f1;
-            border-radius: 10px 10px 0 0;
-            overflow: hidden;
-        }
-        
-        .tab {
-            flex: 1;
-            padding: 15px;
-            background: #bdc3c7;
-            text-align: center;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        
-        .tab.active {
-            background: #3498db;
-            color: white;
-        }
-        
-        .tab-content {
-            background: #fff;
-            padding: 20px;
-            border-radius: 0 0 10px 10px;
-            border: 2px solid #ecf0f1;
-            border-top: none;
-        }
-        
-        .resource-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin: 20px 0;
-        }
-        
-        .resource-item {
-            background: #fff;
-            padding: 15px;
-            border-radius: 10px;
-            text-align: center;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-        
-        .android-robot {
-            font-size: 3em;
-            color: #a4c639;
-            text-align: center;
-            margin: 20px 0;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Estructura de Proyecto Android Studio</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: rgba(255, 255, 255, 0.95);
+      border-radius: 20px;
+      padding: 30px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+    }
+
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 40px;
+      font-size: 2.5em;
+    }
+
+    .section-header {
+      background: linear-gradient(135deg, #3498db, #2980b9);
+      color: white;
+      padding: 20px;
+      border-radius: 15px;
+      margin: 30px 0 20px 0;
+      text-align: center;
+      font-size: 1.5em;
+      font-weight: bold;
+    }
+
+    .folder-tree {
+      background: #2c3e50;
+      color: #ecf0f1;
+      padding: 25px;
+      border-radius: 15px;
+      font-family: 'Courier New', monospace;
+      margin: 20px 0;
+      overflow-x: auto;
+    }
+
+    .tree {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-width: max-content;
+      line-height: 1.6;
+    }
+
+    .tree-node {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      white-space: nowrap;
+    }
+
+    .tree-branch {
+      color: #8aa4bf;
+      min-width: 28px;
+      text-align: right;
+      flex-shrink: 0;
+    }
+
+    .tree-label {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .tree-children {
+      margin-left: 32px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      position: relative;
+    }
+
+    .tree-children::before {
+      content: "";
+      position: absolute;
+      left: -16px;
+      top: 0;
+      bottom: 8px;
+      border-left: 1px solid rgba(236, 240, 241, 0.28);
+    }
+
+    .tree-children.root-level {
+      margin-left: 0;
+    }
+
+    .tree-children.root-level::before {
+      display: none;
+    }
+
+    .tree-folder {
+      color: #ffd166;
+    }
+
+    .tree-file {
+      color: #f8fafc;
+    }
+
+    .tree-class {
+      color: #74b9ff;
+    }
+
+    .tree-note {
+      color: #a5b1c2;
+    }
+
+    .tree-section {
+      color: #ffcf7a;
+      font-weight: bold;
+    }
+
+    .folder-structure {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 25px;
+      margin: 25px 0;
+    }
+
+    .folder-card {
+      background: #f8f9fa;
+      border-radius: 15px;
+      padding: 20px;
+      border-left: 6px solid;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .folder-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .manifests {
+      border-left-color: #e74c3c;
+    }
+
+    .kotlin {
+      border-left-color: #9b59b6;
+    }
+
+    .res {
+      border-left-color: #27ae60;
+    }
+
+    .gradle {
+      border-left-color: #f39c12;
+    }
+
+    .folder-icon {
+      font-size: 2.5em;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    .folder-title {
+      font-size: 1.3em;
+      font-weight: bold;
+      color: #2c3e50;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .folder-description {
+      color: #7f8c8d;
+      margin-bottom: 15px;
+      text-align: center;
+      font-style: italic;
+    }
+
+    .file-list {
+      background: #ecf0f1;
+      padding: 15px;
+      border-radius: 10px;
+      margin: 15px 0;
+    }
+
+    .file-item {
+      display: flex;
+      align-items: center;
+      padding: 8px 0;
+      border-bottom: 1px solid #bdc3c7;
+    }
+
+    .file-item:last-child {
+      border-bottom: none;
+    }
+
+    .file-icon {
+      margin-right: 10px;
+      font-size: 1.2em;
+    }
+
+    .file-name {
+      font-weight: bold;
+      color: #2c3e50;
+      margin-right: 10px;
+    }
+
+    .file-purpose {
+      color: #7f8c8d;
+      font-size: 0.9em;
+    }
+
+    .code-example {
+      background: #2d3748;
+      color: #e2e8f0;
+      padding: 20px;
+      border-radius: 10px;
+      font-family: 'Courier New', monospace;
+      margin: 15px 0;
+      overflow-x: auto;
+    }
+
+    .highlight {
+      background: #ffd700;
+      color: #2d3748;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
+
+    .usage-example {
+      background: linear-gradient(135deg, #f39c12, #e67e22);
+      color: white;
+      padding: 20px;
+      border-radius: 12px;
+      margin: 20px 0;
+    }
+
+    .visual-flow {
+      background: #34495e;
+      color: white;
+      padding: 25px;
+      border-radius: 15px;
+      margin: 25px 0;
+    }
+
+    .flow-step {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 8px;
+      border-left: 4px solid #3498db;
+    }
+
+    .important-note {
+      background: #e8f5e8;
+      border: 2px solid #27ae60;
+      padding: 20px;
+      border-radius: 12px;
+      margin: 20px 0;
+    }
+
+    .warning-note {
+      background: #fef5e7;
+      border: 2px solid #f39c12;
+      padding: 20px;
+      border-radius: 12px;
+      margin: 20px 0;
+    }
+
+    .tabs {
+      display: flex;
+      background: #ecf0f1;
+      border-radius: 10px 10px 0 0;
+      overflow: hidden;
+    }
+
+    .tab {
+      flex: 1;
+      padding: 15px;
+      background: #bdc3c7;
+      text-align: center;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .tab.active {
+      background: #3498db;
+      color: white;
+    }
+
+    .tab-content {
+      background: #fff;
+      padding: 20px;
+      border-radius: 0 0 10px 10px;
+      border: 2px solid #ecf0f1;
+      border-top: none;
+    }
+
+    .resource-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 15px;
+      margin: 20px 0;
+    }
+
+    .resource-item {
+      background: #fff;
+      padding: 15px;
+      border-radius: 10px;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .android-robot {
+      font-size: 3em;
+      color: #a4c639;
+      text-align: center;
+      margin: 20px 0;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>🤖 Estructura de Proyecto Android Studio</h1>
-        
-        <div class="android-robot">🤖</div>
-        
-        <!-- SECCIÓN 1: APP -->
-        <div class="section-header">
-            📱 SECCIÓN 1: CARPETA "app" - EL CORAZÓN DE TU APLICACIÓN
-        </div>
-        
-        <div class="folder-tree">
-📁 app/
-├── 📁 manifests/
-│   └── 📄 AndroidManifest.xml
-├── 📁 kotlin+java/
-│   └── 📁 com.example.myapplication/
-│       ├── 🔵 MainActivity
-│       ├── 📁 (androidTest)/ 
-│       └── 📁 (test)/
-└── 📁 res/
-    ├── 📁 drawable/
-    ├── 📁 layout/
-    ├── 📁 mipmap/
-    ├── 📁 values/
-    └── 📁 xml/
-        </div>
-        
-        <div class="folder-structure">
-            <!-- MANIFESTS -->
-            <div class="folder-card manifests">
-                <div class="folder-icon">📋</div>
-                <div class="folder-title">manifests/</div>
-                <div class="folder-description">"El DNI de tu aplicación"</div>
-                
-                <div class="file-list">
-                    <div class="file-item">
-                        <span class="file-icon">📄</span>
-                        <span class="file-name">AndroidManifest.xml</span>
-                        <span class="file-purpose">Configuración global</span>
-                    </div>
-                </div>
-                
-                <div class="usage-example">
-                    <h4>🎯 ¿Para qué sirve?</h4>
-                    <ul>
-                        <li>🔑 Define permisos de la app</li>
-                        <li>📱 Registra todas las actividades</li>
-                        <li>🎨 Configura iconos y temas</li>
-                        <li>🚀 Punto de entrada de la app</li>
-                    </ul>
-                </div>
-                
-                <div class="code-example">
-&lt;manifest&gt;
-    &lt;uses-permission android:name="<span class="highlight">android.permission.CAMERA</span>" /&gt;
-    &lt;application android:icon="<span class="highlight">@mipmap/ic_launcher</span>"&gt;
-        &lt;activity android:name="<span class="highlight">.MainActivity</span>"&gt;
-            &lt;intent-filter&gt;
-                &lt;action android:name="android.intent.action.MAIN" /&gt;
-                &lt;category android:name="android.intent.category.LAUNCHER" /&gt;
-            &lt;/intent-filter&gt;
-        &lt;/activity&gt;
-    &lt;/application&gt;
-&lt;/manifest&gt;
-                </div>
-            </div>
-            
-            <!-- KOTLIN+JAVA -->
-            <div class="folder-card kotlin">
-                <div class="folder-icon">☕</div>
-                <div class="folder-title">kotlin+java/</div>
-                <div class="folder-description">"El cerebro de tu aplicación"</div>
-                
-                <div class="file-list">
-                    <div class="file-item">
-                        <span class="file-icon">🔵</span>
-                        <span class="file-name">MainActivity.kt</span>
-                        <span class="file-purpose">Pantalla principal</span>
-                    </div>
-                    <div class="file-item">
-                        <span class="file-icon">🧪</span>
-                        <span class="file-name">(androidTest)/</span>
-                        <span class="file-purpose">Pruebas en dispositivo</span>
-                    </div>
-                    <div class="file-item">
-                        <span class="file-icon">⚗️</span>
-                        <span class="file-name">(test)/</span>
-                        <span class="file-purpose">Pruebas unitarias</span>
-                    </div>
-                </div>
-                
-                <div class="usage-example">
-                    <h4>🎯 ¿Para qué sirve?</h4>
-                    <ul>
-                        <li>🧠 Lógica de la aplicación</li>
-                        <li>🔄 Manejo de eventos</li>
-                        <li>📱 Interacción con la UI</li>
-                        <li>🌐 Conexiones a internet</li>
-                    </ul>
-                </div>
-                
-                <div class="code-example">
-class MainActivity : AppCompatActivity() {
-    override fun <span class="highlight">onCreate</span>(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        <span class="highlight">setContentView</span>(R.layout.activity_main)
-        
-        // Tu código aquí
-        val button = findViewById&lt;Button&gt;(R.id.myButton)
-        button.<span class="highlight">setOnClickListener</span> {
-            // Acción cuando se presiona el botón
-        }
-    }
-}
-                </div>
-            </div>
-            
-            <!-- RES -->
-            <div class="folder-card res">
-                <div class="folder-icon">🎨</div>
-                <div class="folder-title">res/</div>
-                <div class="folder-description">"Los recursos visuales y datos"</div>
-                
-                <div class="file-list">
-                    <div class="file-item">
-                        <span class="file-icon">🖼️</span>
-                        <span class="file-name">drawable/</span>
-                        <span class="file-purpose">Imágenes, iconos, formas</span>
-                    </div>
-                    <div class="file-item">
-                        <span class="file-icon">📐</span>
-                        <span class="file-name">layout/</span>
-                        <span class="file-purpose">Diseño de pantallas</span>
-                    </div>
-                    <div class="file-item">
-                        <span class="file-icon">🏠</span>
-                        <span class="file-name">mipmap/</span>
-                        <span class="file-purpose">Iconos del launcher</span>
-                    </div>
-                    <div class="file-item">
-                        <span class="file-icon">🎯</span>
-                        <span class="file-name">values/</span>
-                        <span class="file-purpose">Colores, textos, estilos</span>
-                    </div>
-                </div>
-                
-                <div class="resource-grid">
-                    <div class="resource-item">
-                        <div style="font-size: 2em;">🖼️</div>
-                        <strong>drawable/</strong>
-                        <p>logo.png<br>button_bg.xml</p>
-                    </div>
-                    <div class="resource-item">
-                        <div style="font-size: 2em;">📐</div>
-                        <strong>layout/</strong>
-                        <p>activity_main.xml<br>item_list.xml</p>
-                    </div>
-                    <div class="resource-item">
-                        <div style="font-size: 2em;">🎨</div>
-                        <strong>values/</strong>
-                        <p>colors.xml<br>strings.xml</p>
-                    </div>
-                </div>
-                
-                <div class="code-example">
-&lt;!-- layout/activity_main.xml --&gt;
-&lt;LinearLayout&gt;
-    &lt;TextView
-        android:text="<span class="highlight">@string/app_name</span>"
-        android:textColor="<span class="highlight">@color/primary_color</span>"
-        android:background="<span class="highlight">@drawable/button_background</span>" /&gt;
-&lt;/LinearLayout&gt;
+  <div class="container">
+    <h1>🤖 Estructura de Proyecto Android Studio</h1>
 
-&lt;!-- values/strings.xml --&gt;
-&lt;resources&gt;
-    &lt;string name="<span class="highlight">app_name</span>"&gt;Mi Aplicación&lt;/string&gt;
-&lt;/resources&gt;
-                </div>
-            </div>
-        </div>
-        
-        <!-- SECCIÓN 2: GRADLE SCRIPTS -->
-        <div class="section-header">
-            ⚙️ SECCIÓN 2: GRADLE SCRIPTS - LA CONFIGURACIÓN DEL PROYECTO
-        </div>
-        
-        <div class="folder-tree">
-⚙️ Gradle Scripts/
-├── 📄 build.gradle.kts (Project: My_Application)
-├── 📄 build.gradle.kts (Module: app)
-├── 🛡️ proguard-rules.pro
-├── 📄 gradle.properties
-├── 📄 gradle-wrapper.properties
-├── 📄 libs.versions.toml
-├── 📄 local.properties
-└── 📄 settings.gradle.kts
-        </div>
-        
-        <div class="folder-structure">
-            <!-- BUILD.GRADLE PROJECT -->
-            <div class="folder-card gradle">
-                <div class="folder-icon">🏗️</div>
-                <div class="folder-title">build.gradle.kts (Project)</div>
-                <div class="folder-description">"Configuración global del proyecto"</div>
-                
-                <div class="usage-example">
-                    <h4>🎯 ¿Para qué sirve?</h4>
-                    <ul>
-                        <li>🔧 Define versiones de herramientas</li>
-                        <li>📦 Repositorios de dependencias</li>
-                        <li>🌐 Configuración global</li>
-                        <li>🚀 Plugins del proyecto</li>
-                    </ul>
-                </div>
-                
-                <div class="code-example">
-// build.gradle.kts (Project)
-buildscript {
-    dependencies {
-        classpath("<span class="highlight">com.android.tools.build:gradle:8.1.0</span>")
-        classpath("<span class="highlight">org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.0</span>")
-    }
-}
+    <div class="android-robot">🤖</div>
 
-allprojects {
-    repositories {
-        <span class="highlight">google()</span>
-        <span class="highlight">mavenCentral()</span>
-    }
-}
-                </div>
-            </div>
-            
-            <!-- BUILD.GRADLE MODULE -->
-            <div class="folder-card gradle">
-                <div class="folder-icon">📱</div>
-                <div class="folder-title">build.gradle.kts (Module)</div>
-                <div class="folder-description">"Configuración específica de tu app"</div>
-                
-                <div class="usage-example">
-                    <h4>🎯 ¿Para qué sirve?</h4>
-                    <ul>
-                        <li>📱 Versión mínima de Android</li>
-                        <li>📦 Librerías que usa tu app</li>
-                        <li>🔢 Número de versión</li>
-                        <li>⚙️ Configuración de compilación</li>
-                    </ul>
-                </div>
-                
-                <div class="code-example">
-// build.gradle.kts (Module: app)
-android {
-    compileSdk = <span class="highlight">34</span>
-    
-    defaultConfig {
-        applicationId = "<span class="highlight">com.example.myapplication</span>"
-        minSdk = <span class="highlight">24</span>
-        targetSdk = <span class="highlight">34</span>
-        versionCode = <span class="highlight">1</span>
-        versionName = "<span class="highlight">1.0</span>"
-    }
-}
-
-dependencies {
-    implementation("<span class="highlight">androidx.appcompat:appcompat:1.6.1</span>")
-    implementation("<span class="highlight">com.google.android.material:material:1.9.0</span>")
-}
-                </div>
-            </div>
-            
-            <!-- OTROS ARCHIVOS GRADLE -->
-            <div class="folder-card gradle">
-                <div class="folder-icon">⚙️</div>
-                <div class="folder-title">Otros Archivos de Configuración</div>
-                <div class="folder-description">"Configuraciones específicas"</div>
-                
-                <div class="file-list">
-                    <div class="file-item">
-                        <span class="file-icon">🛡️</span>
-                        <span class="file-name">proguard-rules.pro</span>
-                        <span class="file-purpose">Optimización del código</span>
-                    </div>
-                    <div class="file-item">
-                        <span class="file-icon">🏠</span>
-                        <span class="file-name">local.properties</span>
-                        <span class="file-purpose">Rutas locales del SDK</span>
-                    </div>
-                    <div class="file-item">
-                        <span class="file-icon">📚</span>
-                        <span class="file-name">libs.versions.toml</span>
-                        <span class="file-purpose">Catálogo de versiones</span>
-                    </div>
-                    <div class="file-item">
-                        <span class="file-icon">⚙️</span>
-                        <span class="file-name">gradle.properties</span>
-                        <span class="file-purpose">Propiedades globales</span>
-                    </div>
-                </div>
-                
-                <div class="code-example">
-# gradle.properties
-<span class="highlight">android.useAndroidX=true</span>
-<span class="highlight">android.enableJetifier=true</span>
-org.gradle.jvmargs=-Xmx2048m
-
-# local.properties
-<span class="highlight">sdk.dir=/Users/tu-usuario/Android/Sdk</span>
-                </div>
-            </div>
-        </div>
-        
-        <!-- FLUJO DE TRABAJO -->
-        <div class="visual-flow">
-            <h2>🔄 ¿Cómo Trabajan Juntos?</h2>
-            
-            <div class="flow-step">
-                <h3>1️⃣ GRADLE construye tu proyecto</h3>
-                <p>Lee build.gradle.kts → Descarga dependencias → Compila código Kotlin/Java</p>
-            </div>
-            
-            <div class="flow-step">
-                <h3>2️⃣ RECURSOS se empaquetan</h3>
-                <p>Toma imágenes de drawable/ → Layouts de layout/ → Textos de values/</p>
-            </div>
-            
-            <div class="flow-step">
-                <h3>3️⃣ MANIFEST configura la app</h3>
-                <p>Define permisos → Registra actividades → Establece punto de entrada</p>
-            </div>
-            
-            <div class="flow-step">
-                <h3>4️⃣ SE GENERA el APK</h3>
-                <p>Todo se empaqueta en un archivo .apk listo para instalar</p>
-            </div>
-        </div>
-        
-        <!-- NOTAS IMPORTANTES -->
-        <div class="important-note">
-            <h3>💡 Puntos Clave :</h3>
-            <ul>
-                <li><strong>app/</strong> = Donde programarás (90% del tiempo aquí)</li>
-                <li><strong>Gradle Scripts/</strong> = Configuración (solo al inicio del proyecto)</li>
-                <li><strong>MainActivity</strong> = Tu primera pantalla a programar</li>
-                <li><strong>activity_main.xml</strong> = El diseño de esa pantalla</li>
-                <li><strong>AndroidManifest.xml</strong> = Cada nueva actividad debe registrarse aquí</li>
-            </ul>
-        </div>
-        
-        <div class="warning-note">
-            <h3>⚠️ ¡No Toques Estos Archivos al Principio!</h3>
-            <ul>
-                <li><strong>local.properties</strong> - Se genera automáticamente</li>
-                <li><strong>gradle-wrapper.properties</strong> - Configuración automática</li>
-                <li><strong>proguard-rules.pro</strong> - Solo para apps avanzadas</li>
-            </ul>
-            <p><strong>Enfócate en:</strong> MainActivity, activity_main.xml, y strings.xml</p>
-        </div>
-        
-        <div style="background: #27ae60; color: white; padding: 20px; border-radius: 10px; text-align: center; margin-top: 30px;">
-            <h3>🎯 Resumen para Principiantes</h3>
-            <p><strong>app/ = Tu código y diseños</strong></p>
-            <p><strong>Gradle Scripts/ = Configuración automática</strong></p>
-            <p>¡Programa en app/, deja que Gradle maneje el resto!</p>
-        </div>
+    <!-- SECCIÓN 1: APP -->
+    <div class="section-header">
+      📱 SECCIÓN 1: CARPETA "app" - EL CORAZÓN DE TU APLICACIÓN
     </div>
+
+    <div class="folder-tree">
+      <div class="tree">
+        <div class="tree-node">
+          <span class="tree-label"><span class="tree-folder">📁</span> app/</span>
+        </div>
+
+        <div class="tree-children root-level">
+          <div class="tree-node">
+            <span class="tree-branch">├──</span>
+            <span class="tree-label"><span class="tree-folder">📁</span> manifests/</span>
+          </div>
+          <div class="tree-children">
+            <div class="tree-node">
+              <span class="tree-branch">└──</span>
+              <span class="tree-label"><span class="tree-file">📄</span> AndroidManifest.xml</span>
+            </div>
+          </div>
+
+          <div class="tree-node">
+            <span class="tree-branch">├──</span>
+            <span class="tree-label"><span class="tree-folder">📁</span> kotlin+java/</span>
+          </div>
+          <div class="tree-children">
+            <div class="tree-node">
+              <span class="tree-branch">└──</span>
+              <span class="tree-label"><span class="tree-folder">📁</span> com.example.myapplication/</span>
+            </div>
+            <div class="tree-children">
+              <div class="tree-node">
+                <span class="tree-branch">├──</span>
+                <span class="tree-label"><span class="tree-class">🔵</span> MainActivity</span>
+              </div>
+              <div class="tree-node">
+                <span class="tree-branch">├──</span>
+                <span class="tree-label"><span class="tree-folder">📁</span> (androidTest)/</span>
+              </div>
+              <div class="tree-node">
+                <span class="tree-branch">└──</span>
+                <span class="tree-label"><span class="tree-folder">📁</span> (test)/</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="tree-node">
+            <span class="tree-branch">└──</span>
+            <span class="tree-label"><span class="tree-folder">📁</span> res/</span>
+          </div>
+          <div class="tree-children">
+            <div class="tree-node">
+              <span class="tree-branch">├──</span>
+              <span class="tree-label"><span class="tree-folder">📁</span> drawable/</span>
+            </div>
+            <div class="tree-node">
+              <span class="tree-branch">├──</span>
+              <span class="tree-label"><span class="tree-folder">📁</span> layout/</span>
+            </div>
+            <div class="tree-node">
+              <span class="tree-branch">├──</span>
+              <span class="tree-label"><span class="tree-folder">📁</span> mipmap/</span>
+            </div>
+            <div class="tree-node">
+              <span class="tree-branch">├──</span>
+              <span class="tree-label"><span class="tree-folder">📁</span> values/</span>
+            </div>
+            <div class="tree-node">
+              <span class="tree-branch">└──</span>
+              <span class="tree-label"><span class="tree-folder">📁</span> xml/</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="folder-structure">
+      <!-- MANIFESTS -->
+      <div class="folder-card manifests">
+        <div class="folder-icon">📋</div>
+        <div class="folder-title">manifests/</div>
+        <div class="folder-description">"El DNI de tu aplicación"</div>
+
+        <div class="file-list">
+          <div class="file-item">
+            <span class="file-icon">📄</span>
+            <span class="file-name">AndroidManifest.xml</span>
+            <span class="file-purpose">Configuración global</span>
+          </div>
+        </div>
+
+        <div class="usage-example">
+          <h4>🎯 ¿Para qué sirve?</h4>
+          <ul>
+            <li>🔑 Define permisos de la app</li>
+            <li>📱 Registra todas las actividades</li>
+            <li>🎨 Configura iconos y temas</li>
+            <li>🚀 Punto de entrada de la app</li>
+          </ul>
+        </div>
+
+        <div class="code-example">
+          &lt;manifest&gt;
+          &lt;uses-permission android:name="<span class="highlight">android.permission.CAMERA</span>" /&gt;
+          &lt;application android:icon="<span class="highlight">@mipmap/ic_launcher</span>"&gt;
+          &lt;activity android:name="<span class="highlight">.MainActivity</span>"&gt;
+          &lt;intent-filter&gt;
+          &lt;action android:name="android.intent.action.MAIN" /&gt;
+          &lt;category android:name="android.intent.category.LAUNCHER" /&gt;
+          &lt;/intent-filter&gt;
+          &lt;/activity&gt;
+          &lt;/application&gt;
+          &lt;/manifest&gt;
+        </div>
+      </div>
+
+      <!-- KOTLIN+JAVA -->
+      <div class="folder-card kotlin">
+        <div class="folder-icon">☕</div>
+        <div class="folder-title">kotlin+java/</div>
+        <div class="folder-description">"El cerebro de tu aplicación"</div>
+
+        <div class="file-list">
+          <div class="file-item">
+            <span class="file-icon">🔵</span>
+            <span class="file-name">MainActivity.kt</span>
+            <span class="file-purpose">Pantalla principal</span>
+          </div>
+          <div class="file-item">
+            <span class="file-icon">🧪</span>
+            <span class="file-name">(androidTest)/</span>
+            <span class="file-purpose">Pruebas en dispositivo</span>
+          </div>
+          <div class="file-item">
+            <span class="file-icon">⚗️</span>
+            <span class="file-name">(test)/</span>
+            <span class="file-purpose">Pruebas unitarias</span>
+          </div>
+        </div>
+
+        <div class="usage-example">
+          <h4>🎯 ¿Para qué sirve?</h4>
+          <ul>
+            <li>🧠 Lógica de la aplicación</li>
+            <li>🔄 Manejo de eventos</li>
+            <li>📱 Interacción con la UI</li>
+            <li>🌐 Conexiones a internet</li>
+          </ul>
+        </div>
+
+        <div class="code-example">
+          class MainActivity : AppCompatActivity() {
+          override fun <span class="highlight">onCreate</span>(savedInstanceState: Bundle?) {
+          super.onCreate(savedInstanceState)
+          <span class="highlight">setContentView</span>(R.layout.activity_main)
+
+          // Tu código aquí
+          val button = findViewById&lt;Button&gt;(R.id.myButton)
+          button.<span class="highlight">setOnClickListener</span> {
+          // Acción cuando se presiona el botón
+          }
+          }
+          }
+        </div>
+      </div>
+
+      <!-- RES -->
+      <div class="folder-card res">
+        <div class="folder-icon">🎨</div>
+        <div class="folder-title">res/</div>
+        <div class="folder-description">"Los recursos visuales y datos"</div>
+
+        <div class="file-list">
+          <div class="file-item">
+            <span class="file-icon">🖼️</span>
+            <span class="file-name">drawable/</span>
+            <span class="file-purpose">Imágenes, iconos, formas</span>
+          </div>
+          <div class="file-item">
+            <span class="file-icon">📐</span>
+            <span class="file-name">layout/</span>
+            <span class="file-purpose">Diseño de pantallas</span>
+          </div>
+          <div class="file-item">
+            <span class="file-icon">🏠</span>
+            <span class="file-name">mipmap/</span>
+            <span class="file-purpose">Iconos del launcher</span>
+          </div>
+          <div class="file-item">
+            <span class="file-icon">🎯</span>
+            <span class="file-name">values/</span>
+            <span class="file-purpose">Colores, textos, estilos</span>
+          </div>
+        </div>
+
+        <div class="resource-grid">
+          <div class="resource-item">
+            <div style="font-size: 2em;">🖼️</div>
+            <strong>drawable/</strong>
+            <p>logo.png<br>button_bg.xml</p>
+          </div>
+          <div class="resource-item">
+            <div style="font-size: 2em;">📐</div>
+            <strong>layout/</strong>
+            <p>activity_main.xml<br>item_list.xml</p>
+          </div>
+          <div class="resource-item">
+            <div style="font-size: 2em;">🎨</div>
+            <strong>values/</strong>
+            <p>colors.xml<br>strings.xml</p>
+          </div>
+        </div>
+
+        <div class="code-example">
+          &lt;!-- layout/activity_main.xml --&gt;
+          &lt;LinearLayout&gt;
+          &lt;TextView
+          android:text="<span class="highlight">@string/app_name</span>"
+          android:textColor="<span class="highlight">@color/primary_color</span>"
+          android:background="<span class="highlight">@drawable/button_background</span>" /&gt;
+          &lt;/LinearLayout&gt;
+
+          &lt;!-- values/strings.xml --&gt;
+          &lt;resources&gt;
+          &lt;string name="<span class="highlight">app_name</span>"&gt;Mi Aplicación&lt;/string&gt;
+          &lt;/resources&gt;
+        </div>
+      </div>
+    </div>
+
+    <!-- SECCIÓN 2: GRADLE SCRIPTS -->
+    <div class="section-header">
+      ⚙️ SECCIÓN 2: GRADLE SCRIPTS - LA CONFIGURACIÓN DEL PROYECTO
+    </div>
+
+    <div class="folder-tree">
+      <div class="tree">
+        <div class="tree-node">
+          <span class="tree-label"><span class="tree-section">⚙️</span> Gradle Scripts/</span>
+        </div>
+
+        <div class="tree-children root-level">
+          <div class="tree-node">
+            <span class="tree-branch">├──</span>
+            <span class="tree-label"><span class="tree-file">📄</span> build.gradle.kts <span class="tree-note">(Project: My_Application)</span></span>
+          </div>
+          <div class="tree-node">
+            <span class="tree-branch">├──</span>
+            <span class="tree-label"><span class="tree-file">📄</span> build.gradle.kts <span class="tree-note">(Module: app)</span></span>
+          </div>
+          <div class="tree-node">
+            <span class="tree-branch">├──</span>
+            <span class="tree-label"><span class="tree-file">🛡️</span> proguard-rules.pro</span>
+          </div>
+          <div class="tree-node">
+            <span class="tree-branch">├──</span>
+            <span class="tree-label"><span class="tree-file">📄</span> gradle.properties</span>
+          </div>
+          <div class="tree-node">
+            <span class="tree-branch">├──</span>
+            <span class="tree-label"><span class="tree-file">📄</span> gradle-wrapper.properties</span>
+          </div>
+          <div class="tree-node">
+            <span class="tree-branch">├──</span>
+            <span class="tree-label"><span class="tree-file">📄</span> libs.versions.toml</span>
+          </div>
+          <div class="tree-node">
+            <span class="tree-branch">├──</span>
+            <span class="tree-label"><span class="tree-file">📄</span> local.properties</span>
+          </div>
+          <div class="tree-node">
+            <span class="tree-branch">└──</span>
+            <span class="tree-label"><span class="tree-file">📄</span> settings.gradle.kts</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="folder-structure">
+      <!-- BUILD.GRADLE PROJECT -->
+      <div class="folder-card gradle">
+        <div class="folder-icon">🏗️</div>
+        <div class="folder-title">build.gradle.kts (Project)</div>
+        <div class="folder-description">"Configuración global del proyecto"</div>
+
+        <div class="usage-example">
+          <h4>🎯 ¿Para qué sirve?</h4>
+          <ul>
+            <li>🔧 Define versiones de herramientas</li>
+            <li>📦 Repositorios de dependencias</li>
+            <li>🌐 Configuración global</li>
+            <li>🚀 Plugins del proyecto</li>
+          </ul>
+        </div>
+
+        <div class="code-example">
+          // build.gradle.kts (Project)
+          buildscript {
+          dependencies {
+          classpath("<span class="highlight">com.android.tools.build:gradle:8.1.0</span>")
+          classpath("<span class="highlight">org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.0</span>")
+          }
+          }
+
+          allprojects {
+          repositories {
+          <span class="highlight">google()</span>
+          <span class="highlight">mavenCentral()</span>
+          }
+          }
+        </div>
+      </div>
+
+      <!-- BUILD.GRADLE MODULE -->
+      <div class="folder-card gradle">
+        <div class="folder-icon">📱</div>
+        <div class="folder-title">build.gradle.kts (Module)</div>
+        <div class="folder-description">"Configuración específica de tu app"</div>
+
+        <div class="usage-example">
+          <h4>🎯 ¿Para qué sirve?</h4>
+          <ul>
+            <li>📱 Versión mínima de Android</li>
+            <li>📦 Librerías que usa tu app</li>
+            <li>🔢 Número de versión</li>
+            <li>⚙️ Configuración de compilación</li>
+          </ul>
+        </div>
+
+        <div class="code-example">
+          // build.gradle.kts (Module: app)
+          android {
+          compileSdk = <span class="highlight">34</span>
+
+          defaultConfig {
+          applicationId = "<span class="highlight">com.example.myapplication</span>"
+          minSdk = <span class="highlight">24</span>
+          targetSdk = <span class="highlight">34</span>
+          versionCode = <span class="highlight">1</span>
+          versionName = "<span class="highlight">1.0</span>"
+          }
+          }
+
+          dependencies {
+          implementation("<span class="highlight">androidx.appcompat:appcompat:1.6.1</span>")
+          implementation("<span class="highlight">com.google.android.material:material:1.9.0</span>")
+          }
+        </div>
+      </div>
+
+      <!-- OTROS ARCHIVOS GRADLE -->
+      <div class="folder-card gradle">
+        <div class="folder-icon">⚙️</div>
+        <div class="folder-title">Otros Archivos de Configuración</div>
+        <div class="folder-description">"Configuraciones específicas"</div>
+
+        <div class="file-list">
+          <div class="file-item">
+            <span class="file-icon">🛡️</span>
+            <span class="file-name">proguard-rules.pro</span>
+            <span class="file-purpose">Optimización del código</span>
+          </div>
+          <div class="file-item">
+            <span class="file-icon">🏠</span>
+            <span class="file-name">local.properties</span>
+            <span class="file-purpose">Rutas locales del SDK</span>
+          </div>
+          <div class="file-item">
+            <span class="file-icon">📚</span>
+            <span class="file-name">libs.versions.toml</span>
+            <span class="file-purpose">Catálogo de versiones</span>
+          </div>
+          <div class="file-item">
+            <span class="file-icon">⚙️</span>
+            <span class="file-name">gradle.properties</span>
+            <span class="file-purpose">Propiedades globales</span>
+          </div>
+        </div>
+
+        <div class="code-example">
+          # gradle.properties
+          <span class="highlight">android.useAndroidX=true</span>
+          <span class="highlight">android.enableJetifier=true</span>
+          org.gradle.jvmargs=-Xmx2048m
+
+          # local.properties
+          <span class="highlight">sdk.dir=/Users/tu-usuario/Android/Sdk</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- FLUJO DE TRABAJO -->
+    <div class="visual-flow">
+      <h2>🔄 ¿Cómo Trabajan Juntos?</h2>
+
+      <div class="flow-step">
+        <h3>1️⃣ GRADLE construye tu proyecto</h3>
+        <p>Lee build.gradle.kts → Descarga dependencias → Compila código Kotlin/Java</p>
+      </div>
+
+      <div class="flow-step">
+        <h3>2️⃣ RECURSOS se empaquetan</h3>
+        <p>Toma imágenes de drawable/ → Layouts de layout/ → Textos de values/</p>
+      </div>
+
+      <div class="flow-step">
+        <h3>3️⃣ MANIFEST configura la app</h3>
+        <p>Define permisos → Registra actividades → Establece punto de entrada</p>
+      </div>
+
+      <div class="flow-step">
+        <h3>4️⃣ SE GENERA el APK</h3>
+        <p>Todo se empaqueta en un archivo .apk listo para instalar</p>
+      </div>
+    </div>
+
+    <!-- NOTAS IMPORTANTES -->
+    <div class="important-note">
+      <h3>💡 Puntos Clave :</h3>
+      <ul>
+        <li><strong>app/</strong> = Donde programarás (90% del tiempo aquí)</li>
+        <li><strong>Gradle Scripts/</strong> = Configuración (solo al inicio del proyecto)</li>
+        <li><strong>MainActivity</strong> = Tu primera pantalla a programar</li>
+        <li><strong>activity_main.xml</strong> = El diseño de esa pantalla</li>
+        <li><strong>AndroidManifest.xml</strong> = Cada nueva actividad debe registrarse aquí</li>
+      </ul>
+    </div>
+
+    <div class="warning-note">
+      <h3>⚠️ ¡No Toques Estos Archivos al Principio!</h3>
+      <ul>
+        <li><strong>local.properties</strong> - Se genera automáticamente</li>
+        <li><strong>gradle-wrapper.properties</strong> - Configuración automática</li>
+        <li><strong>proguard-rules.pro</strong> - Solo para apps avanzadas</li>
+      </ul>
+      <p><strong>Enfócate en:</strong> MainActivity, activity_main.xml, y strings.xml</p>
+    </div>
+
+    <div style="background: #27ae60; color: white; padding: 20px; border-radius: 10px; text-align: center; margin-top: 30px;">
+      <h3>🎯 Resumen para Principiantes</h3>
+      <p><strong>app/ = Tu código y diseños</strong></p>
+      <p><strong>Gradle Scripts/ = Configuración automática</strong></p>
+      <p>¡Programa en app/, deja que Gradle maneje el resto!</p>
+    </div>
+  </div>
 </body>
 </html>
