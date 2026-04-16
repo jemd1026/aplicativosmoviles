@@ -356,64 +356,48 @@
     <h2 style="color: #495057; margin: 40px 0 20px 0; text-align: center;">💻 Ejemplo de Código</h2>
 
     <div class="code-example">
-      <span class="keyword">public class</span> <span class="function">MainActivity</span> <span class="keyword">extends</span> AppCompatActivity {
-
       <span class="comment">// Se ejecuta cuando la actividad se crea por primera vez</span>
-      <span class="keyword">@Override</span>
-      <span class="keyword">protected void</span> <span class="function">onCreate</span>(Bundle savedInstanceState) {
-      <span class="keyword">super</span>.onCreate(savedInstanceState);
-      setContentView(R.layout.activity_main);
-      <span class="comment">// Inicializar componentes de la interfaz</span>
-      Log.d(<span class="function">"Ciclo"</span>, <span class="function">"🎬 onCreate - Actividad creada"</span>);
+      <span class="keyword">override fun</span> <span class="function">onCreate</span>(savedInstanceState: Bundle?) {
+          <span class="keyword">super</span>.onCreate(savedInstanceState)
+          setContentView(R.layout.activity_main)
+          <span class="comment">// Inicializar componentes de la interfaz</span>
+          Log.d(<span class="function">"Ciclo"</span>, <span class="function">"🎬 onCreate - Actividad creada"</span>)
       }
 
       <span class="comment">// La actividad va a ser visible</span>
-      <span class="keyword">@Override</span>
-      <span class="keyword">protected void</span> <span class="function">onStart</span>() {
-      <span class="keyword">super</span>.onStart();
-      <span class="comment">// Preparar recursos visuales</span>
-      Log.d(<span class="function">"Ciclo"</span>, <span class="function">"👁️ onStart - Actividad visible"</span>);
+      <span class="keyword">override fun</span> <span class="function">onStart</span>() {
+          <span class="keyword">super</span>.onStart()
+          Log.d(<span class="function">"Ciclo"</span>, <span class="function">"👁️ onStart - Actividad visible"</span>)
       }
 
       <span class="comment">// El usuario puede interactuar</span>
-      <span class="keyword">@Override</span>
-      <span class="keyword">protected void</span> <span class="function">onResume</span>() {
-      <span class="keyword">super</span>.onResume();
-      <span class="comment">// Iniciar animaciones, reproducir música</span>
-      Log.d(<span class="function">"Ciclo"</span>, <span class="function">"▶️ onResume - Usuario puede interactuar"</span>);
+      <span class="keyword">override fun</span> <span class="function">onResume</span>() {
+          <span class="keyword">super</span>.onResume()
+          Log.d(<span class="function">"Ciclo"</span>, <span class="function">"▶️ onResume - Usuario puede interactuar"</span>)
       }
 
       <span class="comment">// La actividad pierde el foco</span>
-      <span class="keyword">@Override</span>
-      <span class="keyword">protected void</span> <span class="function">onPause</span>() {
-      <span class="keyword">super</span>.onPause();
-      <span class="comment">// Pausar operaciones, guardar datos</span>
-      Log.d(<span class="function">"Ciclo"</span>, <span class="function">"⏸️ onPause - Actividad pausada"</span>);
+      <span class="keyword">override fun</span> <span class="function">onPause</span>() {
+          <span class="keyword">super</span>.onPause()
+          Log.d(<span class="function">"Ciclo"</span>, <span class="function">"⏸️ onPause - Actividad pausada"</span>)
       }
 
       <span class="comment">// La actividad ya no es visible</span>
-      <span class="keyword">@Override</span>
-      <span class="keyword">protected void</span> <span class="function">onStop</span>() {
-      <span class="keyword">super</span>.onStop();
-      <span class="comment">// Liberar recursos pesados</span>
-      Log.d(<span class="function">"Ciclo"</span>, <span class="function">"⏹️ onStop - Actividad detenida"</span>);
+      <span class="keyword">override fun</span> <span class="function">onStop</span>() {
+          <span class="keyword">super</span>.onStop()
+          Log.d(<span class="function">"Ciclo"</span>, <span class="function">"⏹️ onStop - Actividad detenida"</span>)
       }
 
       <span class="comment">// Volver de onStop a onStart</span>
-      <span class="keyword">@Override</span>
-      <span class="keyword">protected void</span> <span class="function">onRestart</span>() {
-      <span class="keyword">super</span>.onRestart();
-      <span class="comment">// Restaurar estado antes de onStart</span>
-      Log.d(<span class="function">"Ciclo"</span>, <span class="function">"🔄 onRestart - Reiniciando actividad"</span>);
+      <span class="keyword">override fun</span> <span class="function">onRestart</span>() {
+          <span class="keyword">super</span>.onRestart()
+          Log.d(<span class="function">"Ciclo"</span>, <span class="function">"🔄 onRestart - Reiniciando actividad"</span>)
       }
 
       <span class="comment">// La actividad será destruida</span>
-      <span class="keyword">@Override</span>
-      <span class="keyword">protected void</span> <span class="function">onDestroy</span>() {
-      <span class="keyword">super</span>.onDestroy();
-      <span class="comment">// Limpiar todo</span>
-      Log.d(<span class="function">"Ciclo"</span>, <span class="function">"💥 onDestroy - Actividad destruida"</span>);
-      }
+      <span class="keyword">override fun</span> <span class="function">onDestroy</span>() {
+          <span class="keyword">super</span>.onDestroy()
+          Log.d(<span class="function">"Ciclo"</span>, <span class="function">"💥 onDestroy - Actividad destruida"</span>)
       }
     </div>
 
