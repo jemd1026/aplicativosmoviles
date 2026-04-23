@@ -632,107 +632,102 @@
     </h2>
 
     <div class="code-section">
-      <span class="keyword">class</span> <span class="function">MusicPlayerActivity</span> : AppCompatActivity() {
+      <span class="keyword">package</span> com.example.ucv2026a
 
-      <span class="keyword">private var</span> mediaPlayer: MediaPlayer? = <span class="keyword">null</span>
-      <span class="keyword">private lateinit var</span> btnPlay: Button
-      <span class="keyword">private lateinit var</span> btnPause: Button
-      <span class="keyword">private lateinit var</span> tvSongName: TextView
+      <span class="keyword">import</span> android.media.MediaPlayer
+      <span class="keyword">import</span> android.os.Bundle
+      <span class="keyword">import</span> android.util.Log
+      <span class="keyword">import</span> android.widget.Button
+      <span class="keyword">import</span> android.widget.TextView
+      <span class="keyword">import</span> androidx.activity.enableEdgeToEdge
+      <span class="keyword">import</span> androidx.appcompat.app.AppCompatActivity
+      <span class="keyword">import</span> androidx.core.view.ViewCompat
+      <span class="keyword">import</span> androidx.core.view.WindowInsetsCompat
 
-      <span class="comment">// 🎬 PASO 1: La app se crea por primera vez</span>
-      <span class="keyword">override fun</span> <span class="function">onCreate</span>(savedInstanceState: Bundle?) {
-          <span class="keyword">super</span>.onCreate(savedInstanceState)
-          setContentView(R.layout.activity_music_player)
+      <span class="keyword">class</span> <span class="function">MainActivity</span> : AppCompatActivity() {
 
-          <span class="comment">// Inicializar componentes de la interfaz</span>
-          btnPlay = findViewById(R.id.btnPlay)
-          btnPause = findViewById(R.id.btnPause)
-          tvSongName = findViewById(R.id.tvSongName)
+          <span class="keyword">private var</span> mediaPlayer: MediaPlayer? = <span class="keyword">null</span>
+          <span class="keyword">private lateinit var</span> btnPlay: Button
+          <span class="keyword">private lateinit var</span> btnPause: Button
+          <span class="keyword">private lateinit var</span> tvSongName: TextView
 
-          <span class="comment">// Crear el reproductor de música</span>
-          mediaPlayer = MediaPlayer.create(<span class="keyword">this</span>, R.raw.cancion_favorita)
+          <span class="keyword">override fun</span> <span class="function">onCreate</span>(savedInstanceState: Bundle?) {
+              <span class="keyword">super</span>.onCreate(savedInstanceState)
+              enableEdgeToEdge()
 
-          <span class="comment">// Configurar botones</span>
-          btnPlay.setOnClickListener { mediaPlayer?.start() }
-          btnPause.setOnClickListener { mediaPlayer?.pause() }
+              <span class="comment">// ASEGÚRATE de que este layout exista en res/layout/activity_main.xml</span>
+              setContentView(R.layout.activity_main)
 
-          Log.d(<span class="string">"MusicApp"</span>, <span class="string">"🎬 onCreate: App creada e inicializada"</span>)
-      }
-
-      <span class="comment">// 👁️ PASO 2: La app va a ser visible</span>
-      <span class="keyword">override fun</span> <span class="function">onStart</span>() {
-          <span class="keyword">super</span>.onStart()
-
-          <span class="comment">// Actualizar la interfaz con datos actuales</span>
-          tvSongName.text = <span class="string">"🎵 Reproduciendo: Canción Favorita"</span>
-
-          Log.d(<span class="string">"MusicApp"</span>, <span class="string">"👁️ onStart: App visible en pantalla"</span>)
-      }
-
-      <span class="comment">// ▶️ PASO 3: El usuario puede interactuar</span>
-      <span class="keyword">override fun</span> <span class="function">onResume</span>() {
-          <span class="keyword">super</span>.onResume()
-
-          <span class="comment">// Si la música estaba pausada, reanudarla</span>
-          <span class="keyword">if</span> (mediaPlayer != <span class="keyword">null</span> && mediaPlayer?.isPlaying == <span class="keyword">false</span>) {
-              <span class="comment">// Opcional: reanudar automáticamente</span>
-              <span class="comment">// mediaPlayer?.start()</span>
-          }
-
-          <span class="comment">// Activar animaciones de la interfaz</span>
-          <span class="comment">// startAudioVisualizer()</span>
-
-          Log.d(<span class="string">"MusicApp"</span>, <span class="string">"▶️ onResume: Usuario puede usar la app"</span>)
-      }
-
-      <span class="comment">// ⏸️ PASO 4: Otra app toma el control (WhatsApp)</span>
-      <span class="keyword">override fun</span> <span class="function">onPause</span>() {
-          <span class="keyword">super</span>.onPause()
-
-          <span class="comment">// ⚠️ IMPORTANTE: NO pausar la música aquí</span>
-          <span class="comment">// Queremos que siga sonando en segundo plano</span>
-
-          <span class="comment">// Detener animaciones visuales para ahorrar batería</span>
-          <span class="comment">// stopAudioVisualizer()</span>
-
-          <span class="comment">// Guardar el progreso actual</span>
-          <span class="keyword">val</span> currentPosition = mediaPlayer?.currentPosition ?: 0
-          <span class="comment">// Guardar en SharedPreferences</span>
-
-          Log.d(<span class="string">"MusicApp"</span>, <span class="string">"⏸️ onPause: App en segundo plano, música continúa"</span>)
-      }
-
-      <span class="comment">// ⏹️ PASO 5: La app ya no es visible</span>
-      <span class="keyword">override fun</span> <span class="function">onStop</span>() {
-          <span class="keyword">super</span>.onStop()
-
-          <span class="comment">// La música continúa reproduciéndose en segundo plano</span>
-          <span class="comment">// Liberar recursos pesados que no se necesitan</span>
-
-          Log.d(<span class="string">"MusicApp"</span>, <span class="string">"⏹️ onStop: App completamente oculta"</span>)
-      }
-
-      <span class="comment">// 🔄 PASO ESPECIAL: Volver a la app</span>
-      <span class="keyword">override fun</span> <span class="function">onRestart</span>() {
-          <span class="keyword">super</span>.onRestart()
-          Log.d(<span class="string">"MusicApp"</span>, <span class="string">"🔄 onRestart: Usuario regresó a la app"</span>)
-      }
-
-      <span class="comment">// 💥 PASO 6: Cerrar completamente la app</span>
-      <span class="keyword">override fun</span> <span class="function">onDestroy</span>() {
-          <span class="keyword">super</span>.onDestroy()
-
-          <span class="comment">// Liberar el reproductor de música</span>
-          mediaPlayer?.let {
-              <span class="keyword">if</span> (it.isPlaying) {
-                  it.stop()
+              ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+                  <span class="keyword">val</span> systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+                  v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+                  insets
               }
-              it.release()
-          }
-          mediaPlayer = <span class="keyword">null</span>
 
-          Log.d(<span class="string">"MusicApp"</span>, <span class="string">"💥 onDestroy: App destruida completamente"</span>)
-      }
+              <span class="comment">// Inicializar componentes (Asegúrate de que estos IDs existan en tu XML)</span>
+              btnPlay = findViewById(R.id.btnPlay)
+              btnPause = findViewById(R.id.btnPause)
+              tvSongName = findViewById(R.id.tvSongName)
+
+              <span class="comment">// Crear el reproductor (Asegúrate de que el archivo existe en res/raw/juaneco.mp3)</span>
+              <span class="comment">// Si no tienes la carpeta raw, créala: res -> New -> Android Resource Directory (tipo raw)</span>
+              <span class="keyword">try</span> {
+                  mediaPlayer = MediaPlayer.create(<span class="keyword">this</span>, R.raw.juaneco)
+                  <span class="keyword">if</span> (mediaPlayer == <span class="keyword">null</span>) {
+                      Log.e(<span class="string">"MusicApp"</span>, <span class="string">"❌ ERROR: No se pudo crear el MediaPlayer. Revisa que R.raw.juaneco exista."</span>)
+                  } <span class="keyword">else</span> {
+                      Log.d(<span class="string">"MusicApp"</span>, <span class="string">"✅ MediaPlayer creado con éxito"</span>)
+                  }
+              } <span class="keyword">catch</span> (e: Exception) {
+                  Log.e(<span class="string">"MusicApp"</span>, <span class="string">"❌ Error al cargar el audio: ${e.message}"</span>)
+              }
+
+              btnPlay.setOnClickListener {
+                  Log.d(<span class="string">"MusicApp"</span>, <span class="string">"Botón Play presionado"</span>)
+                  <span class="keyword">if</span> (mediaPlayer != <span class="keyword">null</span>) {
+                      mediaPlayer?.start()
+                      tvSongName.text = <span class="string">"🎵 Reproduciendo..."</span>
+                  } <span class="keyword">else</span> {
+                      Log.e(<span class="string">"MusicApp"</span>, <span class="string">"El MediaPlayer es nulo, no puede sonar"</span>)
+                  }
+              }
+
+              btnPause.setOnClickListener {
+                  Log.d(<span class="string">"MusicApp"</span>, <span class="string">"Botón Pausa presionado"</span>)
+                  mediaPlayer?.pause()
+                  tvSongName.text = <span class="string">"⏸️ Pausado"</span>
+              }
+
+              Log.d(<span class="string">"MusicApp"</span>, <span class="string">"🎬 onCreate: App lista"</span>)
+          }
+
+          <span class="keyword">override fun</span> <span class="function">onStart</span>() {
+              <span class="keyword">super</span>.onStart()
+              tvSongName.text = <span class="string">"🎵 Reproduciendo: Canción Favorita"</span>
+              Log.d(<span class="string">"MusicApp"</span>, <span class="string">"👁️ onStart: App visible"</span>)
+          }
+
+          <span class="keyword">override fun</span> <span class="function">onResume</span>() {
+              <span class="keyword">super</span>.onResume()
+              Log.d(<span class="string">"MusicApp"</span>, <span class="string">"▶️ onResume: Interactuando"</span>)
+          }
+
+          <span class="keyword">override fun</span> <span class="function">onPause</span>() {
+              <span class="keyword">super</span>.onPause()
+              Log.d(<span class="string">"MusicApp"</span>, <span class="string">"⏸️ onPause: En segundo plano"</span>)
+          }
+
+          <span class="keyword">override fun</span> <span class="function">onStop</span>() {
+              <span class="keyword">super</span>.onStop()
+              Log.d(<span class="string">"MusicApp"</span>, <span class="string">"⏹️ onStop: Oculta"</span>)
+          }
+
+          <span class="keyword">override fun</span> <span class="function">onDestroy</span>() {
+              <span class="keyword">super</span>.onDestroy()
+              mediaPlayer?.release()
+              mediaPlayer = <span class="keyword">null</span>
+              Log.d(<span class="string">"MusicApp"</span>, <span class="string">"💥 onDestroy: Destruida"</span>)
+          }
       }
     </div>
 
@@ -749,24 +744,24 @@
       <div class="resource-card">
         <h4>📄 Archivo Kotlin</h4>
         <p>
-          Aquí se programa la lógica del ciclo de vida, los botones y el uso de <code>MediaPlayer</code>.
-          En este caso: <strong>MusicPlayerActivity.kt</strong>.
+          Aquí se programa la lógica del ciclo de vida, los botones, <code>enableEdgeToEdge()</code>
+          y el uso de <code>MediaPlayer</code>. En este caso: <strong>MainActivity.kt</strong>.
         </p>
       </div>
 
       <div class="resource-card">
         <h4>🖼️ Archivo de Vista</h4>
         <p>
-          La interfaz visual se diseña en <strong>activity_music_player.xml</strong>. Allí estarán el texto con el nombre
-          de la canción y los botones <code>Play</code> y <code>Pause</code>.
+          La interfaz visual se diseña en <strong>activity_main.xml</strong>. Allí estarán el contenedor con id
+          <code>main</code>, el texto principal y los botones <code>btnPlay</code> y <code>btnPause</code>.
         </p>
       </div>
 
       <div class="resource-card">
         <h4>🎵 Recurso de Audio</h4>
         <p>
-          El archivo de música debe colocarse en <strong>res/raw/</strong> con un nombre como
-          <code>cancion_favorita.mp3</code> para poder usarlo con <code>R.raw.cancion_favorita</code>.
+          El archivo de música debe colocarse en <strong>res/raw/</strong> con el nombre
+          <code>juaneco.mp3</code> para poder usarlo con <code>R.raw.juaneco</code>.
         </p>
       </div>
     </div>
@@ -777,41 +772,59 @@
 
     <div class="code-section">
       <span class="string">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span>
-      <span class="string">&lt;LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"</span>
+      <span class="comment">&lt;!-- El ID "main" es necesario para ViewCompat.setOnApplyWindowInsetsListener --&gt;</span>
+      <span class="string">&lt;androidx.constraintlayout.widget.ConstraintLayout</span>
+          <span class="string">xmlns:android="http://schemas.android.com/apk/res/android"</span>
+          <span class="string">xmlns:app="http://schemas.android.com/apk/res-auto"</span>
+          <span class="string">xmlns:tools="http://schemas.android.com/tools"</span>
+          <span class="string">android:id="@+id/main"</span>
           <span class="string">android:layout_width="match_parent"</span>
           <span class="string">android:layout_height="match_parent"</span>
-          <span class="string">android:orientation="vertical"</span>
-          <span class="string">android:gravity="center"</span>
-          <span class="string">android:padding="24dp"&gt;</span>
+          <span class="string">android:padding="20dp"</span>
+          <span class="string">tools:context=".MainActivity"&gt;</span>
 
           <span class="string">&lt;TextView</span>
               <span class="string">android:id="@+id/tvSongName"</span>
               <span class="string">android:layout_width="wrap_content"</span>
               <span class="string">android:layout_height="wrap_content"</span>
-              <span class="string">android:text="🎵 Reproduciendo: Canción Favorita"</span>
+              <span class="string">android:text="Presiona Play para escuchar"</span>
               <span class="string">android:textSize="20sp"</span>
               <span class="string">android:textStyle="bold"</span>
-              <span class="string">android:layout_marginBottom="24dp" /&gt;</span>
+              <span class="string">app:layout_constraintBottom_toTopOf="@+id/btnPlay"</span>
+              <span class="string">app:layout_constraintEnd_toEndOf="parent"</span>
+              <span class="string">app:layout_constraintStart_toStartOf="parent"</span>
+              <span class="string">app:layout_constraintTop_toTopOf="parent"</span>
+              <span class="string">app:layout_constraintVertical_chainStyle="packed" /&gt;</span>
 
           <span class="string">&lt;Button</span>
               <span class="string">android:id="@+id/btnPlay"</span>
-              <span class="string">android:layout_width="match_parent"</span>
+              <span class="string">android:layout_width="wrap_content"</span>
               <span class="string">android:layout_height="wrap_content"</span>
-              <span class="string">android:text="▶️ Play" /&gt;</span>
+              <span class="string">android:layout_marginTop="32dp"</span>
+              <span class="string">android:text="REPRODUCIR"</span>
+              <span class="string">app:layout_constraintBottom_toTopOf="@+id/btnPause"</span>
+              <span class="string">app:layout_constraintEnd_toEndOf="parent"</span>
+              <span class="string">app:layout_constraintStart_toStartOf="parent"</span>
+              <span class="string">app:layout_constraintTop_toBottomOf="@+id/tvSongName" /&gt;</span>
 
           <span class="string">&lt;Button</span>
               <span class="string">android:id="@+id/btnPause"</span>
-              <span class="string">android:layout_width="match_parent"</span>
+              <span class="string">android:layout_width="wrap_content"</span>
               <span class="string">android:layout_height="wrap_content"</span>
-              <span class="string">android:layout_marginTop="12dp"</span>
-              <span class="string">android:text="⏸️ Pause" /&gt;</span>
+              <span class="string">android:layout_marginTop="16dp"</span>
+              <span class="string">android:text="PAUSAR"</span>
+              <span class="string">app:layout_constraintBottom_toBottomOf="parent"</span>
+              <span class="string">app:layout_constraintEnd_toEndOf="parent"</span>
+              <span class="string">app:layout_constraintStart_toStartOf="parent"</span>
+              <span class="string">app:layout_constraintTop_toBottomOf="@+id/btnPlay" /&gt;</span>
 
-      <span class="string">&lt;/LinearLayout&gt;</span>
+      <span class="string">&lt;/androidx.constraintlayout.widget.ConstraintLayout&gt;</span>
     </div>
 
     <div class="mini-note">
-      <strong>📌 Importante:</strong> Los identificadores <code>tvSongName</code>, <code>btnPlay</code> y
-      <code>btnPause</code> deben ser exactamente los mismos en el XML y en el código Kotlin. Si no coinciden, Android Studio marcará error.
+      <strong>📌 Importante:</strong> Los identificadores <code>main</code>, <code>tvSongName</code>,
+      <code>btnPlay</code> y <code>btnPause</code> deben ser exactamente los mismos en el XML y en el código Kotlin.
+      Si no coinciden, Android Studio marcará error.
     </div>
 
     <h2 style="text-align: center; color: #667eea; margin: 40px 0 25px 0; font-size: 2em;">
@@ -820,10 +833,18 @@
 
     <div class="code-section">
       <span class="comment">// Colocar el archivo de audio en:</span>
-      <span class="string">res/raw/cancion_favorita.mp3</span>
+      <span class="string">res/raw/juaneco.mp3</span>
 
       <span class="comment">// Si esta pantalla no es la principal, registrarla en AndroidManifest.xml</span>
-      <span class="string">&lt;activity android:name=".MusicPlayerActivity" /&gt;</span>
+      <span class="string">&lt;activity android:name=".MainActivity" /&gt;</span>
+    </div>
+
+    <div class="mini-note">
+      <strong>🔧 Si <code>R.raw.juaneco</code> aparece en rojo:</strong>
+      haz clic derecho en la carpeta <code>res</code>, luego ve a <code>New &gt; Android Resource Directory</code>,
+      elige <code>raw</code> en <code>Resource type</code> y pulsa <code>OK</code>. Después copia tu audio dentro de
+      <code>res/raw/</code> con un nombre en <strong>minúsculas</strong> y <strong>sin espacios</strong>, por ejemplo
+      <code>juaneco.mp3</code>. Así Android podrá reconocerlo como <code>R.raw.juaneco</code>.
     </div>
 
     <div class="mini-note">
