@@ -1,0 +1,2167 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RecyclerView con SQLite en Android - Temario</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-1: #e0f2fe;
+      --bg-2: #fae8ff;
+      --card: rgba(255, 255, 255, 0.88);
+      --ink: #1f2937;
+      --muted: #4b5563;
+      --primary: #0f766e;
+      --secondary: #1d4ed8;
+      --accent: #b45309;
+      --dark: #0f172a;
+      --border: rgba(15, 23, 42, 0.12);
+    }
+
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 100%);
+      color: var(--ink);
+      line-height: 1.6;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 24px 70px rgba(15, 23, 42, 0.18);
+    }
+
+    .hero {
+      padding: 48px 40px;
+      color: white;
+      background: linear-gradient(135deg, #0f766e 0%, #1d4ed8 60%, #312e81 100%);
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: 2.6em;
+      margin-bottom: 12px;
+    }
+
+    .hero p {
+      font-size: 1.1em;
+      opacity: 0.95;
+    }
+
+    .schedule {
+      background: #f8fafc;
+      padding: 32px 40px;
+      border-bottom: 3px solid #cbd5e1;
+    }
+
+    .schedule h2,
+    .section h2,
+    .summary h2,
+    .resources h2 {
+      font-size: 1.9em;
+      margin-bottom: 18px;
+    }
+
+    .schedule-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .schedule-item,
+    .card,
+    .mini-card,
+    .resource-box {
+      background: white;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
+    }
+
+    .schedule-item {
+      padding: 20px;
+      border-left: 5px solid var(--secondary);
+      transition: transform 0.25s ease;
+    }
+
+    .schedule-item:hover,
+    .card:hover,
+    .mini-card:hover {
+      transform: translateY(-4px);
+    }
+
+    .schedule-item h3 {
+      color: var(--secondary);
+      margin-bottom: 8px;
+      font-size: 1.15em;
+    }
+
+    .schedule-item p {
+      margin: 4px 0;
+    }
+
+    .schedule-note {
+      margin-top: 20px;
+    }
+
+    .section {
+      padding: 40px;
+    }
+
+    .section:nth-child(odd) {
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    }
+
+    .section:nth-child(even) {
+      background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
+    }
+
+    .section h2 {
+      border-bottom: 3px solid rgba(29, 78, 216, 0.25);
+      padding-bottom: 10px;
+    }
+
+    .theory,
+    .tips,
+    .warning,
+    .exercise,
+    .note,
+    .dark-panel {
+      padding: 22px;
+      border-radius: 16px;
+      margin: 18px 0;
+      border: 1px solid var(--border);
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+    }
+
+    .theory,
+    .note,
+    .tips,
+    .exercise {
+      background: var(--card);
+      backdrop-filter: blur(10px);
+    }
+
+    .warning {
+      background: rgba(254, 240, 138, 0.55);
+      border-left: 5px solid #ca8a04;
+    }
+
+    .tips {
+      border-left: 5px solid #16a34a;
+    }
+
+    .exercise {
+      border-left: 5px solid var(--accent);
+    }
+
+    .note {
+      border-left: 5px solid var(--secondary);
+    }
+
+    .theory h3,
+    .tips h3,
+    .exercise h3,
+    .note h3,
+    .warning h3,
+    .dark-panel h3 {
+      margin-bottom: 10px;
+    }
+
+    .card-grid,
+    .mini-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    .card,
+    .mini-card {
+      padding: 18px;
+    }
+
+    .card h4,
+    .mini-card h4 {
+      margin-bottom: 8px;
+      color: var(--primary);
+    }
+
+    .dark-block {
+      background: linear-gradient(180deg, #0f172a 0%, #111827 100%);
+      color: #e5eefb;
+      padding: 46px 40px;
+    }
+
+    .dark-panel {
+      background: rgba(15, 23, 42, 0.88);
+      color: #e5eefb;
+      border-color: rgba(148, 163, 184, 0.2);
+    }
+
+    .dark-panel p,
+    .dark-panel li,
+    .dark-panel td,
+    .dark-block p,
+    .dark-block li {
+      color: #dbe4f0;
+    }
+
+    .code-like {
+      background: #020617;
+      color: #dbeafe;
+      border-radius: 14px;
+      padding: 20px;
+      overflow-x: auto;
+      margin-top: 15px;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      font-family: "Courier New", monospace;
+      font-size: 0.92em;
+      line-height: 1.8;
+      white-space: pre-wrap;
+    }
+
+    .code-like .c-com {
+      color: #94a3b8;
+    }
+
+    .code-like .c-kw,
+    .code-like .c-sql-kw {
+      color: #7dd3fc;
+    }
+
+    .code-like .c-type,
+    .code-like .c-sql-ident {
+      color: #86efac;
+    }
+
+    .code-like .c-fn {
+      color: #f9a8d4;
+    }
+
+    .code-like .c-str,
+    .code-like .c-xml-val {
+      color: #fcd34d;
+    }
+
+    .code-like .c-num {
+      color: #c4b5fd;
+    }
+
+    .code-like .c-prop,
+    .code-like .c-xml-attr {
+      color: #fda4af;
+    }
+
+    .code-like .c-xml-tag {
+      color: #7dd3fc;
+    }
+
+    .code-like .c-old {
+      color: #dbeafe;
+    }
+
+    .flow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      align-items: center;
+      margin-top: 18px;
+    }
+
+    .flow-box {
+      min-width: 160px;
+      padding: 16px;
+      border-radius: 14px;
+      background: linear-gradient(135deg, #1d4ed8 0%, #0f766e 100%);
+      background: var(--secondary);
+      color: white;
+      text-align: center;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.16);
+    }
+
+    .flow-arrow {
+      font-size: 1.8em;
+      color: #93c5fd;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 14px;
+      background: white;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+    }
+
+    .comparison-table th {
+      background: var(--secondary);
+      color: white;
+      text-align: left;
+      padding: 12px;
+    }
+
+    .comparison-table td {
+      padding: 12px;
+      border-bottom: 1px solid #e5e7eb;
+      color: var(--muted);
+    }
+
+    .summary {
+      background: #f8fafc;
+      padding: 40px;
+    }
+
+    .checklist {
+      list-style: none;
+    }
+
+    .checklist li {
+      background: white;
+      margin: 10px 0;
+      padding: 15px 18px;
+      border-left: 5px solid #22c55e;
+      border-radius: 12px;
+      box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
+    }
+
+    .checklist li::before {
+      content: "OK ";
+      font-weight: bold;
+      color: #15803d;
+    }
+
+    .resources {
+      padding: 40px;
+      color: white;
+      background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%);
+    }
+
+    .resource-box {
+      margin-top: 20px;
+      padding: 22px;
+      background: rgba(255, 255, 255, 0.12);
+      border-color: rgba(255, 255, 255, 0.15);
+      color: white;
+    }
+
+    .resource-box a {
+      color: #dbeafe;
+    }
+
+    ul,
+    ol {
+      padding-left: 22px;
+    }
+
+    li {
+      margin: 6px 0;
+    }
+
+    @media (max-width: 768px) {
+
+      .hero,
+      .schedule,
+      .section,
+      .dark-block,
+      .summary,
+      .resources {
+        padding: 24px 20px;
+      }
+
+      .hero h1 {
+        font-size: 1.9em;
+      }
+
+      .flow {
+        flex-direction: column;
+      }
+
+      .flow-arrow {
+        transform: rotate(90deg);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="hero">
+      <h1>RecyclerView con SQLite en Android</h1>
+      <p>Guia hibrida: primero el mapa del tema y luego la implementacion paso a paso</p>
+      <p>Nivel sugerido: intermedio</p>
+    </div>
+
+    <div class="schedule">
+      <h2>Temario General del Manual (desarrollado)</h2>
+      <div class="schedule-grid">
+        <div class="schedule-item">
+          <h3>1. 🧠 Fundamentos</h3>
+          <p><strong>Concepto:</strong> Persistencia vs. Temporalidad.</p>
+          <p>La persistencia permite que los datos sobrevivan al cierre de la app. SQLite es el motor ideal para guardar datos sin internet.</p>
+          <p><small>💡 Ejemplo: Las variables se borran; SQLite es permanente. 🎯 Meta: Flujo local.</small></p>
+        </div>
+        <div class="schedule-item">
+          <h3>2. 🏗️ Arquitectura</h3>
+          <p><strong>Organización:</strong> El patrón Modelo-Vista-Adaptador.</p>
+          <p>Separamos la lógica de datos de la interfaz visual usando el patrón M-V-A para un código limpio y ordenado.</p>
+          <p><small>💡 Ejemplo: El Adapter dibuja, el Helper habla con SQL. 🎯 Meta: Código organizado.</small></p>
+        </div>
+        <div class="schedule-item">
+          <h3>3. 🗄️ El Motor (SQLite)</h3>
+          <p><strong>Estructura:</strong> Tablas, Columnas y Tipos de Datos.</p>
+          <p>Crearemos el <code>Helper</code> que da vida a las tablas y columnas mediante sentencias SQL estándar.</p>
+          <div class="code-like" style="font-size: 0.75em; padding: 10px;">CREATE TABLE producto_categoria (id INTEGER PRIMARY KEY, nombre TEXT)</div>
+          <p><small>🎯 Meta: Base de datos funcional.</small></p>
+        </div>
+        <div class="schedule-item">
+          <h3>4. 📺 Visualización</h3>
+          <p><strong>Lectura:</strong> De la tabla a la pantalla.</p>
+          <p>Mapearemos registros de la BD (Cursor) a objetos Kotlin para poder mostrarlos en el RecyclerView.</p>
+          <p><small>💡 Ejemplo: <code>cursor.getString</code> &rarr; <code>Objeto.nombre</code>. 🎯 Meta: Listar datos.</small></p>
+        </div>
+        <div class="schedule-item">
+          <h3>5. ⚙️ CRUD Dinámico</h3>
+          <p><strong>Acciones:</strong> Crear, Editar y Borrar.</p>
+          <p>Implementación del ciclo completo (Insertar, Editar, Borrar) con refresco automático de la lista visual.</p>
+          <div class="code-like" style="font-size: 0.75em; padding: 10px;">db.insert("alumnos", null, values)</div>
+          <p><small>🎯 Meta: Gestión total de registros.</small></p>
+        </div>
+        <div class="schedule-item">
+          <h3>6. 🖱️ Interacción</h3>
+          <p><strong>UX:</strong> Clicks, Diálogos y Validaciones.</p>
+          <p>Crearemos formularios amigables y diálogos de validación para que el usuario interactúe con los datos.</p>
+          <p><small>💡 Ejemplo: Click largo abre diálogo: "¿Deseas eliminar?". 🎯 Meta: App fácil de usar.</small></p>
+        </div>
+        <div class="schedule-item">
+          <h3>7. 🚀 Funciones Pro</h3>
+          <p><strong>Optimización:</strong> Búsquedas y Estados Vacíos.</p>
+          <p>Añadiremos filtros de búsqueda en tiempo real y mensajes visuales personalizados cuando la lista esté vacía.</p>
+          <div class="code-like" style="font-size: 0.75em; padding: 10px;">SELECT * FROM alumnos WHERE nombre LIKE '%Ana%'</div>
+          <p><small>🎯 Meta: Acabado profesional.</small></p>
+        </div>
+        <div class="schedule-item">
+          <h3>8. 🛡️ Estabilidad</h3>
+          <p><strong>Mantenimiento:</strong> Errores y Fugas de Memoria.</p>
+          <p>Manejo de recursos para evitar que la app falle, aprendiendo a cerrar conexiones y manejar excepciones.</p>
+          <p><small>💡 Ejemplo: Siempre cerrar el cursor con <code>cursor.close()</code>. 🎯 Meta: App robusta.</small></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>PARTE 1: Lo que vas a aprender</h2>
+
+      <div class="theory">
+        <h3>Objetivo de la guia</h3>
+        <p>
+          En esta guia vas a conectar una lista moderna de Android con una base de datos local SQLite, para que no trabajes solo con datos estaticos, sino con informacion persistente.
+        </p>
+      </div>
+
+      <div class="card-grid">
+        <div class="card">
+          <h4>Concepto central</h4>
+          <p>RecyclerView muestra datos; SQLite los guarda de forma permanente dentro del dispositivo.</p>
+        </div>
+        <div class="card">
+          <h4>Resultado esperado</h4>
+          <p>Una app capaz de registrar elementos, listarlos, actualizarlos y eliminarlos sin perderlos al cerrar la app.</p>
+        </div>
+        <div class="card">
+          <h4>Proyecto recomendado</h4>
+          <p>Agenda de contactos, lista de productos, tareas o alumnos almacenados localmente.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>PARTE 2: Arquitectura de RecyclerView con SQLite</h2>
+
+      <div class="theory">
+        <h3>Componentes principales</h3>
+        <div class="mini-grid">
+          <div class="mini-card">
+            <h4>Modelo</h4>
+            <p>Representa cada registro. Ejemplo: Contacto, Producto o Tarea.</p>
+          </div>
+          <div class="mini-card">
+            <h4>SQLiteOpenHelper</h4>
+            <p>Crea la base de datos, las tablas y controla actualizaciones de version.</p>
+          </div>
+          <div class="mini-card">
+            <h4>Adapter</h4>
+            <p>Toma los registros recuperados desde SQLite y los dibuja en RecyclerView.</p>
+          </div>
+          <div class="mini-card">
+            <h4>Activity o Fragment</h4>
+            <p>Orquesta la carga de datos, refresco de lista y eventos del usuario.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="note">
+        <h3>Flujo de trabajo recomendado</h3>
+        <div class="flow">
+          <div class="flow-box">Formulario</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-box">SQLite</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-box">Lista de objetos</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-box">Adapter</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-box">RecyclerView</div>
+        </div>
+      </div>
+
+      <div class="warning">
+        <h3>Punto clave del manual</h3>
+        <p>
+          Separa claramente lo que pertenece a la persistencia de datos y lo que pertenece a la representacion visual. Asi evitaras mezclar logica de base de datos con codigo de interfaz.
+        </p>
+      </div>
+
+      <div class="exercise">
+        <h3>Estructura a seguir desde esta etapa</h3>
+        <p>
+          Antes de crear la base de datos, organiza tu proyecto en Android Studio con una estructura pensada para trabajar primero con <code>producto_categoria</code> y luego agregar <code>producto</code> en el mismo proyecto.
+        </p>
+        <div class="code-like">app/
+          ├── manifests/
+          │ └── AndroidManifest.xml
+          ├── java/com.example.sqlite_a/
+          │ ├── adapter/
+          │ │ └── ProductoCategoriaAdapter.kt
+          │ ├── data/
+          │ │ └── ProductoCategoriaDbHelper.kt
+          │ ├── model/
+          │ │ ├── ProductoCategoria.kt
+          │ │ └── Producto.kt
+          │ └── view/
+          │ └── MainActivity.kt
+          └── res/
+          └── layout/
+          ├── activity_main.xml
+          ├── item_producto_categoria.xml
+          └── dialog_producto_categoria.xml</div>
+        <ul>
+          <li>En esta primera parte crearas solo <code>ProductoCategoria.kt</code> y <code>ProductoCategoriaDbHelper.kt</code>.</li>
+          <li>La carpeta <code>adapter</code> y los layouts especificos se completaran cuando llegues a la parte de RecyclerView y CRUD.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>PARTE 3: Base de datos SQLite</h2>
+
+      <div class="theory">
+        <h3>Objetivo de esta parte</h3>
+        <p>
+          En esta parte no haras aun toda la app completa. Primero dejaras lista la base de datos local para trabajar con la tabla <code>producto_categoria</code>, pero organizando el proyecto para que luego puedas agregar la tabla <code>producto</code> sin rehacer la estructura.
+        </p>
+      </div>
+
+      <div class="card-grid">
+        <div class="card">
+          <h4>Archivo 1</h4>
+          <p><strong>Ubicacion:</strong> <code>model/ProductoCategoria.kt</code></p>
+          <p>Representa cada categoria que se guardara en SQLite.</p>
+        </div>
+        <div class="card">
+          <h4>Archivo 2</h4>
+          <p><strong>Ubicacion:</strong> <code>data/ProductoCategoriaDbHelper.kt</code></p>
+          <p>Crea la base de datos, la tabla y luego alojara los metodos CRUD.</p>
+        </div>
+        <div class="card">
+          <h4>Preparado a futuro</h4>
+          <p><strong>Siguiente tabla:</strong> <code>producto</code></p>
+          <p>Desde ahora el nombre de la BD y del helper quedan listos para manejar ambas tablas.</p>
+        </div>
+      </div>
+
+      <div class="note">
+        <h3>Paso 3.1: Crear el modelo ProductoCategoria.kt</h3>
+        <p>
+          En Android Studio: <strong>package</strong> <code>model</code> &rarr; <strong>New</strong> &rarr; <strong>Kotlin Class/File</strong> &rarr; <code>ProductoCategoria.kt</code>
+        </p>
+        <div class="code-like"><span class="c-kw">package</span> com.example.sqlite_a.model
+
+<span class="c-com">// Data class que representa una fila de la tabla producto_categoria.</span>
+<span class="c-com">// Cada objeto de esta clase sera una categoria recuperada o guardada en SQLite.</span>
+<span class="c-kw">data class</span> <span class="c-type">ProductoCategoria</span>(
+    <span class="c-com">// id inicia en 0 porque SQLite lo genera automaticamente al insertar.</span>
+    <span class="c-kw">val</span> id: <span class="c-type">Int</span> = <span class="c-num">0</span>,
+
+    <span class="c-com">// nombre de la categoria. Ejemplo: Bebidas, Lacteos, Utiles.</span>
+    <span class="c-kw">val</span> nombre: <span class="c-type">String</span>,
+
+    <span class="c-com">// descripcion breve para ampliar la informacion de la categoria.</span>
+    <span class="c-kw">val</span> descripcion: <span class="c-type">String</span>
+)</div>
+        <p>
+          Este modelo representa una fila de la tabla <code>producto_categoria</code>. Aunque luego agregues la tabla <code>producto</code>, este archivo ya queda correctamente ubicado dentro de la capa <code>model</code>.
+        </p>
+      </div>
+
+      <div class="note">
+        <h3>Paso 3.2: Crear el helper ProductoCategoriaDbHelper.kt</h3>
+        <p>
+          En Android Studio: <strong>package</strong> <code>data</code> &rarr; <strong>New</strong> &rarr; <strong>Kotlin Class/File</strong> &rarr; <code>ProductoCategoriaDbHelper.kt</code>
+        </p>
+        <div class="code-like"><span class="c-kw">package</span> com.example.sqlite_a.data
+
+          <span class="c-kw">import</span> android.content.Context
+          <span class="c-kw">import</span> android.database.sqlite.SQLiteDatabase
+          <span class="c-kw">import</span> android.database.sqlite.SQLiteOpenHelper
+          <span class="c-kw">import</span> android.util.Log
+
+          <span class="c-com">// Esta clase administra la base de datos local SQLite.</span>
+          <span class="c-com">// Aqui se define el nombre de la BD, su version y la tabla principal.</span>
+          <span class="c-kw">class</span> <span class="c-type">ProductoCategoriaDbHelper</span>(context: Context) :
+          <span class="c-type">SQLiteOpenHelper</span>(context, DB_NAME, null, DB_VERSION) {
+
+          <span class="c-kw">companion object</span> {
+          <span class="c-com">// Etiqueta para identificar los mensajes en Logcat.</span>
+          <span class="c-kw">const val</span> TAG = <span class="c-str">"DBProductCat"</span>
+
+          <span class="c-com">// Nombre del archivo fisico de la base de datos dentro del dispositivo.</span>
+          <span class="c-kw">const val</span> DB_NAME = <span class="c-str">"inventario.db"</span>
+
+          <span class="c-com">// Version actual de la BD. Si en el futuro cambia la estructura,</span>
+          <span class="c-com">// este numero debera aumentar para ejecutar onUpgrade().</span>
+          <span class="c-kw">const val</span> DB_VERSION = <span class="c-num">1</span>
+
+          <span class="c-com">// Nombre de la tabla y de sus columnas.</span>
+          <span class="c-kw">const val</span> TABLE_CATEGORIA = <span class="c-str">"producto_categoria"</span>
+          <span class="c-kw">const val</span> COL_CAT_ID = <span class="c-str">"id"</span>
+          <span class="c-kw">const val</span> COL_CAT_NOMBRE = <span class="c-str">"nombre"</span>
+          <span class="c-kw">const val</span> COL_CAT_DESCRIPCION = <span class="c-str">"descripcion"</span>
+          }
+
+          <span class="c-kw">override fun</span> <span class="c-fn">onCreate</span>(db: <span class="c-type">SQLiteDatabase</span>) {
+          <span class="c-com">// Sentencia SQL que crea la tabla producto_categoria.</span>
+          <span class="c-kw">val</span> createCategoriaTable = <span class="c-str">"""
+          CREATE TABLE $TABLE_CATEGORIA (
+          $COL_CAT_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+          $COL_CAT_NOMBRE TEXT NOT NULL,
+          $COL_CAT_DESCRIPCION TEXT NOT NULL
+          )
+          """</span>.trimIndent()
+          <span class="c-com">// .trimIndent() : Permite escribir el SQL bien ordenado dentro del código. Quita los espacios de sangría sobrantes al inicio de cada línea.</span>
+
+          <span class="c-com">// Muestra en Logcat que SQLite acaba de entrar al proceso de creacion.</span>
+          Log.d(TAG, <span class="c-str">"onCreate(): se esta creando la tabla $TABLE_CATEGORIA"</span>)
+
+          <span class="c-com">// Ejecuta la instruccion SQL para crear la tabla.</span>
+          db.execSQL(createCategoriaTable)
+
+          <span class="c-com">// Confirma en Logcat que la tabla fue creada correctamente.</span>
+          Log.d(TAG, <span class="c-str">"onCreate(): tabla $TABLE_CATEGORIA creada correctamente"</span>)
+          }
+
+          <span class="c-kw">override fun</span> <span class="c-fn">onUpgrade</span>(db: <span class="c-type">SQLiteDatabase</span>, oldVersion: <span class="c-type">Int</span>, newVersion: <span class="c-type">Int</span>) {
+          <span class="c-com">// Si la version cambia, se elimina la tabla anterior</span>
+          <span class="c-com">// y luego se vuelve a crear con la nueva estructura.</span>
+          Log.d(TAG, <span class="c-str">"onUpgrade(): version antigua = $oldVersion, version nueva = $newVersion"</span>)
+          db.execSQL(<span class="c-str">"DROP TABLE IF EXISTS $TABLE_CATEGORIA"</span>)
+          onCreate(db)
+      }
+}</div>
+        <p>
+          La tabla no se crea solo por escribir esta clase. Para que SQLite construya realmente la base de datos y la tabla, es necesario crear una instancia del helper desde la actividad y abrir la base de datos.
+        </p>
+        <div class="code-like"><span class="c-kw">package</span> com.example.sqlite_a
+
+<span class="c-kw">import</span> android.os.Bundle
+<span class="c-kw">import</span> android.util.Log
+<span class="c-kw">import</span> androidx.activity.enableEdgeToEdge
+<span class="c-kw">import</span> androidx.appcompat.app.AppCompatActivity
+<span class="c-kw">import</span> androidx.core.view.ViewCompat
+<span class="c-kw">import</span> androidx.core.view.WindowInsetsCompat
+<span class="c-kw">import</span> com.example.sqlite_a.data.ProductoCategoriaDbHelper
+
+<span class="c-kw">class</span> <span class="c-type">MainActivity</span> : <span class="c-type">AppCompatActivity</span>() {
+    <span class="c-kw">override fun</span> <span class="c-fn">onCreate</span>(savedInstanceState: Bundle?) {
+        <span class="c-kw">super</span>.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        setContentView(R.layout.activity_main)
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets -&gt;
+            <span class="c-kw">val</span> systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
+
+        <span class="c-com">// Se crea el helper de SQLite.</span>
+        Log.d(<span class="c-str">"DBProductCat"</span>, <span class="c-str">"MainActivity: se crea la instancia del helper"</span>)
+        <span class="c-kw">val</span> dbHelper = <span class="c-type">ProductoCategoriaDbHelper</span>(<span class="c-kw">this</span>)
+
+        <span class="c-com">// Al abrir la base de datos, Android crea inventario.db</span>
+        <span class="c-com">// y ejecuta onCreate() si todavia no existe.</span>
+        Log.d(<span class="c-str">"DBProductCat"</span>, <span class="c-str">"MainActivity: se solicita writableDatabase"</span>)
+        <span class="c-kw">val</span> db = dbHelper.writableDatabase
+        Log.d(<span class="c-str">"DBProductCat"</span>, <span class="c-str">"MainActivity: la base de datos esta lista para usarse"</span>)
+
+        <span class="c-com">// Se cierra la conexion luego de esta prueba inicial.</span>
+        db.close()
+        Log.d(<span class="c-str">"DBProductCat"</span>, <span class="c-str">"MainActivity: conexion cerrada"</span>)
+    }
+}</div>
+        <p>
+          Para observar estos mensajes, abre <strong>Logcat</strong> en Android Studio y filtra por la etiqueta <code>DBProductCat</code>.
+        </p>
+        <div class="note">
+          <h3>Comprobar la base de datos en Database Inspector</h3>
+          <p>
+            Despues de ejecutar la app, tambien es posible revisar la base de datos directamente desde Android Studio.
+          </p>
+          <ol>
+            <li>Ejecuta la app en el emulador o en el celular.</li>
+            <li>Ve a <code>View &gt; Tool Windows &gt; App Inspection</code>.</li>
+            <li>Abre la pestaña <code>Database Inspector</code>.</li>
+            <li>Selecciona el proceso <code>com.example.sqlite_a</code>.</li>
+            <li>Expande <code>inventario.db</code>.</li>
+            <li>Abre la tabla <code>producto_categoria</code>.</li>
+          </ol>
+          <p>Desde ahi se puede revisar:</p>
+          <ul>
+            <li>La estructura general de la base de datos y sus tablas.</li>
+            <li>Los registros guardados.</li>
+            <li>Consultas SQL manuales.</li>
+            <li>La exportacion de la tabla o de la base de datos.</li>
+          </ul>
+          <p>Consultas utiles para esta etapa:</p>
+          <div class="code-like"><span class="c-sql-kw">SELECT</span> * <span class="c-sql-kw">FROM</span> <span class="c-sql-ident">producto_categoria</span>
+
+<span class="c-sql-kw">PRAGMA</span> <span class="c-sql-ident">table_info</span>(<span class="c-sql-ident">producto_categoria</span>)
+
+<span class="c-sql-kw">SELECT</span> <span class="c-sql-ident">name</span>, <span class="c-sql-ident">sql</span>
+<span class="c-sql-kw">FROM</span> <span class="c-sql-ident">sqlite_master</span>
+<span class="c-sql-kw">WHERE</span> <span class="c-sql-ident">type</span>=<span class="c-str">'table'</span></div>
+          <p>
+            Si <code>inventario.db</code> aparece como <code>closed</code>, no significa error. Solo indica que la conexion ya fue cerrada y por eso no puede inspeccionarse en vivo en ese momento.
+          </p>
+        </div>
+        <div class="exercise">
+          <h3>Insertar registros de prueba desde Database Inspector</h3>
+          <p>
+            Si la base de datos se encuentra abierta, se pueden insertar varios registros de prueba ejecutando una sola consulta SQL.
+          </p>
+          <div class="code-like"><span class="c-sql-kw">INSERT INTO</span> <span class="c-sql-ident">producto_categoria</span> (<span class="c-sql-ident">nombre</span>, <span class="c-sql-ident">descripcion</span>) <span class="c-sql-kw">VALUES</span>
+(<span class="c-str">'Bebidas'</span>, <span class="c-str">'Categoria de bebidas'</span>),
+(<span class="c-str">'Lacteos'</span>, <span class="c-str">'Categoria de productos lacteos'</span>),
+(<span class="c-str">'Snacks'</span>, <span class="c-str">'Categoria de bocaditos y aperitivos'</span>),
+(<span class="c-str">'Panaderia'</span>, <span class="c-str">'Categoria de panes y productos horneados'</span>),
+(<span class="c-str">'Conservas'</span>, <span class="c-str">'Categoria de productos enlatados y conservados'</span>),
+(<span class="c-str">'Limpieza'</span>, <span class="c-str">'Categoria de productos para limpieza del hogar'</span>),
+(<span class="c-str">'Aseo Personal'</span>, <span class="c-str">'Categoria de higiene y cuidado personal'</span>),
+(<span class="c-str">'Frutas'</span>, <span class="c-str">'Categoria de frutas frescas'</span>),
+(<span class="c-str">'Verduras'</span>, <span class="c-str">'Categoria de verduras frescas'</span>),
+(<span class="c-str">'Carnes'</span>, <span class="c-str">'Categoria de carnes rojas y blancas'</span>),
+(<span class="c-str">'Embutidos'</span>, <span class="c-str">'Categoria de jamones, salchichas y afines'</span>),
+(<span class="c-str">'Congelados'</span>, <span class="c-str">'Categoria de productos almacenados a baja temperatura'</span>),
+(<span class="c-str">'Utiles Escolares'</span>, <span class="c-str">'Categoria de materiales y utiles para estudio'</span>),
+(<span class="c-str">'Mascotas'</span>, <span class="c-str">'Categoria de alimentos y accesorios para mascotas'</span>),
+(<span class="c-str">'Farmacia'</span>, <span class="c-str">'Categoria de productos basicos de botiquin y salud'</span>),
+(<span class="c-str">'Reposteria'</span>, <span class="c-str">'Categoria de insumos para postres y reposteria'</span>),
+(<span class="c-str">'Cereales'</span>, <span class="c-str">'Categoria de avena, granola y cereales variados'</span>),
+(<span class="c-str">'Pastas'</span>, <span class="c-str">'Categoria de fideos, tallarines y otras pastas'</span>),
+(<span class="c-str">'Salsas'</span>, <span class="c-str">'Categoria de aderezos, cremas y salsas'</span>),
+(<span class="c-str">'Bazar'</span>, <span class="c-str">'Categoria de articulos varios para el hogar'</span>)</div>
+          <p>
+            Despues de ejecutar la consulta, puedes comprobar el resultado con:
+          </p>
+          <div class="code-like"><span class="c-sql-kw">SELECT</span> * <span class="c-sql-kw">FROM</span> <span class="c-sql-ident">producto_categoria</span></div>
+        </div>
+        <div class="tips">
+          <h3>Idea clave de este paso</h3>
+          <ul>
+            <li>Primero se escribe la clase helper.</li>
+            <li>Despues se crea el objeto <code>ProductoCategoriaDbHelper</code> en <code>MainActivity</code>.</li>
+            <li>Cuando se usa <code>writableDatabase</code> o <code>readableDatabase</code>, Android crea la BD y la tabla si aun no existen.</li>
+            <li>Los mensajes <code>Log.d(...)</code> permiten verificar en Logcat si el proceso realmente se ejecuto.</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="tips">
+        <h3>Que estas dejando preparado desde ahora</h3>
+        <ul>
+          <li><strong>Nombre general de la base de datos:</strong> <code>inventario.db</code>, para que sirva luego para categorias y productos.</li>
+          <li><strong>Nombre del helper:</strong> <code>ProductoCategoriaDbHelper</code>, porque en esta etapa solo administra la tabla <code>producto_categoria</code>.</li>
+          <li><strong>Tabla actual:</strong> <code>producto_categoria</code>.</li>
+          <li><strong>Tabla futura:</strong> <code>producto</code>, que despues podra incluir una clave foranea como <code>id_categoria</code>.</li>
+        </ul>
+      </div>
+
+      <div class="warning">
+        <h3>Decisiones tecnicas de esta primera version</h3>
+        <ul>
+          <li><strong>SQLiteOpenHelper</strong> crea la BD la primera vez que ejecutas la app.</li>
+          <li><strong>onCreate()</strong> solo construira por ahora la tabla <code>producto_categoria</code>.</li>
+          <li><strong>onUpgrade()</strong> se usara cuando cambies la estructura y aumentes la version de la BD.</li>
+          <li>Usar constantes para tablas y columnas evita errores cuando luego agregues consultas, inserts y updates.</li>
+        </ul>
+      </div>
+
+      <div class="exercise">
+        <h3>Resultado esperado al terminar la Parte 3</h3>
+        <ol>
+          <li>Tendras creado el paquete <code>model</code> con <code>ProductoCategoria.kt</code>.</li>
+          <li>Tendras creado el paquete <code>data</code> con <code>ProductoCategoriaDbHelper.kt</code>.</li>
+          <li>La aplicacion ya podra generar la BD <code>inventario.db</code> al ejecutarse.</li>
+          <li>La tabla <code>producto_categoria</code> quedara lista para usarla en la siguiente parte con RecyclerView.</li>
+        </ol>
+      </div>
+
+    </div>
+
+    <div class="section">
+      <h2>PARTE 4: Leer SQLite y mostrar datos en RecyclerView</h2>
+
+      <div class="theory">
+        <h3>Objetivo de esta parte</h3>
+        <p>
+          Ahora la meta es leer los registros guardados en <code>producto_categoria</code>, convertirlos en una lista de objetos <code>ProductoCategoria</code> y mostrarlos dentro de un <code>RecyclerView</code>.
+        </p>
+      </div>
+
+      <div class="card-grid">
+        <div class="card">
+          <h4>Lectura</h4>
+          <p>Usar una consulta <code>SELECT</code> para recuperar los datos desde SQLite.</p>
+        </div>
+        <div class="card">
+          <h4>Transformacion</h4>
+          <p>Convertir cada fila del <code>Cursor</code> en un objeto <code>ProductoCategoria</code>.</p>
+        </div>
+        <div class="card">
+          <h4>Visualizacion</h4>
+          <p>Configurar el <code>RecyclerView</code>, el <code>Adapter</code> y la carga inicial desde <code>MainActivity</code>.</p>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <h3>Archivos que se completan en esta parte</h3>
+        <div class="code-like">java/com.example.sqlite_a/
+├── adapter/
+│ └── ProductoCategoriaAdapter.kt
+├── data/
+│ └── ProductoCategoriaDbHelper.kt
+├── model/
+│ └── ProductoCategoria.kt
+└── MainActivity.kt
+
+res/layout/
+├── activity_main.xml
+└── item_producto_categoria.xml</div>
+        <ul>
+          <li><code>ProductoCategoria.kt</code> ya fue creado en la parte anterior.</li>
+          <li><code>ProductoCategoriaDbHelper.kt</code> ahora agregara el metodo de lectura.</li>
+          <li><code>ProductoCategoriaAdapter.kt</code> se encargara de dibujar cada fila.</li>
+          <li><code>activity_main.xml</code> y <code>item_producto_categoria.xml</code> definiran la interfaz.</li>
+        </ul>
+      </div>
+
+      <div class="note">
+        <h3>Paso 4.1: Agregar el metodo obtenerCategorias() en ProductoCategoriaDbHelper.kt</h3>
+        <p>
+          Este metodo consultara todos los registros de la tabla, recorrera el <code>Cursor</code> y devolvera una lista de objetos <code>ProductoCategoria</code>.
+        </p>
+        <p>
+          Para evitar mezclar fragmentos, lo mas practico en esta parte es reemplazar todo el contenido del archivo <code>ProductoCategoriaDbHelper.kt</code> por el siguiente bloque completo.
+        </p>
+        <div class="code-like"><span class="c-kw">package</span> com.example.sqlite_a.data
+
+<span class="c-kw">import</span> android.content.Context
+<span class="c-kw">import</span> android.database.sqlite.SQLiteDatabase
+<span class="c-kw">import</span> android.database.sqlite.SQLiteOpenHelper
+<span class="c-kw">import</span> android.util.Log
+<span class="c-kw">import</span> com.example.sqlite_a.model.ProductoCategoria
+
+<span class="c-kw">class</span> <span class="c-type">ProductoCategoriaDbHelper</span>(context: Context) :
+    <span class="c-type">SQLiteOpenHelper</span>(context, DB_NAME, null, DB_VERSION) {
+
+    <span class="c-kw">companion object</span> {
+        <span class="c-kw">const val</span> TAG = <span class="c-str">"DBProductCat"</span>
+        <span class="c-kw">const val</span> DB_NAME = <span class="c-str">"inventario.db"</span>
+        <span class="c-kw">const val</span> DB_VERSION = <span class="c-num">1</span>
+
+        <span class="c-kw">const val</span> TABLE_CATEGORIA = <span class="c-str">"producto_categoria"</span>
+        <span class="c-kw">const val</span> COL_CAT_ID = <span class="c-str">"id"</span>
+        <span class="c-kw">const val</span> COL_CAT_NOMBRE = <span class="c-str">"nombre"</span>
+        <span class="c-kw">const val</span> COL_CAT_DESCRIPCION = <span class="c-str">"descripcion"</span>
+    }
+
+    <span class="c-kw">override fun</span> <span class="c-fn">onCreate</span>(db: <span class="c-type">SQLiteDatabase</span>) {
+        <span class="c-kw">val</span> createCategoriaTable = <span class="c-str">"""
+            CREATE TABLE $TABLE_CATEGORIA (
+                $COL_CAT_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                $COL_CAT_NOMBRE TEXT NOT NULL,
+                $COL_CAT_DESCRIPCION TEXT NOT NULL
+            )
+        """</span>.trimIndent()
+
+        Log.d(TAG, <span class="c-str">"onCreate(): se esta creando la tabla $TABLE_CATEGORIA"</span>)
+        db.execSQL(createCategoriaTable)
+        Log.d(TAG, <span class="c-str">"onCreate(): tabla $TABLE_CATEGORIA creada correctamente"</span>)
+    }
+
+    <span class="c-kw">override fun</span> <span class="c-fn">onUpgrade</span>(db: <span class="c-type">SQLiteDatabase</span>, oldVersion: <span class="c-type">Int</span>, newVersion: <span class="c-type">Int</span>) {
+        Log.d(TAG, <span class="c-str">"onUpgrade(): version antigua = $oldVersion, version nueva = $newVersion"</span>)
+        db.execSQL(<span class="c-str">"DROP TABLE IF EXISTS $TABLE_CATEGORIA"</span>)
+        onCreate(db)
+    }
+
+    <span class="c-kw">fun</span> <span class="c-fn">obtenerCategorias</span>(): <span class="c-type">MutableList</span>&lt;<span class="c-type">ProductoCategoria</span>&gt; {
+        <span class="c-com">// Lista donde se guardaran temporalmente los resultados.</span>
+        <span class="c-kw">val</span> listaCategorias = mutableListOf&lt;<span class="c-type">ProductoCategoria</span>&gt;()
+
+        <span class="c-com">// Se abre la base de datos en modo lectura.</span>
+        <span class="c-kw">val</span> db = readableDatabase
+
+        <span class="c-com">// Consulta SQL para recuperar todas las categorias ordenadas por id.</span>
+        <span class="c-kw">val</span> query = <span class="c-str">"SELECT * FROM $TABLE_CATEGORIA ORDER BY $COL_CAT_ID ASC"</span>
+
+        <span class="c-com">// Cursor: objeto que permite recorrer fila por fila el resultado.</span>
+        <span class="c-kw">val</span> cursor = db.rawQuery(query, null)
+
+        Log.d(TAG, <span class="c-str">"obtenerCategorias(): total recuperado = ${cursor.count}"</span>)
+
+        <span class="c-com">// moveToFirst() verifica si existe al menos un registro.</span>
+        <span class="c-kw">if</span> (cursor.moveToFirst()) {
+            <span class="c-kw">do</span> {
+                <span class="c-com">// Se leen los valores de cada columna de la fila actual.</span>
+                <span class="c-kw">val</span> id = cursor.getInt(cursor.getColumnIndexOrThrow(COL_CAT_ID))
+                <span class="c-kw">val</span> nombre = cursor.getString(cursor.getColumnIndexOrThrow(COL_CAT_NOMBRE))
+                <span class="c-kw">val</span> descripcion = cursor.getString(cursor.getColumnIndexOrThrow(COL_CAT_DESCRIPCION))
+
+                <span class="c-com">// Cada fila se convierte en un objeto ProductoCategoria.</span>
+                <span class="c-kw">val</span> categoria = <span class="c-type">ProductoCategoria</span>(id, nombre, descripcion)
+
+                <span class="c-com">// Se agrega el objeto a la lista final.</span>
+                listaCategorias.add(categoria)
+            } <span class="c-kw">while</span> (cursor.moveToNext())
+        }
+
+        <span class="c-com">// Siempre se debe cerrar el cursor y la conexion al terminar.</span>
+        cursor.close()
+        db.close()
+
+        <span class="c-kw">return</span> listaCategorias
+    }
+}</div>
+      </div>
+
+      <div class="note">
+        <h3>Paso 4.2: Crear el diseno de cada fila item_producto_categoria.xml</h3>
+        <p>
+          Este archivo define como se vera cada categoria dentro del <code>RecyclerView</code>.
+        </p>
+        <div class="code-like"><span class="c-xml-tag">&lt;LinearLayout</span>
+    <span class="c-xml-attr">xmlns:android</span>=<span class="c-xml-val">"http://schemas.android.com/apk/res/android"</span>
+    <span class="c-xml-attr">android:layout_width</span>=<span class="c-xml-val">"match_parent"</span>
+    <span class="c-xml-attr">android:layout_height</span>=<span class="c-xml-val">"wrap_content"</span>
+    <span class="c-xml-attr">android:orientation</span>=<span class="c-xml-val">"vertical"</span>
+    <span class="c-xml-attr">android:padding</span>=<span class="c-xml-val">"12dp"</span>
+    <span class="c-xml-attr">android:layout_marginHorizontal</span>=<span class="c-xml-val">"12dp"</span>
+    <span class="c-xml-attr">android:layout_marginTop</span>=<span class="c-xml-val">"8dp"</span>
+    <span class="c-xml-attr">android:background</span>=<span class="c-xml-val">"@android:color/white"</span><span class="c-xml-tag">&gt;</span>
+
+    <span class="c-xml-tag">&lt;TextView</span>
+        <span class="c-xml-attr">android:id</span>=<span class="c-xml-val">"@+id/tvNombreCategoria"</span>
+        <span class="c-xml-attr">android:layout_width</span>=<span class="c-xml-val">"match_parent"</span>
+        <span class="c-xml-attr">android:layout_height</span>=<span class="c-xml-val">"wrap_content"</span>
+        <span class="c-xml-attr">android:textStyle</span>=<span class="c-xml-val">"bold"</span>
+        <span class="c-xml-attr">android:textSize</span>=<span class="c-xml-val">"18sp"</span>
+        <span class="c-xml-attr">android:text</span>=<span class="c-xml-val">"Nombre categoria"</span> <span class="c-xml-tag">/&gt;</span>
+
+    <span class="c-xml-tag">&lt;TextView</span>
+        <span class="c-xml-attr">android:id</span>=<span class="c-xml-val">"@+id/tvDescripcionCategoria"</span>
+        <span class="c-xml-attr">android:layout_width</span>=<span class="c-xml-val">"match_parent"</span>
+        <span class="c-xml-attr">android:layout_height</span>=<span class="c-xml-val">"wrap_content"</span>
+        <span class="c-xml-attr">android:layout_marginTop</span>=<span class="c-xml-val">"4dp"</span>
+        <span class="c-xml-attr">android:text</span>=<span class="c-xml-val">"Descripcion de la categoria"</span>
+        <span class="c-xml-attr">android:textSize</span>=<span class="c-xml-val">"14sp"</span> <span class="c-xml-tag">/&gt;</span>
+
+<span class="c-xml-tag">&lt;/LinearLayout&gt;</span></div>
+        <ul>
+          <li><code>tvNombreCategoria</code> mostrara el nombre principal.</li>
+          <li><code>tvDescripcionCategoria</code> mostrara la descripcion.</li>
+        </ul>
+      </div>
+
+      <div class="note">
+        <h3>Paso 4.3: Crear ProductoCategoriaAdapter.kt</h3>
+        <p>
+          El adapter recibe la lista de categorias y la vincula con cada item visual del <code>RecyclerView</code>.
+        </p>
+        <div class="code-like"><span class="c-kw">package</span> com.example.sqlite_a.adapter
+
+<span class="c-kw">import</span> android.view.LayoutInflater
+<span class="c-kw">import</span> android.view.View
+<span class="c-kw">import</span> android.view.ViewGroup
+<span class="c-kw">import</span> android.widget.TextView
+<span class="c-kw">import</span> androidx.recyclerview.widget.RecyclerView
+<span class="c-kw">import</span> com.example.sqlite_a.R
+<span class="c-kw">import</span> com.example.sqlite_a.model.ProductoCategoria
+
+<span class="c-kw">class</span> <span class="c-type">ProductoCategoriaAdapter</span>(
+    <span class="c-kw">private val</span> listaCategorias: <span class="c-type">MutableList</span>&lt;<span class="c-type">ProductoCategoria</span>&gt;
+) : <span class="c-type">RecyclerView.Adapter</span>&lt;<span class="c-type">ProductoCategoriaAdapter.ProductoCategoriaViewHolder</span>&gt;() {
+
+    <span class="c-com">// ViewHolder: guarda las referencias de los controles de cada fila.</span>
+    <span class="c-kw">class</span> <span class="c-type">ProductoCategoriaViewHolder</span>(itemView: View) : <span class="c-type">RecyclerView.ViewHolder</span>(itemView) {
+        <span class="c-kw">val</span> tvNombreCategoria: <span class="c-type">TextView</span> = itemView.findViewById(R.id.tvNombreCategoria)
+        <span class="c-kw">val</span> tvDescripcionCategoria: <span class="c-type">TextView</span> = itemView.findViewById(R.id.tvDescripcionCategoria)
+    }
+
+    <span class="c-kw">override fun</span> <span class="c-fn">onCreateViewHolder</span>(parent: ViewGroup, viewType: <span class="c-type">Int</span>): <span class="c-type">ProductoCategoriaViewHolder</span> {
+        <span class="c-com">// Infla el XML item_producto_categoria.xml para convertirlo en una vista real.</span>
+        <span class="c-kw">val</span> view = <span class="c-type">LayoutInflater</span>.from(parent.context)
+            .inflate(R.layout.item_producto_categoria, parent, false)
+
+        <span class="c-kw">return</span> <span class="c-type">ProductoCategoriaViewHolder</span>(view)
+    }
+
+    <span class="c-kw">override fun</span> <span class="c-fn">onBindViewHolder</span>(holder: <span class="c-type">ProductoCategoriaViewHolder</span>, position: <span class="c-type">Int</span>) {
+        <span class="c-com">// Obtiene el objeto actual segun la posicion.</span>
+        <span class="c-kw">val</span> categoria = listaCategorias[position]
+
+        <span class="c-com">// Coloca los datos del objeto en los TextView de la fila.</span>
+        holder.tvNombreCategoria.text = categoria.nombre
+        holder.tvDescripcionCategoria.text = categoria.descripcion
+    }
+
+    <span class="c-kw">override fun</span> <span class="c-fn">getItemCount</span>(): <span class="c-type">Int</span> {
+        <span class="c-com">// Devuelve cuantas filas se deben mostrar.</span>
+        <span class="c-kw">return</span> listaCategorias.size
+    }
+}</div>
+      </div>
+
+      <div class="note">
+        <h3>Paso 4.4: Preparar activity_main.xml con RecyclerView</h3>
+        <p>
+          La pantalla principal necesita un <code>RecyclerView</code> para mostrar la lista y un mensaje opcional cuando no existan registros.
+        </p>
+        <p>
+          Si el archivo actual todavia muestra <code>Hello World!</code>, puedes reemplazar todo el contenido de <code>activity_main.xml</code> por este bloque completo:
+        </p>
+        <div class="code-like"><span class="c-xml-tag">&lt;androidx.constraintlayout.widget.ConstraintLayout</span>
+    <span class="c-xml-attr">xmlns:android</span>=<span class="c-xml-val">"http://schemas.android.com/apk/res/android"</span>
+    <span class="c-xml-attr">xmlns:app</span>=<span class="c-xml-val">"http://schemas.android.com/apk/res-auto"</span>
+    <span class="c-xml-attr">xmlns:tools</span>=<span class="c-xml-val">"http://schemas.android.com/tools"</span>
+    <span class="c-xml-attr">android:id</span>=<span class="c-xml-val">"@+id/main"</span>
+    <span class="c-xml-attr">android:layout_width</span>=<span class="c-xml-val">"match_parent"</span>
+    <span class="c-xml-attr">android:layout_height</span>=<span class="c-xml-val">"match_parent"</span>
+    <span class="c-xml-attr">android:padding</span>=<span class="c-xml-val">"16dp"</span>
+    <span class="c-xml-attr">tools:context</span>=<span class="c-xml-val">".MainActivity"</span><span class="c-xml-tag">&gt;</span>
+
+    <span class="c-xml-tag">&lt;TextView</span>
+        <span class="c-xml-attr">android:id</span>=<span class="c-xml-val">"@+id/tvTitulo"</span>
+        <span class="c-xml-attr">android:layout_width</span>=<span class="c-xml-val">"0dp"</span>
+        <span class="c-xml-attr">android:layout_height</span>=<span class="c-xml-val">"wrap_content"</span>
+        <span class="c-xml-attr">android:text</span>=<span class="c-xml-val">"Lista de categorias"</span>
+        <span class="c-xml-attr">android:textSize</span>=<span class="c-xml-val">"20sp"</span>
+        <span class="c-xml-attr">android:textStyle</span>=<span class="c-xml-val">"bold"</span>
+        <span class="c-xml-attr">app:layout_constraintTop_toTopOf</span>=<span class="c-xml-val">"parent"</span>
+        <span class="c-xml-attr">app:layout_constraintStart_toStartOf</span>=<span class="c-xml-val">"parent"</span>
+        <span class="c-xml-attr">app:layout_constraintEnd_toEndOf</span>=<span class="c-xml-val">"parent"</span> <span class="c-xml-tag">/&gt;</span>
+
+    <span class="c-xml-tag">&lt;TextView</span>
+        <span class="c-xml-attr">android:id</span>=<span class="c-xml-val">"@+id/tvSinDatos"</span>
+        <span class="c-xml-attr">android:layout_width</span>=<span class="c-xml-val">"0dp"</span>
+        <span class="c-xml-attr">android:layout_height</span>=<span class="c-xml-val">"wrap_content"</span>
+        <span class="c-xml-attr">android:layout_marginTop</span>=<span class="c-xml-val">"12dp"</span>
+        <span class="c-xml-attr">android:text</span>=<span class="c-xml-val">"No hay categorias registradas"</span>
+        <span class="c-xml-attr">android:visibility</span>=<span class="c-xml-val">"gone"</span>
+        <span class="c-xml-attr">app:layout_constraintTop_toBottomOf</span>=<span class="c-xml-val">"@id/tvTitulo"</span>
+        <span class="c-xml-attr">app:layout_constraintStart_toStartOf</span>=<span class="c-xml-val">"parent"</span>
+        <span class="c-xml-attr">app:layout_constraintEnd_toEndOf</span>=<span class="c-xml-val">"parent"</span> <span class="c-xml-tag">/&gt;</span>
+
+    <span class="c-xml-tag">&lt;androidx.recyclerview.widget.RecyclerView</span>
+        <span class="c-xml-attr">android:id</span>=<span class="c-xml-val">"@+id/recyclerCategorias"</span>
+        <span class="c-xml-attr">android:layout_width</span>=<span class="c-xml-val">"0dp"</span>
+        <span class="c-xml-attr">android:layout_height</span>=<span class="c-xml-val">"0dp"</span>
+        <span class="c-xml-attr">android:layout_marginTop</span>=<span class="c-xml-val">"12dp"</span>
+        <span class="c-xml-attr">app:layout_constraintTop_toBottomOf</span>=<span class="c-xml-val">"@id/tvTitulo"</span>
+        <span class="c-xml-attr">app:layout_constraintBottom_toBottomOf</span>=<span class="c-xml-val">"parent"</span>
+        <span class="c-xml-attr">app:layout_constraintStart_toStartOf</span>=<span class="c-xml-val">"parent"</span>
+        <span class="c-xml-attr">app:layout_constraintEnd_toEndOf</span>=<span class="c-xml-val">"parent"</span> <span class="c-xml-tag">/&gt;</span>
+
+<span class="c-xml-tag">&lt;/androidx.constraintlayout.widget.ConstraintLayout&gt;</span></div>
+      </div>
+
+      <div class="note">
+        <h3>Paso 4.5: Leer la BD y mostrarla en MainActivity</h3>
+        <p>
+          En este paso se configura el <code>RecyclerView</code>, se llama al helper y se cargan las categorias guardadas en SQLite.
+        </p>
+        <p>
+          En este caso tambien conviene reemplazar todo el contenido de <code>MainActivity.kt</code> por el siguiente bloque completo.
+        </p>
+        <div class="code-like"><span class="c-kw">package</span> com.example.sqlite_a
+
+<span class="c-kw">import</span> android.os.Bundle
+<span class="c-kw">import</span> android.util.Log
+<span class="c-kw">import</span> android.widget.TextView
+<span class="c-kw">import</span> androidx.activity.enableEdgeToEdge
+<span class="c-kw">import</span> androidx.appcompat.app.AppCompatActivity
+<span class="c-kw">import</span> androidx.core.view.ViewCompat
+<span class="c-kw">import</span> androidx.core.view.WindowInsetsCompat
+<span class="c-kw">import</span> androidx.recyclerview.widget.LinearLayoutManager
+<span class="c-kw">import</span> androidx.recyclerview.widget.RecyclerView
+<span class="c-kw">import</span> com.example.sqlite_a.adapter.ProductoCategoriaAdapter
+<span class="c-kw">import</span> com.example.sqlite_a.data.ProductoCategoriaDbHelper
+<span class="c-kw">import</span> com.example.sqlite_a.model.ProductoCategoria
+
+<span class="c-kw">class</span> <span class="c-type">MainActivity</span> : <span class="c-type">AppCompatActivity</span>() {
+
+    <span class="c-kw">private lateinit var</span> recyclerCategorias: <span class="c-type">RecyclerView</span>
+    <span class="c-kw">private lateinit var</span> tvSinDatos: <span class="c-type">TextView</span>
+    <span class="c-kw">private lateinit var</span> dbHelper: <span class="c-type">ProductoCategoriaDbHelper</span>
+    <span class="c-kw">private lateinit var</span> adapter: <span class="c-type">ProductoCategoriaAdapter</span>
+    <span class="c-kw">private var</span> listaCategorias = mutableListOf&lt;<span class="c-type">ProductoCategoria</span>&gt;()
+
+    <span class="c-kw">override fun</span> <span class="c-fn">onCreate</span>(savedInstanceState: Bundle?) {
+        <span class="c-kw">super</span>.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        setContentView(R.layout.activity_main)
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets -&gt;
+            <span class="c-kw">val</span> systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
+
+        <span class="c-com">// Referencias a los controles del layout.</span>
+        recyclerCategorias = findViewById(R.id.recyclerCategorias)
+        tvSinDatos = findViewById(R.id.tvSinDatos)
+
+        <span class="c-com">// Se crea el helper y el adapter.</span>
+        dbHelper = <span class="c-type">ProductoCategoriaDbHelper</span>(<span class="c-kw">this</span>)
+        adapter = <span class="c-type">ProductoCategoriaAdapter</span>(listaCategorias)
+
+        <span class="c-com">// El RecyclerView usara una lista vertical.</span>
+        recyclerCategorias.layoutManager = <span class="c-type">LinearLayoutManager</span>(<span class="c-kw">this</span>)
+        recyclerCategorias.adapter = adapter
+
+        <span class="c-com">// Se cargan los registros guardados en SQLite.</span>
+        cargarCategorias()
+    }
+
+    <span class="c-kw">private fun</span> <span class="c-fn">cargarCategorias</span>() {
+        <span class="c-com">// Se limpia la lista actual para evitar duplicados al recargar.</span>
+        listaCategorias.clear()
+
+        <span class="c-com">// Se agregan a la lista todos los registros recuperados de SQLite.</span>
+        listaCategorias.addAll(dbHelper.obtenerCategorias())
+
+        Log.d(<span class="c-str">"DBProductCat"</span>, <span class="c-str">"MainActivity: categorias cargadas = ${listaCategorias.size}"</span>)
+
+        <span class="c-com">// Notifica al adapter para que vuelva a dibujar la lista.</span>
+        adapter.notifyDataSetChanged()
+
+        <span class="c-com">// Si no hay datos, se muestra un mensaje; si hay datos, se oculta.</span>
+        <span class="c-kw">if</span> (listaCategorias.isEmpty()) {
+            tvSinDatos.visibility = android.view.View.VISIBLE
+            recyclerCategorias.visibility = android.view.View.GONE
+        } <span class="c-kw">else</span> {
+            tvSinDatos.visibility = android.view.View.GONE
+            recyclerCategorias.visibility = android.view.View.VISIBLE
+        }
+    }
+}</div>
+      </div>
+
+      <div class="tips">
+        <h3>Flujo completo de esta parte</h3>
+        <div class="flow">
+          <div class="flow-box">SQLite</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-box">Cursor</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-box">Lista Kotlin</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-box">Adapter</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-box">RecyclerView</div>
+        </div>
+      </div>
+
+      <div class="warning">
+        <h3>Puntos que conviene revisar si la lista no aparece</h3>
+        <ul>
+          <li>Confirmar que la tabla <code>producto_categoria</code> tenga registros.</li>
+          <li>Verificar que el <code>RecyclerView</code> tenga asignado un <code>LayoutManager</code>.</li>
+          <li>Revisar que los ids del XML coincidan con los usados en <code>findViewById()</code>.</li>
+          <li>Comprobar en <code>Logcat</code> la salida con la etiqueta <code>DBProductCat</code>.</li>
+          <li>Notificar cambios con <code>adapter.notifyDataSetChanged()</code> despues de cargar la lista.</li>
+        </ul>
+      </div>
+
+      <div class="exercise">
+        <h3>Resultado esperado al terminar la Parte 4</h3>
+        <ol>
+          <li>El helper ya podra leer los registros con <code>obtenerCategorias()</code>.</li>
+          <li>El <code>RecyclerView</code> mostrara todas las categorias registradas.</li>
+          <li>Si no existen datos, se vera el mensaje <code>No hay categorias registradas</code>.</li>
+          <li>Si ya insertaste datos desde <code>Database Inspector</code>, estos deberian aparecer al abrir la app.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>PARTE 5: CRUD con formularios y eventos</h2>
+
+      <div class="theory">
+        <h3>Objetivo de esta parte</h3>
+        <p>
+          En esta etapa la lista dejara de ser solo de lectura. Ahora se agregaran formularios, eventos y metodos CRUD para insertar, editar y eliminar categorias desde la misma interfaz.
+        </p>
+      </div>
+
+      <div class="card-grid">
+        <div class="card">
+          <h4>Create</h4>
+          <p>Abrir un dialogo, validar datos y guardar una nueva categoria en SQLite.</p>
+        </div>
+        <div class="card">
+          <h4>Update</h4>
+          <p>Usar click sobre una fila para editar el nombre y la descripcion.</p>
+        </div>
+        <div class="card">
+          <h4>Delete</h4>
+          <p>Usar long click para confirmar y eliminar un registro existente.</p>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <h3>Archivos que se crean o actualizan en esta parte</h3>
+        <div class="code-like">java/com.example.sqlite_a/
+├── adapter/
+│ └── ProductoCategoriaAdapter.kt
+├── data/
+│ └── ProductoCategoriaDbHelper.kt
+└── MainActivity.kt
+
+res/layout/
+├── activity_main.xml
+└── dialog_producto_categoria.xml</div>
+        <ul>
+          <li><code>dialog_producto_categoria.xml</code> es nuevo.</li>
+          <li><code>ProductoCategoriaDbHelper.kt</code> se ampliara con insertar, actualizar y eliminar.</li>
+          <li><code>ProductoCategoriaAdapter.kt</code> agregara eventos de click y long click.</li>
+          <li><code>MainActivity.kt</code> coordinara dialogos, validaciones y recarga de lista.</li>
+        </ul>
+      </div>
+
+      <div class="note">
+        <h3>Paso 5.1: Actualizar activity_main.xml para agregar el boton principal</h3>
+        <p>
+          Se agregara un boton superior para abrir el formulario de registro. Puedes reemplazar todo el contenido de <code>activity_main.xml</code> por este bloque completo.
+        </p>
+        <div class="code-like"><span class="c-xml-tag">&lt;androidx.constraintlayout.widget.ConstraintLayout</span>
+    <span class="c-xml-attr">xmlns:android</span>=<span class="c-xml-val">"http://schemas.android.com/apk/res/android"</span>
+    <span class="c-xml-attr">xmlns:app</span>=<span class="c-xml-val">"http://schemas.android.com/apk/res-auto"</span>
+    <span class="c-xml-attr">xmlns:tools</span>=<span class="c-xml-val">"http://schemas.android.com/tools"</span>
+    <span class="c-xml-attr">android:id</span>=<span class="c-xml-val">"@+id/main"</span>
+    <span class="c-xml-attr">android:layout_width</span>=<span class="c-xml-val">"match_parent"</span>
+    <span class="c-xml-attr">android:layout_height</span>=<span class="c-xml-val">"match_parent"</span>
+    <span class="c-xml-attr">android:padding</span>=<span class="c-xml-val">"16dp"</span>
+    <span class="c-xml-attr">tools:context</span>=<span class="c-xml-val">".MainActivity"</span><span class="c-xml-tag">&gt;</span>
+
+    <span class="c-xml-tag">&lt;TextView</span>
+        <span class="c-xml-attr">android:id</span>=<span class="c-xml-val">"@+id/tvTitulo"</span>
+        <span class="c-xml-attr">android:layout_width</span>=<span class="c-xml-val">"0dp"</span>
+        <span class="c-xml-attr">android:layout_height</span>=<span class="c-xml-val">"wrap_content"</span>
+        <span class="c-xml-attr">android:text</span>=<span class="c-xml-val">"Lista de categorias"</span>
+        <span class="c-xml-attr">android:textSize</span>=<span class="c-xml-val">"20sp"</span>
+        <span class="c-xml-attr">android:textStyle</span>=<span class="c-xml-val">"bold"</span>
+        <span class="c-xml-attr">app:layout_constraintTop_toTopOf</span>=<span class="c-xml-val">"parent"</span>
+        <span class="c-xml-attr">app:layout_constraintStart_toStartOf</span>=<span class="c-xml-val">"parent"</span>
+        <span class="c-xml-attr">app:layout_constraintEnd_toEndOf</span>=<span class="c-xml-val">"parent"</span> <span class="c-xml-tag">/&gt;</span>
+
+    <span class="c-xml-tag">&lt;Button</span>
+        <span class="c-xml-attr">android:id</span>=<span class="c-xml-val">"@+id/btnAgregarCategoria"</span>
+        <span class="c-xml-attr">android:layout_width</span>=<span class="c-xml-val">"0dp"</span>
+        <span class="c-xml-attr">android:layout_height</span>=<span class="c-xml-val">"wrap_content"</span>
+        <span class="c-xml-attr">android:layout_marginTop</span>=<span class="c-xml-val">"12dp"</span>
+        <span class="c-xml-attr">android:text</span>=<span class="c-xml-val">"Agregar categoria"</span>
+        <span class="c-xml-attr">app:layout_constraintTop_toBottomOf</span>=<span class="c-xml-val">"@id/tvTitulo"</span>
+        <span class="c-xml-attr">app:layout_constraintStart_toStartOf</span>=<span class="c-xml-val">"parent"</span>
+        <span class="c-xml-attr">app:layout_constraintEnd_toEndOf</span>=<span class="c-xml-val">"parent"</span> <span class="c-xml-tag">/&gt;</span>
+
+    <span class="c-xml-tag">&lt;TextView</span>
+        <span class="c-xml-attr">android:id</span>=<span class="c-xml-val">"@+id/tvSinDatos"</span>
+        <span class="c-xml-attr">android:layout_width</span>=<span class="c-xml-val">"0dp"</span>
+        <span class="c-xml-attr">android:layout_height</span>=<span class="c-xml-val">"wrap_content"</span>
+        <span class="c-xml-attr">android:layout_marginTop</span>=<span class="c-xml-val">"12dp"</span>
+        <span class="c-xml-attr">android:text</span>=<span class="c-xml-val">"No hay categorias registradas"</span>
+        <span class="c-xml-attr">android:visibility</span>=<span class="c-xml-val">"gone"</span>
+        <span class="c-xml-attr">app:layout_constraintTop_toBottomOf</span>=<span class="c-xml-val">"@id/btnAgregarCategoria"</span>
+        <span class="c-xml-attr">app:layout_constraintStart_toStartOf</span>=<span class="c-xml-val">"parent"</span>
+        <span class="c-xml-attr">app:layout_constraintEnd_toEndOf</span>=<span class="c-xml-val">"parent"</span> <span class="c-xml-tag">/&gt;</span>
+
+    <span class="c-xml-tag">&lt;androidx.recyclerview.widget.RecyclerView</span>
+        <span class="c-xml-attr">android:id</span>=<span class="c-xml-val">"@+id/recyclerCategorias"</span>
+        <span class="c-xml-attr">android:layout_width</span>=<span class="c-xml-val">"0dp"</span>
+        <span class="c-xml-attr">android:layout_height</span>=<span class="c-xml-val">"0dp"</span>
+        <span class="c-xml-attr">android:layout_marginTop</span>=<span class="c-xml-val">"12dp"</span>
+        <span class="c-xml-attr">app:layout_constraintTop_toBottomOf</span>=<span class="c-xml-val">"@id/btnAgregarCategoria"</span>
+        <span class="c-xml-attr">app:layout_constraintBottom_toBottomOf</span>=<span class="c-xml-val">"parent"</span>
+        <span class="c-xml-attr">app:layout_constraintStart_toStartOf</span>=<span class="c-xml-val">"parent"</span>
+        <span class="c-xml-attr">app:layout_constraintEnd_toEndOf</span>=<span class="c-xml-val">"parent"</span> <span class="c-xml-tag">/&gt;</span>
+
+<span class="c-xml-tag">&lt;/androidx.constraintlayout.widget.ConstraintLayout&gt;</span></div>
+      </div>
+
+      <div class="note">
+        <h3>Paso 5.2: Crear dialog_producto_categoria.xml</h3>
+        <p>
+          Este layout sera usado tanto para registrar como para editar una categoria.
+        </p>
+        <div class="code-like"><span class="c-xml-tag">&lt;LinearLayout</span>
+    <span class="c-xml-attr">xmlns:android</span>=<span class="c-xml-val">"http://schemas.android.com/apk/res/android"</span>
+    <span class="c-xml-attr">android:layout_width</span>=<span class="c-xml-val">"match_parent"</span>
+    <span class="c-xml-attr">android:layout_height</span>=<span class="c-xml-val">"wrap_content"</span>
+    <span class="c-xml-attr">android:orientation</span>=<span class="c-xml-val">"vertical"</span>
+    <span class="c-xml-attr">android:padding</span>=<span class="c-xml-val">"16dp"</span><span class="c-xml-tag">&gt;</span>
+
+    <span class="c-xml-tag">&lt;EditText</span>
+        <span class="c-xml-attr">android:id</span>=<span class="c-xml-val">"@+id/etNombreCategoria"</span>
+        <span class="c-xml-attr">android:layout_width</span>=<span class="c-xml-val">"match_parent"</span>
+        <span class="c-xml-attr">android:layout_height</span>=<span class="c-xml-val">"wrap_content"</span>
+        <span class="c-xml-attr">android:hint</span>=<span class="c-xml-val">"Nombre de categoria"</span> <span class="c-xml-tag">/&gt;</span>
+
+    <span class="c-xml-tag">&lt;EditText</span>
+        <span class="c-xml-attr">android:id</span>=<span class="c-xml-val">"@+id/etDescripcionCategoria"</span>
+        <span class="c-xml-attr">android:layout_width</span>=<span class="c-xml-val">"match_parent"</span>
+        <span class="c-xml-attr">android:layout_height</span>=<span class="c-xml-val">"wrap_content"</span>
+        <span class="c-xml-attr">android:layout_marginTop</span>=<span class="c-xml-val">"12dp"</span>
+        <span class="c-xml-attr">android:hint</span>=<span class="c-xml-val">"Descripcion de categoria"</span> <span class="c-xml-tag">/&gt;</span>
+
+<span class="c-xml-tag">&lt;/LinearLayout&gt;</span></div>
+      </div>
+
+      <div class="note">
+        <h3>Paso 5.3: Reemplazar ProductoCategoriaDbHelper.kt con los metodos CRUD</h3>
+        <p>
+          Este bloque deja el helper listo para crear, leer, actualizar y eliminar categorias.
+        </p>
+        <div class="code-like"><span class="c-kw">package</span> com.example.sqlite_a.data
+
+<span class="c-kw">import</span> android.content.ContentValues
+<span class="c-kw">import</span> android.content.Context
+<span class="c-kw">import</span> android.database.sqlite.SQLiteDatabase
+<span class="c-kw">import</span> android.database.sqlite.SQLiteOpenHelper
+<span class="c-kw">import</span> android.util.Log
+<span class="c-kw">import</span> com.example.sqlite_a.model.ProductoCategoria
+
+<span class="c-kw">class</span> <span class="c-type">ProductoCategoriaDbHelper</span>(context: Context) :
+    <span class="c-type">SQLiteOpenHelper</span>(context, DB_NAME, null, DB_VERSION) {
+
+    <span class="c-kw">companion object</span> {
+        <span class="c-kw">const val</span> TAG = <span class="c-str">"DBProductCat"</span>
+        <span class="c-kw">const val</span> DB_NAME = <span class="c-str">"inventario.db"</span>
+        <span class="c-kw">const val</span> DB_VERSION = <span class="c-num">1</span>
+
+        <span class="c-kw">const val</span> TABLE_CATEGORIA = <span class="c-str">"producto_categoria"</span>
+        <span class="c-kw">const val</span> COL_CAT_ID = <span class="c-str">"id"</span>
+        <span class="c-kw">const val</span> COL_CAT_NOMBRE = <span class="c-str">"nombre"</span>
+        <span class="c-kw">const val</span> COL_CAT_DESCRIPCION = <span class="c-str">"descripcion"</span>
+    }
+
+    <span class="c-kw">override fun</span> <span class="c-fn">onCreate</span>(db: <span class="c-type">SQLiteDatabase</span>) {
+        <span class="c-kw">val</span> createCategoriaTable = <span class="c-str">"""
+            CREATE TABLE $TABLE_CATEGORIA (
+                $COL_CAT_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                $COL_CAT_NOMBRE TEXT NOT NULL,
+                $COL_CAT_DESCRIPCION TEXT NOT NULL
+            )
+        """</span>.trimIndent()
+
+        Log.d(TAG, <span class="c-str">"onCreate(): se esta creando la tabla $TABLE_CATEGORIA"</span>)
+        db.execSQL(createCategoriaTable)
+        Log.d(TAG, <span class="c-str">"onCreate(): tabla $TABLE_CATEGORIA creada correctamente"</span>)
+    }
+
+    <span class="c-kw">override fun</span> <span class="c-fn">onUpgrade</span>(db: <span class="c-type">SQLiteDatabase</span>, oldVersion: <span class="c-type">Int</span>, newVersion: <span class="c-type">Int</span>) {
+        Log.d(TAG, <span class="c-str">"onUpgrade(): version antigua = $oldVersion, version nueva = $newVersion"</span>)
+        db.execSQL(<span class="c-str">"DROP TABLE IF EXISTS $TABLE_CATEGORIA"</span>)
+        onCreate(db)
+    }
+
+    <span class="c-kw">fun</span> <span class="c-fn">insertarCategoria</span>(categoria: <span class="c-type">ProductoCategoria</span>): <span class="c-type">Long</span> {
+        <span class="c-com">// Se abre la BD en modo escritura.</span>
+        <span class="c-kw">val</span> db = writableDatabase
+
+        <span class="c-com">// ContentValues guarda cada campo como par columna-valor.</span>
+        <span class="c-kw">val</span> values = <span class="c-type">ContentValues</span>().apply {
+            put(COL_CAT_NOMBRE, categoria.nombre)
+            put(COL_CAT_DESCRIPCION, categoria.descripcion)
+        }
+
+        <span class="c-com">// insert() devuelve el id generado o -1 si ocurre error.</span>
+        <span class="c-kw">val</span> resultado = db.insert(TABLE_CATEGORIA, null, values)
+        Log.d(TAG, <span class="c-str">"insertarCategoria(): resultado = $resultado"</span>)
+
+        db.close()
+        <span class="c-kw">return</span> resultado
+    }
+
+    <span class="c-kw">fun</span> <span class="c-fn">obtenerCategorias</span>(): <span class="c-type">MutableList</span>&lt;<span class="c-type">ProductoCategoria</span>&gt; {
+        <span class="c-kw">val</span> listaCategorias = mutableListOf&lt;<span class="c-type">ProductoCategoria</span>&gt;()
+        <span class="c-kw">val</span> db = readableDatabase
+        <span class="c-kw">val</span> query = <span class="c-str">"SELECT * FROM $TABLE_CATEGORIA ORDER BY $COL_CAT_ID ASC"</span>
+        <span class="c-kw">val</span> cursor = db.rawQuery(query, null)
+
+        Log.d(TAG, <span class="c-str">"obtenerCategorias(): total recuperado = ${cursor.count}"</span>)
+
+        <span class="c-kw">if</span> (cursor.moveToFirst()) {
+            <span class="c-kw">do</span> {
+                <span class="c-kw">val</span> id = cursor.getInt(cursor.getColumnIndexOrThrow(COL_CAT_ID))
+                <span class="c-kw">val</span> nombre = cursor.getString(cursor.getColumnIndexOrThrow(COL_CAT_NOMBRE))
+                <span class="c-kw">val</span> descripcion = cursor.getString(cursor.getColumnIndexOrThrow(COL_CAT_DESCRIPCION))
+                listaCategorias.add(<span class="c-type">ProductoCategoria</span>(id, nombre, descripcion))
+            } <span class="c-kw">while</span> (cursor.moveToNext())
+        }
+
+        cursor.close()
+        db.close()
+        <span class="c-kw">return</span> listaCategorias
+    }
+
+    <span class="c-kw">fun</span> <span class="c-fn">actualizarCategoria</span>(categoria: <span class="c-type">ProductoCategoria</span>): <span class="c-type">Int</span> {
+        <span class="c-kw">val</span> db = writableDatabase
+        <span class="c-kw">val</span> values = <span class="c-type">ContentValues</span>().apply {
+            put(COL_CAT_NOMBRE, categoria.nombre)
+            put(COL_CAT_DESCRIPCION, categoria.descripcion)
+        }
+
+        <span class="c-com">// update() devuelve cuantas filas fueron modificadas.</span>
+        <span class="c-kw">val</span> resultado = db.update(
+            TABLE_CATEGORIA,
+            values,
+            <span class="c-str">"$COL_CAT_ID = ?"</span>,
+            arrayOf(categoria.id.toString())
+        )
+
+        Log.d(TAG, <span class="c-str">"actualizarCategoria(): filas afectadas = $resultado"</span>)
+        db.close()
+        <span class="c-kw">return</span> resultado
+    }
+
+    <span class="c-kw">fun</span> <span class="c-fn">eliminarCategoria</span>(id: <span class="c-type">Int</span>): <span class="c-type">Int</span> {
+        <span class="c-kw">val</span> db = writableDatabase
+
+        <span class="c-com">// delete() devuelve cuantas filas fueron eliminadas.</span>
+        <span class="c-kw">val</span> resultado = db.delete(
+            TABLE_CATEGORIA,
+            <span class="c-str">"$COL_CAT_ID = ?"</span>,
+            arrayOf(id.toString())
+        )
+
+        Log.d(TAG, <span class="c-str">"eliminarCategoria(): filas afectadas = $resultado"</span>)
+        db.close()
+        <span class="c-kw">return</span> resultado
+    }
+}</div>
+      </div>
+
+      <div class="note">
+        <h3>Paso 5.4: Reemplazar ProductoCategoriaAdapter.kt para capturar eventos</h3>
+        <p>
+          El adapter ahora recibira funciones para responder al click normal y al long click sobre cada categoria.
+        </p>
+        <div class="code-like"><span class="c-kw">package</span> com.example.sqlite_a.adapter
+
+<span class="c-kw">import</span> android.view.LayoutInflater
+<span class="c-kw">import</span> android.view.View
+<span class="c-kw">import</span> android.view.ViewGroup
+<span class="c-kw">import</span> android.widget.TextView
+<span class="c-kw">import</span> androidx.recyclerview.widget.RecyclerView
+<span class="c-kw">import</span> com.example.sqlite_a.R
+<span class="c-kw">import</span> com.example.sqlite_a.model.ProductoCategoria
+
+<span class="c-kw">class</span> <span class="c-type">ProductoCategoriaAdapter</span>(
+    <span class="c-kw">private val</span> listaCategorias: <span class="c-type">MutableList</span>&lt;<span class="c-type">ProductoCategoria</span>&gt;,
+    <span class="c-kw">private val</span> onClick: (<span class="c-type">ProductoCategoria</span>) -&gt; <span class="c-type">Unit</span>,
+    <span class="c-kw">private val</span> onLongClick: (<span class="c-type">ProductoCategoria</span>) -&gt; <span class="c-type">Unit</span>
+) : <span class="c-type">RecyclerView.Adapter</span>&lt;<span class="c-type">ProductoCategoriaAdapter.ProductoCategoriaViewHolder</span>&gt;() {
+
+    <span class="c-kw">class</span> <span class="c-type">ProductoCategoriaViewHolder</span>(itemView: View) : <span class="c-type">RecyclerView.ViewHolder</span>(itemView) {
+        <span class="c-kw">val</span> tvNombreCategoria: <span class="c-type">TextView</span> = itemView.findViewById(R.id.tvNombreCategoria)
+        <span class="c-kw">val</span> tvDescripcionCategoria: <span class="c-type">TextView</span> = itemView.findViewById(R.id.tvDescripcionCategoria)
+    }
+
+    <span class="c-kw">override fun</span> <span class="c-fn">onCreateViewHolder</span>(parent: ViewGroup, viewType: <span class="c-type">Int</span>): <span class="c-type">ProductoCategoriaViewHolder</span> {
+        <span class="c-kw">val</span> view = <span class="c-type">LayoutInflater</span>.from(parent.context)
+            .inflate(R.layout.item_producto_categoria, parent, false)
+
+        <span class="c-kw">return</span> <span class="c-type">ProductoCategoriaViewHolder</span>(view)
+    }
+
+    <span class="c-kw">override fun</span> <span class="c-fn">onBindViewHolder</span>(holder: <span class="c-type">ProductoCategoriaViewHolder</span>, position: <span class="c-type">Int</span>) {
+        <span class="c-kw">val</span> categoria = listaCategorias[position]
+
+        holder.tvNombreCategoria.text = categoria.nombre
+        holder.tvDescripcionCategoria.text = categoria.descripcion
+
+        <span class="c-com">// Click normal: se usara para editar.</span>
+        holder.itemView.setOnClickListener {
+            onClick(categoria)
+        }
+
+        <span class="c-com">// Long click: se usara para eliminar.</span>
+        holder.itemView.setOnLongClickListener {
+            onLongClick(categoria)
+            true
+        }
+    }
+
+    <span class="c-kw">override fun</span> <span class="c-fn">getItemCount</span>(): <span class="c-type">Int</span> {
+        <span class="c-kw">return</span> listaCategorias.size
+    }
+}</div>
+      </div>
+
+      <div class="note">
+        <h3>Paso 5.5: Reemplazar MainActivity.kt para unir formulario, eventos y CRUD</h3>
+        <p>
+          Este archivo coordinara el boton principal, la carga inicial, el dialogo para insertar o editar y la eliminacion por long click.
+        </p>
+        <div class="code-like"><span class="c-kw">package</span> com.example.sqlite_a
+
+<span class="c-kw">import</span> android.os.Bundle
+<span class="c-kw">import</span> android.util.Log
+<span class="c-kw">import</span> android.view.LayoutInflater
+<span class="c-kw">import</span> android.widget.Button
+<span class="c-kw">import</span> android.widget.EditText
+<span class="c-kw">import</span> android.widget.TextView
+<span class="c-kw">import</span> android.widget.Toast
+<span class="c-kw">import</span> androidx.activity.enableEdgeToEdge
+<span class="c-kw">import</span> androidx.appcompat.app.AlertDialog
+<span class="c-kw">import</span> androidx.appcompat.app.AppCompatActivity
+<span class="c-kw">import</span> androidx.core.view.ViewCompat
+<span class="c-kw">import</span> androidx.core.view.WindowInsetsCompat
+<span class="c-kw">import</span> androidx.recyclerview.widget.LinearLayoutManager
+<span class="c-kw">import</span> androidx.recyclerview.widget.RecyclerView
+<span class="c-kw">import</span> com.example.sqlite_a.adapter.ProductoCategoriaAdapter
+<span class="c-kw">import</span> com.example.sqlite_a.data.ProductoCategoriaDbHelper
+<span class="c-kw">import</span> com.example.sqlite_a.model.ProductoCategoria
+
+<span class="c-kw">class</span> <span class="c-type">MainActivity</span> : <span class="c-type">AppCompatActivity</span>() {
+
+    <span class="c-kw">private lateinit var</span> btnAgregarCategoria: <span class="c-type">Button</span>
+    <span class="c-kw">private lateinit var</span> recyclerCategorias: <span class="c-type">RecyclerView</span>
+    <span class="c-kw">private lateinit var</span> tvSinDatos: <span class="c-type">TextView</span>
+    <span class="c-kw">private lateinit var</span> dbHelper: <span class="c-type">ProductoCategoriaDbHelper</span>
+    <span class="c-kw">private lateinit var</span> adapter: <span class="c-type">ProductoCategoriaAdapter</span>
+    <span class="c-kw">private var</span> listaCategorias = mutableListOf&lt;<span class="c-type">ProductoCategoria</span>&gt;()
+
+    <span class="c-kw">override fun</span> <span class="c-fn">onCreate</span>(savedInstanceState: Bundle?) {
+        <span class="c-kw">super</span>.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        setContentView(R.layout.activity_main)
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets -&gt;
+            <span class="c-kw">val</span> systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
+
+        btnAgregarCategoria = findViewById(R.id.btnAgregarCategoria)
+        recyclerCategorias = findViewById(R.id.recyclerCategorias)
+        tvSinDatos = findViewById(R.id.tvSinDatos)
+
+        dbHelper = <span class="c-type">ProductoCategoriaDbHelper</span>(<span class="c-kw">this</span>)
+
+        adapter = <span class="c-type">ProductoCategoriaAdapter</span>(
+            listaCategorias,
+            onClick = { categoria -&gt;
+                mostrarDialogoEditar(categoria)
+            },
+            onLongClick = { categoria -&gt;
+                mostrarDialogoEliminar(categoria)
+            }
+        )
+
+        recyclerCategorias.layoutManager = <span class="c-type">LinearLayoutManager</span>(<span class="c-kw">this</span>)
+        recyclerCategorias.adapter = adapter
+
+        btnAgregarCategoria.setOnClickListener {
+            mostrarDialogoAgregar()
+        }
+
+        cargarCategorias()
+    }
+
+    <span class="c-kw">private fun</span> <span class="c-fn">cargarCategorias</span>() {
+        listaCategorias.clear()
+        listaCategorias.addAll(dbHelper.obtenerCategorias())
+
+        Log.d(<span class="c-str">"DBProductCat"</span>, <span class="c-str">"MainActivity: categorias cargadas = ${listaCategorias.size}"</span>)
+        adapter.notifyDataSetChanged()
+
+        <span class="c-kw">if</span> (listaCategorias.isEmpty()) {
+            tvSinDatos.visibility = android.view.View.VISIBLE
+            recyclerCategorias.visibility = android.view.View.GONE
+        } <span class="c-kw">else</span> {
+            tvSinDatos.visibility = android.view.View.GONE
+            recyclerCategorias.visibility = android.view.View.VISIBLE
+        }
+    }
+
+    <span class="c-kw">private fun</span> <span class="c-fn">mostrarDialogoAgregar</span>() {
+        <span class="c-com">// Se reutiliza el mismo layout del dialogo para registrar.</span>
+        <span class="c-kw">val</span> view = <span class="c-type">LayoutInflater</span>.from(<span class="c-kw">this</span>).inflate(R.layout.dialog_producto_categoria, null)
+        <span class="c-kw">val</span> etNombreCategoria = view.findViewById&lt;<span class="c-type">EditText</span>&gt;(R.id.etNombreCategoria)
+        <span class="c-kw">val</span> etDescripcionCategoria = view.findViewById&lt;<span class="c-type">EditText</span>&gt;(R.id.etDescripcionCategoria)
+
+        <span class="c-type">AlertDialog</span>.Builder(<span class="c-kw">this</span>)
+            .setTitle(<span class="c-str">"Agregar categoria"</span>)
+            .setView(view)
+            .setPositiveButton(<span class="c-str">"Guardar"</span>) { _, _ -&gt;
+                <span class="c-kw">val</span> nombre = etNombreCategoria.text.toString().trim()
+                <span class="c-kw">val</span> descripcion = etDescripcionCategoria.text.toString().trim()
+
+                <span class="c-com">// Validacion basica antes de insertar.</span>
+                <span class="c-kw">if</span> (nombre.isEmpty() || descripcion.isEmpty()) {
+                    Toast.makeText(<span class="c-kw">this</span>, <span class="c-str">"Completa todos los campos"</span>, Toast.LENGTH_SHORT).show()
+                    <span class="c-kw">return</span>@setPositiveButton
+                }
+
+                <span class="c-kw">val</span> categoria = <span class="c-type">ProductoCategoria</span>(nombre = nombre, descripcion = descripcion)
+                <span class="c-kw">val</span> resultado = dbHelper.insertarCategoria(categoria)
+
+                <span class="c-kw">if</span> (resultado != -<span class="c-num">1</span>L) {
+                    Toast.makeText(<span class="c-kw">this</span>, <span class="c-str">"Categoria registrada"</span>, Toast.LENGTH_SHORT).show()
+                    cargarCategorias()
+                } <span class="c-kw">else</span> {
+                    Toast.makeText(<span class="c-kw">this</span>, <span class="c-str">"No se pudo registrar"</span>, Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton(<span class="c-str">"Cancelar"</span>, null)
+            .show()
+    }
+
+    <span class="c-kw">private fun</span> <span class="c-fn">mostrarDialogoEditar</span>(categoria: <span class="c-type">ProductoCategoria</span>) {
+        <span class="c-kw">val</span> view = <span class="c-type">LayoutInflater</span>.from(<span class="c-kw">this</span>).inflate(R.layout.dialog_producto_categoria, null)
+        <span class="c-kw">val</span> etNombreCategoria = view.findViewById&lt;<span class="c-type">EditText</span>&gt;(R.id.etNombreCategoria)
+        <span class="c-kw">val</span> etDescripcionCategoria = view.findViewById&lt;<span class="c-type">EditText</span>&gt;(R.id.etDescripcionCategoria)
+
+        <span class="c-com">// Se cargan los valores actuales en el formulario.</span>
+        etNombreCategoria.setText(categoria.nombre)
+        etDescripcionCategoria.setText(categoria.descripcion)
+
+        <span class="c-type">AlertDialog</span>.Builder(<span class="c-kw">this</span>)
+            .setTitle(<span class="c-str">"Editar categoria"</span>)
+            .setView(view)
+            .setPositiveButton(<span class="c-str">"Actualizar"</span>) { _, _ -&gt;
+                <span class="c-kw">val</span> nombre = etNombreCategoria.text.toString().trim()
+                <span class="c-kw">val</span> descripcion = etDescripcionCategoria.text.toString().trim()
+
+                <span class="c-kw">if</span> (nombre.isEmpty() || descripcion.isEmpty()) {
+                    Toast.makeText(<span class="c-kw">this</span>, <span class="c-str">"Completa todos los campos"</span>, Toast.LENGTH_SHORT).show()
+                    <span class="c-kw">return</span>@setPositiveButton
+                }
+
+                <span class="c-kw">val</span> categoriaActualizada = <span class="c-type">ProductoCategoria</span>(
+                    id = categoria.id,
+                    nombre = nombre,
+                    descripcion = descripcion
+                )
+
+                <span class="c-kw">val</span> resultado = dbHelper.actualizarCategoria(categoriaActualizada)
+
+                <span class="c-kw">if</span> (resultado &gt; <span class="c-num">0</span>) {
+                    Toast.makeText(<span class="c-kw">this</span>, <span class="c-str">"Categoria actualizada"</span>, Toast.LENGTH_SHORT).show()
+                    cargarCategorias()
+                } <span class="c-kw">else</span> {
+                    Toast.makeText(<span class="c-kw">this</span>, <span class="c-str">"No se pudo actualizar"</span>, Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton(<span class="c-str">"Cancelar"</span>, null)
+            .show()
+    }
+
+    <span class="c-kw">private fun</span> <span class="c-fn">mostrarDialogoEliminar</span>(categoria: <span class="c-type">ProductoCategoria</span>) {
+        <span class="c-type">AlertDialog</span>.Builder(<span class="c-kw">this</span>)
+            .setTitle(<span class="c-str">"Eliminar categoria"</span>)
+            .setMessage(<span class="c-str">"¿Deseas eliminar la categoria ${categoria.nombre}?"</span>)
+            .setPositiveButton(<span class="c-str">"Eliminar"</span>) { _, _ -&gt;
+                <span class="c-kw">val</span> resultado = dbHelper.eliminarCategoria(categoria.id)
+
+                <span class="c-kw">if</span> (resultado &gt; <span class="c-num">0</span>) {
+                    Toast.makeText(<span class="c-kw">this</span>, <span class="c-str">"Categoria eliminada"</span>, Toast.LENGTH_SHORT).show()
+                    cargarCategorias()
+                } <span class="c-kw">else</span> {
+                    Toast.makeText(<span class="c-kw">this</span>, <span class="c-str">"No se pudo eliminar"</span>, Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton(<span class="c-str">"Cancelar"</span>, null)
+            .show()
+    }
+}</div>
+      </div>
+
+      <div class="tips">
+        <h3>Secuencia de trabajo en esta parte</h3>
+        <ol>
+          <li>Presionar <code>Agregar categoria</code>.</li>
+          <li>Completar el formulario y guardar.</li>
+          <li>Insertar el registro en SQLite.</li>
+          <li>Recargar el <code>RecyclerView</code>.</li>
+          <li>Hacer click sobre una fila para editar.</li>
+          <li>Hacer long click sobre una fila para eliminar.</li>
+        </ol>
+      </div>
+
+      <div class="warning">
+        <h3>Errores comunes que conviene evitar</h3>
+        <ul>
+          <li>No olvidar llamar a <code>cargarCategorias()</code> despues de insertar, actualizar o eliminar.</li>
+          <li>No dejar campos vacios antes de guardar cambios.</li>
+          <li>No olvidar pasar las funciones <code>onClick</code> y <code>onLongClick</code> al adapter.</li>
+          <li>No cambiar los ids del layout si luego se usan en <code>findViewById()</code>.</li>
+        </ul>
+      </div>
+
+      <div class="exercise">
+        <h3>Resultado esperado al terminar la Parte 5</h3>
+        <ol>
+          <li>El boton principal abrira un formulario para registrar categorias.</li>
+          <li>El click sobre una fila permitira editarla.</li>
+          <li>El long click permitira eliminarla con confirmacion.</li>
+          <li>La lista se recargara automaticamente despues de cada cambio.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>PARTE 7: Casos practicos y mejoras</h2>
+
+      <div class="theory">
+        <h3>Objetivo de esta parte</h3>
+        <p>
+          En esta mejora se cambiara el boton superior por un <code>FloatingActionButton</code> y se utilizara ese espacio para un buscador local con <code>EditText</code>. Ademas, el mensaje de lista vacia tambien servira para indicar cuando la busqueda no encuentra resultados.
+        </p>
+      </div>
+
+      <div class="card-grid">
+        <div class="card">
+          <h4>Busqueda local</h4>
+          <p>Filtrar la lista por nombre mientras se escribe en un <code>EditText</code>.</p>
+        </div>
+        <div class="card">
+          <h4>Lista vacia</h4>
+          <p>Mostrar un mensaje cuando no existen categorias o cuando no hay coincidencias.</p>
+        </div>
+        <div class="card">
+          <h4>Accion flotante</h4>
+          <p>Mover la accion de agregar a un <code>FloatingActionButton</code> en la parte inferior derecha.</p>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <h3>Archivos que se actualizan en esta parte</h3>
+        <div class="code-like">java/com.example.sqlite_a/
+└── MainActivity.kt
+
+res/layout/
+└── activity_main.xml</div>
+        <ul>
+          <li><code>ProductoCategoriaDbHelper.kt</code> no cambia.</li>
+          <li><code>ProductoCategoriaAdapter.kt</code> no cambia.</li>
+          <li>Solo se actualizan la pantalla principal y la logica del buscador.</li>
+        </ul>
+      </div>
+
+      <div class="note">
+        <h3>Paso 7.1: Reemplazar activity_main.xml para agregar buscador y FloatingActionButton</h3>
+        <p>
+          En este paso el boton superior desaparece. En su lugar se agregara un campo de busqueda y la accion de registrar pasara a un boton flotante.
+        </p>
+        <div class="code-like"><span class="c-xml-tag">&lt;androidx.constraintlayout.widget.ConstraintLayout</span>
+    <span class="c-xml-attr">xmlns:android</span>=<span class="c-xml-val">"http://schemas.android.com/apk/res/android"</span>
+    <span class="c-xml-attr">xmlns:app</span>=<span class="c-xml-val">"http://schemas.android.com/apk/res-auto"</span>
+    <span class="c-xml-attr">xmlns:tools</span>=<span class="c-xml-val">"http://schemas.android.com/tools"</span>
+    <span class="c-xml-attr">android:id</span>=<span class="c-xml-val">"@+id/main"</span>
+    <span class="c-xml-attr">android:layout_width</span>=<span class="c-xml-val">"match_parent"</span>
+    <span class="c-xml-attr">android:layout_height</span>=<span class="c-xml-val">"match_parent"</span>
+    <span class="c-xml-attr">android:padding</span>=<span class="c-xml-val">"16dp"</span>
+    <span class="c-xml-attr">tools:context</span>=<span class="c-xml-val">".MainActivity"</span><span class="c-xml-tag">&gt;</span>
+
+    <span class="c-xml-tag">&lt;TextView</span>
+        <span class="c-xml-attr">android:id</span>=<span class="c-xml-val">"@+id/tvTitulo"</span>
+        <span class="c-xml-attr">android:layout_width</span>=<span class="c-xml-val">"0dp"</span>
+        <span class="c-xml-attr">android:layout_height</span>=<span class="c-xml-val">"wrap_content"</span>
+        <span class="c-xml-attr">android:text</span>=<span class="c-xml-val">"Lista de categorias"</span>
+        <span class="c-xml-attr">android:textSize</span>=<span class="c-xml-val">"20sp"</span>
+        <span class="c-xml-attr">android:textStyle</span>=<span class="c-xml-val">"bold"</span>
+        <span class="c-xml-attr">app:layout_constraintTop_toTopOf</span>=<span class="c-xml-val">"parent"</span>
+        <span class="c-xml-attr">app:layout_constraintStart_toStartOf</span>=<span class="c-xml-val">"parent"</span>
+        <span class="c-xml-attr">app:layout_constraintEnd_toEndOf</span>=<span class="c-xml-val">"parent"</span> <span class="c-xml-tag">/&gt;</span>
+
+    <span class="c-xml-tag">&lt;EditText</span>
+        <span class="c-xml-attr">android:id</span>=<span class="c-xml-val">"@+id/etBuscarCategoria"</span>
+        <span class="c-xml-attr">android:layout_width</span>=<span class="c-xml-val">"0dp"</span>
+        <span class="c-xml-attr">android:layout_height</span>=<span class="c-xml-val">"wrap_content"</span>
+        <span class="c-xml-attr">android:layout_marginTop</span>=<span class="c-xml-val">"12dp"</span>
+        <span class="c-xml-attr">android:hint</span>=<span class="c-xml-val">"Buscar categoria por nombre"</span>
+        <span class="c-xml-attr">android:inputType</span>=<span class="c-xml-val">"text"</span>
+        <span class="c-xml-attr">app:layout_constraintTop_toBottomOf</span>=<span class="c-xml-val">"@id/tvTitulo"</span>
+        <span class="c-xml-attr">app:layout_constraintStart_toStartOf</span>=<span class="c-xml-val">"parent"</span>
+        <span class="c-xml-attr">app:layout_constraintEnd_toEndOf</span>=<span class="c-xml-val">"parent"</span> <span class="c-xml-tag">/&gt;</span>
+
+    <span class="c-xml-tag">&lt;TextView</span>
+        <span class="c-xml-attr">android:id</span>=<span class="c-xml-val">"@+id/tvSinDatos"</span>
+        <span class="c-xml-attr">android:layout_width</span>=<span class="c-xml-val">"0dp"</span>
+        <span class="c-xml-attr">android:layout_height</span>=<span class="c-xml-val">"wrap_content"</span>
+        <span class="c-xml-attr">android:layout_marginTop</span>=<span class="c-xml-val">"12dp"</span>
+        <span class="c-xml-attr">android:text</span>=<span class="c-xml-val">"No hay categorias registradas"</span>
+        <span class="c-xml-attr">android:visibility</span>=<span class="c-xml-val">"gone"</span>
+        <span class="c-xml-attr">app:layout_constraintTop_toBottomOf</span>=<span class="c-xml-val">"@id/etBuscarCategoria"</span>
+        <span class="c-xml-attr">app:layout_constraintStart_toStartOf</span>=<span class="c-xml-val">"parent"</span>
+        <span class="c-xml-attr">app:layout_constraintEnd_toEndOf</span>=<span class="c-xml-val">"parent"</span> <span class="c-xml-tag">/&gt;</span>
+
+    <span class="c-xml-tag">&lt;androidx.recyclerview.widget.RecyclerView</span>
+        <span class="c-xml-attr">android:id</span>=<span class="c-xml-val">"@+id/recyclerCategorias"</span>
+        <span class="c-xml-attr">android:layout_width</span>=<span class="c-xml-val">"0dp"</span>
+        <span class="c-xml-attr">android:layout_height</span>=<span class="c-xml-val">"0dp"</span>
+        <span class="c-xml-attr">android:layout_marginTop</span>=<span class="c-xml-val">"12dp"</span>
+        <span class="c-xml-attr">android:layout_marginBottom</span>=<span class="c-xml-val">"16dp"</span>
+        <span class="c-xml-attr">app:layout_constraintTop_toBottomOf</span>=<span class="c-xml-val">"@id/etBuscarCategoria"</span>
+        <span class="c-xml-attr">app:layout_constraintBottom_toBottomOf</span>=<span class="c-xml-val">"parent"</span>
+        <span class="c-xml-attr">app:layout_constraintStart_toStartOf</span>=<span class="c-xml-val">"parent"</span>
+        <span class="c-xml-attr">app:layout_constraintEnd_toEndOf</span>=<span class="c-xml-val">"parent"</span> <span class="c-xml-tag">/&gt;</span>
+
+    <span class="c-xml-tag">&lt;com.google.android.material.floatingactionbutton.FloatingActionButton</span>
+        <span class="c-xml-attr">android:id</span>=<span class="c-xml-val">"@+id/fabAgregarCategoria"</span>
+        <span class="c-xml-attr">android:layout_width</span>=<span class="c-xml-val">"wrap_content"</span>
+        <span class="c-xml-attr">android:layout_height</span>=<span class="c-xml-val">"wrap_content"</span>
+        <span class="c-xml-attr">android:contentDescription</span>=<span class="c-xml-val">"Agregar categoria"</span>
+        <span class="c-xml-attr">android:tint</span>=<span class="c-xml-val">"@android:color/white"</span>
+        <span class="c-xml-attr">app:srcCompat</span>=<span class="c-xml-val">"@android:drawable/ic_input_add"</span>
+        <span class="c-xml-attr">app:layout_constraintBottom_toBottomOf</span>=<span class="c-xml-val">"parent"</span>
+        <span class="c-xml-attr">app:layout_constraintEnd_toEndOf</span>=<span class="c-xml-val">"parent"</span>
+        <span class="c-xml-attr">android:layout_margin</span>=<span class="c-xml-val">"16dp"</span> <span class="c-xml-tag">/&gt;</span>
+
+<span class="c-xml-tag">&lt;/androidx.constraintlayout.widget.ConstraintLayout&gt;</span></div>
+      </div>
+
+      <div class="note">
+        <h3>Paso 7.2: Reemplazar MainActivity.kt para incluir busqueda local</h3>
+        <p>
+          En este paso se agregara la logica del buscador. La idea es sencilla: cargar toda la lista en memoria, filtrar por nombre y mostrar un mensaje cuando no haya resultados.
+        </p>
+        <div class="code-like"><span class="c-kw">package</span> com.example.sqlite_a
+
+<span class="c-kw">import</span> android.os.Bundle
+<span class="c-kw">import</span> android.text.Editable
+<span class="c-kw">import</span> android.text.TextWatcher
+<span class="c-kw">import</span> android.util.Log
+<span class="c-kw">import</span> android.view.LayoutInflater
+<span class="c-kw">import</span> android.widget.EditText
+<span class="c-kw">import</span> android.widget.TextView
+<span class="c-kw">import</span> android.widget.Toast
+<span class="c-kw">import</span> androidx.activity.enableEdgeToEdge
+<span class="c-kw">import</span> androidx.appcompat.app.AlertDialog
+<span class="c-kw">import</span> androidx.appcompat.app.AppCompatActivity
+<span class="c-kw">import</span> androidx.core.view.ViewCompat
+<span class="c-kw">import</span> androidx.core.view.WindowInsetsCompat
+<span class="c-kw">import</span> androidx.recyclerview.widget.LinearLayoutManager
+<span class="c-kw">import</span> androidx.recyclerview.widget.RecyclerView
+<span class="c-kw">import</span> com.example.sqlite_a.adapter.ProductoCategoriaAdapter
+<span class="c-kw">import</span> com.example.sqlite_a.data.ProductoCategoriaDbHelper
+<span class="c-kw">import</span> com.example.sqlite_a.model.ProductoCategoria
+<span class="c-kw">import</span> com.google.android.material.floatingactionbutton.FloatingActionButton
+
+<span class="c-kw">class</span> <span class="c-type">MainActivity</span> : <span class="c-type">AppCompatActivity</span>() {
+
+    <span class="c-kw">private lateinit var</span> etBuscarCategoria: <span class="c-type">EditText</span>
+    <span class="c-kw">private lateinit var</span> fabAgregarCategoria: <span class="c-type">FloatingActionButton</span>
+    <span class="c-kw">private lateinit var</span> recyclerCategorias: <span class="c-type">RecyclerView</span>
+    <span class="c-kw">private lateinit var</span> tvSinDatos: <span class="c-type">TextView</span>
+    <span class="c-kw">private lateinit var</span> dbHelper: <span class="c-type">ProductoCategoriaDbHelper</span>
+    <span class="c-kw">private lateinit var</span> adapter: <span class="c-type">ProductoCategoriaAdapter</span>
+
+    <span class="c-com">// listaCategorias: contiene lo que se mostrara actualmente en pantalla.</span>
+    <span class="c-kw">private var</span> listaCategorias = mutableListOf&lt;<span class="c-type">ProductoCategoria</span>&gt;()
+
+    <span class="c-com">// listaCategoriasCompleta: conserva todos los registros obtenidos desde SQLite.</span>
+    <span class="c-kw">private var</span> listaCategoriasCompleta = mutableListOf&lt;<span class="c-type">ProductoCategoria</span>&gt;()
+
+    <span class="c-kw">override fun</span> <span class="c-fn">onCreate</span>(savedInstanceState: Bundle?) {
+        <span class="c-kw">super</span>.onCreate(savedInstanceState)
+        enableEdgeToEdge()
+        setContentView(R.layout.activity_main)
+
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets -&gt;
+            <span class="c-kw">val</span> systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
+            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
+            insets
+        }
+
+        etBuscarCategoria = findViewById(R.id.etBuscarCategoria)
+        fabAgregarCategoria = findViewById(R.id.fabAgregarCategoria)
+        recyclerCategorias = findViewById(R.id.recyclerCategorias)
+        tvSinDatos = findViewById(R.id.tvSinDatos)
+
+        dbHelper = <span class="c-type">ProductoCategoriaDbHelper</span>(<span class="c-kw">this</span>)
+
+        adapter = <span class="c-type">ProductoCategoriaAdapter</span>(
+            listaCategorias,
+            onClick = { categoria -&gt;
+                mostrarDialogoEditar(categoria)
+            },
+            onLongClick = { categoria -&gt;
+                mostrarDialogoEliminar(categoria)
+            }
+        )
+
+        recyclerCategorias.layoutManager = <span class="c-type">LinearLayoutManager</span>(<span class="c-kw">this</span>)
+        recyclerCategorias.adapter = adapter
+
+        <span class="c-com">// El boton flotante abre el mismo dialogo de registro.</span>
+        fabAgregarCategoria.setOnClickListener {
+            mostrarDialogoAgregar()
+        }
+
+        <span class="c-com">// TextWatcher escucha lo que se escribe en el buscador.</span>
+        etBuscarCategoria.addTextChangedListener(<span class="c-kw">object</span> : <span class="c-type">TextWatcher</span> {
+            <span class="c-kw">override fun</span> <span class="c-fn">beforeTextChanged</span>(s: CharSequence?, start: <span class="c-type">Int</span>, count: <span class="c-type">Int</span>, after: <span class="c-type">Int</span>) {}
+
+            <span class="c-kw">override fun</span> <span class="c-fn">onTextChanged</span>(s: CharSequence?, start: <span class="c-type">Int</span>, before: <span class="c-type">Int</span>, count: <span class="c-type">Int</span>) {
+                filtrarCategorias(s.toString())
+            }
+
+            <span class="c-kw">override fun</span> <span class="c-fn">afterTextChanged</span>(s: <span class="c-type">Editable</span>?) {}
+        })
+
+        cargarCategorias()
+    }
+
+    <span class="c-kw">private fun</span> <span class="c-fn">cargarCategorias</span>() {
+        <span class="c-com">// Se recarga la lista completa desde SQLite.</span>
+        listaCategoriasCompleta.clear()
+        listaCategoriasCompleta.addAll(dbHelper.obtenerCategorias())
+
+        Log.d(<span class="c-str">"DBProductCat"</span>, <span class="c-str">"MainActivity: total categorias en BD = ${listaCategoriasCompleta.size}"</span>)
+
+        <span class="c-com">// Se vuelve a aplicar el filtro actual para no perder la busqueda activa.</span>
+        filtrarCategorias(etBuscarCategoria.text.toString())
+    }
+
+    <span class="c-kw">private fun</span> <span class="c-fn">filtrarCategorias</span>(texto: <span class="c-type">String</span>) {
+        listaCategorias.clear()
+
+        <span class="c-com">// Si el buscador esta vacio, se muestran todos los registros.</span>
+        <span class="c-kw">if</span> (texto.isBlank()) {
+            listaCategorias.addAll(listaCategoriasCompleta)
+        } <span class="c-kw">else</span> {
+            <span class="c-com">// Si hay texto, se filtra por nombre ignorando mayusculas y minusculas.</span>
+            <span class="c-kw">for</span> (categoria <span class="c-kw">in</span> listaCategoriasCompleta) {
+                <span class="c-kw">if</span> (categoria.nombre.contains(texto, ignoreCase = true)) {
+                    listaCategorias.add(categoria)
+                }
+            }
+        }
+
+        adapter.notifyDataSetChanged()
+        actualizarEstadoLista(texto)
+    }
+
+    <span class="c-kw">private fun</span> <span class="c-fn">actualizarEstadoLista</span>(textoBusqueda: <span class="c-type">String</span>) {
+        <span class="c-com">// Caso 1: la BD no tiene registros.</span>
+        <span class="c-kw">if</span> (listaCategoriasCompleta.isEmpty()) {
+            tvSinDatos.text = <span class="c-str">"No hay categorias registradas"</span>
+            tvSinDatos.visibility = android.view.View.VISIBLE
+            recyclerCategorias.visibility = android.view.View.GONE
+            <span class="c-kw">return</span>
+        }
+
+        <span class="c-com">// Caso 2: si hay datos pero la busqueda no encuentra coincidencias.</span>
+        <span class="c-kw">if</span> (listaCategorias.isEmpty() && textoBusqueda.isNotBlank()) {
+            tvSinDatos.text = <span class="c-str">"No se encontraron categorias"</span>
+            tvSinDatos.visibility = android.view.View.VISIBLE
+            recyclerCategorias.visibility = android.view.View.GONE
+            <span class="c-kw">return</span>
+        }
+
+        <span class="c-com">// Caso 3: existen registros para mostrar.</span>
+        tvSinDatos.visibility = android.view.View.GONE
+        recyclerCategorias.visibility = android.view.View.VISIBLE
+    }
+
+    <span class="c-kw">private fun</span> <span class="c-fn">mostrarDialogoAgregar</span>() {
+        <span class="c-kw">val</span> view = <span class="c-type">LayoutInflater</span>.from(<span class="c-kw">this</span>).inflate(R.layout.dialog_producto_categoria, null)
+        <span class="c-kw">val</span> etNombreCategoria = view.findViewById&lt;<span class="c-type">EditText</span>&gt;(R.id.etNombreCategoria)
+        <span class="c-kw">val</span> etDescripcionCategoria = view.findViewById&lt;<span class="c-type">EditText</span>&gt;(R.id.etDescripcionCategoria)
+
+        <span class="c-type">AlertDialog</span>.Builder(<span class="c-kw">this</span>)
+            .setTitle(<span class="c-str">"Agregar categoria"</span>)
+            .setView(view)
+            .setPositiveButton(<span class="c-str">"Guardar"</span>) { _, _ -&gt;
+                <span class="c-kw">val</span> nombre = etNombreCategoria.text.toString().trim()
+                <span class="c-kw">val</span> descripcion = etDescripcionCategoria.text.toString().trim()
+
+                <span class="c-kw">if</span> (nombre.isEmpty() || descripcion.isEmpty()) {
+                    Toast.makeText(<span class="c-kw">this</span>, <span class="c-str">"Completa todos los campos"</span>, Toast.LENGTH_SHORT).show()
+                    <span class="c-kw">return</span>@setPositiveButton
+                }
+
+                <span class="c-kw">val</span> categoria = <span class="c-type">ProductoCategoria</span>(nombre = nombre, descripcion = descripcion)
+                <span class="c-kw">val</span> resultado = dbHelper.insertarCategoria(categoria)
+
+                <span class="c-kw">if</span> (resultado != -<span class="c-num">1</span>L) {
+                    Toast.makeText(<span class="c-kw">this</span>, <span class="c-str">"Categoria registrada"</span>, Toast.LENGTH_SHORT).show()
+                    cargarCategorias()
+                } <span class="c-kw">else</span> {
+                    Toast.makeText(<span class="c-kw">this</span>, <span class="c-str">"No se pudo registrar"</span>, Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton(<span class="c-str">"Cancelar"</span>, null)
+            .show()
+    }
+
+    <span class="c-kw">private fun</span> <span class="c-fn">mostrarDialogoEditar</span>(categoria: <span class="c-type">ProductoCategoria</span>) {
+        <span class="c-kw">val</span> view = <span class="c-type">LayoutInflater</span>.from(<span class="c-kw">this</span>).inflate(R.layout.dialog_producto_categoria, null)
+        <span class="c-kw">val</span> etNombreCategoria = view.findViewById&lt;<span class="c-type">EditText</span>&gt;(R.id.etNombreCategoria)
+        <span class="c-kw">val</span> etDescripcionCategoria = view.findViewById&lt;<span class="c-type">EditText</span>&gt;(R.id.etDescripcionCategoria)
+
+        etNombreCategoria.setText(categoria.nombre)
+        etDescripcionCategoria.setText(categoria.descripcion)
+
+        <span class="c-type">AlertDialog</span>.Builder(<span class="c-kw">this</span>)
+            .setTitle(<span class="c-str">"Editar categoria"</span>)
+            .setView(view)
+            .setPositiveButton(<span class="c-str">"Actualizar"</span>) { _, _ -&gt;
+                <span class="c-kw">val</span> nombre = etNombreCategoria.text.toString().trim()
+                <span class="c-kw">val</span> descripcion = etDescripcionCategoria.text.toString().trim()
+
+                <span class="c-kw">if</span> (nombre.isEmpty() || descripcion.isEmpty()) {
+                    Toast.makeText(<span class="c-kw">this</span>, <span class="c-str">"Completa todos los campos"</span>, Toast.LENGTH_SHORT).show()
+                    <span class="c-kw">return</span>@setPositiveButton
+                }
+
+                <span class="c-kw">val</span> categoriaActualizada = <span class="c-type">ProductoCategoria</span>(
+                    id = categoria.id,
+                    nombre = nombre,
+                    descripcion = descripcion
+                )
+
+                <span class="c-kw">val</span> resultado = dbHelper.actualizarCategoria(categoriaActualizada)
+
+                <span class="c-kw">if</span> (resultado &gt; <span class="c-num">0</span>) {
+                    Toast.makeText(<span class="c-kw">this</span>, <span class="c-str">"Categoria actualizada"</span>, Toast.LENGTH_SHORT).show()
+                    cargarCategorias()
+                } <span class="c-kw">else</span> {
+                    Toast.makeText(<span class="c-kw">this</span>, <span class="c-str">"No se pudo actualizar"</span>, Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton(<span class="c-str">"Cancelar"</span>, null)
+            .show()
+    }
+
+    <span class="c-kw">private fun</span> <span class="c-fn">mostrarDialogoEliminar</span>(categoria: <span class="c-type">ProductoCategoria</span>) {
+        <span class="c-type">AlertDialog</span>.Builder(<span class="c-kw">this</span>)
+            .setTitle(<span class="c-str">"Eliminar categoria"</span>)
+            .setMessage(<span class="c-str">"¿Deseas eliminar la categoria ${categoria.nombre}?"</span>)
+            .setPositiveButton(<span class="c-str">"Eliminar"</span>) { _, _ -&gt;
+                <span class="c-kw">val</span> resultado = dbHelper.eliminarCategoria(categoria.id)
+
+                <span class="c-kw">if</span> (resultado &gt; <span class="c-num">0</span>) {
+                    Toast.makeText(<span class="c-kw">this</span>, <span class="c-str">"Categoria eliminada"</span>, Toast.LENGTH_SHORT).show()
+                    cargarCategorias()
+                } <span class="c-kw">else</span> {
+                    Toast.makeText(<span class="c-kw">this</span>, <span class="c-str">"No se pudo eliminar"</span>, Toast.LENGTH_SHORT).show()
+                }
+            }
+            .setNegativeButton(<span class="c-str">"Cancelar"</span>, null)
+            .show()
+    }
+}</div>
+      </div>
+
+      <div class="tips">
+        <h3>Proceso que se logra con esta mejora</h3>
+        <ol>
+          <li>El usuario escribe en el buscador y la lista se filtra en tiempo real.</li>
+          <li>Si no hay registros en la BD, aparece el mensaje <code>No hay categorias registradas</code>.</li>
+          <li>Si la busqueda no encuentra coincidencias, aparece el mensaje <code>No se encontraron categorias</code>.</li>
+          <li>El boton flotante permite registrar una categoria sin ocupar espacio en la parte superior.</li>
+        </ol>
+      </div>
+
+      <div class="warning">
+        <h3>Puntos que conviene revisar si la busqueda no funciona</h3>
+        <ul>
+          <li>Verificar que el id del buscador sea <code>etBuscarCategoria</code>.</li>
+          <li>Confirmar que el <code>TextWatcher</code> este llamando a <code>filtrarCategorias()</code>.</li>
+          <li>Comprobar que la lista completa se cargue en <code>listaCategoriasCompleta</code>.</li>
+          <li>Notificar siempre al adapter con <code>notifyDataSetChanged()</code> despues del filtro.</li>
+          <li>Si el proyecto no reconoce el <code>FloatingActionButton</code>, revisar que el tema Material este activo.</li>
+        </ul>
+      </div>
+
+      <div class="exercise">
+        <h3>Resultado esperado al terminar la Parte 7</h3>
+        <ol>
+          <li>El boton superior habra sido reemplazado por un boton flotante.</li>
+          <li>La parte superior mostrara un buscador local por nombre.</li>
+          <li>La lista se filtrara conforme se escriba.</li>
+          <li>El mensaje de estado servira tanto para lista vacia como para busqueda sin resultados.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>PARTE 8: Buenas practicas y cierre del manual</h2>
+
+      <div class="tips">
+        <h3>Aspectos finales del manual</h3>
+        <ul>
+          <li>Cerrar Cursor y base de datos cuando corresponda.</li>
+          <li>Validar ids antes de actualizar o eliminar.</li>
+          <li>Evitar mezclar SQL crudo dentro del Adapter.</li>
+          <li>Identificar cuando ya te conviene migrar de SQLite a Room.</li>
+          <li>Relacionar esta guia con futuras practicas de persistencia avanzada.</li>
+        </ul>
+      </div>
+
+      <table class="comparison-table">
+        <tr>
+          <th>Nivel</th>
+          <th>Lo que ya deberias dominar</th>
+        </tr>
+        <tr>
+          <td>Basico</td>
+          <td>Crear la BD y listar datos en RecyclerView.</td>
+        </tr>
+        <tr>
+          <td>Intermedio</td>
+          <td>Insertar, editar y eliminar con refresco visual correcto.</td>
+        </tr>
+        <tr>
+          <td>Avanzado</td>
+          <td>Agregar busqueda, orden, validaciones y separacion por capas.</td>
+        </tr>
+      </table>
+  </div>
+</body>
+</html>
