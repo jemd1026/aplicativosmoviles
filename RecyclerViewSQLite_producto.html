@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RecyclerView con SQLite: categorias y productos</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-1: #e0f2fe;
+      --bg-2: #fae8ff;
+      --card: rgba(255, 255, 255, 0.9);
+      --ink: #1f2937;
+      --muted: #4b5563;
+      --primary: #0f766e;
+      --secondary: #1d4ed8;
+      --accent: #b45309;
+      --dark: #0f172a;
+      --border: rgba(15, 23, 42, 0.12);
+    }
+
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 100%);
+      color: var(--ink);
+      line-height: 1.6;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 24px 70px rgba(15, 23, 42, 0.18);
+    }
+
+    .hero {
+      padding: 48px 40px;
+      color: white;
+      background: linear-gradient(135deg, #0f766e 0%, #1d4ed8 60%, #312e81 100%);
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: 2.6em;
+      margin-bottom: 12px;
+    }
+
+    .hero p {
+      font-size: 1.05em;
+      opacity: 0.95;
+    }
+
+    .schedule {
+      background: #f8fafc;
+      padding: 32px 40px;
+      border-bottom: 3px solid #cbd5e1;
+    }
+
+    .schedule h2,
+    .section h2 {
+      font-size: 1.9em;
+      margin-bottom: 18px;
+    }
+
+    .schedule-grid,
+    .card-grid,
+    .mini-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    .schedule-item,
+    .card,
+    .mini-card,
+    .theory,
+    .tips,
+    .warning,
+    .exercise,
+    .note {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
+    }
+
+    .schedule-item,
+    .card,
+    .mini-card,
+    .theory,
+    .tips,
+    .warning,
+    .exercise,
+    .note {
+      padding: 22px;
+    }
+
+    .schedule-item {
+      border-left: 5px solid var(--secondary);
+    }
+
+    .tips {
+      border-left: 5px solid #16a34a;
+    }
+
+    .warning {
+      border-left: 5px solid #ca8a04;
+      background: rgba(254, 240, 138, 0.55);
+    }
+
+    .exercise {
+      border-left: 5px solid var(--accent);
+    }
+
+    .note {
+      border-left: 5px solid var(--secondary);
+    }
+
+    .section {
+      padding: 40px;
+    }
+
+    .section:nth-child(odd) {
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    }
+
+    .section:nth-child(even) {
+      background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
+    }
+
+    .section h2 {
+      border-bottom: 3px solid rgba(29, 78, 216, 0.25);
+      padding-bottom: 10px;
+    }
+
+    .card h4,
+    .mini-card h4,
+    .schedule-item h3 {
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+
+    .code-like {
+      background: #020617;
+      color: #dbeafe;
+      border-radius: 14px;
+      padding: 20px;
+      overflow-x: auto;
+      margin-top: 15px;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      font-family: "Courier New", monospace;
+      font-size: 0.9em;
+      line-height: 1.8;
+      white-space: pre-wrap;
+    }
+
+    .flow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      align-items: center;
+      margin-top: 18px;
+    }
+
+    .flow-box {
+      min-width: 160px;
+      padding: 16px;
+      border-radius: 14px;
+      background: var(--secondary);
+      color: white;
+      text-align: center;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.16);
+    }
+
+    .flow-arrow {
+      font-size: 1.8em;
+      color: #93c5fd;
+    }
+
+    ul,
+    ol {
+      padding-left: 22px;
+    }
+
+    li {
+      margin: 6px 0;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 14px;
+      background: white;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+    }
+
+    .comparison-table th {
+      background: var(--secondary);
+      color: white;
+      text-align: left;
+      padding: 12px;
+    }
+
+    .comparison-table td {
+      padding: 12px;
+      border-bottom: 1px solid #e5e7eb;
+      color: var(--muted);
+    }
+
+    @media (max-width: 768px) {
+      .hero,
+      .schedule,
+      .section {
+        padding: 24px 20px;
+      }
+
+      .hero h1 {
+        font-size: 1.9em;
+      }
+
+      .flow {
+        flex-direction: column;
+      }
+
+      .flow-arrow {
+        transform: rotate(90deg);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="hero">
+      <h1>RecyclerView con SQLite: Categorias y Productos</h1>
+      <p>Guia practica desarrollada desde cero para trabajar dos tablas relacionadas en Android Studio</p>
+      <p>Nivel sugerido: intermedio</p>
+    </div>
+
+    <div class="schedule">
+      <h2>Mapa general de la guia</h2>
+      <div class="schedule-grid">
+        <div class="schedule-item">
+          <h3>1. Estructura general</h3>
+          <p>Organizar el proyecto con modelos, helper, adapters, activities y layouts desde el inicio.</p>
+        </div>
+        <div class="schedule-item">
+          <h3>2. Base de datos relacional</h3>
+          <p>Crear las tablas <code>producto_categoria</code> y <code>producto</code> con relacion por <code>id_categoria</code>.</p>
+        </div>
+        <div class="schedule-item">
+          <h3>3. CRUD de categorias</h3>
+          <p>Registrar, listar, editar y eliminar categorias antes de crear productos.</p>
+        </div>
+        <div class="schedule-item">
+          <h3>4. CRUD de productos</h3>
+          <p>Registrar productos con nombre, descripcion, precio, stock y categoria elegida en un Spinner.</p>
+        </div>
+        <div class="schedule-item">
+          <h3>5. RecyclerView y eventos</h3>
+          <p>Mostrar listas, manejar click, long click, formularios y refresco visual.</p>
+        </div>
+        <div class="schedule-item">
+          <h3>6. Mejora recomendada</h3>
+          <p>Agregar busqueda local, mensajes de lista vacia y separacion clara por capas.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>PARTE 1: Propuesta general</h2>
+
+      <div class="theory">
+        <h3>Enfoque sugerido</h3>
+        <p>
+          La forma mas clara de construir este proyecto es separar las categorias y los productos. Primero se administra <code>producto_categoria</code> en una pantalla propia. Luego se administra <code>producto</code> en la pantalla principal usando un formulario con <code>Spinner</code> para elegir la categoria.
+        </p>
+      </div>
+
+      <div class="card-grid">
+        <div class="card">
+          <h4>Pantalla 1</h4>
+          <p><strong>CategoriaActivity</strong>: lista y CRUD de categorias.</p>
+        </div>
+        <div class="card">
+          <h4>Pantalla 2</h4>
+          <p><strong>MainActivity</strong>: lista y CRUD de productos.</p>
+        </div>
+        <div class="card">
+          <h4>Relacion</h4>
+          <p>Cada producto pertenece a una categoria mediante <code>id_categoria</code>.</p>
+        </div>
+      </div>
+
+      <div class="tips">
+        <h3>Secuencia recomendada de trabajo</h3>
+        <ol>
+          <li>Crear modelos y helper.</li>
+          <li>Registrar primero varias categorias.</li>
+          <li>Despues registrar productos usando el Spinner de categorias.</li>
+          <li>Listar productos mostrando tambien el nombre de la categoria.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>PARTE 2: Estructura del proyecto</h2>
+
+      <div class="exercise">
+        <h3>Estructura a seguir</h3>
+        <div class="code-like">app/
+├── manifests/
+│ └── AndroidManifest.xml
+├── java/com.example.sqlite_producto/
+│ ├── adapter/
+│ │ ├── ProductoAdapter.kt
+│ │ └── ProductoCategoriaAdapter.kt
+│ ├── data/
+│ │ └── InventarioDbHelper.kt
+│ ├── model/
+│ │ ├── Producto.kt
+│ │ ├── ProductoCategoria.kt
+│ │ └── ProductoItem.kt
+│ └── view/
+│   ├── MainActivity.kt
+│   └── CategoriaActivity.kt
+└── res/
+  └── layout/
+    ├── activity_main.xml
+    ├── activity_categoria.xml
+    ├── item_producto.xml
+    ├── item_producto_categoria.xml
+    ├── dialog_producto.xml
+    └── dialog_producto_categoria.xml</div>
+      </div>
+
+      <div class="note">
+        <h3>Por que esta estructura es la mas conveniente</h3>
+        <ul>
+          <li><code>ProductoCategoria.kt</code> representa la tabla de categorias.</li>
+          <li><code>Producto.kt</code> representa la tabla de productos.</li>
+          <li><code>ProductoItem.kt</code> puede usarse para listar productos junto con el nombre de la categoria.</li>
+          <li><code>InventarioDbHelper.kt</code> concentra toda la logica SQLite del proyecto.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>PARTE 3: Diseno de la base de datos</h2>
+
+      <div class="theory">
+        <h3>Tablas necesarias</h3>
+        <p>
+          Se usaran dos tablas. La primera guardara las categorias. La segunda guardara los productos y tendra una referencia a la categoria elegida.
+        </p>
+      </div>
+
+      <table class="comparison-table">
+        <tr>
+          <th>Tabla</th>
+          <th>Campos propuestos</th>
+          <th>Funcion</th>
+        </tr>
+        <tr>
+          <td>producto_categoria</td>
+          <td>id, nombre, descripcion</td>
+          <td>Organizar los productos por tipo.</td>
+        </tr>
+        <tr>
+          <td>producto</td>
+          <td>id, nombre, descripcion, precio, stock, id_categoria</td>
+          <td>Guardar el producto y su categoria asociada.</td>
+        </tr>
+      </table>
+
+      <div class="note">
+        <h3>Modelo relacional</h3>
+        <div class="flow">
+          <div class="flow-box">producto_categoria</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-box">producto.id_categoria</div>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <h3>Codigo completo de InventarioDbHelper.kt</h3>
+        <p>
+          Este helper ya deja listas las dos tablas y una base para el CRUD de categorias y productos.
+        </p>
+        <div class="code-like">package com.example.sqlite_producto.data
+
+import android.content.ContentValues
+import android.content.Context
+import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteOpenHelper
+import com.example.sqlite_producto.model.Producto
+import com.example.sqlite_producto.model.ProductoCategoria
+import com.example.sqlite_producto.model.ProductoItem
+
+class InventarioDbHelper(context: Context) :
+    SQLiteOpenHelper(context, DB_NAME, null, DB_VERSION) {
+
+    companion object {
+        const val DB_NAME = "inventario.db"
+        const val DB_VERSION = 1
+
+        const val TABLE_CATEGORIA = "producto_categoria"
+        const val COL_CAT_ID = "id"
+        const val COL_CAT_NOMBRE = "nombre"
+        const val COL_CAT_DESCRIPCION = "descripcion"
+
+        const val TABLE_PRODUCTO = "producto"
+        const val COL_PROD_ID = "id"
+        const val COL_PROD_NOMBRE = "nombre"
+        const val COL_PROD_DESCRIPCION = "descripcion"
+        const val COL_PROD_PRECIO = "precio"
+        const val COL_PROD_STOCK = "stock"
+        const val COL_PROD_ID_CATEGORIA = "id_categoria"
+    }
+
+    override fun onCreate(db: SQLiteDatabase) {
+        val sqlCategoria = """
+            CREATE TABLE $TABLE_CATEGORIA (
+                $COL_CAT_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                $COL_CAT_NOMBRE TEXT NOT NULL,
+                $COL_CAT_DESCRIPCION TEXT NOT NULL
+            )
+        """.trimIndent()
+
+        val sqlProducto = """
+            CREATE TABLE $TABLE_PRODUCTO (
+                $COL_PROD_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                $COL_PROD_NOMBRE TEXT NOT NULL,
+                $COL_PROD_DESCRIPCION TEXT NOT NULL,
+                $COL_PROD_PRECIO REAL NOT NULL,
+                $COL_PROD_STOCK INTEGER NOT NULL,
+                $COL_PROD_ID_CATEGORIA INTEGER NOT NULL,
+                FOREIGN KEY($COL_PROD_ID_CATEGORIA) REFERENCES $TABLE_CATEGORIA($COL_CAT_ID)
+            )
+        """.trimIndent()
+
+        db.execSQL(sqlCategoria)
+        db.execSQL(sqlProducto)
+    }
+
+    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_PRODUCTO")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_CATEGORIA")
+        onCreate(db)
+    }
+
+    fun insertarCategoria(categoria: ProductoCategoria): Long {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put(COL_CAT_NOMBRE, categoria.nombre)
+            put(COL_CAT_DESCRIPCION, categoria.descripcion)
+        }
+        val result = db.insert(TABLE_CATEGORIA, null, values)
+        db.close()
+        return result
+    }
+
+    fun obtenerCategorias(): MutableList&lt;ProductoCategoria&gt; {
+        val lista = mutableListOf&lt;ProductoCategoria&gt;()
+        val db = readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM $TABLE_CATEGORIA ORDER BY $COL_CAT_NOMBRE ASC", null)
+
+        if (cursor.moveToFirst()) {
+            do {
+                lista.add(
+                    ProductoCategoria(
+                        id = cursor.getInt(cursor.getColumnIndexOrThrow(COL_CAT_ID)),
+                        nombre = cursor.getString(cursor.getColumnIndexOrThrow(COL_CAT_NOMBRE)),
+                        descripcion = cursor.getString(cursor.getColumnIndexOrThrow(COL_CAT_DESCRIPCION))
+                    )
+                )
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+        db.close()
+        return lista
+    }
+
+    fun actualizarCategoria(categoria: ProductoCategoria): Int {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put(COL_CAT_NOMBRE, categoria.nombre)
+            put(COL_CAT_DESCRIPCION, categoria.descripcion)
+        }
+        val result = db.update(TABLE_CATEGORIA, values, "$COL_CAT_ID = ?", arrayOf(categoria.id.toString()))
+        db.close()
+        return result
+    }
+
+    fun eliminarCategoria(id: Int): Int {
+        val db = writableDatabase
+        val result = db.delete(TABLE_CATEGORIA, "$COL_CAT_ID = ?", arrayOf(id.toString()))
+        db.close()
+        return result
+    }
+
+    fun insertarProducto(producto: Producto): Long {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put(COL_PROD_NOMBRE, producto.nombre)
+            put(COL_PROD_DESCRIPCION, producto.descripcion)
+            put(COL_PROD_PRECIO, producto.precio)
+            put(COL_PROD_STOCK, producto.stock)
+            put(COL_PROD_ID_CATEGORIA, producto.idCategoria)
+        }
+        val result = db.insert(TABLE_PRODUCTO, null, values)
+        db.close()
+        return result
+    }
+
+    fun obtenerProductosConCategoria(): MutableList&lt;ProductoItem&gt; {
+        val lista = mutableListOf&lt;ProductoItem&gt;()
+        val db = readableDatabase
+        val query = """
+            SELECT p.id, p.nombre, p.descripcion, p.precio, p.stock, p.id_categoria, c.nombre AS categoria_nombre
+            FROM $TABLE_PRODUCTO p
+            INNER JOIN $TABLE_CATEGORIA c ON p.$COL_PROD_ID_CATEGORIA = c.$COL_CAT_ID
+            ORDER BY p.$COL_PROD_NOMBRE ASC
+        """.trimIndent()
+
+        val cursor = db.rawQuery(query, null)
+
+        if (cursor.moveToFirst()) {
+            do {
+                lista.add(
+                    ProductoItem(
+                        id = cursor.getInt(cursor.getColumnIndexOrThrow("id")),
+                        nombre = cursor.getString(cursor.getColumnIndexOrThrow("nombre")),
+                        descripcion = cursor.getString(cursor.getColumnIndexOrThrow("descripcion")),
+                        precio = cursor.getDouble(cursor.getColumnIndexOrThrow("precio")),
+                        stock = cursor.getInt(cursor.getColumnIndexOrThrow("stock")),
+                        idCategoria = cursor.getInt(cursor.getColumnIndexOrThrow("id_categoria")),
+                        nombreCategoria = cursor.getString(cursor.getColumnIndexOrThrow("categoria_nombre"))
+                    )
+                )
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+        db.close()
+        return lista
+    }
+
+    fun actualizarProducto(producto: Producto): Int {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put(COL_PROD_NOMBRE, producto.nombre)
+            put(COL_PROD_DESCRIPCION, producto.descripcion)
+            put(COL_PROD_PRECIO, producto.precio)
+            put(COL_PROD_STOCK, producto.stock)
+            put(COL_PROD_ID_CATEGORIA, producto.idCategoria)
+        }
+        val result = db.update(TABLE_PRODUCTO, values, "$COL_PROD_ID = ?", arrayOf(producto.id.toString()))
+        db.close()
+        return result
+    }
+
+    fun eliminarProducto(id: Int): Int {
+        val db = writableDatabase
+        val result = db.delete(TABLE_PRODUCTO, "$COL_PROD_ID = ?", arrayOf(id.toString()))
+        db.close()
+        return result
+    }
+}</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>PARTE 4: Modelos Kotlin</h2>
+
+      <div class="note">
+        <h3>Archivo 1: ProductoCategoria.kt</h3>
+        <div class="code-like">package com.example.sqlite_producto.model
+
+data class ProductoCategoria(
+    val id: Int = 0,
+    val nombre: String,
+    val descripcion: String
+)</div>
+      </div>
+
+      <div class="note">
+        <h3>Archivo 2: Producto.kt</h3>
+        <div class="code-like">package com.example.sqlite_producto.model
+
+data class Producto(
+    val id: Int = 0,
+    val nombre: String,
+    val descripcion: String,
+    val precio: Double,
+    val stock: Int,
+    val idCategoria: Int
+)</div>
+      </div>
+
+      <div class="note">
+        <h3>Archivo 3: ProductoItem.kt</h3>
+        <p>
+          Este modelo se usa para listar productos junto con el nombre de la categoria, porque un simple <code>Producto</code> solo conoce el <code>idCategoria</code>.
+        </p>
+        <div class="code-like">package com.example.sqlite_producto.model
+
+data class ProductoItem(
+    val id: Int,
+    val nombre: String,
+    val descripcion: String,
+    val precio: Double,
+    val stock: Int,
+    val idCategoria: Int,
+    val nombreCategoria: String
+)</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>PARTE 5: CRUD de categorias</h2>
+
+      <div class="theory">
+        <h3>Objetivo de esta parte</h3>
+        <p>
+          Antes de registrar productos, primero deben existir categorias. Por eso conviene dedicar una pantalla completa a su mantenimiento.
+        </p>
+      </div>
+
+      <div class="exercise">
+        <h3>Layout principal de categorias: activity_categoria.xml</h3>
+        <div class="code-like">&lt;androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/mainCategoria"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"&gt;
+
+    &lt;TextView
+        android:id="@+id/tvTituloCategoria"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Lista de categorias"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" /&gt;
+
+    &lt;TextView
+        android:id="@+id/tvSinCategorias"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="No hay categorias registradas"
+        android:visibility="gone"
+        android:layout_marginTop="12dp"
+        app:layout_constraintTop_toBottomOf="@id/tvTituloCategoria"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" /&gt;
+
+    &lt;androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerCategorias"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="12dp"
+        app:layout_constraintTop_toBottomOf="@id/tvTituloCategoria"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" /&gt;
+
+    &lt;com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAgregarCategoria"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="Agregar categoria"
+        app:srcCompat="@android:drawable/ic_input_add"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="16dp" /&gt;
+
+&lt;/androidx.constraintlayout.widget.ConstraintLayout&gt;</div>
+      </div>
+
+      <div class="exercise">
+        <h3>Formulario de categoria: dialog_producto_categoria.xml</h3>
+        <div class="code-like">&lt;LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"&gt;
+
+    &lt;EditText
+        android:id="@+id/etNombreCategoria"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nombre de categoria" /&gt;
+
+    &lt;EditText
+        android:id="@+id/etDescripcionCategoria"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:hint="Descripcion de categoria" /&gt;
+
+&lt;/LinearLayout&gt;</div>
+      </div>
+
+      <div class="note">
+        <h3>Adapter de categorias: ProductoCategoriaAdapter.kt</h3>
+        <div class="code-like">package com.example.sqlite_producto.adapter
+
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import com.example.sqlite_producto.R
+import com.example.sqlite_producto.model.ProductoCategoria
+
+class ProductoCategoriaAdapter(
+    private val lista: MutableList&lt;ProductoCategoria&gt;,
+    private val onClick: (ProductoCategoria) -&gt; Unit,
+    private val onLongClick: (ProductoCategoria) -&gt; Unit
+) : RecyclerView.Adapter&lt;ProductoCategoriaAdapter.CategoriaViewHolder&gt;() {
+
+    class CategoriaViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val tvNombreCategoria: TextView = itemView.findViewById(R.id.tvNombreCategoria)
+        val tvDescripcionCategoria: TextView = itemView.findViewById(R.id.tvDescripcionCategoria)
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): CategoriaViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_producto_categoria, parent, false)
+        return CategoriaViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: CategoriaViewHolder, position: Int) {
+        val categoria = lista[position]
+        holder.tvNombreCategoria.text = categoria.nombre
+        holder.tvDescripcionCategoria.text = categoria.descripcion
+
+        holder.itemView.setOnClickListener { onClick(categoria) }
+        holder.itemView.setOnLongClickListener {
+            onLongClick(categoria)
+            true
+        }
+    }
+
+    override fun getItemCount(): Int = lista.size
+}</div>
+      </div>
+
+      <div class="note">
+        <h3>Activity de categorias: CategoriaActivity.kt</h3>
+        <div class="code-like">package com.example.sqlite_producto.view
+
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.widget.EditText
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.sqlite_producto.R
+import com.example.sqlite_producto.adapter.ProductoCategoriaAdapter
+import com.example.sqlite_producto.data.InventarioDbHelper
+import com.example.sqlite_producto.model.ProductoCategoria
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+
+class CategoriaActivity : AppCompatActivity() {
+
+    private lateinit var recyclerCategorias: RecyclerView
+    private lateinit var tvSinCategorias: TextView
+    private lateinit var fabAgregarCategoria: FloatingActionButton
+    private lateinit var dbHelper: InventarioDbHelper
+    private lateinit var adapter: ProductoCategoriaAdapter
+    private var listaCategorias = mutableListOf&lt;ProductoCategoria&gt;()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_categoria)
+
+        recyclerCategorias = findViewById(R.id.recyclerCategorias)
+        tvSinCategorias = findViewById(R.id.tvSinCategorias)
+        fabAgregarCategoria = findViewById(R.id.fabAgregarCategoria)
+
+        dbHelper = InventarioDbHelper(this)
+
+        adapter = ProductoCategoriaAdapter(
+            listaCategorias,
+            onClick = { categoria -&gt; mostrarDialogoEditar(categoria) },
+            onLongClick = { categoria -&gt; mostrarDialogoEliminar(categoria) }
+        )
+
+        recyclerCategorias.layoutManager = LinearLayoutManager(this)
+        recyclerCategorias.adapter = adapter
+
+        fabAgregarCategoria.setOnClickListener {
+            mostrarDialogoAgregar()
+        }
+
+        cargarCategorias()
+    }
+
+    private fun cargarCategorias() {
+        listaCategorias.clear()
+        listaCategorias.addAll(dbHelper.obtenerCategorias())
+        adapter.notifyDataSetChanged()
+
+        if (listaCategorias.isEmpty()) {
+            tvSinCategorias.visibility = android.view.View.VISIBLE
+            recyclerCategorias.visibility = android.view.View.GONE
+        } else {
+            tvSinCategorias.visibility = android.view.View.GONE
+            recyclerCategorias.visibility = android.view.View.VISIBLE
+        }
+    }
+
+    private fun mostrarDialogoAgregar() {
+        val view = LayoutInflater.from(this).inflate(R.layout.dialog_producto_categoria, null)
+        val etNombre = view.findViewById&lt;EditText&gt;(R.id.etNombreCategoria)
+        val etDescripcion = view.findViewById&lt;EditText&gt;(R.id.etDescripcionCategoria)
+
+        AlertDialog.Builder(this)
+            .setTitle("Agregar categoria")
+            .setView(view)
+            .setPositiveButton("Guardar") { _, _ -&gt;
+                val nombre = etNombre.text.toString().trim()
+                val descripcion = etDescripcion.text.toString().trim()
+
+                if (nombre.isEmpty() || descripcion.isEmpty()) {
+                    Toast.makeText(this, "Completa todos los campos", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+
+                val result = dbHelper.insertarCategoria(
+                    ProductoCategoria(nombre = nombre, descripcion = descripcion)
+                )
+
+                if (result != -1L) {
+                    Toast.makeText(this, "Categoria registrada", Toast.LENGTH_SHORT).show()
+                    cargarCategorias()
+                }
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
+    private fun mostrarDialogoEditar(categoria: ProductoCategoria) {
+        val view = LayoutInflater.from(this).inflate(R.layout.dialog_producto_categoria, null)
+        val etNombre = view.findViewById&lt;EditText&gt;(R.id.etNombreCategoria)
+        val etDescripcion = view.findViewById&lt;EditText&gt;(R.id.etDescripcionCategoria)
+
+        etNombre.setText(categoria.nombre)
+        etDescripcion.setText(categoria.descripcion)
+
+        AlertDialog.Builder(this)
+            .setTitle("Editar categoria")
+            .setView(view)
+            .setPositiveButton("Actualizar") { _, _ -&gt;
+                val nombre = etNombre.text.toString().trim()
+                val descripcion = etDescripcion.text.toString().trim()
+
+                val result = dbHelper.actualizarCategoria(
+                    ProductoCategoria(id = categoria.id, nombre = nombre, descripcion = descripcion)
+                )
+
+                if (result &gt; 0) {
+                    Toast.makeText(this, "Categoria actualizada", Toast.LENGTH_SHORT).show()
+                    cargarCategorias()
+                }
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
+    private fun mostrarDialogoEliminar(categoria: ProductoCategoria) {
+        AlertDialog.Builder(this)
+            .setTitle("Eliminar categoria")
+            .setMessage("¿Deseas eliminar ${categoria.nombre}?")
+            .setPositiveButton("Eliminar") { _, _ -&gt;
+                val result = dbHelper.eliminarCategoria(categoria.id)
+                if (result &gt; 0) {
+                    Toast.makeText(this, "Categoria eliminada", Toast.LENGTH_SHORT).show()
+                    cargarCategorias()
+                }
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+}</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>PARTE 6: CRUD de productos con Spinner de categorias</h2>
+
+      <div class="theory">
+        <h3>Objetivo de esta parte</h3>
+        <p>
+          El formulario del producto debe permitir elegir una categoria existente. Para eso se cargaran todas las categorias en un <code>Spinner</code> antes de guardar o editar.
+        </p>
+      </div>
+
+      <div class="warning">
+        <h3>Regla importante</h3>
+        <p>
+          Si no existen categorias registradas, no conviene abrir el formulario de productos. Primero se deben crear categorias en <code>CategoriaActivity</code>.
+        </p>
+      </div>
+
+      <div class="exercise">
+        <h3>Campos basicos sugeridos para el producto</h3>
+        <ul>
+          <li><code>nombre</code>: texto obligatorio.</li>
+          <li><code>descripcion</code>: texto obligatorio.</li>
+          <li><code>precio</code>: numero decimal obligatorio.</li>
+          <li><code>stock</code>: numero entero obligatorio.</li>
+          <li><code>categoria</code>: seleccion obligatoria desde un Spinner.</li>
+        </ul>
+      </div>
+
+      <div class="note">
+        <h3>Formulario del producto: dialog_producto.xml</h3>
+        <div class="code-like">&lt;ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"&gt;
+
+    &lt;LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"&gt;
+
+        &lt;EditText
+            android:id="@+id/etNombreProducto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nombre del producto" /&gt;
+
+        &lt;EditText
+            android:id="@+id/etDescripcionProducto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:hint="Descripcion del producto" /&gt;
+
+        &lt;EditText
+            android:id="@+id/etPrecioProducto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:hint="Precio"
+            android:inputType="numberDecimal" /&gt;
+
+        &lt;EditText
+            android:id="@+id/etStockProducto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:hint="Stock"
+            android:inputType="number" /&gt;
+
+        &lt;Spinner
+            android:id="@+id/spCategoriaProducto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp" /&gt;
+
+    &lt;/LinearLayout&gt;
+
+&lt;/ScrollView&gt;</div>
+      </div>
+
+      <div class="note">
+        <h3>Item para listar productos: item_producto.xml</h3>
+        <div class="code-like">&lt;LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="12dp"
+    android:layout_marginHorizontal="12dp"
+    android:layout_marginTop="8dp"
+    android:background="@android:color/white"&gt;
+
+    &lt;TextView
+        android:id="@+id/tvNombreProducto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textStyle="bold"
+        android:textSize="18sp" /&gt;
+
+    &lt;TextView
+        android:id="@+id/tvDescripcionProducto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp" /&gt;
+
+    &lt;TextView
+        android:id="@+id/tvPrecioProducto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp" /&gt;
+
+    &lt;TextView
+        android:id="@+id/tvStockProducto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp" /&gt;
+
+    &lt;TextView
+        android:id="@+id/tvCategoriaProducto"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp" /&gt;
+
+&lt;/LinearLayout&gt;</div>
+      </div>
+
+      <div class="note">
+        <h3>Adapter de productos: ProductoAdapter.kt</h3>
+        <div class="code-like">package com.example.sqlite_producto.adapter
+
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import com.example.sqlite_producto.R
+import com.example.sqlite_producto.model.ProductoItem
+
+class ProductoAdapter(
+    private val lista: MutableList&lt;ProductoItem&gt;,
+    private val onClick: (ProductoItem) -&gt; Unit,
+    private val onLongClick: (ProductoItem) -&gt; Unit
+) : RecyclerView.Adapter&lt;ProductoAdapter.ProductoViewHolder&gt;() {
+
+    class ProductoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val tvNombreProducto: TextView = itemView.findViewById(R.id.tvNombreProducto)
+        val tvDescripcionProducto: TextView = itemView.findViewById(R.id.tvDescripcionProducto)
+        val tvPrecioProducto: TextView = itemView.findViewById(R.id.tvPrecioProducto)
+        val tvStockProducto: TextView = itemView.findViewById(R.id.tvStockProducto)
+        val tvCategoriaProducto: TextView = itemView.findViewById(R.id.tvCategoriaProducto)
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductoViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_producto, parent, false)
+        return ProductoViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: ProductoViewHolder, position: Int) {
+        val item = lista[position]
+
+        holder.tvNombreProducto.text = item.nombre
+        holder.tvDescripcionProducto.text = item.descripcion
+        holder.tvPrecioProducto.text = "Precio: ${item.precio}"
+        holder.tvStockProducto.text = "Stock: ${item.stock}"
+        holder.tvCategoriaProducto.text = "Categoria: ${item.nombreCategoria}"
+
+        holder.itemView.setOnClickListener { onClick(item) }
+        holder.itemView.setOnLongClickListener {
+            onLongClick(item)
+            true
+        }
+    }
+
+    override fun getItemCount(): Int = lista.size
+}</div>
+      </div>
+
+      <div class="exercise">
+        <h3>Pantalla principal de productos: propuesta de activity_main.xml</h3>
+        <div class="code-like">&lt;androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp"&gt;
+
+    &lt;TextView
+        android:id="@+id/tvTituloProducto"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Lista de productos"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/btnCategorias"
+        android:layout_marginEnd="12dp" /&gt;
+
+    &lt;Button
+        android:id="@+id/btnCategorias"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Categorias"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" /&gt;
+
+    &lt;TextView
+        android:id="@+id/tvSinProductos"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="No hay productos registrados"
+        android:visibility="gone"
+        android:layout_marginTop="12dp"
+        app:layout_constraintTop_toBottomOf="@id/tvTituloProducto"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" /&gt;
+
+    &lt;androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerProductos"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="12dp"
+        app:layout_constraintTop_toBottomOf="@id/tvTituloProducto"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" /&gt;
+
+    &lt;com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAgregarProducto"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:contentDescription="Agregar producto"
+        app:srcCompat="@android:drawable/ic_input_add"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_margin="16dp" /&gt;
+
+&lt;/androidx.constraintlayout.widget.ConstraintLayout&gt;</div>
+      </div>
+
+      <div class="note">
+        <h3>MainActivity.kt: propuesta de implementacion</h3>
+        <p>
+          Aqui ocurre la parte clave del proyecto: antes de guardar un producto, se cargan las categorias en un Spinner y se recupera el <code>id</code> de la categoria elegida.
+        </p>
+        <div class="code-like">package com.example.sqlite_producto.view
+
+import android.content.Intent
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.widget.ArrayAdapter
+import android.widget.Button
+import android.widget.EditText
+import android.widget.Spinner
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.sqlite_producto.R
+import com.example.sqlite_producto.adapter.ProductoAdapter
+import com.example.sqlite_producto.data.InventarioDbHelper
+import com.example.sqlite_producto.model.Producto
+import com.example.sqlite_producto.model.ProductoCategoria
+import com.example.sqlite_producto.model.ProductoItem
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+
+class MainActivity : AppCompatActivity() {
+
+    private lateinit var btnCategorias: Button
+    private lateinit var recyclerProductos: RecyclerView
+    private lateinit var tvSinProductos: TextView
+    private lateinit var fabAgregarProducto: FloatingActionButton
+    private lateinit var dbHelper: InventarioDbHelper
+    private lateinit var adapter: ProductoAdapter
+    private var listaProductos = mutableListOf&lt;ProductoItem&gt;()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        btnCategorias = findViewById(R.id.btnCategorias)
+        recyclerProductos = findViewById(R.id.recyclerProductos)
+        tvSinProductos = findViewById(R.id.tvSinProductos)
+        fabAgregarProducto = findViewById(R.id.fabAgregarProducto)
+
+        dbHelper = InventarioDbHelper(this)
+
+        adapter = ProductoAdapter(
+            listaProductos,
+            onClick = { item -&gt; mostrarDialogoEditarProducto(item) },
+            onLongClick = { item -&gt; mostrarDialogoEliminarProducto(item) }
+        )
+
+        recyclerProductos.layoutManager = LinearLayoutManager(this)
+        recyclerProductos.adapter = adapter
+
+        btnCategorias.setOnClickListener {
+            startActivity(Intent(this, CategoriaActivity::class.java))
+        }
+
+        fabAgregarProducto.setOnClickListener {
+            mostrarDialogoAgregarProducto()
+        }
+
+        cargarProductos()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        cargarProductos()
+    }
+
+    private fun cargarProductos() {
+        listaProductos.clear()
+        listaProductos.addAll(dbHelper.obtenerProductosConCategoria())
+        adapter.notifyDataSetChanged()
+
+        if (listaProductos.isEmpty()) {
+            tvSinProductos.visibility = android.view.View.VISIBLE
+            recyclerProductos.visibility = android.view.View.GONE
+        } else {
+            tvSinProductos.visibility = android.view.View.GONE
+            recyclerProductos.visibility = android.view.View.VISIBLE
+        }
+    }
+
+    private fun mostrarDialogoAgregarProducto() {
+        val categorias = dbHelper.obtenerCategorias()
+
+        if (categorias.isEmpty()) {
+            Toast.makeText(this, "Primero registra categorias", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val view = LayoutInflater.from(this).inflate(R.layout.dialog_producto, null)
+        val etNombre = view.findViewById&lt;EditText&gt;(R.id.etNombreProducto)
+        val etDescripcion = view.findViewById&lt;EditText&gt;(R.id.etDescripcionProducto)
+        val etPrecio = view.findViewById&lt;EditText&gt;(R.id.etPrecioProducto)
+        val etStock = view.findViewById&lt;EditText&gt;(R.id.etStockProducto)
+        val spCategoria = view.findViewById&lt;Spinner&gt;(R.id.spCategoriaProducto)
+
+        cargarCategoriasEnSpinner(spCategoria, categorias)
+
+        AlertDialog.Builder(this)
+            .setTitle("Agregar producto")
+            .setView(view)
+            .setPositiveButton("Guardar") { _, _ -&gt;
+                val nombre = etNombre.text.toString().trim()
+                val descripcion = etDescripcion.text.toString().trim()
+                val precioTexto = etPrecio.text.toString().trim()
+                val stockTexto = etStock.text.toString().trim()
+
+                if (nombre.isEmpty() || descripcion.isEmpty() || precioTexto.isEmpty() || stockTexto.isEmpty()) {
+                    Toast.makeText(this, "Completa todos los campos", Toast.LENGTH_SHORT).show()
+                    return@setPositiveButton
+                }
+
+                val categoriaSeleccionada = categorias[spCategoria.selectedItemPosition]
+
+                val producto = Producto(
+                    nombre = nombre,
+                    descripcion = descripcion,
+                    precio = precioTexto.toDouble(),
+                    stock = stockTexto.toInt(),
+                    idCategoria = categoriaSeleccionada.id
+                )
+
+                val result = dbHelper.insertarProducto(producto)
+                if (result != -1L) {
+                    Toast.makeText(this, "Producto registrado", Toast.LENGTH_SHORT).show()
+                    cargarProductos()
+                }
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
+    private fun mostrarDialogoEditarProducto(item: ProductoItem) {
+        val categorias = dbHelper.obtenerCategorias()
+        val view = LayoutInflater.from(this).inflate(R.layout.dialog_producto, null)
+        val etNombre = view.findViewById&lt;EditText&gt;(R.id.etNombreProducto)
+        val etDescripcion = view.findViewById&lt;EditText&gt;(R.id.etDescripcionProducto)
+        val etPrecio = view.findViewById&lt;EditText&gt;(R.id.etPrecioProducto)
+        val etStock = view.findViewById&lt;EditText&gt;(R.id.etStockProducto)
+        val spCategoria = view.findViewById&lt;Spinner&gt;(R.id.spCategoriaProducto)
+
+        etNombre.setText(item.nombre)
+        etDescripcion.setText(item.descripcion)
+        etPrecio.setText(item.precio.toString())
+        etStock.setText(item.stock.toString())
+
+        cargarCategoriasEnSpinner(spCategoria, categorias)
+        val posicion = categorias.indexOfFirst { it.id == item.idCategoria }
+        if (posicion != -1) {
+            spCategoria.setSelection(posicion)
+        }
+
+        AlertDialog.Builder(this)
+            .setTitle("Editar producto")
+            .setView(view)
+            .setPositiveButton("Actualizar") { _, _ -&gt;
+                val categoriaSeleccionada = categorias[spCategoria.selectedItemPosition]
+
+                val producto = Producto(
+                    id = item.id,
+                    nombre = etNombre.text.toString().trim(),
+                    descripcion = etDescripcion.text.toString().trim(),
+                    precio = etPrecio.text.toString().trim().toDouble(),
+                    stock = etStock.text.toString().trim().toInt(),
+                    idCategoria = categoriaSeleccionada.id
+                )
+
+                val result = dbHelper.actualizarProducto(producto)
+                if (result &gt; 0) {
+                    Toast.makeText(this, "Producto actualizado", Toast.LENGTH_SHORT).show()
+                    cargarProductos()
+                }
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
+    private fun mostrarDialogoEliminarProducto(item: ProductoItem) {
+        AlertDialog.Builder(this)
+            .setTitle("Eliminar producto")
+            .setMessage("¿Deseas eliminar ${item.nombre}?")
+            .setPositiveButton("Eliminar") { _, _ -&gt;
+                val result = dbHelper.eliminarProducto(item.id)
+                if (result &gt; 0) {
+                    Toast.makeText(this, "Producto eliminado", Toast.LENGTH_SHORT).show()
+                    cargarProductos()
+                }
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
+    private fun cargarCategoriasEnSpinner(spinner: Spinner, categorias: List&lt;ProductoCategoria&gt;) {
+        val nombres = categorias.map { it.nombre }
+        val adapterSpinner = ArrayAdapter(this, android.R.layout.simple_spinner_item, nombres)
+        adapterSpinner.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinner.adapter = adapterSpinner
+    }
+}</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>PARTE 7: Proceso practico sugerido</h2>
+
+      <div class="tips">
+        <h3>Orden de validacion del proyecto</h3>
+        <ol>
+          <li>Ejecutar la app y abrir la pantalla de categorias.</li>
+          <li>Registrar al menos tres categorias.</li>
+          <li>Volver a la pantalla principal de productos.</li>
+          <li>Abrir el formulario del producto y comprobar que el Spinner muestre las categorias.</li>
+          <li>Registrar varios productos con distintas categorias.</li>
+          <li>Verificar que el RecyclerView muestre tambien el nombre de la categoria.</li>
+          <li>Probar editar y eliminar tanto categorias como productos.</li>
+        </ol>
+      </div>
+
+      <div class="warning">
+        <h3>Puntos delicados del flujo</h3>
+        <ul>
+          <li>Si el Spinner aparece vacio, revisar primero si existen categorias registradas.</li>
+          <li>Si el producto no muestra categoria, revisar la consulta con <code>INNER JOIN</code>.</li>
+          <li>Si no se actualiza la lista, verificar la llamada a <code>cargarProductos()</code> o <code>cargarCategorias()</code>.</li>
+          <li>Si el proyecto no reconoce el <code>FloatingActionButton</code>, confirmar el uso de Material Components.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>PARTE 8: Propuesta final</h2>
+
+      <div class="theory">
+        <h3>Como se realizaria de forma ordenada</h3>
+        <p>
+          La propuesta mas solida es trabajar con dos pantallas: una para categorias y otra para productos. En la pantalla del producto, el formulario usa un Spinner para elegir la categoria existente. Eso evita duplicar nombres de categorias, mejora la consistencia de los datos y deja el proyecto listo para crecer.
+        </p>
+      </div>
+
+      <table class="comparison-table">
+        <tr>
+          <th>Componente</th>
+          <th>Propuesta</th>
+        </tr>
+        <tr>
+          <td>CRUD de categorias</td>
+          <td>En <code>CategoriaActivity</code>, con su propio RecyclerView y FAB.</td>
+        </tr>
+        <tr>
+          <td>CRUD de productos</td>
+          <td>En <code>MainActivity</code>, con formulario y Spinner de categorias.</td>
+        </tr>
+        <tr>
+          <td>Relacion entre tablas</td>
+          <td><code>producto.id_categoria</code> apunta a <code>producto_categoria.id</code>.</td>
+        </tr>
+        <tr>
+          <td>Lista final</td>
+          <td>Mostrar productos con nombre de categoria usando un <code>JOIN</code>.</td>
+        </tr>
+      </table>
+
+      <div class="exercise">
+        <h3>Resultado esperado del proyecto</h3>
+        <ol>
+          <li>Registrar categorias y verlas en un RecyclerView.</li>
+          <li>Registrar productos seleccionando una categoria desde un Spinner.</li>
+          <li>Listar productos con nombre, descripcion, precio, stock y nombre de categoria.</li>
+          <li>Editar y eliminar categorias y productos desde eventos visuales.</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
