@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Login con SQLite en Android</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-1: #e0f2fe;
+      --bg-2: #fae8ff;
+      --card: rgba(255, 255, 255, 0.9);
+      --ink: #1f2937;
+      --muted: #4b5563;
+      --primary: #0f766e;
+      --secondary: #1d4ed8;
+      --accent: #b45309;
+      --dark: #0f172a;
+      --border: rgba(15, 23, 42, 0.12);
+    }
+
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 100%);
+      color: var(--ink);
+      line-height: 1.6;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 24px 70px rgba(15, 23, 42, 0.18);
+    }
+
+    .hero {
+      padding: 48px 40px;
+      color: white;
+      background: linear-gradient(135deg, #0f766e 0%, #1d4ed8 60%, #312e81 100%);
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: 2.6em;
+      margin-bottom: 12px;
+    }
+
+    .hero p {
+      font-size: 1.05em;
+      opacity: 0.95;
+    }
+
+    .schedule,
+    .section {
+      padding: 32px 40px;
+    }
+
+    .schedule {
+      background: #f8fafc;
+      border-bottom: 3px solid #cbd5e1;
+    }
+
+    .schedule h2,
+    .section h2 {
+      font-size: 1.9em;
+      margin-bottom: 18px;
+    }
+
+    .section:nth-child(odd) {
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    }
+
+    .section:nth-child(even) {
+      background: linear-gradient(135deg, #f0fdfa 0%, #ccfbf1 100%);
+    }
+
+    .section h2 {
+      border-bottom: 3px solid rgba(29, 78, 216, 0.25);
+      padding-bottom: 10px;
+    }
+
+    .schedule-grid,
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    .schedule-item,
+    .card,
+    .theory,
+    .tips,
+    .warning,
+    .exercise,
+    .note {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
+      padding: 22px;
+    }
+
+    .schedule-item {
+      border-left: 5px solid var(--secondary);
+    }
+
+    .tips {
+      border-left: 5px solid #16a34a;
+    }
+
+    .warning {
+      border-left: 5px solid #ca8a04;
+      background: rgba(254, 240, 138, 0.55);
+    }
+
+    .exercise {
+      border-left: 5px solid var(--accent);
+    }
+
+    .note {
+      border-left: 5px solid var(--secondary);
+    }
+
+    .card h4,
+    .schedule-item h3 {
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+
+    .code-like {
+      background: #020617;
+      color: #dbeafe;
+      border-radius: 14px;
+      padding: 20px;
+      overflow-x: auto;
+      margin-top: 15px;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      font-family: "Courier New", monospace;
+      font-size: 0.9em;
+      line-height: 1.8;
+      white-space: pre-wrap;
+    }
+
+    .flow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      align-items: center;
+      margin-top: 18px;
+    }
+
+    .flow-box {
+      min-width: 160px;
+      padding: 16px;
+      border-radius: 14px;
+      background: var(--secondary);
+      color: white;
+      text-align: center;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.16);
+    }
+
+    .flow-arrow {
+      font-size: 1.8em;
+      color: #93c5fd;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 14px;
+      background: white;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+    }
+
+    .comparison-table th {
+      background: var(--secondary);
+      color: white;
+      text-align: left;
+      padding: 12px;
+    }
+
+    .comparison-table td {
+      padding: 12px;
+      border-bottom: 1px solid #e5e7eb;
+      color: var(--muted);
+    }
+
+    ul,
+    ol {
+      padding-left: 22px;
+    }
+
+    li {
+      margin: 6px 0;
+    }
+
+    @media (max-width: 768px) {
+      .hero,
+      .schedule,
+      .section {
+        padding: 24px 20px;
+      }
+
+      .hero h1 {
+        font-size: 1.9em;
+      }
+
+      .flow {
+        flex-direction: column;
+      }
+
+      .flow-arrow {
+        transform: rotate(90deg);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="hero">
+      <h1>Login con SQLite en Android</h1>
+      <p>Guia practica desarrollada para registro, acceso local y dashboard basico usando SQLite</p>
+      <p>Nivel sugerido: intermedio</p>
+    </div>
+
+    <div class="schedule">
+      <h2>Mapa general de la guia</h2>
+      <div class="schedule-grid">
+        <div class="schedule-item">
+          <h3>1. Estructura general</h3>
+          <p>Organizar pantallas, modelos, helper y layouts para registro, login y dashboard.</p>
+        </div>
+        <div class="schedule-item">
+          <h3>2. Base de datos</h3>
+          <p>Crear la tabla <code>usuario</code> con limites maximos y validaciones.</p>
+        </div>
+        <div class="schedule-item">
+          <h3>3. Registro</h3>
+          <p>Guardar nombres, DNI, direccion, email, usuario y clave en SQLite.</p>
+        </div>
+        <div class="schedule-item">
+          <h3>4. Login</h3>
+          <p>Ingresar con usuario o correo y validar la clave desde SQLite.</p>
+        </div>
+        <div class="schedule-item">
+          <h3>5. Dashboard</h3>
+          <p>Mostrar una pantalla sencilla con gadgets de compras, ventas, productos y saldo.</p>
+        </div>
+        <div class="schedule-item">
+          <h3>6. Flujo completo</h3>
+          <p>Si no existe cuenta, se registra; si existe, se inicia sesion y se entra al dashboard.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>PARTE 1: Propuesta general</h2>
+
+      <div class="theory">
+        <h3>Enfoque sugerido</h3>
+        <p>
+          La aplicacion debe iniciar en una pantalla de login moderna, con logo, dos campos y un acceso a registro. Si la persona aun no tiene credenciales, se abre la pantalla de registro. Una vez validado el acceso, se muestra un dashboard sencillo con informacion estatica para practicar la navegacion despues del login.
+        </p>
+      </div>
+
+      <div class="card-grid">
+        <div class="card">
+          <h4>Pantalla 1</h4>
+          <p><strong>LoginActivity</strong>: ingreso con usuario o correo y clave.</p>
+        </div>
+        <div class="card">
+          <h4>Pantalla 2</h4>
+          <p><strong>RegistroActivity</strong>: alta del usuario si aun no tiene cuenta.</p>
+        </div>
+        <div class="card">
+          <h4>Pantalla 3</h4>
+          <p><strong>DashboardActivity</strong>: vista posterior al acceso, con gadgets estaticos.</p>
+        </div>
+      </div>
+
+      <div class="tips">
+        <h3>Secuencia de trabajo recomendada</h3>
+        <ol>
+          <li>Crear la tabla <code>usuario</code> en SQLite.</li>
+          <li>Construir primero el registro.</li>
+          <li>Luego construir el login usando esa misma tabla.</li>
+          <li>Finalmente mostrar el dashboard al validar las credenciales.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>PARTE 2: Estructura del proyecto</h2>
+
+      <div class="exercise">
+        <h3>Estructura a seguir</h3>
+        <div class="code-like">app/
+├── manifests/
+│ └── AndroidManifest.xml
+├── java/com.example.login_sqlite/
+│ ├── data/
+│ │ └── UsuarioDbHelper.kt
+│ ├── model/
+│ │ └── Usuario.kt
+│ └── view/
+│   ├── LoginActivity.kt
+│   ├── RegistroActivity.kt
+│   └── DashboardActivity.kt
+└── res/
+  └── layout/
+    ├── activity_login.xml
+    ├── activity_registro.xml
+    └── activity_dashboard.xml</div>
+      </div>
+
+      <div class="note">
+        <h3>Por que esta estructura es conveniente</h3>
+        <ul>
+          <li><code>Usuario.kt</code> representa una fila de la tabla <code>usuario</code>.</li>
+          <li><code>UsuarioDbHelper.kt</code> concentra toda la logica SQLite de registro y acceso.</li>
+          <li><code>LoginActivity</code> y <code>RegistroActivity</code> quedan separadas para no mezclar procesos.</li>
+          <li><code>DashboardActivity</code> solo se preocupa por la vista posterior al login.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>PARTE 3: Diseno de la tabla usuario</h2>
+
+      <div class="theory">
+        <h3>Campos necesarios</h3>
+        <p>
+          La tabla <code>usuario</code> tendra los siguientes campos: nombres, dni, direccion, email, usuario y clave. Como se desea controlar el tamano maximo de cada campo, conviene usar restricciones <code>CHECK</code> en la sentencia SQL y validaciones previas desde la interfaz.
+        </p>
+      </div>
+
+      <table class="comparison-table">
+        <tr>
+          <th>Campo</th>
+          <th>Tipo</th>
+          <th>Regla propuesta</th>
+        </tr>
+        <tr>
+          <td>nombres</td>
+          <td>TEXT</td>
+          <td>Obligatorio, maximo 80 caracteres</td>
+        </tr>
+        <tr>
+          <td>dni</td>
+          <td>TEXT</td>
+          <td>Obligatorio, exactamente 8 digitos</td>
+        </tr>
+        <tr>
+          <td>direccion</td>
+          <td>TEXT</td>
+          <td>Obligatoria, maximo 120 caracteres</td>
+        </tr>
+        <tr>
+          <td>email</td>
+          <td>TEXT</td>
+          <td>Obligatorio, unico, maximo 100 caracteres</td>
+        </tr>
+        <tr>
+          <td>usuario</td>
+          <td>TEXT</td>
+          <td>Obligatorio, unico, maximo 30 caracteres</td>
+        </tr>
+        <tr>
+          <td>clave</td>
+          <td>TEXT</td>
+          <td>Obligatoria, minimo 6 y maximo 20 caracteres</td>
+        </tr>
+      </table>
+
+      <div class="exercise">
+        <h3>Modelo Usuario.kt</h3>
+        <div class="code-like">package com.example.login_sqlite.model
+
+data class Usuario(
+    val id: Int = 0,
+    val nombres: String,
+    val dni: String,
+    val direccion: String,
+    val email: String,
+    val usuario: String,
+    val clave: String
+)</div>
+      </div>
+
+      <div class="note">
+        <h3>Helper completo: UsuarioDbHelper.kt</h3>
+        <p>
+          Este helper crea la tabla, registra usuarios, verifica si existen credenciales repetidas y permite iniciar sesion con usuario o correo.
+        </p>
+        <div class="code-like">package com.example.login_sqlite.data
+
+import android.content.ContentValues
+import android.content.Context
+import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteOpenHelper
+import com.example.login_sqlite.model.Usuario
+
+class UsuarioDbHelper(context: Context) :
+    SQLiteOpenHelper(context, DB_NAME, null, DB_VERSION) {
+
+    companion object {
+        const val DB_NAME = "login_app.db"
+        const val DB_VERSION = 1
+
+        const val TABLE_USUARIO = "usuario"
+        const val COL_ID = "id"
+        const val COL_NOMBRES = "nombres"
+        const val COL_DNI = "dni"
+        const val COL_DIRECCION = "direccion"
+        const val COL_EMAIL = "email"
+        const val COL_USUARIO = "usuario"
+        const val COL_CLAVE = "clave"
+    }
+
+    override fun onCreate(db: SQLiteDatabase) {
+        val sqlUsuario = """
+            CREATE TABLE $TABLE_USUARIO (
+                $COL_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                $COL_NOMBRES TEXT NOT NULL CHECK(LENGTH($COL_NOMBRES) &lt;= 80),
+                $COL_DNI TEXT NOT NULL UNIQUE CHECK(LENGTH($COL_DNI) = 8),
+                $COL_DIRECCION TEXT NOT NULL CHECK(LENGTH($COL_DIRECCION) &lt;= 120),
+                $COL_EMAIL TEXT NOT NULL UNIQUE CHECK(LENGTH($COL_EMAIL) &lt;= 100),
+                $COL_USUARIO TEXT NOT NULL UNIQUE CHECK(LENGTH($COL_USUARIO) &lt;= 30),
+                $COL_CLAVE TEXT NOT NULL CHECK(LENGTH($COL_CLAVE) &gt;= 6 AND LENGTH($COL_CLAVE) &lt;= 20)
+            )
+        """.trimIndent()
+
+        db.execSQL(sqlUsuario)
+    }
+
+    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_USUARIO")
+        onCreate(db)
+    }
+
+    fun registrarUsuario(usuario: Usuario): Long {
+        val db = writableDatabase
+        val values = ContentValues().apply {
+            put(COL_NOMBRES, usuario.nombres)
+            put(COL_DNI, usuario.dni)
+            put(COL_DIRECCION, usuario.direccion)
+            put(COL_EMAIL, usuario.email)
+            put(COL_USUARIO, usuario.usuario)
+            put(COL_CLAVE, usuario.clave)
+        }
+
+        val result = db.insert(TABLE_USUARIO, null, values)
+        db.close()
+        return result
+    }
+
+    fun existeUsuarioOEmail(usuario: String, email: String, dni: String): Boolean {
+        val db = readableDatabase
+        val query = """
+            SELECT * FROM $TABLE_USUARIO
+            WHERE $COL_USUARIO = ? OR $COL_EMAIL = ? OR $COL_DNI = ?
+        """.trimIndent()
+
+        val cursor = db.rawQuery(query, arrayOf(usuario, email, dni))
+        val existe = cursor.count &gt; 0
+        cursor.close()
+        db.close()
+        return existe
+    }
+
+    fun loginConUsuarioOCorreo(usuarioOEmail: String, clave: String): Usuario? {
+        val db = readableDatabase
+        val query = """
+            SELECT * FROM $TABLE_USUARIO
+            WHERE ($COL_USUARIO = ? OR $COL_EMAIL = ?) AND $COL_CLAVE = ?
+        """.trimIndent()
+
+        val cursor = db.rawQuery(query, arrayOf(usuarioOEmail, usuarioOEmail, clave))
+
+        var usuarioEncontrado: Usuario? = null
+
+        if (cursor.moveToFirst()) {
+            usuarioEncontrado = Usuario(
+                id = cursor.getInt(cursor.getColumnIndexOrThrow(COL_ID)),
+                nombres = cursor.getString(cursor.getColumnIndexOrThrow(COL_NOMBRES)),
+                dni = cursor.getString(cursor.getColumnIndexOrThrow(COL_DNI)),
+                direccion = cursor.getString(cursor.getColumnIndexOrThrow(COL_DIRECCION)),
+                email = cursor.getString(cursor.getColumnIndexOrThrow(COL_EMAIL)),
+                usuario = cursor.getString(cursor.getColumnIndexOrThrow(COL_USUARIO)),
+                clave = cursor.getString(cursor.getColumnIndexOrThrow(COL_CLAVE))
+            )
+        }
+
+        cursor.close()
+        db.close()
+        return usuarioEncontrado
+    }
+}</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>PARTE 4: Pantalla inicial de login</h2>
+
+      <div class="theory">
+        <h3>Objetivo de la pantalla</h3>
+        <p>
+          La vista de acceso debe verse moderna y clara: logo, titulo, un campo para <code>usuario o correo</code>, otro para <code>clave</code>, un boton de acceso y otro para crear cuenta si aun no existen datos.
+        </p>
+      </div>
+
+      <div class="exercise">
+        <h3>Layout propuesto: activity_login.xml</h3>
+        <div class="code-like">&lt;androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="24dp"&gt;
+
+    &lt;ImageView
+        android:id="@+id/imgLogo"
+        android:layout_width="96dp"
+        android:layout_height="96dp"
+        android:src="@mipmap/ic_launcher"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="40dp" /&gt;
+
+    &lt;TextView
+        android:id="@+id/tvTituloLogin"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Bienvenido"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/imgLogo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="20dp" /&gt;
+
+    &lt;TextView
+        android:id="@+id/tvSubtituloLogin"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Ingresa con tu usuario o correo"
+        android:gravity="center"
+        app:layout_constraintTop_toBottomOf="@id/tvTituloLogin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="8dp" /&gt;
+
+    &lt;EditText
+        android:id="@+id/etUsuarioOCorreo"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Usuario o correo"
+        app:layout_constraintTop_toBottomOf="@id/tvSubtituloLogin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="32dp" /&gt;
+
+    &lt;EditText
+        android:id="@+id/etClaveLogin"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Clave"
+        android:inputType="textPassword"
+        app:layout_constraintTop_toBottomOf="@id/etUsuarioOCorreo"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="12dp" /&gt;
+
+    &lt;Button
+        android:id="@+id/btnIngresar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Ingresar"
+        app:layout_constraintTop_toBottomOf="@id/etClaveLogin"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="20dp" /&gt;
+
+    &lt;TextView
+        android:id="@+id/tvCrearCuenta"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Crear cuenta"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/btnIngresar"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="18dp" /&gt;
+
+&lt;/androidx.constraintlayout.widget.ConstraintLayout&gt;</div>
+      </div>
+
+      <div class="note">
+        <h3>Proceso de logueo</h3>
+        <ol>
+          <li>La persona escribe usuario o correo.</li>
+          <li>Luego escribe su clave.</li>
+          <li>Se valida que ambos campos no esten vacios.</li>
+          <li>Se consulta SQLite con <code>loginConUsuarioOCorreo()</code>.</li>
+          <li>Si existe coincidencia, se abre el dashboard.</li>
+          <li>Si no existe coincidencia, se muestra un mensaje de error.</li>
+        </ol>
+      </div>
+
+      <div class="exercise">
+        <h3>Codigo completo: LoginActivity.kt</h3>
+        <div class="code-like">package com.example.login_sqlite.view
+
+import android.content.Intent
+import android.os.Bundle
+import android.widget.Button
+import android.widget.EditText
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import com.example.login_sqlite.R
+import com.example.login_sqlite.data.UsuarioDbHelper
+
+class LoginActivity : AppCompatActivity() {
+
+    private lateinit var etUsuarioOCorreo: EditText
+    private lateinit var etClaveLogin: EditText
+    private lateinit var btnIngresar: Button
+    private lateinit var tvCrearCuenta: TextView
+    private lateinit var dbHelper: UsuarioDbHelper
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_login)
+
+        etUsuarioOCorreo = findViewById(R.id.etUsuarioOCorreo)
+        etClaveLogin = findViewById(R.id.etClaveLogin)
+        btnIngresar = findViewById(R.id.btnIngresar)
+        tvCrearCuenta = findViewById(R.id.tvCrearCuenta)
+
+        dbHelper = UsuarioDbHelper(this)
+
+        btnIngresar.setOnClickListener {
+            iniciarSesion()
+        }
+
+        tvCrearCuenta.setOnClickListener {
+            startActivity(Intent(this, RegistroActivity::class.java))
+        }
+    }
+
+    private fun iniciarSesion() {
+        val usuarioOEmail = etUsuarioOCorreo.text.toString().trim()
+        val clave = etClaveLogin.text.toString().trim()
+
+        if (usuarioOEmail.isEmpty() || clave.isEmpty()) {
+            Toast.makeText(this, "Completa usuario o correo y clave", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val usuario = dbHelper.loginConUsuarioOCorreo(usuarioOEmail, clave)
+
+        if (usuario != null) {
+            val intent = Intent(this, DashboardActivity::class.java)
+            intent.putExtra("nombres", usuario.nombres)
+            startActivity(intent)
+            finish()
+        } else {
+            Toast.makeText(this, "Credenciales incorrectas", Toast.LENGTH_SHORT).show()
+        }
+    }
+}</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>PARTE 5: Pantalla de registro</h2>
+
+      <div class="theory">
+        <h3>Objetivo del registro</h3>
+        <p>
+          Si aun no existen datos de acceso, se debe crear primero el usuario. El formulario debe pedir todos los campos de la tabla y validar tanto el contenido como la longitud maxima.
+        </p>
+      </div>
+
+      <div class="exercise">
+        <h3>Layout propuesto: activity_registro.xml</h3>
+        <div class="code-like">&lt;ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"&gt;
+
+    &lt;androidx.constraintlayout.widget.ConstraintLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="24dp"&gt;
+
+        &lt;TextView
+            android:id="@+id/tvTituloRegistro"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Crear cuenta"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" /&gt;
+
+        &lt;EditText
+            android:id="@+id/etNombres"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="Nombres completos"
+            app:layout_constraintTop_toBottomOf="@id/tvTituloRegistro"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="24dp" /&gt;
+
+        &lt;EditText
+            android:id="@+id/etDni"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="DNI"
+            android:inputType="number"
+            app:layout_constraintTop_toBottomOf="@id/etNombres"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="12dp" /&gt;
+
+        &lt;EditText
+            android:id="@+id/etDireccion"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="Direccion"
+            app:layout_constraintTop_toBottomOf="@id/etDni"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="12dp" /&gt;
+
+        &lt;EditText
+            android:id="@+id/etEmail"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="Email"
+            android:inputType="textEmailAddress"
+            app:layout_constraintTop_toBottomOf="@id/etDireccion"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="12dp" /&gt;
+
+        &lt;EditText
+            android:id="@+id/etUsuario"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="Usuario"
+            app:layout_constraintTop_toBottomOf="@id/etEmail"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="12dp" /&gt;
+
+        &lt;EditText
+            android:id="@+id/etClave"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:hint="Clave"
+            android:inputType="textPassword"
+            app:layout_constraintTop_toBottomOf="@id/etUsuario"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="12dp" /&gt;
+
+        &lt;Button
+            android:id="@+id/btnRegistrar"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:text="Registrar usuario"
+            app:layout_constraintTop_toBottomOf="@id/etClave"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginTop="20dp" /&gt;
+
+    &lt;/androidx.constraintlayout.widget.ConstraintLayout&gt;
+
+&lt;/ScrollView&gt;</div>
+      </div>
+
+      <div class="note">
+        <h3>Proceso de registro</h3>
+        <ol>
+          <li>Leer todos los campos del formulario.</li>
+          <li>Validar vacios, longitud maxima, longitud de DNI y longitud de clave.</li>
+          <li>Verificar si ya existe el mismo usuario, email o DNI.</li>
+          <li>Si no hay duplicados, insertar el nuevo registro en SQLite.</li>
+          <li>Volver al login con un mensaje de registro correcto.</li>
+        </ol>
+      </div>
+
+      <div class="exercise">
+        <h3>Codigo completo: RegistroActivity.kt</h3>
+        <div class="code-like">package com.example.login_sqlite.view
+
+import android.os.Bundle
+import android.widget.Button
+import android.widget.EditText
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import com.example.login_sqlite.R
+import com.example.login_sqlite.data.UsuarioDbHelper
+import com.example.login_sqlite.model.Usuario
+
+class RegistroActivity : AppCompatActivity() {
+
+    private lateinit var etNombres: EditText
+    private lateinit var etDni: EditText
+    private lateinit var etDireccion: EditText
+    private lateinit var etEmail: EditText
+    private lateinit var etUsuario: EditText
+    private lateinit var etClave: EditText
+    private lateinit var btnRegistrar: Button
+    private lateinit var dbHelper: UsuarioDbHelper
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_registro)
+
+        etNombres = findViewById(R.id.etNombres)
+        etDni = findViewById(R.id.etDni)
+        etDireccion = findViewById(R.id.etDireccion)
+        etEmail = findViewById(R.id.etEmail)
+        etUsuario = findViewById(R.id.etUsuario)
+        etClave = findViewById(R.id.etClave)
+        btnRegistrar = findViewById(R.id.btnRegistrar)
+
+        dbHelper = UsuarioDbHelper(this)
+
+        btnRegistrar.setOnClickListener {
+            registrarUsuario()
+        }
+    }
+
+    private fun registrarUsuario() {
+        val nombres = etNombres.text.toString().trim()
+        val dni = etDni.text.toString().trim()
+        val direccion = etDireccion.text.toString().trim()
+        val email = etEmail.text.toString().trim()
+        val usuario = etUsuario.text.toString().trim()
+        val clave = etClave.text.toString().trim()
+
+        if (nombres.isEmpty() || dni.isEmpty() || direccion.isEmpty() || email.isEmpty() || usuario.isEmpty() || clave.isEmpty()) {
+            Toast.makeText(this, "Completa todos los campos", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (nombres.length &gt; 80) {
+            Toast.makeText(this, "Nombres: maximo 80 caracteres", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (dni.length != 8) {
+            Toast.makeText(this, "DNI: deben ser 8 digitos", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (direccion.length &gt; 120) {
+            Toast.makeText(this, "Direccion: maximo 120 caracteres", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (email.length &gt; 100) {
+            Toast.makeText(this, "Email: maximo 100 caracteres", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (usuario.length &gt; 30) {
+            Toast.makeText(this, "Usuario: maximo 30 caracteres", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (clave.length &lt; 6 || clave.length &gt; 20) {
+            Toast.makeText(this, "Clave: minimo 6 y maximo 20 caracteres", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        if (dbHelper.existeUsuarioOEmail(usuario, email, dni)) {
+            Toast.makeText(this, "Ya existe un usuario con ese usuario, email o DNI", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        val nuevoUsuario = Usuario(
+            nombres = nombres,
+            dni = dni,
+            direccion = direccion,
+            email = email,
+            usuario = usuario,
+            clave = clave
+        )
+
+        val result = dbHelper.registrarUsuario(nuevoUsuario)
+
+        if (result != -1L) {
+            Toast.makeText(this, "Usuario registrado correctamente", Toast.LENGTH_SHORT).show()
+            finish()
+        } else {
+            Toast.makeText(this, "No se pudo registrar el usuario", Toast.LENGTH_SHORT).show()
+        }
+    }
+}</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>PARTE 6: Dashboard sencillo despues del acceso</h2>
+
+      <div class="theory">
+        <h3>Objetivo de la pantalla</h3>
+        <p>
+          Despues del login, se mostrara una pantalla sencilla tipo dashboard para simular una app real. Los datos pueden ser estaticos al inicio, porque el foco de esta practica es el registro y el acceso con SQLite.
+        </p>
+      </div>
+
+      <div class="exercise">
+        <h3>Layout propuesto: activity_dashboard.xml</h3>
+        <div class="code-like">&lt;ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"&gt;
+
+    &lt;LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp"&gt;
+
+        &lt;TextView
+            android:id="@+id/tvSaludo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Hola, usuario"
+            android:textSize="24sp"
+            android:textStyle="bold" /&gt;
+
+        &lt;TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Resumen rapido del sistema"
+            android:layout_marginTop="6dp" /&gt;
+
+        &lt;LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="20dp"&gt;
+
+            &lt;TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Compras: 12"
+                android:padding="16dp"
+                android:background="#E0F2FE" /&gt;
+
+            &lt;TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Ventas: 18"
+                android:padding="16dp"
+                android:layout_marginTop="12dp"
+                android:background="#DCFCE7" /&gt;
+
+            &lt;TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Productos: 35"
+                android:padding="16dp"
+                android:layout_marginTop="12dp"
+                android:background="#FEF3C7" /&gt;
+
+            &lt;TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Saldo: S/ 250"
+                android:padding="16dp"
+                android:layout_marginTop="12dp"
+                android:background="#FCE7F3" /&gt;
+
+        &lt;/LinearLayout&gt;
+
+    &lt;/LinearLayout&gt;
+
+&lt;/ScrollView&gt;</div>
+      </div>
+
+      <div class="exercise">
+        <h3>Codigo completo: DashboardActivity.kt</h3>
+        <div class="code-like">package com.example.login_sqlite.view
+
+import android.os.Bundle
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+import com.example.login_sqlite.R
+
+class DashboardActivity : AppCompatActivity() {
+
+    private lateinit var tvSaludo: TextView
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_dashboard)
+
+        tvSaludo = findViewById(R.id.tvSaludo)
+
+        val nombres = intent.getStringExtra("nombres") ?: "usuario"
+        tvSaludo.text = "Hola, $nombres"
+    }
+}</div>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>PARTE 7: AndroidManifest y flujo final</h2>
+
+      <div class="note">
+        <h3>Registro de activities en AndroidManifest.xml</h3>
+        <div class="code-like">&lt;application
+    ... &gt;
+
+    &lt;activity android:name=".view.DashboardActivity" /&gt;
+    &lt;activity android:name=".view.RegistroActivity" /&gt;
+    &lt;activity android:name=".view.LoginActivity"&gt;
+        &lt;intent-filter&gt;
+            &lt;action android:name="android.intent.action.MAIN" /&gt;
+            &lt;category android:name="android.intent.category.LAUNCHER" /&gt;
+        &lt;/intent-filter&gt;
+    &lt;/activity&gt;
+
+&lt;/application&gt;</div>
+      </div>
+
+      <div class="tips">
+        <h3>Flujo completo del proyecto</h3>
+        <div class="flow">
+          <div class="flow-box">LoginActivity</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-box">RegistroActivity</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-box">SQLite</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-box">Login correcto</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-box">DashboardActivity</div>
+        </div>
+      </div>
+
+      <div class="warning">
+        <h3>Puntos que conviene revisar si algo falla</h3>
+        <ul>
+          <li>Confirmar que la tabla <code>usuario</code> se haya creado correctamente.</li>
+          <li>Verificar que no exista <code>android.R</code> importado por error.</li>
+          <li>Revisar que los ids del XML coincidan exactamente con los usados en <code>findViewById()</code>.</li>
+          <li>Comprobar que el registro no repita usuario, email o DNI.</li>
+          <li>Recordar que el login acepta <code>usuario</code> o <code>correo</code>, pero siempre necesita la clave correcta.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="section">
+      <h2>PARTE 8: Propuesta final</h2>
+
+      <div class="theory">
+        <h3>Como se realizaria de forma ordenada</h3>
+        <p>
+          La forma mas clara de trabajar este proyecto es construir primero la tabla y el formulario de registro, porque sin usuario no tiene sentido el login. Luego se implementa la validacion con SQLite para aceptar usuario o correo. Finalmente se redirige a un dashboard sencillo para completar el flujo de una app moderna de acceso local.
+        </p>
+      </div>
+
+      <table class="comparison-table">
+        <tr>
+          <th>Proceso</th>
+          <th>Resultado esperado</th>
+        </tr>
+        <tr>
+          <td>Registro</td>
+          <td>Se guarda un nuevo usuario cumpliendo limites y validaciones.</td>
+        </tr>
+        <tr>
+          <td>Login</td>
+          <td>Se valida si existe un usuario con ese correo o usuario y la clave correcta.</td>
+        </tr>
+        <tr>
+          <td>Dashboard</td>
+          <td>Se muestra una pantalla simple con gadgets estaticos y saludo por nombre.</td>
+        </tr>
+      </table>
+
+      <div class="exercise">
+        <h3>Resultado esperado del proyecto</h3>
+        <ol>
+          <li>Registrar un usuario nuevo en SQLite.</li>
+          <li>Iniciar sesion con usuario o correo y clave.</li>
+          <li>Ver un dashboard con compras, ventas, productos y saldo <code>S/ 250</code>.</li>
+          <li>Tener una base clara para luego agregar cierre de sesion o sesion persistente.</li>
+        </ol>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
