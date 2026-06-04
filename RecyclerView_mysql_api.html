@@ -1,0 +1,1679 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RecyclerView con MySQL y API REST en Android</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    :root {
+      --bg-1: #e0f2fe;
+      --bg-2: #fce7f3;
+      --card: rgba(255, 255, 255, 0.9);
+      --ink: #1f2937;
+      --muted: #4b5563;
+      --primary: #7c3aed;
+      --secondary: #1d4ed8;
+      --accent: #b45309;
+      --dark: #0f172a;
+      --border: rgba(15, 23, 42, 0.12);
+    }
+
+    body {
+      font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, var(--bg-1) 0%, var(--bg-2) 100%);
+      color: var(--ink);
+      line-height: 1.6;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      background: #ffffff;
+      border-radius: 24px;
+      overflow: hidden;
+      box-shadow: 0 24px 70px rgba(15, 23, 42, 0.18);
+    }
+
+    .hero {
+      padding: 48px 40px;
+      color: white;
+      background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 50%, #db2777 100%);
+      text-align: center;
+    }
+
+    .hero h1 {
+      font-size: 2.6em;
+      margin-bottom: 12px;
+    }
+
+    .hero p {
+      font-size: 1.05em;
+      opacity: 0.95;
+    }
+
+    .schedule,
+    .section,
+    .resources {
+      padding: 32px 40px;
+    }
+
+    .schedule {
+      background: #f8fafc;
+      border-bottom: 3px solid #cbd5e1;
+    }
+
+    .resources {
+      color: white;
+      background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%);
+    }
+
+    .schedule h2,
+    .section h2,
+    .resources h2 {
+      font-size: 1.9em;
+      margin-bottom: 18px;
+    }
+
+    .section:nth-child(odd) {
+      background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%);
+    }
+
+    .section:nth-child(even) {
+      background: linear-gradient(135deg, #fdf4ff 0%, #ede9fe 100%);
+    }
+
+    .section h2 {
+      border-bottom: 3px solid rgba(124, 58, 237, 0.25);
+      padding-bottom: 10px;
+    }
+
+    .schedule-grid,
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    .schedule-item,
+    .card,
+    .theory,
+    .tips,
+    .warning,
+    .exercise,
+    .note,
+    .resource-box {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: 0 10px 25px rgba(15, 23, 42, 0.06);
+      padding: 22px;
+      color: var(--ink);
+    }
+
+    .schedule-item {
+      border-left: 5px solid var(--primary);
+    }
+
+    .tips {
+      border-left: 5px solid #16a34a;
+    }
+
+    .warning {
+      border-left: 5px solid #ca8a04;
+      background: rgba(254, 240, 138, 0.55);
+    }
+
+    .exercise {
+      border-left: 5px solid var(--accent);
+    }
+
+    .note {
+      border-left: 5px solid var(--secondary);
+    }
+
+    .card h4,
+    .schedule-item h3 {
+      color: var(--primary);
+      margin-bottom: 8px;
+    }
+
+    .theory {
+      margin-bottom: 20px;
+    }
+
+    .code-like {
+      background: #020617;
+      color: #dbeafe;
+      border-radius: 14px;
+      padding: 20px;
+      overflow-x: auto;
+      margin-top: 15px;
+      border: 1px solid rgba(148, 163, 184, 0.18);
+      font-family: "Courier New", monospace;
+      font-size: 0.9em;
+      line-height: 1.8;
+      white-space: pre-wrap;
+    }
+
+    .code-like .comment { color: #6b7280; }
+    .code-like .key { color: #a78bfa; }
+    .code-like .val { color: #86efac; }
+    .code-like .str { color: #fde68a; }
+
+    .flow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      justify-content: center;
+      align-items: center;
+      margin-top: 18px;
+    }
+
+    .flow-box {
+      min-width: 150px;
+      padding: 14px 16px;
+      border-radius: 14px;
+      background: var(--primary);
+      color: white;
+      text-align: center;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.16);
+      font-size: 0.92em;
+    }
+
+    .flow-box.green { background: #15803d; }
+    .flow-box.orange { background: #b45309; }
+    .flow-box.dark { background: #1e3a8a; }
+
+    .flow-arrow {
+      font-size: 1.8em;
+      color: #a78bfa;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 14px;
+      background: white;
+      border-radius: 14px;
+      overflow: hidden;
+      box-shadow: 0 8px 20px rgba(15, 23, 42, 0.08);
+    }
+
+    .comparison-table th {
+      background: var(--primary);
+      color: white;
+      text-align: left;
+      padding: 12px;
+    }
+
+    .comparison-table td {
+      padding: 12px;
+      border-bottom: 1px solid #e5e7eb;
+      color: var(--muted);
+    }
+
+    .resources a {
+      color: #a78bfa;
+    }
+
+    ul,
+    ol {
+      padding-left: 22px;
+    }
+
+    li {
+      margin: 6px 0;
+    }
+
+    .env-block {
+      background: #0d1117;
+      color: #c9d1d9;
+      border-radius: 14px;
+      padding: 20px;
+      margin-top: 14px;
+      font-family: "Courier New", monospace;
+      font-size: 0.92em;
+      line-height: 2;
+      border: 1px solid #30363d;
+      white-space: pre-wrap;
+    }
+
+    .env-block .comment { color: #8b949e; }
+    .env-block .key { color: #79c0ff; }
+    .env-block .val { color: #a5d6ff; }
+    .env-block .eq { color: #ff7b72; }
+
+    .badge {
+      display: inline-block;
+      background: var(--primary);
+      color: white;
+      border-radius: 8px;
+      padding: 2px 10px;
+      font-size: 0.8em;
+      font-weight: bold;
+      margin-left: 8px;
+      vertical-align: middle;
+    }
+
+    .badge.green { background: #15803d; }
+    .badge.orange { background: #b45309; }
+
+    @media (max-width: 768px) {
+      .hero,
+      .schedule,
+      .section,
+      .resources {
+        padding: 24px 20px;
+      }
+
+      .hero h1 {
+        font-size: 1.9em;
+      }
+
+      .flow {
+        flex-direction: column;
+      }
+
+      .flow-arrow {
+        transform: rotate(90deg);
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- HERO -->
+    <div class="hero">
+      <h1>RecyclerView con MySQL y API REST en Android</h1>
+      <p>Guia paso a paso para conectar Android a una base de datos MySQL remota mediante una API REST propia</p>
+      <p>Incluye configuracion con archivo <code>.env</code>, soporte local y VPS, y tabla <strong>usuario</strong></p>
+      <p style="margin-top:8px;">Nivel sugerido: intermedio-avanzado</p>
+    </div>
+
+    <!-- MAPA GENERAL -->
+    <div class="schedule">
+      <h2>Mapa general de la guia</h2>
+      <div class="schedule-grid">
+        <div class="schedule-item">
+          <h3>1. Arquitectura general</h3>
+          <p>Entender la diferencia entre SQLite local, Firebase y MySQL con API propia.</p>
+        </div>
+        <div class="schedule-item">
+          <h3>2. Servidor y base de datos</h3>
+          <p>Preparar MySQL: local (XAMPP/WAMP) o VPS. Crear la base y la tabla <code>usuario</code>.</p>
+        </div>
+        <div class="schedule-item">
+          <h3>3. API REST con PHP y .env</h3>
+          <p>Construir los endpoints CRUD. Usar <code>.env</code> para credenciales y configuracion.</p>
+        </div>
+        <div class="schedule-item">
+          <h3>4. Android: dependencias</h3>
+          <p>Agregar Retrofit y Gson. Configurar <code>build.gradle.kts</code> y <code>AndroidManifest.xml</code>.</p>
+        </div>
+        <div class="schedule-item">
+          <h3>5. Modelo y Retrofit</h3>
+          <p>Crear el modelo <code>Usuario.kt</code>, la interfaz de la API y el cliente Retrofit.</p>
+        </div>
+        <div class="schedule-item">
+          <h3>6. RecyclerView y CRUD</h3>
+          <p>Adaptar, listar, registrar, editar y eliminar usuarios desde la app.</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- PARTE 1 -->
+    <div class="section">
+      <h2>PARTE 1: Arquitectura general</h2>
+
+      <div class="theory">
+        <h3>Como funciona esta arquitectura</h3>
+        <p>
+          A diferencia de SQLite que guarda datos dentro del dispositivo, o Firebase que provee un servicio gestionado en la nube, aqui se construye una <strong>API REST propia</strong> que expone los datos de una base MySQL a traves de HTTP. La app Android no toca MySQL directamente: siempre habla con la API.
+        </p>
+      </div>
+
+      <div class="note">
+        <h3>Flujo completo</h3>
+        <div class="flow">
+          <div class="flow-box">Android App</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-box dark">API REST (PHP)</div>
+          <div class="flow-arrow">&rarr;</div>
+          <div class="flow-box green">MySQL</div>
+        </div>
+        <p style="margin-top:14px; color:var(--muted);">
+          La API puede vivir en tu maquina local durante el desarrollo, o en un VPS/hosting cuando se despliega. Android solo necesita saber la URL base de la API.
+        </p>
+      </div>
+
+      <div class="card-grid">
+        <div class="card">
+          <h4>SQLite</h4>
+          <p>Local, dentro del dispositivo. Sin internet. Sin servidor.</p>
+        </div>
+        <div class="card">
+          <h4>Firebase Firestore</h4>
+          <p>Nube gestionada por Google. Sin servidor propio. Cuotas incluidas.</p>
+        </div>
+        <div class="card">
+          <h4>MySQL + API REST</h4>
+          <p>Tu propio servidor. Control total de los datos. Requiere backend propio.</p>
+        </div>
+      </div>
+
+      <table class="comparison-table">
+        <tr>
+          <th>Aspecto</th>
+          <th>SQLite</th>
+          <th>Firebase</th>
+          <th>MySQL + API</th>
+        </tr>
+        <tr>
+          <td>Ubicacion de datos</td>
+          <td>Dispositivo</td>
+          <td>Nube Google</td>
+          <td>Tu servidor</td>
+        </tr>
+        <tr>
+          <td>Internet requerido</td>
+          <td>No</td>
+          <td>Si</td>
+          <td>Si</td>
+        </tr>
+        <tr>
+          <td>Backend propio</td>
+          <td>No</td>
+          <td>No</td>
+          <td>Si (PHP u otro)</td>
+        </tr>
+        <tr>
+          <td>Control total de datos</td>
+          <td>Si (local)</td>
+          <td>Limitado</td>
+          <td>Si (total)</td>
+        </tr>
+        <tr>
+          <td>Costo</td>
+          <td>Gratis</td>
+          <td>Plan gratuito disponible</td>
+          <td>Depende del hosting</td>
+        </tr>
+      </table>
+
+      <div class="warning">
+        <h3>Consideracion importante antes de empezar</h3>
+        <p>
+          Durante el desarrollo la API estara en tu maquina local (por ejemplo <code>http://192.168.1.x/api/</code>). Para que el emulador de Android Studio acceda a tu maquina local usa la IP <code>10.0.2.2</code> en lugar de <code>localhost</code>. Un celular fisico conectado al mismo WiFi usa la IP local de tu PC.
+        </p>
+        <p style="margin-top:10px;">
+          Cuando el proyecto se despliega en un VPS solo cambia la URL base en el archivo de configuracion de Android. Ese es precisamente el valor de usar un archivo <code>.env</code> en el servidor y una constante de URL configurable en el cliente.
+        </p>
+      </div>
+    </div>
+
+    <!-- PARTE 2 -->
+    <div class="section">
+      <h2>PARTE 2: Preparar MySQL y la tabla usuario</h2>
+
+      <div class="theory">
+        <h3>Opciones de servidor</h3>
+        <p>
+          Para esta guia se puede usar un entorno local (XAMPP o WAMP en Windows, MAMP en Mac) o un VPS con acceso SSH. Ambas opciones usan exactamente el mismo codigo PHP y el mismo esquema de base de datos; solo cambia la URL que Android usara para conectarse.
+        </p>
+      </div>
+
+      <div class="card-grid">
+        <div class="card">
+          <h4>Local con XAMPP <span class="badge orange">Desarrollo</span></h4>
+          <p>Instala XAMPP. Inicia Apache y MySQL desde el panel. PhpMyAdmin en <code>localhost/phpmyadmin</code>.</p>
+        </div>
+        <div class="card">
+          <h4>VPS propio <span class="badge green">Produccion</span></h4>
+          <p>Acceso por SSH. MySQL instalado en el servidor. Dominio o IP publica para la URL de la API.</p>
+        </div>
+        <div class="card">
+          <h4>Hosting compartido</h4>
+          <p>Panel cPanel o similar. MySQL y PHP disponibles. La URL de la API es el dominio del hosting.</p>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <h3>Paso 2.1: Crear la base de datos</h3>
+        <p>En PhpMyAdmin o desde la consola MySQL ejecuta:</p>
+        <div class="code-like">CREATE DATABASE IF NOT EXISTS app_usuarios
+    CHARACTER SET utf8mb4
+    COLLATE utf8mb4_unicode_ci;</div>
+      </div>
+
+      <div class="exercise">
+        <h3>Paso 2.2: Crear la tabla usuario</h3>
+        <div class="code-like">USE app_usuarios;
+
+CREATE TABLE IF NOT EXISTS usuario (
+    id         INT          NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    nombre     VARCHAR(80)  NOT NULL,
+    apellido   VARCHAR(80)  NOT NULL,
+    email      VARCHAR(120) NOT NULL UNIQUE,
+    password   VARCHAR(255) NOT NULL,
+    telefono   VARCHAR(20)  DEFAULT NULL,
+    activo     TINYINT(1)   NOT NULL DEFAULT 1,
+    created_at TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;</div>
+      </div>
+
+      <div class="warning">
+        <h3>Sobre el campo password</h3>
+        <p>
+          La contrasena <strong>nunca se guarda en texto plano</strong>. En la API PHP se aplica <code>password_hash()</code> antes de insertar, y se verifica con <code>password_verify()</code>. El campo en MySQL es <code>VARCHAR(255)</code> porque el hash generado por <code>PASSWORD_BCRYPT</code> tiene 60 caracteres pero la longitud recomendada es 255 para soportar futuros algoritmos.
+        </p>
+        <p style="margin-top:8px;">
+          La columna <code>password</code> <strong>nunca se incluye en las respuestas GET</strong> de la API: el modelo PHP la excluye explicitamente al serializar.
+        </p>
+      </div>
+
+      <div class="tips">
+        <h3>Resultado esperado de esta parte</h3>
+        <ul>
+          <li>Base de datos <code>app_usuarios</code> creada en MySQL.</li>
+          <li>Tabla <code>usuario</code> con los campos indicados.</li>
+          <li>MySQL accesible desde PHP (local o VPS).</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- PARTE 3 -->
+    <div class="section">
+      <h2>PARTE 3: API REST en PHP con archivo .env</h2>
+
+      <div class="theory">
+        <h3>Por que usar un archivo .env</h3>
+        <p>
+          Un archivo <code>.env</code> separa la configuracion del codigo. Las credenciales de la base de datos, el nombre de la BD y el modo de entorno se guardan ahi. El codigo PHP lo lee al arrancar. Cambiar de entorno local a VPS solo requiere editar <code>.env</code>, no el codigo fuente.
+        </p>
+        <p style="margin-top:8px;">
+          El proyecto de esta guia vive en <code>D:\laragon\www\api_ucv\</code> y se accede desde Laragon en <code>http://localhost/api_ucv/</code>.
+        </p>
+      </div>
+
+      <div class="exercise">
+        <h3>Paso 3.1: Estructura de carpetas del proyecto</h3>
+        <div class="code-like">api_ucv/
+├── .env                  &lt;-- credenciales y configuracion (NO subir a git)
+├── .env.example          &lt;-- plantilla sin valores reales (SI subir a git)
+├── .gitignore            &lt;-- excluye .env del repositorio
+├── .htaccess             &lt;-- bloquea .env y redirige todo a index.php
+├── index.php             &lt;-- router principal
+├── config/
+│   └── Database.php      &lt;-- lee .env y abre la conexion PDO
+├── models/
+│   └── Usuario.php       &lt;-- CRUD de usuario con password_hash
+├── controllers/          &lt;-- vacia, lista para futuros recursos
+└── sql/
+    └── crear_tablas.sql  &lt;-- script para crear la BD y la tabla en MySQL</div>
+      </div>
+
+      <div class="exercise">
+        <h3>Paso 3.2: Archivo .env</h3>
+        <p>Ubicacion: <code>api_ucv/.env</code>. Laragon usa <code>root</code> sin contrasena por defecto; ajusta <code>DB_PASS</code> si cambiaste la clave de MySQL.</p>
+        <div class="env-block"><span class="comment"># ─── Entorno ───────────────────────────────────────────</span>
+<span class="key">APP_ENV</span><span class="eq">=</span><span class="val">local</span>            <span class="comment"># local | production</span>
+<span class="key">APP_DEBUG</span><span class="eq">=</span><span class="val">true</span>           <span class="comment"># true en desarrollo, false en produccion</span>
+
+<span class="comment"># ─── Base de datos ─────────────────────────────────────</span>
+<span class="key">DB_HOST</span><span class="eq">=</span><span class="val">127.0.0.1</span>
+<span class="key">DB_PORT</span><span class="eq">=</span><span class="val">3306</span>
+<span class="key">DB_NAME</span><span class="eq">=</span><span class="val">app_usuarios</span>
+<span class="key">DB_USER</span><span class="eq">=</span><span class="val">root</span>
+<span class="key">DB_PASS</span><span class="eq">=</span><span class="val"></span>
+
+<span class="comment"># ─── API ────────────────────────────────────────────────</span>
+<span class="key">API_KEY</span><span class="eq">=</span><span class="val">cambia_esta_clave_secreta</span></div>
+        <div class="warning" style="margin-top:16px;">
+          <h3>Proteger el archivo .env</h3>
+          <p>El <code>.htaccess</code> ya bloquea el acceso al <code>.env</code> desde el navegador y redirige todo a <code>index.php</code>. El <code>.gitignore</code> lo excluye del repositorio. Sube solo <code>.env.example</code> con valores vacios.</p>
+        </div>
+      </div>
+
+      <div class="exercise">
+        <h3>Paso 3.3: .htaccess</h3>
+        <p>Ubicacion: <code>api_ucv/.htaccess</code></p>
+        <div class="code-like"># Bloquear acceso directo al .env desde el navegador
+&lt;Files ".env"&gt;
+    Order allow,deny
+    Deny from all
+&lt;/Files&gt;
+
+# Redirigir todas las peticiones a index.php (router)
+RewriteEngine On
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteRule ^(.*)$ index.php [QSA,L]</div>
+      </div>
+
+      <div class="exercise">
+        <h3>Paso 3.4: config/Database.php</h3>
+        <p>Lee el <code>.env</code> sin dependencias externas y abre la conexion PDO. Si <code>APP_DEBUG=true</code> muestra el mensaje de error real; en produccion lo oculta.</p>
+        <div class="code-like">&lt;?php
+// config/Database.php
+
+class Database {
+
+    private PDO $conn;
+
+    public function __construct() {
+        $this-&gt;loadEnv(__DIR__ . '/../.env');
+
+        $host = $_ENV['DB_HOST'] ?? '127.0.0.1';
+        $port = $_ENV['DB_PORT'] ?? '3306';
+        $name = $_ENV['DB_NAME'] ?? '';
+        $user = $_ENV['DB_USER'] ?? '';
+        $pass = $_ENV['DB_PASS'] ?? '';
+
+        $dsn = "mysql:host=$host;port=$port;dbname=$name;charset=utf8mb4";
+
+        try {
+            $this-&gt;conn = new PDO($dsn, $user, $pass, [
+                PDO::ATTR_ERRMODE            =&gt; PDO::ERRMODE_EXCEPTION,
+                PDO::ATTR_DEFAULT_FETCH_MODE =&gt; PDO::FETCH_ASSOC,
+                PDO::ATTR_EMULATE_PREPARES   =&gt; false,
+            ]);
+        } catch (PDOException $e) {
+            $debug = ($_ENV['APP_DEBUG'] ?? 'false') === 'true';
+            http_response_code(500);
+            echo json_encode([
+                'error'   =&gt; 'Error de conexion a la base de datos',
+                'detalle' =&gt; $debug ? $e-&gt;getMessage() : null,
+            ]);
+            exit;
+        }
+    }
+
+    public function getConnection(): PDO {
+        return $this-&gt;conn;
+    }
+
+    private function loadEnv(string $path): void {
+        if (!file_exists($path)) return;
+
+        $lines = file($path, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        foreach ($lines as $line) {
+            $line = trim($line);
+            if ($line === '' || str_starts_with($line, '#')) continue;
+
+            // Soporta valores con = dentro (ej. contrasenas con =)
+            [$key, $value] = array_map('trim', explode('=', $line, 2));
+
+            // Quita comillas simples o dobles opcionales alrededor del valor
+            $value = trim($value, '"\'');
+
+            // Elimina comentarios inline (valor # comentario)
+            if (($pos = strpos($value, ' #')) !== false) {
+                $value = trim(substr($value, 0, $pos));
+            }
+
+            $_ENV[$key] = $value;
+            putenv("$key=$value");
+        }
+    }
+}</div>
+      </div>
+
+      <div class="exercise">
+        <h3>Paso 3.5: models/Usuario.php</h3>
+        <p>
+          <code>listar()</code> y <code>obtener()</code> seleccionan columnas explicitas y excluyen <code>password</code>: el hash nunca viaja al cliente. <code>insertar()</code> aplica <code>password_hash()</code> con BCrypt. <code>actualizar()</code> solo cambia la contrasena si el campo llega no vacio.
+        </p>
+        <div class="code-like">&lt;?php
+// models/Usuario.php
+
+class Usuario {
+
+    private PDO $db;
+    private string $table = 'usuario';
+
+    // password excluido deliberadamente — nunca viaja al cliente
+    private string $campos = 'id, nombre, apellido, email, telefono, activo, created_at';
+
+    public function __construct(PDO $db) {
+        $this-&gt;db = $db;
+    }
+
+    public function listar(): array {
+        $stmt = $this-&gt;db-&gt;query(
+            "SELECT {$this-&gt;campos} FROM {$this-&gt;table} ORDER BY id DESC"
+        );
+        return $stmt-&gt;fetchAll();
+    }
+
+    public function obtener(int $id): array|false {
+        $stmt = $this-&gt;db-&gt;prepare(
+            "SELECT {$this-&gt;campos} FROM {$this-&gt;table} WHERE id = ?"
+        );
+        $stmt-&gt;execute([$id]);
+        return $stmt-&gt;fetch();
+    }
+
+    public function insertar(array $data): int {
+        $hash = password_hash($data['password'], PASSWORD_BCRYPT);
+
+        $stmt = $this-&gt;db-&gt;prepare(
+            "INSERT INTO {$this-&gt;table} (nombre, apellido, email, password, telefono)
+             VALUES (:nombre, :apellido, :email, :password, :telefono)"
+        );
+        $stmt-&gt;execute([
+            ':nombre'   =&gt; $data['nombre'],
+            ':apellido' =&gt; $data['apellido'],
+            ':email'    =&gt; $data['email'],
+            ':password' =&gt; $hash,
+            ':telefono' =&gt; $data['telefono'] ?? null,
+        ]);
+        return (int) $this-&gt;db-&gt;lastInsertId();
+    }
+
+    public function actualizar(int $id, array $data): int {
+        // Si viene password se hashea y actualiza; si no, se conserva el existente
+        if (!empty($data['password'])) {
+            $stmt = $this-&gt;db-&gt;prepare(
+                "UPDATE {$this-&gt;table}
+                 SET nombre=:nombre, apellido=:apellido, email=:email,
+                     password=:password, telefono=:telefono
+                 WHERE id = :id"
+            );
+            $params = [
+                ':nombre'   =&gt; $data['nombre'],
+                ':apellido' =&gt; $data['apellido'],
+                ':email'    =&gt; $data['email'],
+                ':password' =&gt; password_hash($data['password'], PASSWORD_BCRYPT),
+                ':telefono' =&gt; $data['telefono'] ?? null,
+                ':id'       =&gt; $id,
+            ];
+        } else {
+            $stmt = $this-&gt;db-&gt;prepare(
+                "UPDATE {$this-&gt;table}
+                 SET nombre=:nombre, apellido=:apellido, email=:email, telefono=:telefono
+                 WHERE id = :id"
+            );
+            $params = [
+                ':nombre'   =&gt; $data['nombre'],
+                ':apellido' =&gt; $data['apellido'],
+                ':email'    =&gt; $data['email'],
+                ':telefono' =&gt; $data['telefono'] ?? null,
+                ':id'       =&gt; $id,
+            ];
+        }
+
+        $stmt-&gt;execute($params);
+        return $stmt-&gt;rowCount();
+    }
+
+    public function eliminar(int $id): int {
+        $stmt = $this-&gt;db-&gt;prepare("DELETE FROM {$this-&gt;table} WHERE id = ?");
+        $stmt-&gt;execute([$id]);
+        return $stmt-&gt;rowCount();
+    }
+}</div>
+      </div>
+
+      <div class="exercise">
+        <h3>Paso 3.6: index.php — router principal</h3>
+        <p>
+          Maneja CORS, extrae el recurso e id de la URI, y delega a la funcion correspondiente. El segmento <code>api_ucv</code> del path de Laragon se elimina automaticamente antes de leer el recurso.
+        </p>
+        <div class="code-like">&lt;?php
+// index.php — router principal
+
+header("Content-Type: application/json; charset=UTF-8");
+header("Access-Control-Allow-Origin: *");
+header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
+header("Access-Control-Allow-Headers: Content-Type, Authorization");
+
+// Responder preflight CORS sin procesar nada mas
+if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
+    http_response_code(204);
+    exit;
+}
+
+require_once 'config/Database.php';
+require_once 'models/Usuario.php';
+
+$db      = (new Database())-&gt;getConnection();
+$usuario = new Usuario($db);
+$method  = $_SERVER['REQUEST_METHOD'];
+
+// Extraer segmentos de la URI limpiando el prefijo del proyecto
+// Laragon: /api_ucv/usuarios/5  ->  ['usuarios', '5']
+$uri      = trim(parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH), '/');
+$segments = explode('/', $uri);
+
+// Eliminar el segmento del nombre del proyecto si Laragon lo incluye en la ruta
+$projectFolder = 'api_ucv';
+if (isset($segments[0]) &amp;&amp; $segments[0] === $projectFolder) {
+    array_shift($segments);
+}
+
+$resource = $segments[0] ?? '';
+$id       = isset($segments[1]) &amp;&amp; $segments[1] !== '' ? (int) $segments[1] : null;
+
+$body = json_decode(file_get_contents("php://input"), true) ?? [];
+
+// ----- Router -----
+switch ($resource) {
+    case 'usuarios':
+        routeUsuarios($usuario, $method, $id, $body);
+        break;
+
+    default:
+        http_response_code(404);
+        echo json_encode(['error' =&gt; 'Recurso no encontrado']);
+}
+
+// ----- Handlers -----
+
+function routeUsuarios(Usuario $u, string $method, ?int $id, array $body): void {
+    switch ($method) {
+        case 'GET':
+            if ($id) {
+                $data = $u-&gt;obtener($id);
+                echo $data
+                    ? json_encode($data)
+                    : (http_response_code(404) &amp;&amp; json_encode(['error' =&gt; 'Usuario no encontrado']));
+            } else {
+                echo json_encode($u-&gt;listar());
+            }
+            break;
+
+        case 'POST':
+            if (empty($body['nombre']) || empty($body['apellido']) ||
+                empty($body['email'])  || empty($body['password'])) {
+                http_response_code(422);
+                echo json_encode(['error' =&gt; 'nombre, apellido, email y password son obligatorios']);
+                return;
+            }
+            $newId = $u-&gt;insertar($body);
+            http_response_code(201);
+            echo json_encode(['id' =&gt; $newId, 'mensaje' =&gt; 'Usuario creado']);
+            break;
+
+        case 'PUT':
+            if (!$id) {
+                http_response_code(400);
+                echo json_encode(['error' =&gt; 'Se requiere el id en la URL']);
+                return;
+            }
+            if (empty($body['nombre']) || empty($body['apellido']) || empty($body['email'])) {
+                http_response_code(422);
+                echo json_encode(['error' =&gt; 'nombre, apellido y email son obligatorios']);
+                return;
+            }
+            $rows = $u-&gt;actualizar($id, $body);
+            echo json_encode(['filas' =&gt; $rows, 'mensaje' =&gt; 'Usuario actualizado']);
+            break;
+
+        case 'DELETE':
+            if (!$id) {
+                http_response_code(400);
+                echo json_encode(['error' =&gt; 'Se requiere el id en la URL']);
+                return;
+            }
+            $rows = $u-&gt;eliminar($id);
+            echo json_encode(['filas' =&gt; $rows, 'mensaje' =&gt; 'Usuario eliminado']);
+            break;
+
+        default:
+            http_response_code(405);
+            echo json_encode(['error' =&gt; 'Metodo no permitido']);
+    }
+}</div>
+      </div>
+
+      <div class="note">
+        <h3>Paso 3.7: Crear la base de datos y la tabla</h3>
+        <p>
+          El script esta en <code>api_ucv/sql/crear_tablas.sql</code>. El SQL completo y la explicacion de cada campo se encuentran en la <strong>Parte 2</strong> de esta guia. Ejecutalo una sola vez desde <strong>phpMyAdmin</strong> de Laragon (<code>localhost/phpmyadmin</code>) antes de probar la API.
+        </p>
+      </div>
+
+      <div class="tips">
+        <h3>Probar la API en Laragon antes de tocar Android</h3>
+        <p>Con Laragon corriendo, prueba cada endpoint con <strong>Postman</strong> o <strong>Thunder Client</strong>:</p>
+        <ul>
+          <li><code>GET  http://localhost/api_ucv/usuarios</code> — lista todos (password no aparece)</li>
+          <li><code>POST http://localhost/api_ucv/usuarios</code> body JSON: <code>{"nombre":"Ana","apellido":"Lopez","email":"ana@test.com","password":"123456","telefono":"04141234567"}</code></li>
+          <li><code>PUT  http://localhost/api_ucv/usuarios/1</code> body con campos a editar; omite <code>password</code> si no se quiere cambiar</li>
+          <li><code>DELETE http://localhost/api_ucv/usuarios/1</code></li>
+        </ul>
+      </div>
+
+      <div class="note">
+        <h3>URL segun el entorno</h3>
+        <table class="comparison-table" style="margin-top:0;">
+          <tr>
+            <th>Entorno</th>
+            <th>Desde donde accede Android</th>
+            <th>URL base en AppConfig.kt</th>
+          </tr>
+          <tr>
+            <td>Laragon local — emulador Android Studio</td>
+            <td>Emulador</td>
+            <td><code>http://10.0.2.2/api_ucv/</code></td>
+          </tr>
+          <tr>
+            <td>Laragon local — celular fisico (mismo WiFi)</td>
+            <td>Celular</td>
+            <td><code>http://192.168.1.X/api_ucv/</code> (IP local de tu PC)</td>
+          </tr>
+          <tr>
+            <td>VPS / hosting</td>
+            <td>Cualquiera</td>
+            <td><code>https://tudominio.com/api_ucv/</code></td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- PARTE 4 -->
+    <div class="section">
+      <h2>PARTE 4: Configurar Android Studio</h2>
+
+      <div class="theory">
+        <h3>Dependencias necesarias</h3>
+        <p>
+          Se usara <strong>Retrofit 2</strong> como cliente HTTP, <strong>Gson</strong> como conversor JSON y la libreria <strong>RecyclerView</strong>. Retrofit se encarga de hacer las llamadas HTTP a la API y deserializar las respuestas automaticamente.
+        </p>
+      </div>
+
+      <div class="exercise">
+        <h3>Paso 4.1: Estructura del proyecto Android</h3>
+        <p>El proyecto se creo con el package <code>com.example.apiucv</code>. Android Studio ya genero <code>MainActivity.kt</code> y <code>activity_main.xml</code>. Solo hay que agregar las carpetas y archivos nuevos indicados abajo.</p>
+        <div class="code-like">app/
+├── manifests/
+│   └── AndroidManifest.xml          &lt;-- agregar permiso INTERNET
+├── java/com.example.apiucv/
+│   ├── MainActivity.kt              &lt;-- ya existe, reemplazar contenido
+│   ├── model/                       &lt;-- crear carpeta
+│   │   └── Usuario.kt
+│   ├── network/                     &lt;-- crear carpeta
+│   │   ├── AppConfig.kt
+│   │   ├── ApiService.kt
+│   │   └── RetrofitClient.kt
+│   └── adapter/                     &lt;-- crear carpeta
+│       └── UsuarioAdapter.kt
+└── res/
+    └── layout/
+        ├── activity_main.xml        &lt;-- ya existe, reemplazar contenido
+        ├── item_usuario.xml         &lt;-- crear
+        └── dialog_usuario.xml       &lt;-- crear</div>
+      </div>
+
+      <div class="note">
+        <h3>Paso 4.2: build.gradle.kts del modulo app — completo</h3>
+        <p>Abre <code>Gradle Scripts &gt; build.gradle.kts (Module :app)</code>. El archivo ya tiene el bloque generado por Android Studio; solo agrega las cuatro dependencias al final del bloque <code>dependencies</code>. El resultado completo queda asi:</p>
+        <div class="code-like">plugins {
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+}
+
+android {
+    namespace = "com.example.apiucv"
+    compileSdk = 36
+
+    defaultConfig {
+        applicationId = "com.example.apiucv"
+        minSdk = 27
+        targetSdk = 36
+        versionCode = 1
+        versionName = "1.0"
+
+        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            isMinifyEnabled = false
+            proguardFiles(
+                getDefaultProguardFile("proguard-android-optimize.txt"),
+                "proguard-rules.pro"
+            )
+        }
+    }
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+    kotlinOptions {
+        jvmTarget = "11"
+    }
+}
+
+dependencies {
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.material)
+    implementation(libs.androidx.activity)
+    implementation(libs.androidx.constraintlayout)
+    testImplementation(libs.junit)
+    androidTestImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.espresso.core)
+
+    // Retrofit y Gson
+    implementation("com.squareup.retrofit2:retrofit:2.11.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.11.0")
+
+    // OkHttp logging (util para ver peticiones en Logcat durante desarrollo)
+    implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
+
+    // RecyclerView
+    implementation("androidx.recyclerview:recyclerview:1.3.2")
+
+    // Material Components
+    implementation("com.google.android.material:material:1.12.0")
+}</div>
+        <p style="margin-top:10px;">Pulsa <strong>Sync Now</strong> en la barra amarilla que aparece al guardar.</p>
+      </div>
+
+      <div class="exercise">
+        <h3>Paso 4.3: AndroidManifest.xml</h3>
+        <p>
+          El archivo ya existe. Agrega el permiso de Internet y <code>usesCleartextTraffic</code> antes de que Android Studio lo genere sin ellos. Nota que <code>MainActivity</code> esta declarada como <code>.view.MainActivity</code> porque la movimos a la carpeta <code>view/</code>.
+        </p>
+        <div class="code-like">&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"&gt;
+
+    &lt;uses-permission android:name="android.permission.INTERNET" /&gt;
+
+    &lt;application
+        android:usesCleartextTraffic="true"
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Apiucv"&gt;
+
+        &lt;activity
+            android:name=".view.MainActivity"
+            android:exported="true"&gt;
+            &lt;intent-filter&gt;
+                &lt;action android:name="android.intent.action.MAIN" /&gt;
+                &lt;category android:name="android.intent.category.LAUNCHER" /&gt;
+            &lt;/intent-filter&gt;
+        &lt;/activity&gt;
+
+    &lt;/application&gt;
+
+&lt;/manifest&gt;</div>
+        <div class="warning" style="margin-top:14px;">
+          <h3>Dos cosas importantes en este archivo</h3>
+          <ul>
+            <li><code>android:usesCleartextTraffic="true"</code> — permite HTTP sin cifrar. Solo necesario mientras la API este en local. Cuando pases a VPS con HTTPS, elimina esta linea.</li>
+            <li><code>android:name=".view.MainActivity"</code> — el punto indica que es relativo al package <code>com.example.apiucv</code>. Si MainActivity esta en la carpeta <code>view/</code> debe declararse asi, de lo contrario la app no arranca.</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <!-- PARTE 5 -->
+    <div class="section">
+      <h2>PARTE 5: Modelo, API Service y Retrofit Client</h2>
+
+      <div class="exercise">
+        <h3>Paso 5.1: model/Usuario.kt</h3>
+        <p>Crea el archivo en <code>java/com.example.apiucv/model/Usuario.kt</code>. Los nombres de los campos deben coincidir exactamente con las claves JSON que devuelve la API. <code>@SerializedName</code> se usa cuando el nombre en JSON difiere del nombre en Kotlin (aqui <code>created_at</code> vs <code>createdAt</code>). El campo <code>password</code> llega como <code>null</code> en los GET porque la API nunca lo incluye; solo se envia en POST y PUT.</p>
+        <div class="code-like">package com.example.apiucv.model
+
+import com.google.gson.annotations.SerializedName
+
+data class Usuario(
+    val id: Int = 0,
+    val nombre: String = "",
+    val apellido: String = "",
+    val email: String = "",
+    // Solo se envia al crear o editar; la API no lo devuelve en GET
+    val password: String? = null,
+    val telefono: String? = null,
+    val activo: Int = 1,
+    @SerializedName("created_at")
+    val createdAt: String? = null
+)</div>
+      </div>
+
+      <div class="note">
+        <h3>Paso 5.2: network/AppConfig.kt</h3>
+        <p>Crea el archivo en <code>java/com.example.apiucv/network/AppConfig.kt</code>. Centraliza la URL base en un solo lugar: cuando cambies de entorno solo editas esta linea, sin tocar <code>RetrofitClient</code> ni ningún otro archivo.</p>
+        <div class="code-like">package com.example.apiucv.network
+
+object AppConfig {
+    // Cambia esta URL segun el entorno:
+    // Emulador local:      "http://10.0.2.2/api_ucv/"
+    // Celular + WiFi:      "http://192.168.1.X/api_ucv/"
+    // VPS produccion:      "https://tudominio.com/api_ucv/"
+    const val BASE_URL = "http://10.0.2.2/api_ucv/"
+}</div>
+      </div>
+
+      <div class="exercise">
+        <h3>Paso 5.3: network/ApiService.kt</h3>
+        <p>Crea el archivo en <code>java/com.example.apiucv/network/ApiService.kt</code>. Cada funcion corresponde a un endpoint de la API. La anotacion indica el metodo HTTP y la ruta relativa a <code>BASE_URL</code>. Todas son <code>suspend</code> para llamarlas desde coroutines.</p>
+        <div class="code-like">package com.example.apiucv.network
+
+import com.example.apiucv.model.Usuario
+import retrofit2.Response
+import retrofit2.http.*
+
+interface ApiService {
+
+    @GET("usuarios")
+    suspend fun listarUsuarios(): Response&lt;List&lt;Usuario&gt;&gt;
+
+    @GET("usuarios/{id}")
+    suspend fun obtenerUsuario(@Path("id") id: Int): Response&lt;Usuario&gt;
+
+    @POST("usuarios")
+    suspend fun crearUsuario(@Body usuario: Usuario): Response&lt;Map&lt;String, Any&gt;&gt;
+
+    @PUT("usuarios/{id}")
+    suspend fun actualizarUsuario(
+        @Path("id") id: Int,
+        @Body usuario: Usuario
+    ): Response&lt;Map&lt;String, Any&gt;&gt;
+
+    @DELETE("usuarios/{id}")
+    suspend fun eliminarUsuario(@Path("id") id: Int): Response&lt;Map&lt;String, Any&gt;&gt;
+}</div>
+      </div>
+
+      <div class="exercise">
+        <h3>Paso 5.4: network/RetrofitClient.kt</h3>
+        <p>Crea el archivo en <code>java/com.example.apiucv/network/RetrofitClient.kt</code>. Es un <code>object</code> (singleton) que crea la instancia de Retrofit una sola vez. El <code>HttpLoggingInterceptor</code> imprime en Logcat cada peticion y respuesta HTTP completa, lo cual es muy util para depurar durante el desarrollo.</p>
+        <div class="code-like">package com.example.apiucv.network
+
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+
+object RetrofitClient {
+
+    private val loggingInterceptor = HttpLoggingInterceptor().apply {
+        level = HttpLoggingInterceptor.Level.BODY
+    }
+
+    private val okHttpClient = OkHttpClient.Builder()
+        .addInterceptor(loggingInterceptor)
+        .build()
+
+    val apiService: ApiService by lazy {
+        Retrofit.Builder()
+            .baseUrl(AppConfig.BASE_URL)
+            .client(okHttpClient)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+            .create(ApiService::class.java)
+    }
+}</div>
+      </div>
+    </div>
+
+    <!-- PARTE 6 -->
+    <div class="section">
+      <h2>PARTE 6: Layouts</h2>
+
+      <div class="exercise">
+        <h3>Paso 6.1: activity_main.xml</h3>
+        <p>El archivo ya existe generado por Android Studio. Reemplaza todo su contenido por esto: se conserva el <code>ConstraintLayout</code> raiz con el mismo <code>android:id="@+id/main"</code> que genera Android Studio, se elimina el <code>TextView</code> de "Hello World!" y se agregan el <code>RecyclerView</code> y el <code>FloatingActionButton</code>.</p>
+        <div class="code-like">&lt;?xml version="1.0" encoding="utf-8"?&gt; 
+&lt;androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.apiucv.view.MainActivity"&gt;
+
+    &lt;androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:padding="8dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" /&gt;
+
+    &lt;com.google.android.material.floatingactionbutton.FloatingActionButton
+        android:id="@+id/fabAgregar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="24dp"
+        android:contentDescription="Agregar usuario"
+        android:src="@android:drawable/ic_input_add"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" /&gt;
+
+&lt;/androidx.constraintlayout.widget.ConstraintLayout&gt;</div>
+      </div>
+
+      <div class="exercise">
+        <h3>Paso 6.2: item_usuario.xml</h3>
+        <div class="code-like">&lt;androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="6dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="4dp"&gt;
+
+    &lt;LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="14dp"&gt;
+
+        &lt;TextView
+            android:id="@+id/tvNombreCompleto"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="17sp"
+            android:textStyle="bold" /&gt;
+
+        &lt;TextView
+            android:id="@+id/tvEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="14sp"
+            android:textColor="#555555"
+            android:layout_marginTop="2dp" /&gt;
+
+        &lt;TextView
+            android:id="@+id/tvTelefono"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="13sp"
+            android:textColor="#888888"
+            android:layout_marginTop="2dp" /&gt;
+
+    &lt;/LinearLayout&gt;
+
+&lt;/androidx.cardview.widget.CardView&gt;</div>
+      </div>
+
+      <div class="exercise">
+        <h3>Paso 6.3: dialog_usuario.xml</h3>
+        <p>
+          El campo de contrasena usa <code>inputType="textPassword"</code> para enmascarar lo que escribe el usuario. En modo edicion el hint indica que dejarlo vacio conserva la contrasena actual.
+        </p>
+        <div class="code-like">&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="20dp"&gt;
+
+    &lt;com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Nombre"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"&gt;
+        &lt;com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etNombre"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName" /&gt;
+    &lt;/com.google.android.material.textfield.TextInputLayout&gt;
+
+    &lt;com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Apellido"
+        android:layout_marginTop="10dp"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"&gt;
+        &lt;com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etApellido"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPersonName" /&gt;
+    &lt;/com.google.android.material.textfield.TextInputLayout&gt;
+
+    &lt;com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Email"
+        android:layout_marginTop="10dp"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"&gt;
+        &lt;com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etEmail"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textEmailAddress" /&gt;
+    &lt;/com.google.android.material.textfield.TextInputLayout&gt;
+
+    &lt;!-- En edicion: dejar vacio conserva la contrasena actual --&gt;
+    &lt;com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/tilPassword"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Contrasena"
+        android:layout_marginTop="10dp"
+        app:passwordToggleEnabled="true"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"&gt;
+        &lt;com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etPassword"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword" /&gt;
+    &lt;/com.google.android.material.textfield.TextInputLayout&gt;
+
+    &lt;com.google.android.material.textfield.TextInputLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Telefono (opcional)"
+        android:layout_marginTop="10dp"
+        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"&gt;
+        &lt;com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/etTelefono"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="phone" /&gt;
+    &lt;/com.google.android.material.textfield.TextInputLayout&gt;
+
+&lt;/LinearLayout&gt;</div>
+      </div>
+    </div>
+
+    <!-- PARTE 7 -->
+    <div class="section">
+      <h2>PARTE 7: Adapter y MainActivity</h2>
+
+      <div class="exercise">
+        <h3>Paso 7.1: adapter/UsuarioAdapter.kt</h3>
+        <p>Crea el archivo en <code>java/com.example.apiucv/adapter/UsuarioAdapter.kt</code>. El adapter recibe dos lambdas: <code>onEditar</code> se dispara con un toque normal y <code>onEliminar</code> con toque largo.</p>
+        <div class="code-like">package com.example.apiucv.adapter
+
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import com.example.apiucv.R
+import com.example.apiucv.model.Usuario
+
+class UsuarioAdapter(
+    private val lista: MutableList&lt;Usuario&gt;,
+    private val onEditar: (Usuario) -&gt; Unit,
+    private val onEliminar: (Usuario) -&gt; Unit
+) : RecyclerView.Adapter&lt;UsuarioAdapter.ViewHolder&gt;() {
+
+    inner class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val tvNombreCompleto: TextView = itemView.findViewById(R.id.tvNombreCompleto)
+        val tvEmail: TextView          = itemView.findViewById(R.id.tvEmail)
+        val tvTelefono: TextView       = itemView.findViewById(R.id.tvTelefono)
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_usuario, parent, false)
+        return ViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val u = lista[position]
+        holder.tvNombreCompleto.text = "${u.nombre} ${u.apellido}"
+        holder.tvEmail.text          = u.email
+        holder.tvTelefono.text       = u.telefono ?: "Sin telefono"
+
+        holder.itemView.setOnClickListener { onEditar(u) }
+        holder.itemView.setOnLongClickListener { onEliminar(u); true }
+    }
+
+    override fun getItemCount() = lista.size
+
+    fun actualizar(nuevaLista: List&lt;Usuario&gt;) {
+        lista.clear()
+        lista.addAll(nuevaLista)
+        notifyDataSetChanged()
+    }
+}</div>
+      </div>
+
+      <div class="exercise">
+        <h3>Paso 7.2: view/MainActivity.kt</h3>
+        <p>Mueve <code>MainActivity.kt</code> a la carpeta <code>view/</code> y reemplaza todo su contenido. Nota que el import de <code>R</code> es explicito (<code>com.example.apiucv.R</code>) porque la clase esta en un subpaquete distinto al raiz.</p>
+        <div class="code-like">package com.example.apiucv.view
+
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.apiucv.adapter.UsuarioAdapter
+import com.example.apiucv.model.Usuario
+import com.example.apiucv.network.RetrofitClient
+import com.google.android.material.floatingactionbutton.FloatingActionButton
+import com.google.android.material.textfield.TextInputEditText
+import kotlinx.coroutines.launch
+import com.example.apiucv.R
+
+class MainActivity : AppCompatActivity() {
+
+    private lateinit var adapter: UsuarioAdapter
+    private val lista = mutableListOf&lt;Usuario&gt;()
+    private val api = RetrofitClient.apiService
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        val recyclerView = findViewById&lt;RecyclerView&gt;(R.id.recyclerView)
+        val fab          = findViewById&lt;FloatingActionButton&gt;(R.id.fabAgregar)
+
+        adapter = UsuarioAdapter(
+            lista,
+            onEditar   = { mostrarDialogo(it) },
+            onEliminar = { confirmarEliminar(it) }
+        )
+
+        recyclerView.layoutManager = LinearLayoutManager(this)
+        recyclerView.adapter       = adapter
+
+        fab.setOnClickListener { mostrarDialogo(null) }
+
+        cargarUsuarios()
+    }
+
+    private fun cargarUsuarios() {
+        lifecycleScope.launch {
+            try {
+                val response = api.listarUsuarios()
+                if (response.isSuccessful) {
+                    adapter.actualizar(response.body() ?: emptyList())
+                } else {
+                    toast("Error al cargar: ${response.code()}")
+                }
+            } catch (e: Exception) {
+                toast("Sin conexion: ${e.message}")
+            }
+        }
+    }
+
+    private fun mostrarDialogo(usuario: Usuario?) {
+        val dialogView = LayoutInflater.from(this).inflate(R.layout.dialog_usuario, null)
+        val etNombre   = dialogView.findViewById&lt;TextInputEditText&gt;(R.id.etNombre)
+        val etApellido = dialogView.findViewById&lt;TextInputEditText&gt;(R.id.etApellido)
+        val etEmail    = dialogView.findViewById&lt;TextInputEditText&gt;(R.id.etEmail)
+        val etPassword = dialogView.findViewById&lt;TextInputEditText&gt;(R.id.etPassword)
+        val etTelefono = dialogView.findViewById&lt;TextInputEditText&gt;(R.id.etTelefono)
+
+        val esEdicion = usuario != null
+        if (esEdicion) {
+            etNombre.setText(usuario!!.nombre)
+            etApellido.setText(usuario.apellido)
+            etEmail.setText(usuario.email)
+            etTelefono.setText(usuario.telefono ?: "")
+            etPassword.hint = "Nueva contrasena (dejar vacio para no cambiar)"
+        }
+
+        val titulo = if (!esEdicion) "Nuevo usuario" else "Editar usuario"
+
+        AlertDialog.Builder(this)
+            .setTitle(titulo)
+            .setView(dialogView)
+            .setPositiveButton("Guardar") { _, _ ->
+                val passTexto = etPassword.text.toString().trim()
+
+                if (!esEdicion &amp;&amp; passTexto.isEmpty()) {
+                    toast("La contrasena es obligatoria")
+                    return@setPositiveButton
+                }
+
+                val nuevo = Usuario(
+                    id       = usuario?.id ?: 0,
+                    nombre   = etNombre.text.toString().trim(),
+                    apellido = etApellido.text.toString().trim(),
+                    email    = etEmail.text.toString().trim(),
+                    password = passTexto.ifEmpty { null },
+                    telefono = etTelefono.text.toString().trim().ifEmpty { null }
+                )
+                if (!esEdicion) crearUsuario(nuevo) else actualizarUsuario(nuevo)
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
+    private fun crearUsuario(usuario: Usuario) {
+        lifecycleScope.launch {
+            try {
+                val response = api.crearUsuario(usuario)
+                if (response.isSuccessful) {
+                    toast("Usuario creado")
+                    cargarUsuarios()
+                } else {
+                    toast("Error: ${response.code()}")
+                }
+            } catch (e: Exception) {
+                toast("Error: ${e.message}")
+            }
+        }
+    }
+
+    private fun actualizarUsuario(usuario: Usuario) {
+        lifecycleScope.launch {
+            try {
+                val response = api.actualizarUsuario(usuario.id, usuario)
+                if (response.isSuccessful) {
+                    toast("Usuario actualizado")
+                    cargarUsuarios()
+                } else {
+                    toast("Error: ${response.code()}")
+                }
+            } catch (e: Exception) {
+                toast("Error: ${e.message}")
+            }
+        }
+    }
+
+    private fun confirmarEliminar(usuario: Usuario) {
+        AlertDialog.Builder(this)
+            .setTitle("Eliminar usuario")
+            .setMessage("¿Deseas eliminar a ${usuario.nombre} ${usuario.apellido}?")
+            .setPositiveButton("Eliminar") { _, _ -> eliminarUsuario(usuario) }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
+    private fun eliminarUsuario(usuario: Usuario) {
+        lifecycleScope.launch {
+            try {
+                val response = api.eliminarUsuario(usuario.id)
+                if (response.isSuccessful) {
+                    toast("Usuario eliminado")
+                    cargarUsuarios()
+                } else {
+                    toast("Error: ${response.code()}")
+                }
+            } catch (e: Exception) {
+                toast("Error: ${e.message}")
+            }
+        }
+    }
+
+    private fun toast(msg: String) =
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+}</div>
+      </div>
+
+      <div class="tips">
+        <h3>Resultado esperado de esta parte</h3>
+        <ul>
+          <li>Al abrir la app se carga la lista de usuarios desde la API.</li>
+          <li>El FAB abre un dialogo para registrar un usuario nuevo.</li>
+          <li>Un toque en un item abre el dialogo de edicion precargado.</li>
+          <li>Un toque largo muestra confirmacion de eliminacion.</li>
+          <li>Cualquier cambio recarga la lista automaticamente.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- PARTE 8 -->
+    <div class="section">
+      <h2>PARTE 8: Cambiar de entorno local a VPS</h2>
+
+      <div class="theory">
+        <h3>Lo que cambia al pasar a produccion</h3>
+        <p>
+          La arquitectura no cambia en absoluto. Solo cambian dos cosas: la URL base en Android y el archivo <code>.env</code> en el servidor.
+        </p>
+      </div>
+
+      <div class="card-grid">
+        <div class="card">
+          <h4>En el servidor (VPS)</h4>
+          <ol>
+            <li>Sube la carpeta <code>api/</code> al servidor (excepto <code>.env</code>).</li>
+            <li>Crea el archivo <code>.env</code> directamente en el servidor con las credenciales reales.</li>
+            <li>Verifica que el dominio apunte al directorio correcto.</li>
+            <li>Activa HTTPS con Let's Encrypt o el proveedor del hosting.</li>
+          </ol>
+        </div>
+        <div class="card">
+          <h4>En Android</h4>
+          <ol>
+            <li>Edita <code>AppConfig.kt</code> y cambia <code>BASE_URL</code> a la URL del VPS.</li>
+            <li>Quita <code>android:usesCleartextTraffic="true"</code> del Manifest si la URL es HTTPS.</li>
+            <li>Sincroniza y genera el APK.</li>
+          </ol>
+        </div>
+        <div class="card">
+          <h4>En .env del VPS</h4>
+          <div class="env-block" style="font-size:0.82em; padding:12px;"><span class="key">APP_ENV</span><span class="eq">=</span><span class="val">production</span>
+<span class="key">APP_DEBUG</span><span class="eq">=</span><span class="val">false</span>
+<span class="key">DB_HOST</span><span class="eq">=</span><span class="val">127.0.0.1</span>
+<span class="key">DB_NAME</span><span class="eq">=</span><span class="val">app_usuarios</span>
+<span class="key">DB_USER</span><span class="eq">=</span><span class="val">usuario_bd</span>
+<span class="key">DB_PASS</span><span class="eq">=</span><span class="val">contrasena_fuerte</span></div>
+        </div>
+      </div>
+
+      <div class="warning">
+        <h3>Buenas practicas de seguridad en produccion</h3>
+        <ul>
+          <li>Usa HTTPS en todos los endpoints.</li>
+          <li>No uses el usuario <code>root</code> de MySQL en produccion. Crea un usuario con permisos minimos.</li>
+          <li>Valida y sanea todos los datos recibidos en la API antes de usarlos en SQL.</li>
+          <li>Usa siempre consultas preparadas con PDO (ya incluidas en el modelo de esta guia).</li>
+          <li>El archivo <code>.env</code> nunca debe estar en el repositorio ni ser accesible desde el navegador.</li>
+          <li>Desactiva <code>APP_DEBUG</code> en produccion para no exponer trazas de error.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- PARTE 9: Ejercicios -->
+    <div class="section">
+      <h2>PARTE 9: Ejercicios sugeridos</h2>
+
+      <div class="exercise">
+        <h3>Ejercicio 1 — Verificar la API en Postman</h3>
+        <ol>
+          <li>Levanta XAMPP (Apache + MySQL).</li>
+          <li>Crea la base de datos y la tabla como indica la Parte 2.</li>
+          <li>Coloca los archivos PHP en <code>htdocs/api/</code>.</li>
+          <li>Abre Postman y prueba GET, POST, PUT y DELETE antes de abrir Android Studio.</li>
+        </ol>
+      </div>
+
+      <div class="exercise">
+        <h3>Ejercicio 2 — Conectar Android al entorno local</h3>
+        <ol>
+          <li>Crea el proyecto Android con el package <code>com.example.apiucv</code>.</li>
+          <li>Copia la estructura de archivos Kotlin y los layouts de esta guia.</li>
+          <li>Verifica que <code>AppConfig.BASE_URL</code> use <code>10.0.2.2</code> para el emulador.</li>
+          <li>Ejecuta la app y registra al menos 3 usuarios desde el formulario.</li>
+        </ol>
+      </div>
+
+      <div class="exercise">
+        <h3>Ejercicio 3 — Agregar busqueda local</h3>
+        <ol>
+          <li>Agrega un <code>SearchView</code> en el layout principal.</li>
+          <li>Filtra la lista en el adapter por nombre o email sin llamar de nuevo a la API.</li>
+          <li>Guarda la lista completa en una variable separada para poder restaurarla cuando el filtro este vacio.</li>
+        </ol>
+      </div>
+
+      <div class="exercise">
+        <h3>Ejercicio 4 — Cambiar a VPS</h3>
+        <ol>
+          <li>Sube la carpeta <code>api/</code> a un hosting o VPS con PHP y MySQL.</li>
+          <li>Crea el archivo <code>.env</code> directamente en el servidor con las credenciales reales.</li>
+          <li>Cambia <code>BASE_URL</code> en <code>AppConfig.kt</code> a la URL del dominio.</li>
+          <li>Verifica que la app funcione desde el celular fisico con datos moviles (sin WiFi de la maquina local).</li>
+        </ol>
+      </div>
+
+      <div class="tips">
+        <h3>Checklist final</h3>
+        <ul>
+          <li>La API responde correctamente en Postman antes de integrarla a Android.</li>
+          <li><code>.env</code> no esta en el repositorio y esta bloqueado en <code>.htaccess</code>.</li>
+          <li>Todas las consultas SQL usan sentencias preparadas con PDO.</li>
+          <li>La contrasena se hashea con <code>password_hash()</code> antes de insertarla en MySQL.</li>
+          <li>El campo <code>password</code> nunca aparece en las respuestas GET de la API.</li>
+          <li>En el dialogo de edicion, dejar el campo vacio conserva la contrasena existente.</li>
+          <li>Android agrega el permiso de Internet en el Manifest.</li>
+          <li>La URL base esta centralizada en <code>AppConfig.kt</code>.</li>
+          <li>Las llamadas de red se hacen con <code>lifecycleScope.launch</code> para no bloquear el hilo principal.</li>
+          <li>En produccion se usa HTTPS y se elimina <code>usesCleartextTraffic</code>.</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- RECURSOS -->
+    <div class="resources">
+      <h2>Recursos oficiales sugeridos</h2>
+      <div class="resource-box">
+        <h3 style="color:#a78bfa; margin-bottom:14px;">PHP y base de datos</h3>
+        <ul>
+          <li><a href="https://www.php.net/manual/es/book.pdo.php" target="_blank">PDO — PHP Data Objects (documentacion oficial)</a></li>
+          <li><a href="https://www.php.net/manual/es/pdo.prepared-statements.php" target="_blank">Consultas preparadas con PDO</a></li>
+          <li><a href="https://dev.mysql.com/doc/refman/8.0/en/creating-tables.html" target="_blank">CREATE TABLE — MySQL 8.0 Reference</a></li>
+          <li><a href="https://www.apachefriends.org/es/index.html" target="_blank">XAMPP — Servidor local para desarrollo</a></li>
+        </ul>
+
+        <h3 style="color:#a78bfa; margin-top:18px; margin-bottom:14px;">Retrofit y Android</h3>
+        <ul>
+          <li><a href="https://square.github.io/retrofit/" target="_blank">Retrofit — A type-safe HTTP client for Android (documentacion oficial)</a></li>
+          <li><a href="https://github.com/google/gson" target="_blank">Gson — Google JSON serialization library</a></li>
+          <li><a href="https://square.github.io/okhttp/" target="_blank">OkHttp — HTTP client para Android y JVM</a></li>
+          <li><a href="https://developer.android.com/develop/ui/views/layout/recyclerview" target="_blank">Create dynamic lists with RecyclerView (Android Developers)</a></li>
+          <li><a href="https://developer.android.com/topic/libraries/architecture/coroutines" target="_blank">Kotlin coroutines en Android (lifecycleScope)</a></li>
+        </ul>
+
+        <h3 style="color:#a78bfa; margin-top:18px; margin-bottom:14px;">Seguridad y despliegue</h3>
+        <ul>
+          <li><a href="https://developer.android.com/privacy-and-security/risks/cleartext" target="_blank">Riesgo de cleartext traffic en Android</a></li>
+          <li><a href="https://letsencrypt.org/es/" target="_blank">Let's Encrypt — Certificados HTTPS gratuitos</a></li>
+          <li><a href="https://owasp.org/www-project-top-ten/" target="_blank">OWASP Top Ten — vulnerabilidades mas comunes en APIs</a></li>
+        </ul>
+      </div>
+    </div>
+
+  </div>
+</body>
+</html>
