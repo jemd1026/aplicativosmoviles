@@ -1,0 +1,1179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sesión 1 — Despegue | Flutter &amp; Dart</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0E1218;
+      --bg-soft: #11161D;
+      --card: #171D26;
+      --card-soft: #141A22;
+      --line: #262E3A;
+      --text: #E7ECF3;
+      --text-dim: #9AA7B8;
+      --text-faint: #5E6B7D;
+      --dart: #1389FD;
+      --dart-soft: #0E2A45;
+      --flutter: #FFC93C;
+      --flutter-soft: #3A2F12;
+      --green: #3DDC97;
+      --green-soft: #10301F;
+      --red: #FF6B6B;
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.65;
+    }
+
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background-image: radial-gradient(circle at 10% 0%, rgba(19, 137, 253, .10), transparent 40%),
+        radial-gradient(circle at 95% 60%, rgba(255, 201, 60, .06), transparent 40%);
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 880px;
+      margin: 0 auto;
+      padding: 48px 26px 120px;
+    }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 40px;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+
+    .back {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--text-dim);
+      text-decoration: none;
+      border: 1px solid var(--line);
+      padding: 8px 14px;
+      border-radius: 100px;
+      transition: .2s;
+    }
+
+    .back:hover {
+      border-color: var(--dart);
+      color: var(--text);
+    }
+
+    .nav-pills {
+      display: flex;
+      gap: 8px;
+    }
+
+    .nav-pills a {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      padding: 8px 14px;
+      border-radius: 100px;
+      text-decoration: none;
+      color: var(--text-faint);
+      border: 1px solid var(--line);
+    }
+
+    .nav-pills a.active {
+      background: var(--dart-soft);
+      color: var(--dart);
+      border-color: rgba(19, 137, 253, .4);
+    }
+
+    .nav-pills a:hover:not(.active) {
+      color: var(--text);
+    }
+
+    .hero-kicker {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--dart);
+      letter-spacing: .06em;
+      margin-bottom: 14px;
+    }
+
+    h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: clamp(30px, 5vw, 46px);
+      line-height: 1.08;
+      letter-spacing: -0.01em;
+      margin-bottom: 16px;
+    }
+
+    .hero-sub {
+      color: var(--text-dim);
+      font-size: 17px;
+      max-width: 620px;
+      margin-bottom: 34px;
+    }
+
+    .timeline {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 56px;
+    }
+
+    .timeline-item {
+      flex: 1;
+      min-width: 140px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 14px 16px;
+    }
+
+    .timeline-item .t {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--flutter);
+      margin-bottom: 4px;
+    }
+
+    .timeline-item .d {
+      font-size: 13.5px;
+      color: var(--text-dim);
+    }
+
+    h2.block-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 25px;
+      margin-bottom: 6px;
+      margin-top: 0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .block {
+      margin-bottom: 64px;
+    }
+
+    .block-time {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--text-faint);
+      margin-bottom: 24px;
+      display: block;
+    }
+
+    .block-num {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--dart-soft);
+      color: var(--dart);
+      flex-shrink: 0;
+    }
+
+    p.txt {
+      color: var(--text-dim);
+      margin-bottom: 16px;
+      font-size: 15.5px;
+    }
+
+    p.txt b {
+      color: var(--text);
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 24px 26px;
+      margin-bottom: 20px;
+    }
+
+    /* Extensiones VS Code */
+    .ext-grid {
+      display: grid;
+      gap: 14px;
+      margin: 24px 0;
+    }
+
+    .ext-card {
+      display: flex;
+      gap: 16px;
+      align-items: flex-start;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 18px 20px;
+      position: relative;
+    }
+
+    .ext-card.required::before {
+      content: 'OBLIGATORIA';
+      position: absolute;
+      top: -9px;
+      right: 16px;
+      background: var(--dart);
+      color: #06121F;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 100px;
+      letter-spacing: .04em;
+    }
+
+    .ext-card.optional::before {
+      content: 'RECOMENDADA';
+      position: absolute;
+      top: -9px;
+      right: 16px;
+      background: var(--flutter);
+      color: #241D08;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 3px 9px;
+      border-radius: 100px;
+      letter-spacing: .04em;
+    }
+
+    .ext-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 19px;
+      background: var(--bg-soft);
+      border: 1px solid var(--line);
+    }
+
+    .ext-name {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 16px;
+      margin-bottom: 4px;
+    }
+
+    .ext-publisher {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11.5px;
+      color: var(--text-faint);
+      margin-bottom: 8px;
+    }
+
+    .ext-desc {
+      font-size: 14px;
+      color: var(--text-dim);
+    }
+
+    /* Code blocks */
+    .codeblock {
+      background: #0A0D12;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+      margin: 18px 0;
+    }
+
+    .codeblock .bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .codeblock .bar .fname {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--text-faint);
+    }
+
+    .codeblock .bar .dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .codeblock .bar .dots span {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+    }
+
+    .codeblock pre {
+      padding: 18px 20px;
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13.5px;
+      line-height: 1.7;
+    }
+
+    .codeblock code {
+      color: #D6E2F0;
+    }
+
+    body.lock-dart-copy #dart-en-vivo .codeblock,
+    body.lock-dart-copy #dart-en-vivo .codeblock * {
+      user-select: none;
+      -webkit-user-select: none;
+      -ms-user-select: none;
+    }
+
+    body.lock-dart-copy #dart-en-vivo .codeblock {
+      position: relative;
+    }
+
+    body.lock-dart-copy #dart-en-vivo .codeblock::after {
+      content: 'Solo tipeo manual';
+      position: absolute;
+      top: 12px;
+      right: 16px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10px;
+      letter-spacing: .04em;
+      color: #0B141F;
+      background: var(--flutter);
+      padding: 4px 8px;
+      border-radius: 999px;
+      pointer-events: none;
+      opacity: .92;
+    }
+
+    .tk-key {
+      color: #FF7AB2;
+    }
+
+    .tk-type {
+      color: #5FD3FF;
+    }
+
+    .tk-str {
+      color: #9EE6A8;
+    }
+
+    .tk-com {
+      color: #5E6B7D;
+    }
+
+    .tk-fn {
+      color: #FFD479;
+    }
+
+    .tk-num {
+      color: #FFB86C;
+    }
+
+    .terminal {
+      background: #0A0D12;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 16px 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13.5px;
+      margin: 18px 0;
+    }
+
+    .terminal .l {
+      color: var(--green);
+      margin-bottom: 4px;
+    }
+
+    .terminal .l::before {
+      content: '$ ';
+      color: var(--text-faint);
+    }
+
+    .terminal .out {
+      color: var(--text-faint);
+      margin-bottom: 10px;
+      padding-left: 14px;
+    }
+
+    .manual-shot {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 16px;
+      margin: 18px 0 24px;
+    }
+
+    .manual-shot img {
+      display: block;
+      width: 100%;
+      border-radius: 10px;
+      border: 1px solid var(--line);
+    }
+
+    .manual-shot figcaption {
+      margin-top: 12px;
+      font-size: 14px;
+      color: var(--text-dim);
+    }
+
+    .manual-split {
+      display: grid;
+      grid-template-columns: minmax(260px, 320px) 1fr;
+      gap: 20px;
+      align-items: start;
+      margin: 18px 0 24px;
+    }
+
+    .manual-split .manual-shot,
+    .manual-split .card {
+      margin: 0;
+    }
+
+    /* Exercise box */
+    .exercise {
+      background: linear-gradient(150deg, var(--green-soft), var(--card-soft));
+      border: 1px solid rgba(61, 220, 151, .35);
+      border-radius: var(--radius);
+      padding: 22px 24px;
+      margin: 24px 0;
+    }
+
+    .exercise .ex-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--green);
+      letter-spacing: .06em;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .exercise .ex-label::before {
+      content: '⏱';
+    }
+
+    .exercise h4 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 17px;
+      margin-bottom: 8px;
+    }
+
+    .exercise p {
+      color: var(--text-dim);
+      font-size: 14.5px;
+      margin-bottom: 10px;
+    }
+
+    .check-list {
+      list-style: none;
+      margin-top: 12px;
+    }
+
+    .check-list li {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      margin-bottom: 8px;
+      font-size: 14.5px;
+      color: var(--text-dim);
+    }
+
+    .check-list input {
+      accent-color: var(--green);
+      width: 16px;
+      height: 16px;
+      margin-top: 2px;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .check-list label {
+      cursor: pointer;
+    }
+
+    /* tip / warning */
+    .tip {
+      display: flex;
+      gap: 14px;
+      background: var(--dart-soft);
+      border: 1px solid rgba(19, 137, 253, .3);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin: 18px 0;
+    }
+
+    .tip .ic {
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .tip p {
+      color: var(--text-dim);
+      font-size: 14.5px;
+      margin: 0;
+    }
+
+    .warn {
+      display: flex;
+      gap: 14px;
+      background: #2A1A10;
+      border: 1px solid rgba(255, 201, 60, .3);
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin: 18px 0;
+    }
+
+    .warn p {
+      color: var(--text-dim);
+      font-size: 14.5px;
+      margin: 0;
+    }
+
+    .checkpoint {
+      background: linear-gradient(150deg, var(--dart-soft), var(--card));
+      border: 1px solid rgba(19, 137, 253, .4);
+      border-radius: var(--radius);
+      padding: 30px 28px;
+      margin-top: 20px;
+    }
+
+    .checkpoint .ck-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--dart);
+      letter-spacing: .08em;
+      margin-bottom: 10px;
+    }
+
+    .checkpoint h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 21px;
+      margin-bottom: 10px;
+    }
+
+    .checkpoint p {
+      color: var(--text-dim);
+      font-size: 15px;
+    }
+
+    .footer-nav {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 80px;
+      padding-top: 30px;
+      border-top: 1px solid var(--line);
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .footer-nav a {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 600;
+      text-decoration: none;
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 15px;
+    }
+
+    .footer-nav a span.lbl {
+      display: block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text-faint);
+      font-weight: 400;
+      margin-bottom: 2px;
+    }
+
+    .footer-nav a:hover {
+      color: var(--dart);
+    }
+
+    @media(max-width:600px) {
+      .footer-nav {
+        flex-direction: column;
+      }
+
+      .manual-split {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="wrap">
+
+    <h1>Instalación, Dart básico<br>y tu primer widget</h1>
+    <p class="hero-sub">
+      Hoy nadie sale sin Flutter corriendo en su máquina. Instalamos herramientas,
+      aprendemos lo esencial de Dart escribiendo código real, y cerramos con una
+      pantalla interactiva: un botón que cambia un mensaje en pantalla.
+    </p>
+
+    <!-- BLOQUE 1 -->
+    <div class="block">
+      <h2 class="block-title"><span class="block-num">1</span> Instalación y extensiones de VS Code</h2>
+      <span class="block-time">45 minutos · todos deben terminar antes de avanzar</span>
+
+      <p class="txt">Antes de tocar una línea de Dart, dejen el entorno listo. Sigan este orden exacto para evitar errores de configuración:</p>
+
+      <div class="card">
+        <p class="txt"><b>Paso 1. Descargar Flutter SDK.</b> Entren a <b>https://docs.flutter.dev/get-started/install/windows</b> o, si usan Mac, a <b>https://docs.flutter.dev/get-started/install/macos</b>. Hagan clic en <b>Download Flutter SDK</b>, descarguen el archivo oficial y descomprímanlo en una ruta corta como <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">C:\src\flutter</code> o <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">D:\flutter</code>. No lo dejen en <b>Downloads</b>, <b>Desktop</b>, <b>OneDrive</b> ni dentro de <b>Program Files</b>.</p>
+        <p class="txt"><b>Paso 2. Agregar Flutter al PATH.</b> Busquen en Windows <b>"Editar las variables de entorno del sistema"</b> → <b>Variables de entorno</b> → en <b>Path</b> agreguen la carpeta <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">C:\flutter\bin</code> (o la ruta donde lo descomprimieron). Cierren y vuelvan a abrir la terminal, luego prueben con <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">flutter --version</code>. Si responde con la versión, el PATH quedó bien.</p>
+        <p class="txt"><b>Paso 3. Instalar VS Code.</b> Descárguenlo desde <b>https://code.visualstudio.com/Download</b>. En Windows, elijan <b>User Installer</b> de 64 bits; en Mac, la versión estable para Apple Silicon o Intel según su equipo. Instalen con las opciones por defecto y abran VS Code al terminar.</p>
+        <p class="txt"><b>Paso 4. Instalar Android Studio para tener Android SDK y emulador.</b> Descárguenlo desde <b>https://developer.android.com/studio</b>. Instalen con la configuración estándar. Luego abran <b>More Actions → SDK Manager</b> y verifiquen que estén instalados <b>Android SDK</b>, <b>Android SDK Platform-Tools</b> y <b>Android SDK Command-line Tools</b>. Después entren a <b>Device Manager</b> y creen un emulador, por ejemplo un <b>Pixel</b> con una imagen reciente de Android. Si prefieren usar un teléfono físico, igual necesitan este paso porque Flutter usa el SDK y las herramientas de Android aunque no trabajen con emulador.</p>
+        <p class="txt"><b>Paso 5. Instalar las extensiones de VS Code.</b> Ya dentro de VS Code, abran <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">Ctrl+Shift+X</code>, escriban <b>Flutter</b> e instalen la extensión publicada por <b>Dart Code</b>. Confirmen que también aparezca instalada <b>Dart</b>. Las demás extensiones de abajo son apoyo, pero esas dos son obligatorias.</p>
+        <p class="txt" style="margin-bottom:0;"><b>Paso 6. Verificar todo en terminal.</b> Abran una terminal nueva y ejecuten <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">flutter doctor</code>. Si aparece una advertencia sobre licencias de Android, ejecuten <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">flutter doctor --android-licenses</code> y acepten todo con <b>y</b>. Recién cuando Flutter y VS Code estén en verde, sigan con la práctica.</p>
+      </div>
+
+      <figure class="manual-shot">
+        <img src="img-flutter/variables-entorno.png" alt="Ventana de Variables de entorno de Windows mostrando dónde editar la variable Path del usuario">
+        <figcaption>En esta ventana deben seleccionar <b>Path</b> dentro de <b>Variables de usuario</b> y agregar <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">C:\flutter\bin</code>. No creen una variable nueva llamada <b>flutter</b>; la ruta debe quedar dentro de <b>Path</b>.</figcaption>
+      </figure>
+
+      <div class="terminal">
+        <div class="l">flutter --version</div>
+        <div class="out">Debe mostrar la versión de Flutter y de Dart, no un error de comando no reconocido</div>
+        <div class="l">flutter doctor</div>
+        <div class="out">✓ Flutter · ✓ Android toolchain · ✓ VS Code · ✓ Connected device</div>
+        <div class="l">Si Android toolchain sale en rojo, falta Android Studio, el SDK o aceptar licencias</div>
+        <div class="l">No avancen hasta que esto muestre al menos ✓ en Flutter y VS Code; si además usarán emulador, Android toolchain también debe quedar en verde</div>
+      </div>
+
+      <figure class="manual-shot">
+        <img src="img-flutter/confirmacion-instalacion.png" alt="Confirmacion en PowerShell mostrando el resultado correcto del comando flutter --version">
+        <figcaption>Esta es la confirmación esperada en <b>PowerShell</b> al ejecutar <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">flutter --version</code>. Si aparece la versión de <b>Flutter</b> y <b>Dart</b>, el comando ya fue reconocido correctamente.</figcaption>
+      </figure>
+
+      <div class="tip">
+        <div class="ic">💡</div>
+        <p><b>Alternativa al emulador:</b> también pueden usar un <b>teléfono Android real</b>. Activen <b>Opciones de desarrollador</b> y <b>Depuración USB</b>, conéctenlo por cable, autoricen la computadora y verifiquen con <code style="font-family:'JetBrains Mono',monospace;">flutter devices</code>. Si quieren ver la pantalla del teléfono en la PC durante la clase, pueden usar <b>Vysor</b>; sirve para mostrar y controlar el equipo, pero no reemplaza el <b>Android SDK</b>.</p>
+      </div>
+
+      <h3 style="font-family:'Space Grotesk',sans-serif; font-size:19px; margin:32px 0 6px;">Extensiones necesarias en VS Code</h3>
+      <p class="txt">Abran la pestaña de Extensiones (<code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">Ctrl+Shift+X</code> / <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">Cmd+Shift+X</code>) e instalen, en este orden:</p>
+
+      <div class="ext-grid">
+        <div class="ext-card required">
+          <div class="ext-icon">🎯</div>
+          <div>
+            <div class="ext-name">Flutter</div>
+            <div class="ext-publisher">por Dart Code</div>
+            <div class="ext-desc">La extensión principal. Trae soporte de depuración, hot reload con un clic, snippets de widgets y la integración con dispositivos/emuladores. Al instalarla, arrastra consigo la extensión de Dart automáticamente.</div>
+          </div>
+        </div>
+        <div class="ext-card required">
+          <div class="ext-icon">🎯</div>
+          <div>
+            <div class="ext-name">Dart</div>
+            <div class="ext-publisher">por Dart Code</div>
+            <div class="ext-desc">Da soporte al lenguaje Dart en sí: resaltado de sintaxis, autocompletado, formateo automático y detección de errores mientras escriben. Se instala junto con Flutter, pero conviene confirmar que aparezca en la lista.</div>
+          </div>
+        </div>
+        <div class="ext-card optional">
+          <div class="ext-icon">✨</div>
+          <div>
+            <div class="ext-name">Awesome Flutter Snippets</div>
+            <div class="ext-publisher">por Nash Tahir</div>
+            <div class="ext-desc">Atajos para generar StatelessWidget, StatefulWidget y estructuras comunes escribiendo solo unas letras. Ahorra mucho tecleo a principiantes mientras memorizan la sintaxis.</div>
+          </div>
+        </div>
+        <div class="ext-card optional">
+          <div class="ext-icon">🎨</div>
+          <div>
+            <div class="ext-name">Pubspec Assist</div>
+            <div class="ext-publisher">por Jeroen Meijer</div>
+            <div class="ext-desc">Facilita agregar paquetes al archivo pubspec.yaml sin tener que recordar el formato exacto de YAML. Útil cuando en sesiones futuras agreguen alguna librería.</div>
+          </div>
+        </div>
+        <div class="ext-card optional">
+          <div class="ext-icon">🌳</div>
+          <div>
+            <div class="ext-name">Material Icon Theme</div>
+            <div class="ext-publisher">por Philipp Kief</div>
+            <div class="ext-desc">Solo estético: pone íconos distintivos a las carpetas y archivos del proyecto (lib, android, ios) para que el árbol de archivos sea más fácil de leer a simple vista.</div>
+          </div>
+        </div>
+        <div class="ext-card optional">
+          <div class="ext-icon">🪄</div>
+          <div>
+            <div class="ext-name">Error Lens</div>
+            <div class="ext-publisher">por Alexander</div>
+            <div class="ext-desc">Muestra el mensaje de error directamente en la línea donde ocurre, en vez de solo subrayar en rojo. Para principiantes, ver el error sin tener que pasar el mouse encima ahorra mucha frustración.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="tip">
+        <div class="ic">💡</div>
+        <p><b>Verificación rápida:</b> antes de seguir, confirmen que las extensiones <b>Flutter</b> y <b>Dart</b> aparezcan instaladas. Las dos marcadas "OBLIGATORIA" son indispensables; las "RECOMENDADA" se pueden instalar después si el tiempo aprieta.</p>
+      </div>
+
+      <div class="card">
+        <p class="txt"><b>Paso a paso: ejecutar la app en un emulador Android.</b> Si quieren probar la app como aplicación móvil real, sigan esta secuencia completa.</p>
+        <p class="txt"><b>1.</b> Abran <b>Android Studio</b>.</p>
+        <p class="txt"><b>2.</b> Entren a <b>Device Manager</b>.</p>
+        <p class="txt"><b>3.</b> Si todavía no existe un emulador, creen uno. Una opción simple es un <b>Pixel</b> con una imagen reciente de Android.</p>
+        <p class="txt"><b>4.</b> Enciendan el emulador con el botón <b>Play</b> y esperen a que termine de arrancar por completo.</p>
+        <p class="txt"><b>5.</b> En la terminal del proyecto ejecuten:</p>
+        <div class="terminal" style="margin:10px 0;">
+          <div class="l">flutter devices</div>
+        </div>
+        <p class="txt"><b>6.</b> Verifiquen que aparezca un dispositivo parecido a <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">emulator-5554</code>. Ese nombre identifica al emulador activo.</p>
+        <p class="txt"><b>7.</b> Ejecuten la app directamente en ese emulador con:</p>
+        <div class="terminal" style="margin:10px 0;">
+          <div class="l">flutter run -d emulator-5554</div>
+        </div>
+        <p class="txt"><b>8.</b> Si prefieren que Flutter muestre la lista de dispositivos y les pida elegir, usen:</p>
+        <div class="terminal" style="margin:10px 0;">
+          <div class="l">flutter run</div>
+        </div>
+        <p class="txt"><b>9.</b> Si el emulador no aparece en la lista, revisen que siga encendido y ejecuten:</p>
+        <div class="terminal" style="margin:10px 0;">
+          <div class="l">flutter doctor</div>
+        </div>
+        <p class="txt" style="margin-bottom:0;"><b>Regla práctica:</b> usen <b>Chrome</b> o <b>Edge</b> para avanzar más rápido en las primeras pruebas, y usen el <b>emulador Android</b> cuando quieran validar el comportamiento como app móvil real.</p>
+      </div>
+
+    </div>
+
+    <!-- BLOQUE 2 -->
+    <div class="block" id="dart-en-vivo">
+      <h2 class="block-title"><span class="block-num">2</span> Dart básico, escribiendo en vivo</h2>
+      <span class="block-time">60 minutos · código en vivo + ejercicios cada 15–20 min</span>
+
+      <p class="txt">No usen un archivo aparte: abran <b>DartPad</b> (dartpad.dev) en el navegador para esta sección — es más rápido para experimentar que crear archivos nuevos. Vuelven a VS Code en el Bloque 3.</p>
+
+      <div class="warn">
+        <p><b>Modo práctica:</b> los ejemplos de código de esta sección están bloqueados para copiar y pegar. La idea es que escriban cada línea manualmente para fijar sintaxis, errores comunes y estructura.</p>
+      </div>
+
+      <h3 style="font-family:'Space Grotesk',sans-serif; font-size:18px; margin:28px 0 10px;">Variables y tipos</h3>
+      <div class="codeblock">
+        <div class="bar"><span class="fname">main.dart</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+        <pre><code><span class="tk-type">void</span> <span class="tk-fn">main</span>() {
+            <span class="tk-type">String</span> nombre = <span class="tk-str">'Ana'</span>; <span class="tk-com">// texto</span>
+            <span class="tk-type">int</span> edad = <span class="tk-num">21</span>; <span class="tk-com">// número entero</span>
+            <span class="tk-type">double</span> estatura = <span class="tk-num">1.65</span>; <span class="tk-com">// número decimal</span>
+            <span class="tk-type">bool</span> esEstudiante = <span class="tk-key">true</span>; <span class="tk-com">// verdadero o falso</span>
+
+            <span class="tk-fn">print</span>(<span class="tk-str">'$nombre tiene $edad años'</span>); <span class="tk-com">// interpolación con $</span>
+            }</code></pre>
+      </div>
+      <p class="txt">Cambien el valor de <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">nombre</code> y <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">edad</code>, y luego presionen "Run" en DartPad para ver el cambio inmediato. Esta práctica introduce la idea de "cambio de estado → cambio visible" que usarán durante todo el curso.</p>
+
+      <div class="tip">
+        <div class="ic">💡</div>
+        <p><b>Null safety en una frase:</b> en Dart, una variable normal nunca puede quedar "vacía" (null) a menos que se lo permitas explícitamente con <code style="font-family:'JetBrains Mono',monospace;">String? nombre</code>. El <code style="font-family:'JetBrains Mono',monospace;">?</code> es Dart preguntando "¿esto puede no tener valor?".</p>
+      </div>
+
+      <h3 style="font-family:'Space Grotesk',sans-serif; font-size:18px; margin:28px 0 10px;">Comentarios, constantes y lectura del código</h3>
+      <div class="codeblock">
+        <div class="bar"><span class="fname">main.dart</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+        <pre><code><span class="tk-key">void</span> <span class="tk-fn">main</span>() {
+            <span class="tk-com">// comentario de una línea</span>
+            <span class="tk-key">final</span> nombreCurso = <span class="tk-str">'Flutter desde cero'</span>;
+            <span class="tk-key">const</span> diasSemana = <span class="tk-num">7</span>;
+
+            <span class="tk-fn">print</span>(nombreCurso);
+            <span class="tk-fn">print</span>(diasSemana);
+            }</code></pre>
+      </div>
+      <p class="txt"><code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">final</code> se usa cuando el valor se asigna una vez durante la ejecución y luego no cambia. <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">const</code> se usa cuando el valor es fijo desde el código mismo. Los comentarios con <code style="font-family:'JetBrains Mono',monospace;">//</code> ayudan a documentar ideas rápidas o explicar una línea importante.</p>
+
+      <h3 style="font-family:'Space Grotesk',sans-serif; font-size:18px; margin:28px 0 10px;">Strings, concatenación y operadores</h3>
+      <div class="codeblock">
+        <div class="bar"><span class="fname">main.dart</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+        <pre><code><span class="tk-key">void</span> <span class="tk-fn">main</span>() {
+            <span class="tk-type">String</span> nombre = <span class="tk-str">'Lucía'</span>;
+            <span class="tk-type">int</span> tareasHechas = <span class="tk-num">3</span>;
+            <span class="tk-type">int</span> tareasPendientes = <span class="tk-num">2</span>;
+
+            <span class="tk-type">int</span> total = tareasHechas + tareasPendientes;
+            <span class="tk-type">bool</span> terminoTodo = tareasPendientes == <span class="tk-num">0</span>;
+
+            <span class="tk-fn">print</span>(<span class="tk-str">'Hola '</span> + nombre);
+            <span class="tk-fn">print</span>(<span class="tk-str">'Total de tareas: $total'</span>);
+            <span class="tk-fn">print</span>(<span class="tk-str">'¿Terminó todo? $terminoTodo'</span>);
+            }</code></pre>
+      </div>
+      <p class="txt">Aquí aparecen tres ideas clave: concatenar texto con <code style="font-family:'JetBrains Mono',monospace;">+</code>, combinar variables dentro de un string con <code style="font-family:'JetBrains Mono',monospace;">$</code>, y usar operadores como <code style="font-family:'JetBrains Mono',monospace;">+</code>, <code style="font-family:'JetBrains Mono',monospace;">-</code>, <code style="font-family:'JetBrains Mono',monospace;">*</code>, <code style="font-family:'JetBrains Mono',monospace;">/</code>, <code style="font-family:'JetBrains Mono',monospace;">==</code>, <code style="font-family:'JetBrains Mono',monospace;">&gt;</code> o <code style="font-family:'JetBrains Mono',monospace;">&lt;</code> para calcular o comparar valores.</p>
+
+      <h3 style="font-family:'Space Grotesk',sans-serif; font-size:18px; margin:28px 0 10px;">Condicionales</h3>
+      <div class="codeblock">
+        <div class="bar"><span class="fname">main.dart</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+        <pre><code><span class="tk-key">void</span> <span class="tk-fn">main</span>() {
+            <span class="tk-type">int</span> tareasPendientes = <span class="tk-num">1</span>;
+
+            <span class="tk-key">if</span> (tareasPendientes == <span class="tk-num">0</span>) {
+            <span class="tk-fn">print</span>(<span class="tk-str">'Todo completado'</span>);
+            } <span class="tk-key">else</span> {
+            <span class="tk-fn">print</span>(<span class="tk-str">'Aún hay tareas por hacer'</span>);
+            }
+            }</code></pre>
+      </div>
+      <p class="txt">Los condicionales permiten que el programa tome decisiones. Esta lógica aparece después en Flutter cuando una pantalla muestra un mensaje, un color o un widget distinto según el estado de la app.</p>
+
+      <h3 style="font-family:'Space Grotesk',sans-serif; font-size:18px; margin:28px 0 10px;">Funciones</h3>
+      <div class="codeblock">
+        <div class="bar"><span class="fname">main.dart</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+        <pre><code><span class="tk-type">String</span> <span class="tk-fn">saludar</span>(<span class="tk-type">String</span> nombre) {
+            <span class="tk-key">return</span> <span class="tk-str">'Hola, $nombre 👋'</span>;
+            }
+
+            <span class="tk-type">void</span> <span class="tk-fn">main</span>() {
+            <span class="tk-fn">print</span>(<span class="tk-fn">saludar</span>(<span class="tk-str">'Carlos'</span>));
+            }</code></pre>
+      </div>
+      <p class="txt">Una función agrupa instrucciones que pueden reutilizarse. En Flutter esto aparece todo el tiempo: una función puede construir un widget, validar un texto o responder a un botón.</p>
+
+      <h3 style="font-family:'Space Grotesk',sans-serif; font-size:18px; margin:28px 0 10px;">Clases básicas</h3>
+      <div class="codeblock">
+        <div class="bar"><span class="fname">main.dart</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+        <pre><code><span class="tk-key">class</span> <span class="tk-type">Tarea</span> {
+            <span class="tk-type">String</span> titulo;
+            <span class="tk-type">bool</span> completada;
+
+            <span class="tk-type">Tarea</span>(<span class="tk-type">this</span>.titulo, <span class="tk-type">this</span>.completada);
+            }
+
+            <span class="tk-key">void</span> <span class="tk-fn">main</span>() {
+            <span class="tk-type">Tarea</span> tarea1 = <span class="tk-fn">Tarea</span>(<span class="tk-str">'Estudiar Flutter'</span>, <span class="tk-key">false</span>);
+
+            <span class="tk-fn">print</span>(tarea1.titulo);
+            <span class="tk-fn">print</span>(tarea1.completada);
+            }</code></pre>
+      </div>
+      <p class="txt">Una <b>clase</b> define la estructura de un tipo de dato propio. En este ejemplo, <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">Tarea</code> tiene dos atributos: <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">titulo</code> y <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">completada</code>. El constructor <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">Tarea(...)</code> crea objetos nuevos con esos valores.</p>
+      <p class="txt">Más adelante en Flutter, una clase puede representar una tarea, un usuario o cualquier estructura con varios datos relacionados. Esto permite que el código sea más claro que manejar todo solo con strings sueltos.</p>
+
+      <h3 style="font-family:'Space Grotesk',sans-serif; font-size:18px; margin:28px 0 10px;">Mapas, listas y un vistazo a clases</h3>
+      <div class="codeblock">
+        <div class="bar"><span class="fname">main.dart</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+        <pre><code><span class="tk-key">void</span> <span class="tk-fn">main</span>() {
+            <span class="tk-type">Map</span>&lt;<span class="tk-type">String</span>, <span class="tk-type">dynamic</span>&gt; tarea = {
+            <span class="tk-str">'titulo'</span>: <span class="tk-str">'Estudiar Flutter'</span>,
+            <span class="tk-str">'prioridad'</span>: <span class="tk-str">'alta'</span>,
+            <span class="tk-str">'completada'</span>: <span class="tk-key">false</span>,
+            };
+
+            <span class="tk-fn">print</span>(tarea[<span class="tk-str">'titulo'</span>]);
+            }</code></pre>
+      </div>
+      <p class="txt">Un <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">Map</code> guarda datos en formato <b>clave → valor</b>. Es útil cuando un mismo elemento necesita varios atributos, por ejemplo título, prioridad y estado.</p>
+
+      <div class="codeblock">
+        <div class="bar"><span class="fname">main.dart</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+        <pre><code><span class="tk-type">void</span> <span class="tk-fn">main</span>() {
+            <span class="tk-type">List</span>&lt;<span class="tk-type">String</span>&gt; tareas = [<span class="tk-str">'Estudiar'</span>, <span class="tk-str">'Hacer ejercicio'</span>];
+            tareas.<span class="tk-fn">add</span>(<span class="tk-str">'Leer'</span>); <span class="tk-com">// agregar</span>
+            tareas.<span class="tk-fn">removeAt</span>(<span class="tk-num">0</span>); <span class="tk-com">// eliminar por posición</span>
+
+            <span class="tk-key">for</span> (<span class="tk-type">var</span> tarea <span class="tk-key">in</span> tareas) {
+            <span class="tk-fn">print</span>(<span class="tk-str">'- $tarea'</span>);
+            }
+            }</code></pre>
+      </div>
+      <p class="txt">Esta es exactamente la estructura de datos que va a sostener la app de las próximas dos sesiones: una <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">List&lt;String&gt;</code> con tareas que crece y se reduce.</p>
+    </div>
+
+    <!-- BLOQUE 3 -->
+    <div class="block">
+      <h2 class="block-title"><span class="block-num">3</span> Primer widget interactivo</h2>
+      <span class="block-time">60 minutos · de vuelta en VS Code, dentro del proyecto creado</span>
+
+      <p class="txt">Antes del código, fíjense en esta idea central: en <b>Flutter</b> la interfaz no se arma con archivos XML separados ni con controles visuales externos al lenguaje. La UI se construye directamente en <b>Dart</b> usando <b>widgets</b>. Eso hace que estructura, comportamiento y estado trabajen juntos en el mismo flujo de código.</p>
+
+      <figure class="manual-shot">
+        <img src="img-flutter/flutter-widgetg.png" alt="Resumen visual de widgets comunes de Flutter como Scaffold, AppBar, SafeArea, Container, Button, Text, Column y Row">
+        <figcaption>En Flutter, casi todo lo que aparece en pantalla es un <b>widget</b>: <b>Scaffold</b> organiza la pantalla, <b>AppBar</b> crea la barra superior, <b>Column</b> y <b>Row</b> acomodan elementos, <b>Text</b> muestra texto y <b>Button</b> responde a acciones. En lugar de dibujar controles sueltos por separado, Flutter compone la interfaz como un árbol de widgets.</figcaption>
+      </figure>
+
+      <div class="tip">
+        <div class="ic">💡</div>
+        <p><b>Diferencia clave:</b> en enfoques tradicionales suele haber una separación más rígida entre la vista y la lógica de la interfaz. En Flutter, la pantalla se describe con widgets en Dart y, cuando cambia el estado, Flutter vuelve a construir esa descripción para reflejar el nuevo resultado visual.</p>
+      </div>
+
+      <div class="manual-split">
+        <figure class="manual-shot">
+          <img src="img-flutter/estructura-proyecto-flutter.png" alt="Explorador de VS Code mostrando la estructura inicial de un proyecto Flutter con carpetas como android, ios, lib, test, web y windows">
+          <figcaption>Esta es la estructura básica que aparece cuando Flutter crea un proyecto nuevo. No es necesario memorizarla completa desde el primer día; lo importante es identificar qué carpeta usarán con frecuencia y cuáles existen para cada plataforma.</figcaption>
+        </figure>
+
+        <div class="card">
+          <p class="txt"><b>lib/</b> es la carpeta más importante del curso. Aquí va casi todo el código Dart de la app: pantallas, widgets, lógica básica y el archivo <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">main.dart</code>. Es la carpeta que usarán con más frecuencia.</p>
+          <p class="txt"><b>android/</b> contiene la configuración nativa para compilar la app en Android. Normalmente no se toca al inicio, salvo cuando más adelante se configuren permisos, íconos o detalles de compilación.</p>
+          <p class="txt"><b>ios/</b>, <b>macos/</b>, <b>linux/</b>, <b>windows/</b> y <b>web/</b> guardan la parte específica de cada plataforma. Flutter comparte gran parte del código en <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">lib/</code>, pero cada una de esas carpetas existe para generar la app en ese entorno.</p>
+          <p class="txt"><b>test/</b> se usa para pruebas automáticas. En esta etapa puede quedar sin tocar, pero es la carpeta donde se escriben tests cuando se empieza a validar el comportamiento del código.</p>
+          <p class="txt"><b>build/</b> guarda archivos generados automáticamente al compilar o ejecutar. No es una carpeta para editar manualmente.</p>
+          <p class="txt"><b>.dart_tool/</b> y <b>.idea/</b> contienen archivos internos de Dart, Flutter o del editor. Sirven para configuración y caché del entorno, no para escribir la lógica de la app.</p>
+          <p class="txt"><b>pubspec.yaml</b> es uno de los archivos más importantes fuera de <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">lib/</code>. Aquí se definen el nombre del proyecto, la versión, los paquetes y los assets como imágenes o fuentes.</p>
+          <p class="txt" style="margin-bottom:0;"><b>Regla práctica para empezar:</b> miren toda la estructura, pero trabajen casi siempre en <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">lib/main.dart</code> y, más adelante, en otros archivos dentro de <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">lib/</code>.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <p class="txt"><b>Si ya están dentro de la carpeta del proyecto</b>, por ejemplo <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">app_flutter</code>, usen:</p>
+        <div class="terminal" style="margin:10px 0;">
+          <div class="l">flutter create .</div>
+        </div>
+        <p class="txt">Ese punto <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">.</code> significa: <b>crear el proyecto Flutter en la carpeta actual</b>.</p>
+        <p class="txt"><b>Si todavía no han entrado a la carpeta</b> y quieren crearla desde cero, usen:</p>
+        <div class="terminal" style="margin:10px 0;">
+          <div class="l">flutter create app_flutter</div>
+        </div>
+        <p class="txt" style="margin-bottom:0;">Después de crear el proyecto, ejecútenlo, esperen que abra la app inicial y recién entonces editen <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">lib/main.dart</code>.</p>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-label">SECUENCIA RECOMENDADA</div>
+        <h4>Antes de editar <code style="font-family:'JetBrains Mono',monospace;">main.dart</code></h4>
+        <p>Sigan este orden para evitar errores de archivo faltante o de dispositivo:</p>
+        <div class="terminal" style="margin:10px 0;">
+          <div class="l">flutter create .</div>
+          <div class="l">flutter run</div>
+        </div>
+        <ul class="check-list">
+          <li><input type="checkbox" id="pre-1"><label for="pre-1">Esperar a que Flutter termine de crear el proyecto</label></li>
+          <li><input type="checkbox" id="pre-2"><label for="pre-2">Ejecutar la app base con <code style="font-family:'JetBrains Mono',monospace;">flutter run</code></label></li>
+          <li><input type="checkbox" id="pre-3"><label for="pre-3">Abrir <code style="font-family:'JetBrains Mono',monospace;">lib/main.dart</code></label></li>
+          <li><input type="checkbox" id="pre-4"><label for="pre-4">Reemplazar el contenido por el ejemplo de esta guía</label></li>
+        </ul>
+      </div>
+
+      <div class="tip">
+        <div class="ic">💡</div>
+        <p><b>Si al ejecutar <code style="font-family:'JetBrains Mono',monospace;">flutter run</code> aparece una lista de dispositivos:</b> en una clase inicial conviene elegir <b>Chrome</b> o <b>Edge</b> porque arrancan más rápido, no requieren emulador ni celular y son suficientes para practicar widgets, estado y layout. Si quieres evitar la pregunta, ejecuta directamente <code style="font-family:'JetBrains Mono',monospace;">flutter run -d chrome</code> o <code style="font-family:'JetBrains Mono',monospace;">flutter run -d edge</code>.</p>
+      </div>
+
+      <p class="txt"><b>Ejemplo 1.</b> Este primer ejemplo cambia un mensaje al tocar un botón. Sirve para entender la relación entre <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">StatefulWidget</code>, una variable de estado y <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">setState()</code>.</p>
+
+      <div class="codeblock">
+        <div class="bar"><span class="fname">lib/main.dart — Ejemplo 1</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+        <pre><code><span class="tk-key">import</span> <span class="tk-str">'package:flutter/material.dart'</span>; <span class="tk-com">// importa los widgets visuales de Flutter</span>
+
+            <span class="tk-type">void</span> <span class="tk-fn">main</span>() { <span class="tk-com">// punto de entrada de la app</span>
+            <span class="tk-fn">runApp</span>(<span class="tk-fn">MiApp</span>()); <span class="tk-com">// inicia Flutter y dibuja el widget principal</span>
+            }
+
+            <span class="tk-key">class</span> <span class="tk-type">MiApp</span> <span class="tk-key">extends</span> <span class="tk-type">StatelessWidget</span> { <span class="tk-com">// widget raíz que no guarda estado</span>
+            <span class="tk-key">@override</span>
+            <span class="tk-type">Widget</span> <span class="tk-fn">build</span>(<span class="tk-type">BuildContext</span> context) { <span class="tk-com">// construye la interfaz inicial</span>
+            <span class="tk-key">return</span> <span class="tk-fn">MaterialApp</span>( <span class="tk-com">// contenedor principal de una app Material Design</span>
+            home: <span class="tk-fn">PantallaInicio</span>(), <span class="tk-com">// define la primera pantalla visible</span>
+            );
+            }
+            }
+
+            <span class="tk-key">class</span> <span class="tk-type">PantallaInicio</span> <span class="tk-key">extends</span> <span class="tk-type">StatefulWidget</span> { <span class="tk-com">// pantalla que sí puede cambiar con el tiempo</span>
+            <span class="tk-key">@override</span>
+            <span class="tk-type">State</span>&lt;<span class="tk-type">PantallaInicio</span>&gt; <span class="tk-fn">createState</span>() =&gt; _PantallaInicioState(); <span class="tk-com">// conecta el widget con su estado</span>
+            }
+
+            <span class="tk-key">class</span> _PantallaInicioState <span class="tk-key">extends</span> <span class="tk-type">State</span>&lt;<span class="tk-type">PantallaInicio</span>&gt; { <span class="tk-com">// aquí viven los datos que cambian</span>
+            <span class="tk-type">String</span> mensaje = <span class="tk-str">'Aún no tocas el botón'</span>; <span class="tk-com">// texto inicial que se muestra en pantalla</span>
+
+            <span class="tk-type">void</span> <span class="tk-fn">cambiarMensaje</span>() { <span class="tk-com">// función que modifica el texto</span>
+            <span class="tk-fn">setState</span>(() { <span class="tk-com">// avisa a Flutter que debe redibujar la pantalla</span>
+            mensaje = <span class="tk-str">'¡Lo lograste! 🎉'</span>; <span class="tk-com">// nuevo valor del mensaje</span>
+            });
+            }
+
+            <span class="tk-key">@override</span>
+            <span class="tk-type">Widget</span> <span class="tk-fn">build</span>(<span class="tk-type">BuildContext</span> context) { <span class="tk-com">// describe todo lo que se verá en esta pantalla</span>
+            <span class="tk-key">return</span> <span class="tk-fn">Scaffold</span>( <span class="tk-com">// estructura base de la pantalla</span>
+            appBar: <span class="tk-fn">AppBar</span>(title: <span class="tk-fn">Text</span>(<span class="tk-str">'Mi Lista de Tareas'</span>)), <span class="tk-com">// barra superior con título</span>
+            body: <span class="tk-fn">Center</span>( <span class="tk-com">// centra el contenido en la pantalla</span>
+            child: <span class="tk-fn">Column</span>( <span class="tk-com">// acomoda los widgets uno debajo del otro</span>
+            mainAxisAlignment: MainAxisAlignment.center, <span class="tk-com">// centra verticalmente los elementos</span>
+            children: [
+            <span class="tk-fn">Text</span>(mensaje, style: <span class="tk-fn">TextStyle</span>(fontSize: <span class="tk-num">20</span>)), <span class="tk-com">// muestra el mensaje actual</span>
+            <span class="tk-fn">SizedBox</span>(height: <span class="tk-num">20</span>), <span class="tk-com">// deja un espacio vertical</span>
+            <span class="tk-fn">ElevatedButton</span>( <span class="tk-com">// botón interactivo</span>
+            onPressed: cambiarMensaje, <span class="tk-com">// ejecuta la función al tocar el botón</span>
+            child: <span class="tk-fn">Text</span>(<span class="tk-str">'Tócame'</span>), <span class="tk-com">// texto visible dentro del botón</span>
+            ),
+            ],
+            ),
+            ),
+            );
+            }
+            }</code></pre>
+      </div>
+
+      <p class="txt">Identifiquen estas piezas en orden mientras escriben el código y revisen qué función cumple cada una:</p>
+      <div class="card">
+        <p class="txt"><b>StatelessWidget vs StatefulWidget</b> — el primero nunca cambia una vez dibujado; el segundo puede "recordar" datos (estado) y redibujarse cuando cambian.</p>
+        <p class="txt"><b>build()</b> — el método que describe qué se ve en pantalla. Flutter lo vuelve a llamar cada vez que el estado cambia.</p>
+        <p class="txt"><b>setState()</b> — la forma de avisarle a Flutter "algo cambió, vuelve a dibujar". Sin esta llamada, el cambio de la variable <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">mensaje</code> nunca se vería en pantalla.</p>
+        <p class="txt" style="margin-bottom:0;"><b>Scaffold / AppBar / Column / Center</b> — los widgets de estructura básica que casi toda pantalla de Flutter usa.</p>
+      </div>
+
+      <div class="warn">
+        <p><b>Error común:</b> si ven "The method 'setState' isn't defined", probablemente la clase está extendiendo StatelessWidget en vez de State. Revisen que sea <code style="font-family:'JetBrains Mono',monospace;">_PantallaInicioState extends State&lt;PantallaInicio&gt;</code>.</p>
+      </div>
+
+      <p class="txt"><b>Ejemplo 2.</b> Ahora vean una versión más cercana a una app real con <b>Material 3</b>, un contador en el centro y un botón flotante para aumentar el valor. Este patrón se usa mucho para practicar estado y estructura visual.</p>
+
+      <div class="codeblock">
+        <div class="bar"><span class="fname">lib/main.dart — Ejemplo 2 Material 3</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+        <pre><code><span class="tk-key">import</span> <span class="tk-str">'package:flutter/material.dart'</span>; <span class="tk-com">// importa los widgets necesarios de Flutter</span>
+
+            <span class="tk-key">void</span> <span class="tk-fn">main</span>() { <span class="tk-com">// punto de entrada de la aplicación</span>
+            <span class="tk-fn">runApp</span>(<span class="tk-fn">MiContadorApp</span>()); <span class="tk-com">// inicia la app mostrando el widget principal</span>
+            }
+
+            <span class="tk-key">class</span> <span class="tk-type">MiContadorApp</span> <span class="tk-key">extends</span> <span class="tk-type">StatelessWidget</span> { <span class="tk-com">// widget raíz sin estado</span>
+            <span class="tk-key">@override</span>
+            <span class="tk-type">Widget</span> <span class="tk-fn">build</span>(<span class="tk-type">BuildContext</span> context) {
+            <span class="tk-key">return</span> <span class="tk-fn">MaterialApp</span>(
+            debugShowCheckedModeBanner: <span class="tk-key">false</span>, <span class="tk-com">// oculta la cinta de DEBUG</span>
+            theme: <span class="tk-fn">ThemeData</span>(
+            useMaterial3: <span class="tk-key">true</span>, <span class="tk-com">// activa el estilo Material 3</span>
+            colorScheme: ColorScheme.<span class="tk-fn">fromSeed</span>(seedColor: Colors.blue), <span class="tk-com">// genera la paleta desde un color base</span>
+            ),
+            home: <span class="tk-fn">PantallaContador</span>(), <span class="tk-com">// primera pantalla de la app</span>
+            );
+            }
+            }
+
+            <span class="tk-key">class</span> <span class="tk-type">PantallaContador</span> <span class="tk-key">extends</span> <span class="tk-type">StatefulWidget</span> { <span class="tk-com">// widget con estado porque el número cambia</span>
+            <span class="tk-key">@override</span>
+            <span class="tk-type">State</span>&lt;<span class="tk-type">PantallaContador</span>&gt; <span class="tk-fn">createState</span>() =&gt; _PantallaContadorState();
+            }
+
+            <span class="tk-key">class</span> _PantallaContadorState <span class="tk-key">extends</span> <span class="tk-type">State</span>&lt;<span class="tk-type">PantallaContador</span>&gt; {
+            <span class="tk-type">int</span> contador = <span class="tk-num">5</span>; <span class="tk-com">// valor inicial del contador</span>
+
+            <span class="tk-key">void</span> <span class="tk-fn">incrementar</span>() { <span class="tk-com">// función que suma uno al contador</span>
+            <span class="tk-fn">setState</span>(() {
+            contador++; <span class="tk-com">// aumenta el valor en 1</span>
+            });
+            }
+
+            <span class="tk-key">@override</span>
+            <span class="tk-type">Widget</span> <span class="tk-fn">build</span>(<span class="tk-type">BuildContext</span> context) {
+            <span class="tk-key">return</span> <span class="tk-fn">Scaffold</span>(
+            appBar: <span class="tk-fn">AppBar</span>(
+            title: <span class="tk-fn">Text</span>(<span class="tk-str">'Pantalla principal'</span>), <span class="tk-com">// título superior</span>
+            ),
+            body: <span class="tk-fn">Center</span>(
+            child: <span class="tk-fn">Column</span>(
+            mainAxisAlignment: MainAxisAlignment.center, <span class="tk-com">// centra el contenido verticalmente</span>
+            children: [
+            <span class="tk-fn">Text</span>(
+            <span class="tk-str">'$contador'</span>,
+            style: Theme.<span class="tk-fn">of</span>(context).textTheme.displayLarge, <span class="tk-com">// número grande en el centro</span>
+            ),
+            <span class="tk-fn">Text</span>(<span class="tk-str">'Cantidad de clicks'</span>), <span class="tk-com">// texto descriptivo debajo</span>
+            ],
+            ),
+            ),
+            floatingActionButton: <span class="tk-fn">FloatingActionButton</span>(
+            onPressed: incrementar, <span class="tk-com">// al tocar, aumenta el contador</span>
+            child: <span class="tk-fn">Text</span>(<span class="tk-str">'+1'</span>), <span class="tk-com">// texto dentro del botón flotante</span>
+            ),
+            );
+            }
+            }</code></pre>
+      </div>
+
+      <div class="card">
+        <p class="txt"><b>Qué cambia respecto al Ejemplo 1:</b> aquí el estado ya no es un texto, sino un número entero. En lugar de cambiar un mensaje completo, se incrementa una variable <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">int</code> y Flutter redibuja la pantalla.</p>
+        <p class="txt"><b>Material 3</b> se activa con <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">useMaterial3: true</code>. Eso ajusta el estilo de componentes como <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">AppBar</code>, <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">FloatingActionButton</code> y la tipografía general.</p>
+        <p class="txt" style="margin-bottom:0;"><b>FloatingActionButton</b> es el botón flotante circular de la esquina. Se usa mucho para acciones principales como agregar, crear o incrementar.</p>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-label">EJERCICIO · 20 MIN</div>
+        <h4>Personaliza tu pantalla</h4>
+        <p>Sobre el Ejemplo 1 o el Ejemplo 2, completen esto en este orden:</p>
+        <ul class="check-list">
+          <li><input type="checkbox" id="e3-1"><label for="e3-1">Cambiar el título del AppBar por el nombre de su propia app</label></li>
+          <li><input type="checkbox" id="e3-2"><label for="e3-2">Cambiar el texto inicial y el texto que aparece tras tocar el botón</label></li>
+          <li><input type="checkbox" id="e3-3"><label for="e3-3">Agregar un contador de "veces tocado" usando una variable int o modificar el valor inicial del Ejemplo 2</label></li>
+          <li><input type="checkbox" id="e3-4"><label for="e3-4">Probar hot reload: guardar el archivo (Ctrl+S) con la app corriendo y ver el cambio sin reiniciar</label></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="checkpoint">
+      <div class="ck-label">CHECKPOINT DE CIERRE</div>
+      <h3>Al final de hoy tendrás:</h3>
+      <p>Flutter y VS Code instalados y verificados con <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">flutter doctor</code> · las extensiones clave funcionando · manejo básico de variables, funciones y listas en Dart · una app corriendo con estado, botón y hot reload. Esta misma pantalla es el punto de partida exacto de la Sesión 2.</p>
+    </div>
+
+  </div>
+  <script>
+    (() => {
+      const bloquearCopiadoDart = true;
+      const lockedBlocks = document.querySelectorAll('#dart-en-vivo .codeblock');
+      const blockedEvents = ['copy', 'cut', 'paste', 'contextmenu', 'dragstart', 'selectstart'];
+
+      if (!bloquearCopiadoDart) {
+        return;
+      }
+
+      document.body.classList.add('lock-dart-copy');
+
+      lockedBlocks.forEach((block) => {
+        blockedEvents.forEach((eventName) => {
+          block.addEventListener(eventName, (event) => {
+            event.preventDefault();
+          });
+        });
+
+        block.addEventListener('keydown', (event) => {
+          const key = event.key.toLowerCase();
+          if ((event.ctrlKey || event.metaKey) && ['a', 'c', 'v', 'x'].includes(key)) {
+            event.preventDefault();
+          }
+        });
+      });
+    })();
+  </script>
+</body>
+</html>
