@@ -1138,6 +1138,105 @@
           <li><input type="checkbox" id="e3-4"><label for="e3-4">Probar hot reload: guardar el archivo (Ctrl+S) con la app corriendo y ver el cambio sin reiniciar</label></li>
         </ul>
       </div>
+
+      <h3 style="font-family:'Space Grotesk',sans-serif; font-size:19px; margin:34px 0 10px;">Partes de un Scaffold</h3>
+      <p class="txt">Ahora que ya vieron pantallas con botón y contador, conviene identificar la estructura base que organiza casi toda interfaz en Flutter: <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">Scaffold</code>.</p>
+
+      <div class="card">
+        <p class="txt"><b>appBar</b> coloca la barra superior. Normalmente lleva el título, íconos de acción y, si hace falta, botón de regreso.</p>
+        <p class="txt"><b>body</b> contiene el contenido principal de la pantalla. Aquí suelen ir textos, formularios, listas, imágenes y botones.</p>
+        <p class="txt"><b>floatingActionButton</b> agrega el botón flotante circular, usado para la acción principal de la vista, por ejemplo sumar, crear o agregar.</p>
+        <p class="txt"><b>drawer</b> muestra un menú lateral que se abre desde la izquierda.</p>
+        <p class="txt"><b>bottomNavigationBar</b> agrega una barra inferior para cambiar entre secciones.</p>
+        <p class="txt"><b>backgroundColor</b> permite cambiar el color de fondo general de la pantalla.</p>
+        <p class="txt" style="margin-bottom:0;"><b>persistentFooterButtons</b> coloca botones fijos en la parte inferior, útiles cuando una pantalla necesita acciones visibles todo el tiempo.</p>
+      </div>
+
+      <div class="tip">
+        <div class="ic">💡</div>
+        <p><b>Idea práctica:</b> no siempre se usan todas las partes a la vez. Lo más común al empezar es trabajar con <code style="font-family:'JetBrains Mono',monospace;">appBar</code>, <code style="font-family:'JetBrains Mono',monospace;">body</code> y <code style="font-family:'JetBrains Mono',monospace;">floatingActionButton</code>. Las demás se agregan según la necesidad de la pantalla.</p>
+      </div>
+
+      <h3 style="font-family:'Space Grotesk',sans-serif; font-size:18px; margin:28px 0 10px;">Uso básico</h3>
+      <div class="codeblock">
+        <div class="bar"><span class="fname">Scaffold mínimo</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+        <pre><code><span class="tk-fn">Scaffold</span>(
+            appBar: <span class="tk-fn">AppBar</span>(
+            title: <span class="tk-fn">Text</span>(<span class="tk-str">'Mi pantalla'</span>),
+            ),
+            body: <span class="tk-fn">Center</span>(
+            child: <span class="tk-fn">Text</span>(<span class="tk-str">'Contenido principal'</span>),
+            ),
+            floatingActionButton: <span class="tk-fn">FloatingActionButton</span>(
+            onPressed: () {},
+            child: <span class="tk-fn">Icon</span>(Icons.add),
+            ),
+            )</code></pre>
+      </div>
+      <p class="txt">Este es el patrón más frecuente al inicio: una barra superior, una zona de contenido y una acción principal flotante.</p>
+
+      <h3 style="font-family:'Space Grotesk',sans-serif; font-size:18px; margin:28px 0 10px;">Maqueta aplicando todo</h3>
+      <div class="codeblock">
+        <div class="bar"><span class="fname">lib/main.dart — maqueta Scaffold</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+        <pre><code><span class="tk-key">return</span> <span class="tk-fn">Scaffold</span>(
+            backgroundColor: Colors.grey.shade100, <span class="tk-com">// color de fondo de la pantalla</span>
+            appBar: <span class="tk-fn">AppBar</span>(
+            title: <span class="tk-fn">Text</span>(<span class="tk-str">'Panel principal'</span>), <span class="tk-com">// título superior</span>
+            actions: [
+            <span class="tk-fn">IconButton</span>(
+            onPressed: () {},
+            icon: <span class="tk-fn">Icon</span>(Icons.notifications_none),
+            ),
+            ],
+            ),
+            drawer: <span class="tk-fn">Drawer</span>( <span class="tk-com">// menú lateral</span>
+            child: <span class="tk-fn">ListView</span>(
+            children: [
+            <span class="tk-fn">DrawerHeader</span>(child: <span class="tk-fn">Text</span>(<span class="tk-str">'Menú'</span>)),
+            <span class="tk-fn">ListTile</span>(title: <span class="tk-fn">Text</span>(<span class="tk-str">'Inicio'</span>)),
+            <span class="tk-fn">ListTile</span>(title: <span class="tk-fn">Text</span>(<span class="tk-str">'Perfil'</span>)),
+            ],
+            ),
+            ),
+            body: <span class="tk-fn">Center</span>(
+            child: <span class="tk-fn">Column</span>(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+            <span class="tk-fn">Icon</span>(Icons.dashboard, size: <span class="tk-num">70</span>, color: Colors.blue),
+            <span class="tk-fn">SizedBox</span>(height: <span class="tk-num">16</span>),
+            <span class="tk-fn">Text</span>(<span class="tk-str">'Bienvenido'</span>, style: <span class="tk-fn">TextStyle</span>(fontSize: <span class="tk-num">24</span>)),
+            <span class="tk-fn">Text</span>(<span class="tk-str">'Aquí iría el contenido principal'</span>),
+            ],
+            ),
+            ),
+            floatingActionButton: <span class="tk-fn">FloatingActionButton</span>(
+            onPressed: () {},
+            child: <span class="tk-fn">Icon</span>(Icons.add),
+            ),
+            bottomNavigationBar: <span class="tk-fn">BottomNavigationBar</span>(
+            items: <span class="tk-key">const</span> [
+            BottomNavigationBarItem(icon: <span class="tk-fn">Icon</span>(Icons.home), label: <span class="tk-str">'Inicio'</span>),
+            BottomNavigationBarItem(icon: <span class="tk-fn">Icon</span>(Icons.settings), label: <span class="tk-str">'Ajustes'</span>),
+            ],
+            ),
+            )</code></pre>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-label">RETO EXTRA</div>
+        <h4>Maqueta propia con Scaffold</h4>
+        <p>Usen la maqueta anterior como referencia y armen una pantalla propia con al menos estas partes:</p>
+        <ul class="check-list">
+          <li><input type="checkbox" id="sc-1"><label for="sc-1">Un <code style="font-family:'JetBrains Mono',monospace;">AppBar</code> con título</label></li>
+          <li><input type="checkbox" id="sc-2"><label for="sc-2">Un <code style="font-family:'JetBrains Mono',monospace;">body</code> con ícono y texto centrados</label></li>
+          <li><input type="checkbox" id="sc-3"><label for="sc-3">Un <code style="font-family:'JetBrains Mono',monospace;">FloatingActionButton</code></label></li>
+          <li><input type="checkbox" id="sc-4"><label for="sc-4">Un <code style="font-family:'JetBrains Mono',monospace;">drawer</code> o una <code style="font-family:'JetBrains Mono',monospace;">bottomNavigationBar</code></label></li>
+        </ul>
+      </div>
     </div>
 
     <div class="checkpoint">
