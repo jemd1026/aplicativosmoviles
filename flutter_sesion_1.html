@@ -577,6 +577,45 @@
       font-size: 15px;
     }
 
+    .compare-wrap {
+      overflow-x: auto;
+      margin: 18px 0 24px;
+    }
+
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .compare-table th,
+    .compare-table td {
+      text-align: left;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+      font-size: 14px;
+    }
+
+    .compare-table th {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--flutter);
+      letter-spacing: .04em;
+      background: #111722;
+    }
+
+    .compare-table td {
+      color: var(--text-dim);
+    }
+
+    .compare-table tr:last-child td {
+      border-bottom: none;
+    }
+
     .footer-nav {
       display: flex;
       justify-content: space-between;
@@ -1224,6 +1263,122 @@
             ],
             ),
             )</code></pre>
+      </div>
+
+      <h3 style="font-family:'Space Grotesk',sans-serif; font-size:19px; margin:34px 0 10px;">Estados de un Widget</h3>
+      <p class="txt">Quienes vienen de Android nativo suelen pensar en <b>Created</b>, <b>Started</b>, <b>Resumed</b>, <b>Paused</b>, <b>Stopped</b> y <b>Destroyed</b>. En Flutter la idea principal cambia: primero se trabaja con el <b>ciclo de vida del widget</b>, sobre todo en <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">StatefulWidget</code>.</p>
+
+      <div class="card">
+        <p class="txt"><b>createState()</b> conecta el widget con su clase de estado.</p>
+        <p class="txt"><b>initState()</b> se ejecuta una sola vez al crear el widget. Aquí suele inicializarse data, controladores o listeners.</p>
+        <p class="txt"><b>build()</b> dibuja la interfaz. Puede ejecutarse muchas veces cuando cambia el estado.</p>
+        <p class="txt"><b>setState()</b> no es una etapa del ciclo de vida, pero provoca que Flutter vuelva a ejecutar <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">build()</code>.</p>
+        <p class="txt"><b>dispose()</b> se ejecuta cuando el widget deja de usarse. Sirve para liberar controladores, animaciones o recursos.</p>
+        <p class="txt" style="margin-bottom:0;"><b>Idea clave:</b> en Flutter se describe la pantalla como un widget, y cuando el estado cambia, Flutter reconstruye esa descripción visual.</p>
+      </div>
+
+      <div class="codeblock">
+        <div class="bar"><span class="fname">Ejemplo de ciclo de vida</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+        <pre><code><span class="tk-key">class</span> <span class="tk-type">MiPantalla</span> <span class="tk-key">extends</span> <span class="tk-type">StatefulWidget</span> {
+            <span class="tk-key">@override</span>
+            <span class="tk-type">State</span>&lt;<span class="tk-type">MiPantalla</span>&gt; <span class="tk-fn">createState</span>() =&gt; _MiPantallaState(); <span class="tk-com">// crea el estado del widget</span>
+            }
+
+            <span class="tk-key">class</span> _MiPantallaState <span class="tk-key">extends</span> <span class="tk-type">State</span>&lt;<span class="tk-type">MiPantalla</span>&gt; {
+            <span class="tk-type">int</span> contador = <span class="tk-num">0</span>; <span class="tk-com">// valor para provocar reconstrucciones</span>
+
+            <span class="tk-key">@override</span>
+            <span class="tk-key">void</span> <span class="tk-fn">initState</span>() {
+            <span class="tk-key">super</span>.<span class="tk-fn">initState</span>();
+            <span class="tk-fn">debugPrint</span>(<span class="tk-str">'initState: se creó la pantalla'</span>); <span class="tk-com">// se ejecuta una sola vez</span>
+            }
+
+            <span class="tk-key">void</span> <span class="tk-fn">incrementar</span>() {
+            <span class="tk-fn">setState</span>(() {
+            contador++;
+            <span class="tk-fn">debugPrint</span>(<span class="tk-str">'setState: contador = $contador'</span>); <span class="tk-com">// aparece al tocar el botón</span>
+            });
+            }
+
+            <span class="tk-key">@override</span>
+            <span class="tk-type">Widget</span> <span class="tk-fn">build</span>(<span class="tk-type">BuildContext</span> context) {
+            <span class="tk-fn">debugPrint</span>(<span class="tk-str">'build: Flutter volvió a dibujar la pantalla'</span>); <span class="tk-com">// puede verse muchas veces</span>
+            <span class="tk-key">return</span> <span class="tk-fn">Scaffold</span>(
+            body: <span class="tk-fn">Center</span>(
+            child: <span class="tk-fn">Column</span>(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+            <span class="tk-fn">Text</span>(<span class="tk-str">'Contador: $contador'</span>),
+            <span class="tk-fn">SizedBox</span>(height: <span class="tk-num">12</span>),
+            <span class="tk-fn">ElevatedButton</span>(
+            onPressed: incrementar,
+            child: <span class="tk-fn">Text</span>(<span class="tk-str">'Sumar'</span>),
+            ),
+            ],
+            ),
+            ); <span class="tk-com">// describe lo que se ve en pantalla</span>
+            }
+
+            <span class="tk-key">@override</span>
+            <span class="tk-key">void</span> <span class="tk-fn">dispose</span>() {
+            <span class="tk-fn">debugPrint</span>(<span class="tk-str">'dispose: la pantalla se cerró'</span>); <span class="tk-com">// libera recursos al salir</span>
+            <span class="tk-key">super</span>.<span class="tk-fn">dispose</span>();
+            }
+            }</code></pre>
+      </div>
+
+      <p class="txt">En este ejemplo, <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">initState()</code> se ejecuta al crear la pantalla, <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">build()</code> cada vez que Flutter necesita redibujarla, <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">setState()</code> cuando cambia el contador, y <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">dispose()</code> cuando la pantalla deja de existir.</p>
+
+      <div class="tip">
+        <div class="ic">💡</div>
+        <p><b>Cómo ver los logs:</b> ejecuten la app con <code style="font-family:'JetBrains Mono',monospace;">flutter run</code> y dejen abierta la terminal. Cada vez que cargue la pantalla, toquen el botón o salgan de la vista, aparecerán mensajes como <code style="font-family:'JetBrains Mono',monospace;">initState</code>, <code style="font-family:'JetBrains Mono',monospace;">build</code>, <code style="font-family:'JetBrains Mono',monospace;">setState</code> y <code style="font-family:'JetBrains Mono',monospace;">dispose</code>. Esa es la forma más clara de observar el ciclo de vida en tiempo real.</p>
+      </div>
+
+      <h3 style="font-family:'Space Grotesk',sans-serif; font-size:18px; margin:28px 0 10px;">Comparativa con Android Studio</h3>
+      <div class="compare-wrap">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>Android Nativo</th>
+              <th>Flutter</th>
+              <th>Idea Práctica</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><code style="font-family:'JetBrains Mono',monospace;">onCreate()</code></td>
+              <td><code style="font-family:'JetBrains Mono',monospace;">initState()</code></td>
+              <td>Se usa para inicializar datos o preparar recursos al crear la pantalla.</td>
+            </tr>
+            <tr>
+              <td><code style="font-family:'JetBrains Mono',monospace;">onResume()</code></td>
+              <td><code style="font-family:'JetBrains Mono',monospace;">build()</code> / <code style="font-family:'JetBrains Mono',monospace;">AppLifecycleState.resumed</code></td>
+              <td>En Flutter el redibujado se entiende más desde el widget; para estado de app existe <code style="font-family:'JetBrains Mono',monospace;">resumed</code>.</td>
+            </tr>
+            <tr>
+              <td><code style="font-family:'JetBrains Mono',monospace;">onPause()</code></td>
+              <td><code style="font-family:'JetBrains Mono',monospace;">AppLifecycleState.paused</code></td>
+              <td>Se usa cuando la app pasa a segundo plano.</td>
+            </tr>
+            <tr>
+              <td><code style="font-family:'JetBrains Mono',monospace;">onStop()</code></td>
+              <td><code style="font-family:'JetBrains Mono',monospace;">AppLifecycleState.inactive</code> o <code style="font-family:'JetBrains Mono',monospace;">paused</code></td>
+              <td>No existe una equivalencia exacta uno a uno; depende del contexto de la app.</td>
+            </tr>
+            <tr>
+              <td><code style="font-family:'JetBrains Mono',monospace;">onDestroy()</code></td>
+              <td><code style="font-family:'JetBrains Mono',monospace;">dispose()</code></td>
+              <td>Sirve para liberar controladores, streams o recursos al cerrar el widget.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="tip">
+        <div class="ic">💡</div>
+        <p><b>Conclusión simple:</b> en Android nativo se piensa mucho en el ciclo de vida de la <b>Activity</b> o el <b>Fragment</b>; en Flutter, al inicio conviene pensar primero en el ciclo de vida del <b>widget</b>. Más adelante, cuando la app crece, también se puede observar el ciclo de vida general con <code style="font-family:'JetBrains Mono',monospace;">AppLifecycleState</code>.</p>
       </div>
 
       <div class="exercise">
