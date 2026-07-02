@@ -1,0 +1,1225 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sesion 2 - Formularios, listas y navegacion | Flutter &amp; Dart</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0E1218;
+      --bg-soft: #11161D;
+      --card: #171D26;
+      --card-soft: #141A22;
+      --line: #262E3A;
+      --text: #E7ECF3;
+      --text-dim: #9AA7B8;
+      --text-faint: #5E6B7D;
+      --dart: #1389FD;
+      --dart-soft: #0E2A45;
+      --flutter: #FFC93C;
+      --flutter-soft: #3A2F12;
+      --green: #3DDC97;
+      --green-soft: #10301F;
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.65;
+    }
+
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background-image:
+        radial-gradient(circle at 8% 0%, rgba(19, 137, 253, .08), transparent 38%),
+        radial-gradient(circle at 90% 72%, rgba(255, 201, 60, .08), transparent 38%);
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 48px 26px 120px;
+    }
+
+    h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: clamp(30px, 5vw, 46px);
+      line-height: 1.08;
+      letter-spacing: -0.01em;
+      margin-bottom: 16px;
+    }
+
+    .hero-sub {
+      color: var(--text-dim);
+      font-size: 17px;
+      max-width: 700px;
+      margin-bottom: 34px;
+    }
+
+    .timeline {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 56px;
+    }
+
+    .timeline-item {
+      flex: 1;
+      min-width: 160px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 14px 16px;
+    }
+
+    .timeline-item .t {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--flutter);
+      margin-bottom: 4px;
+    }
+
+    .timeline-item .d {
+      font-size: 13.5px;
+      color: var(--text-dim);
+    }
+
+    .block {
+      margin-bottom: 64px;
+    }
+
+    h2.block-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 25px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .block-num {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--flutter-soft);
+      color: var(--flutter);
+      flex-shrink: 0;
+    }
+
+    .block-time {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--text-faint);
+      margin-bottom: 24px;
+      display: block;
+    }
+
+    p.txt {
+      color: var(--text-dim);
+      margin-bottom: 16px;
+      font-size: 15.5px;
+    }
+
+    p.txt b {
+      color: var(--text);
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 24px 26px;
+      margin-bottom: 20px;
+    }
+
+    .codeblock {
+      background: #0A0D12;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+      margin: 18px 0;
+    }
+
+    .codeblock .bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .codeblock .bar .fname {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--text-faint);
+    }
+
+    .codeblock .bar .dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .codeblock .bar .dots span {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+    }
+
+    .codeblock pre {
+      padding: 18px 20px;
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13.5px;
+      line-height: 1.7;
+    }
+
+    .codeblock code {
+      color: #D6E2F0;
+    }
+
+    .tk-key { color: #FF7AB2; }
+    .tk-type { color: #5FD3FF; }
+    .tk-str { color: #9EE6A8; }
+    .tk-com { color: #5E6B7D; }
+    .tk-fn { color: #FFD479; }
+    .tk-num { color: #FFB86C; }
+
+    .tip, .warn {
+      display: flex;
+      gap: 14px;
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin: 18px 0;
+    }
+
+    .tip {
+      background: var(--dart-soft);
+      border: 1px solid rgba(19, 137, 253, .3);
+    }
+
+    .warn {
+      background: #2A1A10;
+      border: 1px solid rgba(255, 201, 60, .3);
+    }
+
+    .tip .ic, .warn .ic {
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .tip p, .warn p {
+      color: var(--text-dim);
+      font-size: 14.5px;
+      margin: 0;
+    }
+
+    .exercise {
+      background: linear-gradient(150deg, var(--green-soft), var(--card-soft));
+      border: 1px solid rgba(61, 220, 151, .35);
+      border-radius: var(--radius);
+      padding: 22px 24px;
+      margin: 24px 0;
+    }
+
+    .exercise .ex-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--green);
+      letter-spacing: .06em;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .exercise .ex-label::before {
+      content: '⏱';
+    }
+
+    .exercise h4 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 17px;
+      margin-bottom: 8px;
+    }
+
+    .exercise p {
+      color: var(--text-dim);
+      font-size: 14.5px;
+      margin-bottom: 10px;
+    }
+
+    .check-list {
+      list-style: none;
+      margin-top: 12px;
+    }
+
+    .check-list li {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      margin-bottom: 8px;
+      font-size: 14.5px;
+      color: var(--text-dim);
+    }
+
+    .check-list input {
+      accent-color: var(--green);
+      width: 16px;
+      height: 16px;
+      margin-top: 2px;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .check-list label {
+      cursor: pointer;
+    }
+
+    .compare-wrap {
+      overflow-x: auto;
+      margin: 18px 0 24px;
+    }
+
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .compare-table th,
+    .compare-table td {
+      text-align: left;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+      font-size: 14px;
+    }
+
+    .compare-table th {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--flutter);
+      letter-spacing: .04em;
+      background: #111722;
+    }
+
+    .compare-table td {
+      color: var(--text-dim);
+    }
+
+    .compare-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .checkpoint {
+      background: linear-gradient(150deg, var(--flutter-soft), var(--card));
+      border: 1px solid rgba(255, 201, 60, .4);
+      border-radius: var(--radius);
+      padding: 30px 28px;
+      margin-top: 20px;
+    }
+
+    .checkpoint .ck-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--flutter);
+      letter-spacing: .08em;
+      margin-bottom: 10px;
+    }
+
+    .checkpoint h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 21px;
+      margin-bottom: 10px;
+    }
+
+    .checkpoint p {
+      color: var(--text-dim);
+      font-size: 15px;
+    }
+
+    @media (max-width: 640px) {
+      .timeline {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="wrap">
+
+    <h1>Formularios, listas<br>y navegacion</h1>
+    <p class="hero-sub">
+      En esta sesion el salto ya no es solo visual. Aqui empiezan a capturar datos
+      con formularios, a mostrarlos en listas, a pasar de una pantalla a otra y a
+      ordenar mejor el proyecto para que no todo termine en <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">main.dart</code>.
+    </p>
+
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="t">BLOQUE 1</div>
+        <div class="d">TextField, Switch, Checkbox, Radio y Select</div>
+      </div>
+      <div class="timeline-item">
+        <div class="t">BLOQUE 2</div>
+        <div class="d">ListView con memoria local y JSON simulado</div>
+      </div>
+      <div class="timeline-item">
+        <div class="t">BLOQUE 3</div>
+        <div class="d">Navegacion entre pantallas y separar widgets</div>
+      </div>
+      <div class="timeline-item">
+        <div class="t">BLOQUE 4</div>
+        <div class="d">Tema Material 3 y persistencia basica</div>
+      </div>
+    </div>
+
+    <div class="block">
+      <h2 class="block-title"><span class="block-num">1</span> TextField y controles de formulario</h2>
+      <span class="block-time">60 minutos · captura de datos y estado del formulario</span>
+
+      <p class="txt">Una app deja de ser solo una maqueta cuando puede recibir datos. En Flutter, eso empieza con controles de formulario. El <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">TextField</code> captura texto; <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">Switch</code>, <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">Checkbox</code>, <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">RadioListTile</code> y <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">DropdownButtonFormField</code> permiten decisiones y opciones.</p>
+
+      <div class="card">
+        <p class="txt"><b>TextField</b> se usa para escribir texto como nombre, titulo o descripcion.</p>
+        <p class="txt"><b>Switch</b> representa una decision binaria: activo o inactivo.</p>
+        <p class="txt"><b>Checkbox</b> marca o desmarca una opcion concreta.</p>
+        <p class="txt"><b>RadioListTile</b> permite elegir solo una opcion entre varias.</p>
+        <p class="txt" style="margin-bottom:0;"><b>DropdownButtonFormField</b> funciona como un select: muestra varias opciones y deja elegir una.</p>
+      </div>
+
+      <p class="txt"><b>Estructura completa.</b> La clase <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">_FormularioDemoState</code> no se usa sola. Siempre debe ir unida a un <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">StatefulWidget</code> que la invoque con <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">createState()</code>. Este es el ejemplo completo y funcional:</p>
+
+      <div class="codeblock">
+        <div class="bar"><span class="fname">lib/main.dart - formulario basico completo</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+        <pre><code><span class="tk-key">import</span> <span class="tk-str">'package:flutter/material.dart'</span>;
+
+            <span class="tk-key">void</span> <span class="tk-fn">main</span>() {
+            <span class="tk-fn">runApp</span>(<span class="tk-fn">MiApp</span>()); <span class="tk-com">// inicia la aplicacion</span>
+            }
+
+            <span class="tk-key">class</span> <span class="tk-type">MiApp</span> <span class="tk-key">extends</span> <span class="tk-type">StatelessWidget</span> {
+            <span class="tk-key">@override</span>
+            <span class="tk-type">Widget</span> <span class="tk-fn">build</span>(<span class="tk-type">BuildContext</span> context) {
+            <span class="tk-key">return</span> <span class="tk-fn">MaterialApp</span>(
+            debugShowCheckedModeBanner: <span class="tk-key">false</span>,
+            theme: <span class="tk-fn">ThemeData</span>(useMaterial3: <span class="tk-key">true</span>),
+            home: <span class="tk-fn">FormularioDemo</span>(), <span class="tk-com">// primera pantalla</span>
+            );
+            }
+            }
+
+            <span class="tk-key">class</span> <span class="tk-type">FormularioDemo</span> <span class="tk-key">extends</span> <span class="tk-type">StatefulWidget</span> {
+            <span class="tk-key">@override</span>
+            <span class="tk-type">State</span>&lt;<span class="tk-type">FormularioDemo</span>&gt; <span class="tk-fn">createState</span>() =&gt; _FormularioDemoState(); <span class="tk-com">// conecta el widget con su estado</span>
+            }
+
+            <span class="tk-key">class</span> _FormularioDemoState <span class="tk-key">extends</span> <span class="tk-type">State</span>&lt;<span class="tk-type">FormularioDemo</span>&gt; {
+            <span class="tk-type">final</span> nombreController = <span class="tk-fn">TextEditingController</span>(); <span class="tk-com">// controla el texto escrito</span>
+            <span class="tk-type">bool</span> recibirNotificaciones = <span class="tk-key">true</span>; <span class="tk-com">// estado del switch</span>
+            <span class="tk-type">bool</span> aceptaTerminos = <span class="tk-key">false</span>; <span class="tk-com">// estado del checkbox</span>
+            <span class="tk-type">String</span> prioridad = <span class="tk-str">'Media'</span>; <span class="tk-com">// valor del radio</span>
+            <span class="tk-type">String</span>? categoria = <span class="tk-str">'Estudio'</span>; <span class="tk-com">// valor del select</span>
+
+            <span class="tk-key">@override</span>
+            <span class="tk-type">Widget</span> <span class="tk-fn">build</span>(<span class="tk-type">BuildContext</span> context) {
+            <span class="tk-key">return</span> <span class="tk-fn">Scaffold</span>(
+            appBar: <span class="tk-fn">AppBar</span>(title: <span class="tk-fn">Text</span>(<span class="tk-str">'Formulario simple'</span>)),
+            body: <span class="tk-fn">Padding</span>(
+            padding: EdgeInsets.<span class="tk-fn">all</span>(<span class="tk-num">16</span>),
+            child: <span class="tk-fn">ListView</span>(
+            children: [
+            <span class="tk-fn">TextField</span>(
+            controller: nombreController,
+            decoration: <span class="tk-fn">InputDecoration</span>(
+            labelText: <span class="tk-str">'Nombre'</span>,
+            border: <span class="tk-fn">OutlineInputBorder</span>(),
+            ),
+            ),
+            <span class="tk-fn">SizedBox</span>(height: <span class="tk-num">16</span>),
+            <span class="tk-fn">SwitchListTile</span>(
+            title: <span class="tk-fn">Text</span>(<span class="tk-str">'Recibir notificaciones'</span>),
+            value: recibirNotificaciones,
+            onChanged: (valor) =&gt; <span class="tk-fn">setState</span>(() =&gt; recibirNotificaciones = valor),
+            ),
+            <span class="tk-fn">CheckboxListTile</span>(
+            title: <span class="tk-fn">Text</span>(<span class="tk-str">'Acepto terminos'</span>),
+            value: aceptaTerminos,
+            onChanged: (valor) =&gt; <span class="tk-fn">setState</span>(() =&gt; aceptaTerminos = valor ?? <span class="tk-key">false</span>),
+            ),
+            <span class="tk-fn">RadioListTile</span>&lt;<span class="tk-type">String</span>&gt;(
+            title: <span class="tk-fn">Text</span>(<span class="tk-str">'Prioridad alta'</span>),
+            value: <span class="tk-str">'Alta'</span>,
+            groupValue: prioridad,
+            onChanged: (valor) =&gt; <span class="tk-fn">setState</span>(() =&gt; prioridad = valor!),
+            ),
+            <span class="tk-fn">RadioListTile</span>&lt;<span class="tk-type">String</span>&gt;(
+            title: <span class="tk-fn">Text</span>(<span class="tk-str">'Prioridad media'</span>),
+            value: <span class="tk-str">'Media'</span>,
+            groupValue: prioridad,
+            onChanged: (valor) =&gt; <span class="tk-fn">setState</span>(() =&gt; prioridad = valor!),
+            ),
+            <span class="tk-fn">DropdownButtonFormField</span>&lt;<span class="tk-type">String</span>&gt;(
+            value: categoria,
+            items: [<span class="tk-str">'Estudio'</span>, <span class="tk-str">'Trabajo'</span>, <span class="tk-str">'Personal'</span>]
+              .<span class="tk-fn">map</span>((item) =&gt; <span class="tk-fn">DropdownMenuItem</span>(value: item, child: <span class="tk-fn">Text</span>(item)))
+              .<span class="tk-fn">toList</span>(),
+            onChanged: (valor) =&gt; <span class="tk-fn">setState</span>(() =&gt; categoria = valor),
+            decoration: <span class="tk-fn">InputDecoration</span>(labelText: <span class="tk-str">'Categoria'</span>),
+            ),
+            ],
+            ),
+            ),
+            );
+            }
+
+            <span class="tk-key">@override</span>
+            <span class="tk-key">void</span> <span class="tk-fn">dispose</span>() {
+            nombreController.<span class="tk-fn">dispose</span>(); <span class="tk-com">// libera el controlador al cerrar la pantalla</span>
+            <span class="tk-key">super</span>.<span class="tk-fn">dispose</span>();
+            }
+            }</code></pre>
+      </div>
+
+      <div class="tip">
+        <div class="ic">💡</div>
+        <p><b>Lectura correcta de la estructura:</b> <code style="font-family:'JetBrains Mono',monospace;">MiApp</code> arranca la aplicacion, <code style="font-family:'JetBrains Mono',monospace;">FormularioDemo</code> representa la pantalla, y <code style="font-family:'JetBrains Mono',monospace;">_FormularioDemoState</code> guarda los valores que cambian mientras se usa el formulario.</p>
+      </div>
+
+      <div class="tip">
+        <div class="ic">💡</div>
+        <p><b>Regla simple:</b> si el control cambia en pantalla, su valor debe vivir en una variable de estado y actualizarse con <code style="font-family:'JetBrains Mono',monospace;">setState()</code>.</p>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-label">EJERCICIO · 20 MIN</div>
+        <h4>Formulario de producto o tarea</h4>
+        <p>Construyan un formulario propio que use al menos cuatro controles distintos.</p>
+        <ul class="check-list">
+          <li><input type="checkbox" id="s2-1"><label for="s2-1">Un <code style="font-family:'JetBrains Mono',monospace;">TextField</code> para el nombre</label></li>
+          <li><input type="checkbox" id="s2-2"><label for="s2-2">Un <code style="font-family:'JetBrains Mono',monospace;">Switch</code> o <code style="font-family:'JetBrains Mono',monospace;">Checkbox</code></label></li>
+          <li><input type="checkbox" id="s2-3"><label for="s2-3">Un grupo de <code style="font-family:'JetBrains Mono',monospace;">RadioListTile</code> o un select</label></li>
+          <li><input type="checkbox" id="s2-4"><label for="s2-4">Que los cambios se reflejen en pantalla usando estado</label></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="block">
+      <h2 class="block-title"><span class="block-num">2</span> ListView con datos en memoria y JSON local</h2>
+      <span class="block-time">60 minutos · listas dinamicas sin base de datos</span>
+
+      <p class="txt">Mostrar una lista en Flutter no requiere base de datos. Primero se trabaja con datos en memoria; después, si hace falta, esos mismos datos pueden venir de un JSON local o de una API.</p>
+
+      <div class="compare-wrap">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>Forma</th>
+              <th>Ejemplo</th>
+              <th>Cuándo usarla</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Lista en memoria</td>
+              <td><code style="font-family:'JetBrains Mono',monospace;">List&lt;String&gt;</code></td>
+              <td>Cuando solo quieren practicar interfaz y estado.</td>
+            </tr>
+            <tr>
+              <td>Lista de objetos</td>
+              <td><code style="font-family:'JetBrains Mono',monospace;">List&lt;Producto&gt;</code></td>
+              <td>Cuando cada item tiene varios datos relacionados.</td>
+            </tr>
+            <tr>
+              <td>JSON local</td>
+              <td><code style="font-family:'JetBrains Mono',monospace;">List&lt;Map&lt;String, dynamic&gt;&gt;</code></td>
+              <td>Cuando quieren simular data sin internet ni API.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="txt"><b>Ejemplo completo 1.</b> Aquí tienen la estructura completa para trabajar con <b>JSON simulado</b>, convertirlo a objetos con <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">fromJson</code> y dejar la lista lista para mostrarse en pantalla.</p>
+
+      <div class="codeblock">
+        <div class="bar"><span class="fname">lib/main.dart - JSON simulado + clase desde fromJson</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+        <pre><code><span class="tk-key">import</span> <span class="tk-str">'package:flutter/material.dart'</span>; <span class="tk-com">// widgets base de Flutter</span>
+
+            <span class="tk-key">void</span> <span class="tk-fn">main</span>() { <span class="tk-com">// punto de entrada</span>
+            <span class="tk-fn">runApp</span>(<span class="tk-fn">MiApp</span>()); <span class="tk-com">// inicia la aplicación</span>
+            }
+
+            <span class="tk-key">class</span> <span class="tk-type">MiApp</span> <span class="tk-key">extends</span> <span class="tk-type">StatelessWidget</span> {
+            <span class="tk-key">@override</span>
+            <span class="tk-type">Widget</span> <span class="tk-fn">build</span>(<span class="tk-type">BuildContext</span> context) {
+            <span class="tk-key">return</span> <span class="tk-fn">MaterialApp</span>(
+            debugShowCheckedModeBanner: <span class="tk-key">false</span>,
+            theme: <span class="tk-fn">ThemeData</span>(useMaterial3: <span class="tk-key">true</span>),
+            home: <span class="tk-fn">ProductosPage</span>(),
+            );
+            }
+            }
+
+            <span class="tk-com">// JSON local simulado: aquí la data todavía no viene de internet</span>
+            <span class="tk-key">final</span> productosJson = [
+            {<span class="tk-str">'nombre'</span>: <span class="tk-str">'Arroz'</span>, <span class="tk-str">'precio'</span>: <span class="tk-num">4.50</span>, <span class="tk-str">'stock'</span>: <span class="tk-num">8</span>},
+            {<span class="tk-str">'nombre'</span>: <span class="tk-str">'Leche'</span>, <span class="tk-str">'precio'</span>: <span class="tk-num">3.20</span>, <span class="tk-str">'stock'</span>: <span class="tk-num">4</span>},
+            {<span class="tk-str">'nombre'</span>: <span class="tk-str">'Pan'</span>, <span class="tk-str">'precio'</span>: <span class="tk-num">0.80</span>, <span class="tk-str">'stock'</span>: <span class="tk-num">20</span>},
+            {<span class="tk-str">'nombre'</span>: <span class="tk-str">'Huevos'</span>, <span class="tk-str">'precio'</span>: <span class="tk-num">7.00</span>, <span class="tk-str">'stock'</span>: <span class="tk-num">12</span>},
+            ];
+
+            <span class="tk-key">class</span> <span class="tk-type">Producto</span> { <span class="tk-com">// modelo que representa cada producto</span>
+            <span class="tk-type">String</span> nombre;
+            <span class="tk-type">double</span> precio;
+            <span class="tk-type">int</span> stock;
+
+            <span class="tk-type">Producto</span>({
+            <span class="tk-key">required</span> <span class="tk-type">this</span>.nombre,
+            <span class="tk-key">required</span> <span class="tk-type">this</span>.precio,
+            <span class="tk-key">required</span> <span class="tk-type">this</span>.stock,
+            });
+
+            <span class="tk-key">factory</span> <span class="tk-type">Producto</span>.<span class="tk-fn">fromJson</span>(<span class="tk-type">Map</span>&lt;<span class="tk-type">String</span>, <span class="tk-type">dynamic</span>&gt; json) { <span class="tk-com">// convierte un Map en objeto</span>
+            <span class="tk-key">return</span> <span class="tk-fn">Producto</span>(
+            nombre: json[<span class="tk-str">'nombre'</span>],
+            precio: (json[<span class="tk-str">'precio'</span>] <span class="tk-key">as</span> num).<span class="tk-fn">toDouble</span>(), <span class="tk-com">// asegura tipo double</span>
+            stock: json[<span class="tk-str">'stock'</span>],
+            );
+            }
+            }
+
+            <span class="tk-key">class</span> <span class="tk-type">ProductosPage</span> <span class="tk-key">extends</span> <span class="tk-type">StatelessWidget</span> { <span class="tk-com">// pantalla que usa la data ya convertida</span>
+            <span class="tk-key">@override</span>
+            <span class="tk-type">Widget</span> <span class="tk-fn">build</span>(<span class="tk-type">BuildContext</span> context) {
+            <span class="tk-key">final</span> productos = productosJson
+            .<span class="tk-fn">map</span>((item) =&gt; <span class="tk-fn">Producto</span>.fromJson(item))
+            .<span class="tk-fn">toList</span>(); <span class="tk-com">// convierte cada map en un objeto Producto</span>
+
+            <span class="tk-key">return</span> <span class="tk-fn">Scaffold</span>(
+            appBar: <span class="tk-fn">AppBar</span>(title: <span class="tk-fn">Text</span>(<span class="tk-str">'Productos desde JSON local'</span>)),
+            body: <span class="tk-fn">Center</span>(
+            child: <span class="tk-fn">Text</span>(<span class="tk-str">'Total de productos: ${productos.length}'</span>),
+            ),
+            );
+            }
+            }</code></pre>
+      </div>
+
+      <p class="txt"><b>Ejemplo completo 2.</b> Ahora el mismo escenario, pero mostrando los objetos con <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">ListView.builder</code> dentro de una pantalla funcional.</p>
+
+      <div class="codeblock">
+        <div class="bar"><span class="fname">lib/main.dart - ListView.builder con objetos</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+        <pre><code><span class="tk-key">import</span> <span class="tk-str">'package:flutter/material.dart'</span>; <span class="tk-com">// widgets visuales de Flutter</span>
+
+            <span class="tk-key">void</span> <span class="tk-fn">main</span>() { <span class="tk-com">// arranque de la app</span>
+            <span class="tk-fn">runApp</span>(<span class="tk-fn">MiApp</span>()); <span class="tk-com">// dibuja el widget principal</span>
+            }
+
+            <span class="tk-key">class</span> <span class="tk-type">MiApp</span> <span class="tk-key">extends</span> <span class="tk-type">StatelessWidget</span> {
+            <span class="tk-key">@override</span>
+            <span class="tk-type">Widget</span> <span class="tk-fn">build</span>(<span class="tk-type">BuildContext</span> context) {
+            <span class="tk-key">return</span> <span class="tk-fn">MaterialApp</span>(
+            debugShowCheckedModeBanner: <span class="tk-key">false</span>,
+            theme: <span class="tk-fn">ThemeData</span>(useMaterial3: <span class="tk-key">true</span>),
+            home: <span class="tk-fn">ProductosListPage</span>(),
+            );
+            }
+            }
+
+            <span class="tk-key">final</span> productosJson = [ <span class="tk-com">// lista que simula una respuesta JSON</span>
+            {<span class="tk-str">'nombre'</span>: <span class="tk-str">'Arroz'</span>, <span class="tk-str">'precio'</span>: <span class="tk-num">4.50</span>, <span class="tk-str">'stock'</span>: <span class="tk-num">8</span>},
+            {<span class="tk-str">'nombre'</span>: <span class="tk-str">'Leche'</span>, <span class="tk-str">'precio'</span>: <span class="tk-num">3.20</span>, <span class="tk-str">'stock'</span>: <span class="tk-num">4</span>},
+            {<span class="tk-str">'nombre'</span>: <span class="tk-str">'Pan'</span>, <span class="tk-str">'precio'</span>: <span class="tk-num">0.80</span>, <span class="tk-str">'stock'</span>: <span class="tk-num">20</span>},
+            {<span class="tk-str">'nombre'</span>: <span class="tk-str">'Huevos'</span>, <span class="tk-str">'precio'</span>: <span class="tk-num">7.00</span>, <span class="tk-str">'stock'</span>: <span class="tk-num">12</span>},
+            ];
+
+            <span class="tk-key">class</span> <span class="tk-type">Producto</span> {
+            <span class="tk-type">String</span> nombre;
+            <span class="tk-type">double</span> precio;
+            <span class="tk-type">int</span> stock;
+
+            <span class="tk-type">Producto</span>({
+            <span class="tk-key">required</span> <span class="tk-type">this</span>.nombre,
+            <span class="tk-key">required</span> <span class="tk-type">this</span>.precio,
+            <span class="tk-key">required</span> <span class="tk-type">this</span>.stock,
+            });
+
+            <span class="tk-key">factory</span> <span class="tk-type">Producto</span>.<span class="tk-fn">fromJson</span>(<span class="tk-type">Map</span>&lt;<span class="tk-type">String</span>, <span class="tk-type">dynamic</span>&gt; json) {
+            <span class="tk-key">return</span> <span class="tk-fn">Producto</span>(
+            nombre: json[<span class="tk-str">'nombre'</span>],
+            precio: (json[<span class="tk-str">'precio'</span>] <span class="tk-key">as</span> num).<span class="tk-fn">toDouble</span>(),
+            stock: json[<span class="tk-str">'stock'</span>],
+            );
+            }
+            }
+
+            <span class="tk-key">class</span> <span class="tk-type">ProductosListPage</span> <span class="tk-key">extends</span> <span class="tk-type">StatelessWidget</span> { <span class="tk-com">// pantalla que mostrará la lista</span>
+            <span class="tk-key">@override</span>
+            <span class="tk-type">Widget</span> <span class="tk-fn">build</span>(<span class="tk-type">BuildContext</span> context) {
+            <span class="tk-key">final</span> productos = productosJson
+            .<span class="tk-fn">map</span>((item) =&gt; <span class="tk-fn">Producto</span>.fromJson(item))
+            .<span class="tk-fn">toList</span>(); <span class="tk-com">// transforma todos los Map en objetos</span>
+
+            <span class="tk-key">return</span> <span class="tk-fn">Scaffold</span>(
+            appBar: <span class="tk-fn">AppBar</span>(title: <span class="tk-fn">Text</span>(<span class="tk-str">'Lista de productos'</span>)),
+            body: <span class="tk-fn">ListView</span>.<span class="tk-fn">builder</span>( <span class="tk-com">// construye solo los items visibles</span>
+            itemCount: productos.length, <span class="tk-com">// cantidad total de elementos</span>
+            itemBuilder: (context, index) {
+            <span class="tk-key">final</span> producto = productos[index]; <span class="tk-com">// obtiene el item actual</span>
+            <span class="tk-key">return</span> <span class="tk-fn">Card</span>(
+            margin: EdgeInsets.<span class="tk-fn">symmetric</span>(horizontal: <span class="tk-num">12</span>, vertical: <span class="tk-num">6</span>),
+            child: <span class="tk-fn">ListTile</span>(
+            leading: <span class="tk-fn">CircleAvatar</span>(child: <span class="tk-fn">Text</span>(<span class="tk-str">'${index + 1}'</span>)),
+            title: <span class="tk-fn">Text</span>(producto.nombre),
+            subtitle: <span class="tk-fn">Text</span>(<span class="tk-str">'Stock: ${producto.stock}'</span>),
+            trailing: <span class="tk-fn">Text</span>(<span class="tk-str">'S/ ${producto.precio.toStringAsFixed(2)}'</span>),
+            ),
+            );
+            },
+            ),
+            );
+            }
+            }</code></pre>
+      </div>
+
+      <div class="warn">
+        <div class="ic">⚠</div>
+        <p><b>Diferencia con Android nativo:</b> en Android moderno se usa mucho <code style="font-family:'JetBrains Mono',monospace;">RecyclerView</code>. En Flutter, el equivalente practico para empezar suele ser <code style="font-family:'JetBrains Mono',monospace;">ListView.builder</code>.</p>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-label">EJERCICIO · 20 MIN</div>
+        <h4>Lista local de compras o productos</h4>
+        <p>Construyan una lista usando JSON simulado y muéstrenla en pantalla.</p>
+        <ul class="check-list">
+          <li><input type="checkbox" id="s2-5"><label for="s2-5">Definir al menos 4 items en un JSON local</label></li>
+          <li><input type="checkbox" id="s2-6"><label for="s2-6">Convertir cada item a objeto con <code style="font-family:'JetBrains Mono',monospace;">fromJson</code></label></li>
+          <li><input type="checkbox" id="s2-7"><label for="s2-7">Mostrar la lista con <code style="font-family:'JetBrains Mono',monospace;">ListView.builder</code></label></li>
+          <li><input type="checkbox" id="s2-8"><label for="s2-8">Visualizar al menos nombre y otro dato adicional</label></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="block">
+      <h2 class="block-title"><span class="block-num">3</span> Navegacion entre pantallas y separar widgets</h2>
+      <span class="block-time">55 minutos · organizar mejor la app</span>
+
+      <p class="txt">Cuando una app empieza a crecer, dejar todo en <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">main.dart</code> deja de ser practico. Esta sesion ya debe acostumbrarlos a separar pantallas, widgets y modelos en archivos distintos.</p>
+
+      <div class="card">
+        <p class="txt"><b>Navegacion entre pantallas</b> se hace con <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">Navigator.push()</code> para entrar y <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">Navigator.pop()</code> para volver.</p>
+        <p class="txt"><b>Separar widgets en archivos</b> mejora lectura, mantenimiento y reutilizacion.</p>
+        <p class="txt" style="margin-bottom:0;"><b>Regla basica:</b> <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">main.dart</code> inicia la app; las pantallas viven en otros archivos; los widgets reutilizables van a una carpeta propia; los modelos se definen aparte.</p>
+      </div>
+
+      <div class="codeblock">
+        <div class="bar"><span class="fname">Estructura sugerida dentro de lib/</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+        <pre><code>lib/
+            main.dart
+            models/
+              producto.dart
+            pages/
+              home_page.dart
+              detail_page.dart
+            widgets/
+              producto_card.dart
+              producto_form.dart</code></pre>
+      </div>
+
+      <div class="codeblock">
+        <div class="bar"><span class="fname">Navegacion hacia detalle</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+        <pre><code><span class="tk-fn">ListTile</span>(
+            title: <span class="tk-fn">Text</span>(producto.nombre),
+            onTap: () {
+            Navigator.<span class="tk-fn">push</span>(
+            context,
+            MaterialPageRoute(
+            builder: (context) =&gt; <span class="tk-fn">DetailPage</span>(producto: producto),
+            ),
+            );
+            },
+            )</code></pre>
+      </div>
+
+      <div class="codeblock">
+        <div class="bar"><span class="fname">Volver desde la segunda pantalla</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+        <pre><code><span class="tk-fn">ElevatedButton</span>(
+            onPressed: () {
+            Navigator.<span class="tk-fn">pop</span>(context);
+            },
+            child: <span class="tk-fn">Text</span>(<span class="tk-str">'Volver'</span>),
+            )</code></pre>
+      </div>
+
+      <p class="txt"><b>Ejemplo completo y funcional.</b> Si quieren probar navegación real y organización en archivos, esta estructura ya está lista para usar. Aquí se separa el modelo, la pantalla principal, la pantalla detalle y el widget reutilizable que dibuja cada producto.</p>
+
+      <div class="codeblock">
+        <div class="bar"><span class="fname">lib/main.dart</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+        <pre><code><span class="tk-key">import</span> <span class="tk-str">'package:flutter/material.dart'</span>; <span class="tk-com">// importa Material Design</span>
+            <span class="tk-key">import</span> <span class="tk-str">'pages/home_page.dart'</span>;
+
+            <span class="tk-key">void</span> <span class="tk-fn">main</span>() { <span class="tk-com">// inicia la aplicación</span>
+            <span class="tk-fn">runApp</span>(<span class="tk-fn">MiApp</span>());
+            }
+
+            <span class="tk-key">class</span> <span class="tk-type">MiApp</span> <span class="tk-key">extends</span> <span class="tk-type">StatelessWidget</span> {
+            <span class="tk-key">const</span> <span class="tk-fn">MiApp</span>({<span class="tk-key">super</span>.key});
+
+            <span class="tk-key">@override</span>
+            <span class="tk-type">Widget</span> <span class="tk-fn">build</span>(<span class="tk-type">BuildContext</span> context) {
+            <span class="tk-key">return</span> <span class="tk-fn">MaterialApp</span>(
+            debugShowCheckedModeBanner: <span class="tk-key">false</span>,
+            title: <span class="tk-str">'Navegacion Flutter'</span>,
+            theme: <span class="tk-fn">ThemeData</span>(
+            useMaterial3: <span class="tk-key">true</span>,
+            colorScheme: ColorScheme.<span class="tk-fn">fromSeed</span>(seedColor: Colors.blue),
+            ),
+            home: <span class="tk-key">const</span> <span class="tk-fn">HomePage</span>(), <span class="tk-com">// primera pantalla visible</span>
+            );
+            }
+            }</code></pre>
+      </div>
+
+      <div class="codeblock">
+        <div class="bar"><span class="fname">lib/models/producto.dart</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+        <pre><code><span class="tk-key">class</span> <span class="tk-type">Producto</span> { <span class="tk-com">// clase de dominio para transportar datos entre pantallas</span>
+            <span class="tk-key">final</span> <span class="tk-type">String</span> nombre;
+            <span class="tk-key">final</span> <span class="tk-type">double</span> precio;
+            <span class="tk-key">final</span> <span class="tk-type">int</span> stock;
+            <span class="tk-key">final</span> <span class="tk-type">String</span> descripcion;
+
+            <span class="tk-key">const</span> <span class="tk-fn">Producto</span>({
+            <span class="tk-key">required</span> <span class="tk-type">this</span>.nombre,
+            <span class="tk-key">required</span> <span class="tk-type">this</span>.precio,
+            <span class="tk-key">required</span> <span class="tk-type">this</span>.stock,
+            <span class="tk-key">required</span> <span class="tk-type">this</span>.descripcion,
+            });
+            }</code></pre>
+      </div>
+
+      <div class="codeblock">
+        <div class="bar"><span class="fname">lib/widgets/producto_card.dart</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+        <pre><code><span class="tk-key">import</span> <span class="tk-str">'package:flutter/material.dart'</span>; <span class="tk-com">// widgets de interfaz</span>
+            <span class="tk-key">import</span> <span class="tk-str">'../models/producto.dart'</span>;
+
+            <span class="tk-key">class</span> <span class="tk-type">ProductoCard</span> <span class="tk-key">extends</span> <span class="tk-type">StatelessWidget</span> { <span class="tk-com">// widget reutilizable para un item</span>
+            <span class="tk-key">final</span> <span class="tk-type">Producto</span> producto; <span class="tk-com">// datos a mostrar</span>
+            <span class="tk-key">final</span> <span class="tk-type">VoidCallback</span> onTap; <span class="tk-com">// acción al tocar el item</span>
+
+            <span class="tk-key">const</span> <span class="tk-fn">ProductoCard</span>({
+            <span class="tk-key">super</span>.key,
+            <span class="tk-key">required</span> <span class="tk-type">this</span>.producto,
+            <span class="tk-key">required</span> <span class="tk-type">this</span>.onTap,
+            });
+
+            <span class="tk-key">@override</span>
+            <span class="tk-type">Widget</span> <span class="tk-fn">build</span>(<span class="tk-type">BuildContext</span> context) {
+            <span class="tk-key">return</span> <span class="tk-fn">Card</span>(
+            margin: <span class="tk-key">const</span> EdgeInsets.<span class="tk-fn">symmetric</span>(horizontal: <span class="tk-num">12</span>, vertical: <span class="tk-num">6</span>),
+            child: <span class="tk-fn">ListTile</span>(
+            leading: <span class="tk-fn">CircleAvatar</span>(
+            child: <span class="tk-fn">Text</span>(producto.nombre[<span class="tk-num">0</span>]),
+            ),
+            title: <span class="tk-fn">Text</span>(producto.nombre),
+            subtitle: <span class="tk-fn">Text</span>(<span class="tk-str">'Stock: ${producto.stock}'</span>),
+            trailing: <span class="tk-fn">Text</span>(<span class="tk-str">'S/ ${producto.precio.toStringAsFixed(2)}'</span>),
+            onTap: onTap, <span class="tk-com">// ejecuta la navegación definida afuera</span>
+            ),
+            );
+            }
+            }</code></pre>
+      </div>
+
+      <div class="codeblock">
+        <div class="bar"><span class="fname">lib/pages/home_page.dart</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+        <pre><code><span class="tk-key">import</span> <span class="tk-str">'package:flutter/material.dart'</span>; <span class="tk-com">// interfaz visual</span>
+            <span class="tk-key">import</span> <span class="tk-str">'../models/producto.dart'</span>;
+            <span class="tk-key">import</span> <span class="tk-str">'../widgets/producto_card.dart'</span>;
+            <span class="tk-key">import</span> <span class="tk-str">'detail_page.dart'</span>;
+
+            <span class="tk-key">class</span> <span class="tk-type">HomePage</span> <span class="tk-key">extends</span> <span class="tk-type">StatelessWidget</span> { <span class="tk-com">// pantalla inicial con la lista</span>
+            <span class="tk-key">const</span> <span class="tk-fn">HomePage</span>({<span class="tk-key">super</span>.key});
+
+            <span class="tk-key">static</span> <span class="tk-key">final</span> <span class="tk-type">List</span>&lt;<span class="tk-type">Producto</span>&gt; productos = [ <span class="tk-com">// datos locales de ejemplo</span>
+            <span class="tk-key">const</span> <span class="tk-fn">Producto</span>(
+            nombre: <span class="tk-str">'Arroz'</span>,
+            precio: <span class="tk-num">4.50</span>,
+            stock: <span class="tk-num">8</span>,
+            descripcion: <span class="tk-str">'Bolsa de arroz de 1 kg.'</span>,
+            ),
+            <span class="tk-key">const</span> <span class="tk-fn">Producto</span>(
+            nombre: <span class="tk-str">'Leche'</span>,
+            precio: <span class="tk-num">3.20</span>,
+            stock: <span class="tk-num">4</span>,
+            descripcion: <span class="tk-str">'Leche evaporada entera.'</span>,
+            ),
+            <span class="tk-key">const</span> <span class="tk-fn">Producto</span>(
+            nombre: <span class="tk-str">'Pan'</span>,
+            precio: <span class="tk-num">0.80</span>,
+            stock: <span class="tk-num">20</span>,
+            descripcion: <span class="tk-str">'Unidad de pan frances.'</span>,
+            ),
+            <span class="tk-key">const</span> <span class="tk-fn">Producto</span>(
+            nombre: <span class="tk-str">'Huevos'</span>,
+            precio: <span class="tk-num">7.00</span>,
+            stock: <span class="tk-num">12</span>,
+            descripcion: <span class="tk-str">'Docena de huevos.'</span>,
+            ),
+            ];
+
+            <span class="tk-key">@override</span>
+            <span class="tk-type">Widget</span> <span class="tk-fn">build</span>(<span class="tk-type">BuildContext</span> context) {
+            <span class="tk-key">return</span> <span class="tk-fn">Scaffold</span>(
+            appBar: <span class="tk-fn">AppBar</span>(title: <span class="tk-key">const</span> <span class="tk-fn">Text</span>(<span class="tk-str">'Lista de productos'</span>)),
+            body: <span class="tk-fn">ListView</span>.<span class="tk-fn">builder</span>( <span class="tk-com">// arma la lista dinámicamente</span>
+            itemCount: productos.length,
+            itemBuilder: (context, index) {
+            <span class="tk-key">final</span> producto = productos[index];
+
+            <span class="tk-key">return</span> <span class="tk-fn">ProductoCard</span>(
+            producto: producto,
+            onTap: () { <span class="tk-com">// abre el detalle enviando el producto actual</span>
+            Navigator.<span class="tk-fn">push</span>(
+            context,
+            MaterialPageRoute(
+            builder: (context) =&gt; <span class="tk-fn">DetailPage</span>(producto: producto),
+            ),
+            );
+            },
+            );
+            },
+            ),
+            );
+            }
+            }</code></pre>
+      </div>
+
+      <div class="codeblock">
+        <div class="bar"><span class="fname">lib/pages/detail_page.dart</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+        <pre><code><span class="tk-key">import</span> <span class="tk-str">'package:flutter/material.dart'</span>; <span class="tk-com">// widgets Material</span>
+            <span class="tk-key">import</span> <span class="tk-str">'../models/producto.dart'</span>;
+
+            <span class="tk-key">class</span> <span class="tk-type">DetailPage</span> <span class="tk-key">extends</span> <span class="tk-type">StatelessWidget</span> { <span class="tk-com">// segunda pantalla</span>
+            <span class="tk-key">final</span> <span class="tk-type">Producto</span> producto; <span class="tk-com">// recibe el producto desde la pantalla anterior</span>
+
+            <span class="tk-key">const</span> <span class="tk-fn">DetailPage</span>({
+            <span class="tk-key">super</span>.key,
+            <span class="tk-key">required</span> <span class="tk-type">this</span>.producto,
+            });
+
+            <span class="tk-key">@override</span>
+            <span class="tk-type">Widget</span> <span class="tk-fn">build</span>(<span class="tk-type">BuildContext</span> context) {
+            <span class="tk-key">return</span> <span class="tk-fn">Scaffold</span>(
+            appBar: <span class="tk-fn">AppBar</span>(
+            title: <span class="tk-fn">Text</span>(producto.nombre),
+            ),
+            body: <span class="tk-fn">Padding</span>(
+            padding: <span class="tk-key">const</span> EdgeInsets.<span class="tk-fn">all</span>(<span class="tk-num">16</span>),
+            child: <span class="tk-fn">Column</span>(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+            <span class="tk-fn">Text</span>(
+            producto.nombre,
+            style: <span class="tk-key">const</span> <span class="tk-fn">TextStyle</span>(
+            fontSize: <span class="tk-num">26</span>,
+            fontWeight: FontWeight.bold,
+            ),
+            ),
+            <span class="tk-fn">SizedBox</span>(height: <span class="tk-num">12</span>),
+            <span class="tk-fn">Text</span>(<span class="tk-str">'Precio: S/ ${producto.precio.toStringAsFixed(2)}'</span>),
+            <span class="tk-fn">SizedBox</span>(height: <span class="tk-num">8</span>),
+            <span class="tk-fn">Text</span>(<span class="tk-str">'Stock disponible: ${producto.stock}'</span>),
+            <span class="tk-fn">SizedBox</span>(height: <span class="tk-num">16</span>),
+            <span class="tk-fn">Text</span>(producto.descripcion),
+            <span class="tk-fn">SizedBox</span>(height: <span class="tk-num">24</span>),
+            <span class="tk-fn">ElevatedButton</span>(
+            onPressed: () { <span class="tk-com">// regresa a la pantalla previa</span>
+            Navigator.<span class="tk-fn">pop</span>(context);
+            },
+            child: <span class="tk-key">const</span> <span class="tk-fn">Text</span>(<span class="tk-str">'Volver'</span>),
+            ),
+            ],
+            ),
+            ),
+            );
+            }
+            }</code></pre>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-label">EJERCICIO · 15 MIN</div>
+        <h4>Pantalla de detalle separada</h4>
+        <p>Creen una pantalla de detalle en otro archivo y naveguen hacia ella al tocar un item de la lista.</p>
+        <ul class="check-list">
+          <li><input type="checkbox" id="s2-9"><label for="s2-9">Crear un archivo separado para la pantalla detalle</label></li>
+          <li><input type="checkbox" id="s2-10"><label for="s2-10">Enviar un objeto o dato al detalle</label></li>
+          <li><input type="checkbox" id="s2-11"><label for="s2-11">Volver a la pantalla anterior con <code style="font-family:'JetBrains Mono',monospace;">Navigator.pop</code></label></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="block">
+      <h2 class="block-title"><span class="block-num">4</span> Tema, Material 3 y persistencia basica</h2>
+      <span class="block-time">45 minutos · dar identidad y guardar datos simples</span>
+
+      <p class="txt">Una app tambien debe verse consistente. Flutter permite configurar el estilo general desde <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">MaterialApp</code> usando <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">ThemeData</code>. A eso se suma la persistencia basica cuando quieren que un dato no desaparezca al cerrar la app.</p>
+
+      <div class="warn">
+        <div class="ic">⚠</div>
+        <p><b>Antes de ejecutar este ejemplo:</b> como aqui se usa <code style="font-family:'JetBrains Mono',monospace;">shared_preferences</code>, primero deben agregar la dependencia en <code style="font-family:'JetBrains Mono',monospace;">pubspec.yaml</code> y luego ejecutar <code style="font-family:'JetBrains Mono',monospace;">flutter pub get</code>. Si no hacen ese paso, Flutter mostrara errores de paquete no encontrado.</p>
+      </div>
+
+      <div class="card">
+        <p class="txt"><b>Ejemplo de dependencia en <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">pubspec.yaml</code>:</b></p>
+        <div class="codeblock" style="margin-top:10px;">
+          <div class="bar"><span class="fname">pubspec.yaml</span>
+            <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+          </div>
+          <pre><code>dependencies:
+            flutter:
+              sdk: flutter
+            shared_preferences: ^2.2.3</code></pre>
+        </div>
+        <p class="txt"><b>Luego, en terminal:</b></p>
+        <div class="codeblock" style="margin-top:10px;">
+          <div class="bar"><span class="fname">terminal</span>
+            <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+          </div>
+          <pre><code>flutter pub get</code></pre>
+        </div>
+        <p class="txt" style="margin-bottom:0;"><b>Regla practica:</b> si un ejemplo importa un paquete que no viene por defecto con Flutter, primero se instala en <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">pubspec.yaml</code>, despues se ejecuta <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">flutter pub get</code>, y recien luego se corre la app.</p>
+      </div>
+
+      <p class="txt"><b>Ejemplo completo y funcional.</b> Este ejemplo combina <b>Material 3</b> con una persistencia muy simple usando <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">SharedPreferences</code>. La pantalla permite cambiar entre dos colores base y guardar una lista corta de nombres para recuperarla al volver a abrir la app.</p>
+
+      <div class="codeblock">
+        <div class="bar"><span class="fname">lib/main.dart - tema Material 3 + persistencia basica</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+        <pre><code><span class="tk-key">import</span> <span class="tk-str">'package:flutter/material.dart'</span>; <span class="tk-com">// widgets visuales</span>
+            <span class="tk-key">import</span> <span class="tk-str">'package:shared_preferences/shared_preferences.dart'</span>; <span class="tk-com">// persistencia simple en el dispositivo</span>
+
+            <span class="tk-key">void</span> <span class="tk-fn">main</span>() { <span class="tk-com">// punto de entrada</span>
+            <span class="tk-fn">runApp</span>(<span class="tk-fn">MiApp</span>());
+            }
+
+            <span class="tk-key">class</span> <span class="tk-type">MiApp</span> <span class="tk-key">extends</span> <span class="tk-type">StatefulWidget</span> { <span class="tk-com">// debe ser con estado porque el tema puede cambiar</span>
+            <span class="tk-key">@override</span>
+            <span class="tk-type">State</span>&lt;<span class="tk-type">MiApp</span>&gt; <span class="tk-fn">createState</span>() =&gt; _MiAppState();
+            }
+
+            <span class="tk-key">class</span> _MiAppState <span class="tk-key">extends</span> <span class="tk-type">State</span>&lt;<span class="tk-type">MiApp</span>&gt; {
+            <span class="tk-type">Color</span> colorBase = Colors.teal; <span class="tk-com">// color inicial del tema</span>
+
+            <span class="tk-key">@override</span>
+            <span class="tk-type">Widget</span> <span class="tk-fn">build</span>(<span class="tk-type">BuildContext</span> context) {
+            <span class="tk-key">return</span> <span class="tk-fn">MaterialApp</span>(
+            debugShowCheckedModeBanner: <span class="tk-key">false</span>,
+            theme: <span class="tk-fn">ThemeData</span>(
+            useMaterial3: <span class="tk-key">true</span>, <span class="tk-com">// activa Material 3</span>
+            colorScheme: ColorScheme.<span class="tk-fn">fromSeed</span>(seedColor: colorBase), <span class="tk-com">// genera la paleta general</span>
+            inputDecorationTheme: <span class="tk-key">const</span> InputDecorationTheme(
+            border: OutlineInputBorder(),
+            ),
+            ),
+            home: <span class="tk-fn">TemaPersistenciaPage</span>(
+            onCambiarColor: (nuevoColor) {
+            <span class="tk-fn">setState</span>(() {
+            colorBase = nuevoColor; <span class="tk-com">// cambia el tema de toda la app</span>
+            });
+            },
+            ),
+            );
+            }
+            }
+
+            <span class="tk-key">class</span> <span class="tk-type">TemaPersistenciaPage</span> <span class="tk-key">extends</span> <span class="tk-type">StatefulWidget</span> {
+            <span class="tk-key">final</span> <span class="tk-type">Function</span>(<span class="tk-type">Color</span>) onCambiarColor;
+
+            <span class="tk-key">const</span> <span class="tk-fn">TemaPersistenciaPage</span>({
+            <span class="tk-key">super</span>.key,
+            <span class="tk-key">required</span> <span class="tk-type">this</span>.onCambiarColor,
+            });
+
+            <span class="tk-key">@override</span>
+            <span class="tk-type">State</span>&lt;<span class="tk-type">TemaPersistenciaPage</span>&gt; <span class="tk-fn">createState</span>() =&gt; _TemaPersistenciaPageState();
+            }
+
+            <span class="tk-key">class</span> _TemaPersistenciaPageState <span class="tk-key">extends</span> <span class="tk-type">State</span>&lt;<span class="tk-type">TemaPersistenciaPage</span>&gt; {
+            <span class="tk-type">final</span> nombreController = <span class="tk-fn">TextEditingController</span>(); <span class="tk-com">// maneja el texto del input</span>
+            <span class="tk-type">List</span>&lt;<span class="tk-type">String</span>&gt; nombres = []; <span class="tk-com">// lista simple para guardar</span>
+
+            <span class="tk-key">@override</span>
+            <span class="tk-key">void</span> <span class="tk-fn">initState</span>() {
+            <span class="tk-key">super</span>.<span class="tk-fn">initState</span>();
+            <span class="tk-fn">cargarDatos</span>(); <span class="tk-com">// recupera lo guardado al iniciar</span>
+            }
+
+            <span class="tk-key">Future</span>&lt;<span class="tk-key">void</span>&gt; <span class="tk-fn">cargarDatos</span>() <span class="tk-key">async</span> {
+            <span class="tk-key">final</span> prefs = <span class="tk-key">await</span> SharedPreferences.<span class="tk-fn">getInstance</span>(); <span class="tk-com">// abre acceso al almacenamiento local</span>
+            <span class="tk-key">final</span> datosGuardados = prefs.<span class="tk-fn">getStringList</span>(<span class="tk-str">'nombres_guardados'</span>) ?? [];
+
+            <span class="tk-fn">setState</span>(() {
+            nombres = datosGuardados; <span class="tk-com">// actualiza la lista visible en pantalla</span>
+            });
+            }
+
+            <span class="tk-key">Future</span>&lt;<span class="tk-key">void</span>&gt; <span class="tk-fn">guardarDatos</span>() <span class="tk-key">async</span> {
+            <span class="tk-key">final</span> prefs = <span class="tk-key">await</span> SharedPreferences.<span class="tk-fn">getInstance</span>();
+            <span class="tk-key">await</span> prefs.<span class="tk-fn">setStringList</span>(<span class="tk-str">'nombres_guardados'</span>, nombres); <span class="tk-com">// persiste la lista</span>
+            }
+
+            <span class="tk-key">void</span> <span class="tk-fn">agregarNombre</span>() {
+            <span class="tk-key">if</span> (nombreController.text.isNotEmpty) {
+            <span class="tk-fn">setState</span>(() {
+            nombres.<span class="tk-fn">add</span>(nombreController.text); <span class="tk-com">// agrega el nuevo nombre a memoria</span>
+            });
+            nombreController.<span class="tk-fn">clear</span>(); <span class="tk-com">// limpia el campo luego de guardar</span>
+            <span class="tk-fn">guardarDatos</span>(); <span class="tk-com">// persiste el cambio en disco</span>
+            }
+            }
+
+            <span class="tk-key">@override</span>
+            <span class="tk-type">Widget</span> <span class="tk-fn">build</span>(<span class="tk-type">BuildContext</span> context) {
+            <span class="tk-key">return</span> <span class="tk-fn">Scaffold</span>(
+            appBar: <span class="tk-fn">AppBar</span>(
+            title: <span class="tk-key">const</span> <span class="tk-fn">Text</span>(<span class="tk-str">'Tema y persistencia basica'</span>),
+            ),
+            body: <span class="tk-fn">Padding</span>(
+            padding: <span class="tk-key">const</span> EdgeInsets.<span class="tk-fn">all</span>(<span class="tk-num">16</span>),
+            child: <span class="tk-fn">Column</span>(
+            children: [
+            <span class="tk-fn">Row</span>(
+            children: [
+            <span class="tk-fn">Expanded</span>(
+            child: <span class="tk-fn">TextField</span>(
+            controller: nombreController,
+            decoration: <span class="tk-key">const</span> <span class="tk-fn">InputDecoration</span>(
+            labelText: <span class="tk-str">'Nombre'</span>,
+            ),
+            ),
+            ),
+            <span class="tk-fn">SizedBox</span>(width: <span class="tk-num">10</span>),
+            <span class="tk-fn">FilledButton</span>(
+            onPressed: agregarNombre,
+            child: <span class="tk-key">const</span> <span class="tk-fn">Text</span>(<span class="tk-str">'Guardar'</span>),
+            ),
+            ],
+            ),
+            <span class="tk-fn">SizedBox</span>(height: <span class="tk-num">16</span>),
+            <span class="tk-fn">Wrap</span>(
+            spacing: <span class="tk-num">10</span>,
+            children: [
+            <span class="tk-fn">FilledButton</span>(
+            onPressed: () =&gt; widget.onCambiarColor(Colors.teal), <span class="tk-com">// cambia el color base del tema</span>
+            child: <span class="tk-key">const</span> <span class="tk-fn">Text</span>(<span class="tk-str">'Tema teal'</span>),
+            ),
+            <span class="tk-fn">FilledButton</span>(
+            onPressed: () =&gt; widget.onCambiarColor(Colors.deepPurple), <span class="tk-com">// aplica otro color global</span>
+            child: <span class="tk-key">const</span> <span class="tk-fn">Text</span>(<span class="tk-str">'Tema morado'</span>),
+            ),
+            ],
+            ),
+            <span class="tk-fn">SizedBox</span>(height: <span class="tk-num">20</span>),
+            <span class="tk-fn">Expanded</span>(
+            child: <span class="tk-fn">ListView</span>.<span class="tk-fn">builder</span>( <span class="tk-com">// muestra todos los nombres guardados</span>
+            itemCount: nombres.length,
+            itemBuilder: (context, index) {
+            <span class="tk-key">return</span> <span class="tk-fn">Card</span>(
+            child: <span class="tk-fn">ListTile</span>(
+            title: <span class="tk-fn">Text</span>(nombres[index]),
+            ),
+            );
+            },
+            ),
+            ),
+            ],
+            ),
+            ),
+            );
+            }
+
+            <span class="tk-key">@override</span>
+            <span class="tk-key">void</span> <span class="tk-fn">dispose</span>() {
+            nombreController.<span class="tk-fn">dispose</span>();
+            <span class="tk-key">super</span>.<span class="tk-fn">dispose</span>();
+            }
+            }</code></pre>
+      </div>
+
+      <div class="warn">
+        <div class="ic">⚠</div>
+        <p><b>Persistencia basica</b> no es lo mismo que una base de datos completa. <code style="font-family:'JetBrains Mono',monospace;">SharedPreferences</code> sirve para configuraciones y datos simples. Si despues necesitan estructuras mas complejas, ahi si conviene SQLite, Hive o una API.</p>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-label">EJERCICIO FINAL</div>
+        <h4>Mini app completa local</h4>
+        <p>Cierren la sesion con una app que combine lo visto hoy.</p>
+        <ul class="check-list">
+          <li><input type="checkbox" id="s2-12"><label for="s2-12">Formulario con al menos 3 controles</label></li>
+          <li><input type="checkbox" id="s2-13"><label for="s2-13">Lista mostrada con <code style="font-family:'JetBrains Mono',monospace;">ListView.builder</code></label></li>
+          <li><input type="checkbox" id="s2-14"><label for="s2-14">Detalle en segunda pantalla</label></li>
+          <li><input type="checkbox" id="s2-15"><label for="s2-15">Material 3 activo</label></li>
+          <li><input type="checkbox" id="s2-16"><label for="s2-16">Explicar verbalmente qué parte está en memoria, qué parte viene de JSON local y qué parte quedaría para persistencia</label></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="checkpoint">
+      <div class="ck-label">CHECKPOINT DE CIERRE</div>
+      <h3>Al final de esta sesion tendran:</h3>
+      <p>Una app que ya captura datos con formularios, muestra listas locales, navega entre pantallas, usa Material 3 y entiende la diferencia entre memoria, JSON local y persistencia basica. La sesion 3 ya puede enfocarse en comunicacion con API y carga remota.</p>
+    </div>
+
+  </div>
+</body>
+</html>

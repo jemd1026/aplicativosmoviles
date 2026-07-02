@@ -1,0 +1,1049 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sesion 3 - API REST y carga remota | Flutter &amp; Dart</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0E1218;
+      --bg-soft: #11161D;
+      --card: #171D26;
+      --card-soft: #141A22;
+      --line: #262E3A;
+      --text: #E7ECF3;
+      --text-dim: #9AA7B8;
+      --text-faint: #5E6B7D;
+      --dart: #1389FD;
+      --dart-soft: #0E2A45;
+      --flutter: #FFC93C;
+      --flutter-soft: #3A2F12;
+      --green: #3DDC97;
+      --green-soft: #10301F;
+      --radius: 14px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.65;
+    }
+
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background-image:
+        radial-gradient(circle at 12% 4%, rgba(61, 220, 151, .08), transparent 36%),
+        radial-gradient(circle at 92% 70%, rgba(19, 137, 253, .08), transparent 38%);
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 48px 26px 120px;
+    }
+
+    h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: clamp(30px, 5vw, 46px);
+      line-height: 1.08;
+      letter-spacing: -0.01em;
+      margin-bottom: 16px;
+    }
+
+    .hero-sub {
+      color: var(--text-dim);
+      font-size: 17px;
+      max-width: 720px;
+      margin-bottom: 34px;
+    }
+
+    .timeline {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 56px;
+    }
+
+    .timeline-item {
+      flex: 1;
+      min-width: 160px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 14px 16px;
+    }
+
+    .timeline-item .t {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--green);
+      margin-bottom: 4px;
+    }
+
+    .timeline-item .d {
+      font-size: 13.5px;
+      color: var(--text-dim);
+    }
+
+    .block {
+      margin-bottom: 64px;
+    }
+
+    h2.block-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 25px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .block-num {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--green-soft);
+      color: var(--green);
+      flex-shrink: 0;
+    }
+
+    .block-time {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--text-faint);
+      margin-bottom: 24px;
+      display: block;
+    }
+
+    p.txt {
+      color: var(--text-dim);
+      margin-bottom: 16px;
+      font-size: 15.5px;
+    }
+
+    p.txt b {
+      color: var(--text);
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 24px 26px;
+      margin-bottom: 20px;
+    }
+
+    .codeblock {
+      background: #0A0D12;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+      margin: 18px 0;
+    }
+
+    .codeblock .bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .codeblock .bar .fname {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--text-faint);
+    }
+
+    .codeblock .bar .dots {
+      display: flex;
+      gap: 6px;
+    }
+
+    .codeblock .bar .dots span {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+    }
+
+    .codeblock pre {
+      padding: 18px 20px;
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13.5px;
+      line-height: 1.7;
+    }
+
+    .codeblock code {
+      color: #D6E2F0;
+    }
+
+    .tk-key { color: #FF7AB2; }
+    .tk-type { color: #5FD3FF; }
+    .tk-str { color: #9EE6A8; }
+    .tk-com { color: #5E6B7D; }
+    .tk-fn { color: #FFD479; }
+    .tk-num { color: #FFB86C; }
+
+    .tip, .warn {
+      display: flex;
+      gap: 14px;
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin: 18px 0;
+    }
+
+    .tip {
+      background: var(--dart-soft);
+      border: 1px solid rgba(19, 137, 253, .3);
+    }
+
+    .warn {
+      background: #2A1A10;
+      border: 1px solid rgba(255, 201, 60, .3);
+    }
+
+    .tip .ic, .warn .ic {
+      font-size: 18px;
+      flex-shrink: 0;
+    }
+
+    .tip p, .warn p {
+      color: var(--text-dim);
+      font-size: 14.5px;
+      margin: 0;
+    }
+
+    .exercise {
+      background: linear-gradient(150deg, var(--green-soft), var(--card-soft));
+      border: 1px solid rgba(61, 220, 151, .35);
+      border-radius: var(--radius);
+      padding: 22px 24px;
+      margin: 24px 0;
+    }
+
+    .exercise .ex-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--green);
+      letter-spacing: .06em;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .exercise .ex-label::before {
+      content: '⏱';
+    }
+
+    .exercise h4 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 17px;
+      margin-bottom: 8px;
+    }
+
+    .exercise p {
+      color: var(--text-dim);
+      font-size: 14.5px;
+      margin-bottom: 10px;
+    }
+
+    .check-list {
+      list-style: none;
+      margin-top: 12px;
+    }
+
+    .check-list li {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      margin-bottom: 8px;
+      font-size: 14.5px;
+      color: var(--text-dim);
+    }
+
+    .check-list input {
+      accent-color: var(--green);
+      width: 16px;
+      height: 16px;
+      margin-top: 2px;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+
+    .check-list label {
+      cursor: pointer;
+    }
+
+    .compare-wrap {
+      overflow-x: auto;
+      margin: 18px 0 24px;
+    }
+
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .compare-table th,
+    .compare-table td {
+      text-align: left;
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+      font-size: 14px;
+    }
+
+    .compare-table th {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--green);
+      letter-spacing: .04em;
+      background: #111722;
+    }
+
+    .compare-table td {
+      color: var(--text-dim);
+    }
+
+    .compare-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .checkpoint {
+      background: linear-gradient(150deg, var(--green-soft), var(--card));
+      border: 1px solid rgba(61, 220, 151, .4);
+      border-radius: var(--radius);
+      padding: 30px 28px;
+      margin-top: 20px;
+    }
+
+    .checkpoint .ck-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--green);
+      letter-spacing: .08em;
+      margin-bottom: 10px;
+    }
+
+    .checkpoint h3 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 21px;
+      margin-bottom: 10px;
+    }
+
+    .checkpoint p {
+      color: var(--text-dim);
+      font-size: 15px;
+    }
+
+    @media (max-width: 640px) {
+      .timeline {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="wrap">
+
+    <h1>API REST, carga remota<br>y datos en tiempo real</h1>
+    <p class="hero-sub">
+      Esta sesion conecta lo que ya construyeron con el mundo exterior. Aqui la lista
+      ya no sale solo de memoria o de un JSON local: ahora puede venir de una API.
+      El objetivo es entender dependencias, modelos, carga remota, estados visuales
+      y navegacion con datos obtenidos desde internet.
+    </p>
+
+    <div class="timeline">
+      <div class="timeline-item">
+        <div class="t">BLOQUE 1</div>
+        <div class="d">Preparar paquete http y entender una API REST</div>
+      </div>
+      <div class="timeline-item">
+        <div class="t">BLOQUE 2</div>
+        <div class="d">GET, fromJson y lista remota</div>
+      </div>
+      <div class="timeline-item">
+        <div class="t">BLOQUE 3</div>
+        <div class="d">Loading, error, refresh y detalle</div>
+      </div>
+      <div class="timeline-item">
+        <div class="t">BLOQUE 4</div>
+        <div class="d">Separar service, model y pages</div>
+      </div>
+    </div>
+
+    <div class="block">
+      <h2 class="block-title"><span class="block-num">1</span> Preparar el proyecto para consumir una API</h2>
+      <span class="block-time">35 minutos · dependencia, endpoint y estructura mental</span>
+
+      <p class="txt">Para consumir una API desde Flutter, primero hay que instalar un paquete que haga peticiones HTTP. En esta sesion se usara <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">http</code>, que es una de las opciones mas comunes para empezar. Como ya existe una API propia en <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">D:\laragon\www\api_ucv</code>, la guia puede trabajar directamente sobre ese backend.</p>
+
+      <div class="warn">
+        <div class="ic">⚠</div>
+        <p><b>Antes de correr cualquier ejemplo de esta sesion:</b> agreguen la dependencia en <code style="font-family:'JetBrains Mono',monospace;">pubspec.yaml</code> y luego ejecuten <code style="font-family:'JetBrains Mono',monospace;">flutter pub get</code>. Si no hacen ese paso, Flutter mostrara errores de paquete no encontrado.</p>
+      </div>
+
+      <div class="codeblock">
+        <div class="bar"><span class="fname">pubspec.yaml</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+        <pre><code>dependencies:
+            flutter:
+              sdk: flutter
+            http: ^1.2.2</code></pre>
+      </div>
+
+      <div class="codeblock">
+        <div class="bar"><span class="fname">terminal</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+        <pre><code>flutter pub get</code></pre>
+      </div>
+
+      <div class="card">
+        <p class="txt"><b>Qué es una API REST:</b> es un servicio al que la app le pide datos usando una URL. La API responde casi siempre en formato JSON.</p>
+        <p class="txt"><b>Qué significa GET:</b> es la petición para leer datos, por ejemplo obtener una lista de productos o usuarios.</p>
+        <p class="txt"><b>Qué es un endpoint:</b> es la URL concreta que responde con cierto recurso, por ejemplo una lista de posts.</p>
+        <p class="txt" style="margin-bottom:0;"><b>Regla didáctica:</b> primero entiendan el flujo <b>pedir datos → recibir JSON → convertir a objetos → mostrar en pantalla</b>. Luego ya pueden agregar creación, edición o borrado.</p>
+      </div>
+
+      <div class="compare-wrap">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>Etapa</th>
+              <th>Qué pasa</th>
+              <th>Ejemplo</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Request</td>
+              <td>La app pide datos a una URL</td>
+              <td><code style="font-family:'JetBrains Mono',monospace;">http.get(uri)</code></td>
+            </tr>
+            <tr>
+              <td>Response</td>
+              <td>La API responde con JSON</td>
+              <td><code style="font-family:'JetBrains Mono',monospace;">response.body</code></td>
+            </tr>
+            <tr>
+              <td>Parse</td>
+              <td>Se convierte el JSON en objetos Dart</td>
+              <td><code style="font-family:'JetBrains Mono',monospace;">fromJson</code></td>
+            </tr>
+            <tr>
+              <td>Render</td>
+              <td>La app dibuja esos datos en widgets</td>
+              <td><code style="font-family:'JetBrains Mono',monospace;">ListView.builder</code></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <p class="txt"><b>API detectada para esta sesion:</b> el proyecto expone el recurso <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">usuarios</code> con rutas limpias gracias al router de <code style="font-family:'JetBrains Mono',monospace;">index.php</code> y su <code style="font-family:'JetBrains Mono',monospace;">.htaccess</code>.</p>
+        <p class="txt"><b>Campos que devuelve:</b> <code style="font-family:'JetBrains Mono',monospace;">id, nombre, apellido, email, telefono, activo, created_at</code>. La contraseña no viaja al cliente, lo cual está correcto.</p>
+        <p class="txt"><b>URL en Windows desktop o navegador:</b> <code style="font-family:'JetBrains Mono',monospace;">http://localhost/api_ucv/usuarios</code></p>
+        <p class="txt"><b>URL en emulador Android:</b> <code style="font-family:'JetBrains Mono',monospace;">http://10.0.2.2/api_ucv/usuarios</code></p>
+        <p class="txt" style="margin-bottom:0;"><b>URL en celular físico:</b> usar la IP de la PC en la red local, por ejemplo <code style="font-family:'JetBrains Mono',monospace;">http://192.168.1.10/api_ucv/usuarios</code></p>
+      </div>
+
+      <div class="compare-wrap">
+        <table class="compare-table">
+          <thead>
+            <tr>
+              <th>Método</th>
+              <th>Ruta</th>
+              <th>Uso en clase</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>GET</td>
+              <td><code style="font-family:'JetBrains Mono',monospace;">/api_ucv/usuarios</code></td>
+              <td>Listar usuarios</td>
+            </tr>
+            <tr>
+              <td>GET</td>
+              <td><code style="font-family:'JetBrains Mono',monospace;">/api_ucv/usuarios/5</code></td>
+              <td>Ver detalle de un usuario</td>
+            </tr>
+            <tr>
+              <td>POST</td>
+              <td><code style="font-family:'JetBrains Mono',monospace;">/api_ucv/usuarios</code></td>
+              <td>Registrar usuario</td>
+            </tr>
+            <tr>
+              <td>PUT</td>
+              <td><code style="font-family:'JetBrains Mono',monospace;">/api_ucv/usuarios/5</code></td>
+              <td>Actualizar usuario</td>
+            </tr>
+            <tr>
+              <td>DELETE</td>
+              <td><code style="font-family:'JetBrains Mono',monospace;">/api_ucv/usuarios/5</code></td>
+              <td>Eliminar usuario</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="block">
+      <h2 class="block-title"><span class="block-num">2</span> GET, fromJson y lista remota</h2>
+      <span class="block-time">65 minutos · primer consumo real desde internet</span>
+
+      <p class="txt">En lugar de una API pública de prueba, aquí conviene usar la API propia del curso. Así los ejemplos ya quedan alineados con el backend que también puede usarse desde Android Studio. El flujo será el mismo: consumir <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">/api_ucv/usuarios</code>, convertir el JSON en objetos Dart y mostrarlo en una lista.</p>
+
+      <div class="codeblock">
+        <div class="bar"><span class="fname">lib/main.dart - ejemplo completo con api_ucv</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+        <pre><code><span class="tk-key">import</span> <span class="tk-str">'dart:convert'</span>; <span class="tk-com">// permite convertir texto JSON a estructuras Dart</span>
+            <span class="tk-key">import</span> <span class="tk-str">'package:flutter/material.dart'</span>; <span class="tk-com">// widgets visuales</span>
+            <span class="tk-key">import</span> <span class="tk-str">'package:http/http.dart'</span> <span class="tk-key">as</span> http; <span class="tk-com">// paquete para peticiones HTTP</span>
+
+            <span class="tk-key">void</span> <span class="tk-fn">main</span>() { <span class="tk-com">// punto de entrada</span>
+            <span class="tk-fn">runApp</span>(<span class="tk-fn">MiApp</span>()); <span class="tk-com">// arranca la aplicación</span>
+            }
+
+            <span class="tk-key">class</span> <span class="tk-type">MiApp</span> <span class="tk-key">extends</span> <span class="tk-type">StatelessWidget</span> {
+            <span class="tk-key">@override</span>
+            <span class="tk-type">Widget</span> <span class="tk-fn">build</span>(<span class="tk-type">BuildContext</span> context) {
+            <span class="tk-key">return</span> <span class="tk-fn">MaterialApp</span>(
+            debugShowCheckedModeBanner: <span class="tk-key">false</span>,
+            theme: <span class="tk-fn">ThemeData</span>(useMaterial3: <span class="tk-key">true</span>),
+            home: <span class="tk-fn">UsuariosPage</span>(),
+            );
+            }
+            }
+
+            <span class="tk-key">class</span> <span class="tk-type">Usuario</span> { <span class="tk-com">// modelo para representar cada fila recibida de la API</span>
+            <span class="tk-key">final</span> <span class="tk-type">int</span> id;
+            <span class="tk-key">final</span> <span class="tk-type">String</span> nombre;
+            <span class="tk-key">final</span> <span class="tk-type">String</span> apellido;
+            <span class="tk-key">final</span> <span class="tk-type">String</span> email;
+            <span class="tk-key">final</span> <span class="tk-type">String</span> telefono;
+            <span class="tk-key">final</span> <span class="tk-type">int</span> activo;
+
+            <span class="tk-type">Usuario</span>({
+            <span class="tk-key">required</span> <span class="tk-type">this</span>.id,
+            <span class="tk-key">required</span> <span class="tk-type">this</span>.nombre,
+            <span class="tk-key">required</span> <span class="tk-type">this</span>.apellido,
+            <span class="tk-key">required</span> <span class="tk-type">this</span>.email,
+            <span class="tk-key">required</span> <span class="tk-type">this</span>.telefono,
+            <span class="tk-key">required</span> <span class="tk-type">this</span>.activo,
+            });
+
+            <span class="tk-key">factory</span> <span class="tk-type">Usuario</span>.<span class="tk-fn">fromJson</span>(<span class="tk-type">Map</span>&lt;<span class="tk-type">String</span>, <span class="tk-type">dynamic</span>&gt; json) { <span class="tk-com">// mapea JSON a objeto Dart</span>
+            <span class="tk-key">return</span> <span class="tk-fn">Usuario</span>(
+            id: json[<span class="tk-str">'id'</span>],
+            nombre: json[<span class="tk-str">'nombre'</span>] ?? <span class="tk-str">''</span>,
+            apellido: json[<span class="tk-str">'apellido'</span>] ?? <span class="tk-str">''</span>,
+            email: json[<span class="tk-str">'email'</span>] ?? <span class="tk-str">''</span>,
+            telefono: json[<span class="tk-str">'telefono'</span>] ?? <span class="tk-str">''</span>,
+            activo: json[<span class="tk-str">'activo'</span>] ?? <span class="tk-num">0</span>,
+            );
+            }
+            }
+
+            <span class="tk-key">Future</span>&lt;<span class="tk-type">List</span>&lt;<span class="tk-type">Usuario</span>&gt;&gt; <span class="tk-fn">obtenerUsuarios</span>() <span class="tk-key">async</span> { <span class="tk-com">// solicita la lista a la API</span>
+            <span class="tk-key">final</span> uri = Uri.<span class="tk-fn">parse</span>(<span class="tk-str">'http://10.0.2.2/api_ucv/usuarios'</span>); <span class="tk-com">// emulador Android</span>
+            <span class="tk-com">// Si ejecutan en Chrome o Windows desktop, usar: http://localhost/api_ucv/usuarios</span>
+            <span class="tk-key">final</span> response = <span class="tk-key">await</span> http.<span class="tk-fn">get</span>(uri); <span class="tk-com">// hace la petición GET</span>
+
+            <span class="tk-key">if</span> (response.statusCode == <span class="tk-num">200</span>) {
+            <span class="tk-key">final</span> <span class="tk-type">List</span> data = json.<span class="tk-fn">decode</span>(response.body); <span class="tk-com">// convierte el texto JSON en lista</span>
+            <span class="tk-key">return</span> data.<span class="tk-fn">map</span>((item) =&gt; <span class="tk-fn">Usuario</span>.fromJson(item)).<span class="tk-fn">toList</span>(); <span class="tk-com">// convierte toda la lista JSON</span>
+            } <span class="tk-key">else</span> {
+            <span class="tk-key">throw</span> Exception(<span class="tk-str">'Error al cargar usuarios'</span>);
+            }
+            }
+
+            <span class="tk-key">class</span> <span class="tk-type">UsuariosPage</span> <span class="tk-key">extends</span> <span class="tk-type">StatelessWidget</span> { <span class="tk-com">// pantalla que consume y muestra la API</span>
+            <span class="tk-key">@override</span>
+            <span class="tk-type">Widget</span> <span class="tk-fn">build</span>(<span class="tk-type">BuildContext</span> context) {
+            <span class="tk-key">return</span> <span class="tk-fn">Scaffold</span>(
+            appBar: <span class="tk-fn">AppBar</span>(title: <span class="tk-fn">Text</span>(<span class="tk-str">'Usuarios remotos'</span>)),
+            body: <span class="tk-fn">FutureBuilder</span>&lt;<span class="tk-type">List</span>&lt;<span class="tk-type">Usuario</span>&gt;&gt;( <span class="tk-com">// escucha el resultado de la petición</span>
+            future: <span class="tk-fn">obtenerUsuarios</span>(),
+            builder: (context, snapshot) {
+            <span class="tk-key">if</span> (snapshot.connectionState == ConnectionState.waiting) {
+            <span class="tk-key">return</span> <span class="tk-fn">Center</span>(child: <span class="tk-fn">CircularProgressIndicator</span>()); <span class="tk-com">// loading</span>
+            }
+
+            <span class="tk-key">if</span> (snapshot.hasError) {
+            <span class="tk-key">return</span> <span class="tk-fn">Center</span>(child: <span class="tk-fn">Text</span>(<span class="tk-str">'Error: ${snapshot.error}'</span>)); <span class="tk-com">// error</span>
+            }
+
+            <span class="tk-key">final</span> usuarios = snapshot.data ?? []; <span class="tk-com">// usa lista vacía si aún no hay data</span>
+
+            <span class="tk-key">return</span> <span class="tk-fn">ListView</span>.<span class="tk-fn">builder</span>(
+            itemCount: usuarios.length, <span class="tk-com">// total de usuarios a pintar</span>
+            itemBuilder: (context, index) {
+            <span class="tk-key">final</span> usuario = usuarios[index]; <span class="tk-com">// usuario actual</span>
+            <span class="tk-key">return</span> <span class="tk-fn">Card</span>(
+            margin: EdgeInsets.<span class="tk-fn">symmetric</span>(horizontal: <span class="tk-num">12</span>, vertical: <span class="tk-num">6</span>),
+            child: <span class="tk-fn">ListTile</span>(
+            leading: <span class="tk-fn">CircleAvatar</span>(child: <span class="tk-fn">Text</span>(usuario.id.toString())),
+            title: <span class="tk-fn">Text</span>(<span class="tk-str">'${usuario.nombre} ${usuario.apellido}'</span>),
+            subtitle: <span class="tk-fn">Text</span>(
+            usuario.email,
+            maxLines: <span class="tk-num">1</span>,
+            overflow: TextOverflow.ellipsis,
+            ),
+            trailing: <span class="tk-fn">Icon</span>(
+            usuario.activo == <span class="tk-num">1</span> ? Icons.check_circle : Icons.cancel,
+            color: usuario.activo == <span class="tk-num">1</span> ? Colors.green : Colors.red,
+            ),
+            ),
+            );
+            },
+            );
+            },
+            ),
+            );
+            }
+            }</code></pre>
+      </div>
+
+      <div class="tip">
+        <div class="ic">💡</div>
+        <p><b>Qué enseña este ejemplo:</b> instalar <code style="font-family:'JetBrains Mono',monospace;">http</code>, consumir una API real del curso, convertir JSON a objetos con <code style="font-family:'JetBrains Mono',monospace;">fromJson</code> y mostrar estados de <b>loading</b>, <b>error</b> y <b>data</b> con <code style="font-family:'JetBrains Mono',monospace;">FutureBuilder</code>.</p>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-label">EJERCICIO · 20 MIN</div>
+        <h4>Primera lista remota</h4>
+        <p>Usen el ejemplo como base y verifiquen todo el flujo de datos desde la API hasta la interfaz.</p>
+        <ul class="check-list">
+          <li><input type="checkbox" id="s3-1"><label for="s3-1">La lista carga desde internet</label></li>
+          <li><input type="checkbox" id="s3-2"><label for="s3-2">Aparece un loading mientras espera</label></li>
+          <li><input type="checkbox" id="s3-3"><label for="s3-3">Los datos pasan por <code style="font-family:'JetBrains Mono',monospace;">fromJson</code></label></li>
+          <li><input type="checkbox" id="s3-4"><label for="s3-4">La lista muestra nombre, correo y estado del usuario</label></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="block">
+      <h2 class="block-title"><span class="block-num">3</span> Estados visuales, refresh y detalle</h2>
+      <span class="block-time">55 minutos · no solo cargar datos, tambien manejar experiencia real</span>
+
+      <p class="txt">Cuando una app ya consume una API, no basta con mostrar la lista cuando todo sale bien. Tambien hay que pensar qué mostrar mientras carga, qué hacer si falla, cómo actualizar manualmente y cómo pasar a una pantalla de detalle. En este caso, el detalle puede mostrar nombre completo, correo, teléfono y estado del usuario.</p>
+
+      <div class="card">
+        <p class="txt"><b>Loading</b> se representa con un <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">CircularProgressIndicator</code>.</p>
+        <p class="txt"><b>Error</b> se representa con un mensaje visible y, si hace falta, un botón para reintentar.</p>
+        <p class="txt"><b>Data</b> es el estado correcto: la lista ya llegó y puede mostrarse.</p>
+        <p class="txt"><b>Refresh</b> permite pedir la información otra vez, por ejemplo con <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">RefreshIndicator</code>.</p>
+        <p class="txt" style="margin-bottom:0;"><b>Detalle</b> permite tocar un item y abrir otra pantalla con toda su información.</p>
+      </div>
+
+      <div class="codeblock">
+        <div class="bar"><span class="fname">Lista de usuarios con refresh y detalle</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+        <pre><code><span class="tk-key">class</span> _UsuariosPageState <span class="tk-key">extends</span> <span class="tk-type">State</span>&lt;<span class="tk-type">UsuariosPage</span>&gt; { <span class="tk-com">// versión con estado para poder refrescar</span>
+            <span class="tk-key">late</span> <span class="tk-key">Future</span>&lt;<span class="tk-type">List</span>&lt;<span class="tk-type">Usuario</span>&gt;&gt; futureUsuarios; <span class="tk-com">// guarda la petición actual</span>
+
+            <span class="tk-key">@override</span>
+            <span class="tk-key">void</span> <span class="tk-fn">initState</span>() {
+            <span class="tk-key">super</span>.<span class="tk-fn">initState</span>();
+            futureUsuarios = <span class="tk-fn">obtenerUsuarios</span>(); <span class="tk-com">// lanza la primera carga al abrir la pantalla</span>
+            }
+
+            <span class="tk-key">Future</span>&lt;<span class="tk-key">void</span>&gt; <span class="tk-fn">recargar</span>() <span class="tk-key">async</span> { <span class="tk-com">// vuelve a pedir datos manualmente</span>
+            <span class="tk-fn">setState</span>(() {
+            futureUsuarios = <span class="tk-fn">obtenerUsuarios</span>();
+            });
+            }
+
+            <span class="tk-key">@override</span>
+            <span class="tk-type">Widget</span> <span class="tk-fn">build</span>(<span class="tk-type">BuildContext</span> context) {
+            <span class="tk-key">return</span> <span class="tk-fn">Scaffold</span>(
+            appBar: <span class="tk-fn">AppBar</span>(title: <span class="tk-fn">Text</span>(<span class="tk-str">'Usuarios con refresh'</span>)),
+            body: <span class="tk-fn">FutureBuilder</span>&lt;<span class="tk-type">List</span>&lt;<span class="tk-type">Usuario</span>&gt;&gt;(
+            future: futureUsuarios,
+            builder: (context, snapshot) {
+            <span class="tk-key">if</span> (snapshot.connectionState == ConnectionState.waiting) {
+            <span class="tk-key">return</span> <span class="tk-fn">Center</span>(child: <span class="tk-fn">CircularProgressIndicator</span>());
+            }
+            <span class="tk-key">if</span> (snapshot.hasError) {
+            <span class="tk-key">return</span> <span class="tk-fn">Center</span>(
+            child: <span class="tk-fn">Column</span>(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+            <span class="tk-fn">Text</span>(<span class="tk-str">'Error al cargar usuarios'</span>),
+            <span class="tk-fn">SizedBox</span>(height: <span class="tk-num">12</span>),
+            <span class="tk-fn">ElevatedButton</span>(
+            onPressed: recargar,
+            child: <span class="tk-fn">Text</span>(<span class="tk-str">'Reintentar'</span>),
+            ),
+            ],
+            ),
+            );
+            }
+
+            <span class="tk-key">final</span> usuarios = snapshot.data ?? [];
+
+            <span class="tk-key">return</span> <span class="tk-fn">RefreshIndicator</span>( <span class="tk-com">// habilita arrastrar para refrescar</span>
+            onRefresh: recargar,
+            child: <span class="tk-fn">ListView</span>.<span class="tk-fn">builder</span>(
+            itemCount: usuarios.length,
+            itemBuilder: (context, index) {
+            <span class="tk-key">final</span> usuario = usuarios[index];
+            <span class="tk-key">return</span> <span class="tk-fn">ListTile</span>(
+            title: <span class="tk-fn">Text</span>(<span class="tk-str">'${usuario.nombre} ${usuario.apellido}'</span>),
+            subtitle: <span class="tk-fn">Text</span>(usuario.email),
+            onTap: () { <span class="tk-com">// abre una pantalla con más información del usuario</span>
+            Navigator.<span class="tk-fn">push</span>(
+            context,
+            MaterialPageRoute(
+            builder: (context) =&gt; <span class="tk-fn">UsuarioDetailPage</span>(usuario: usuario),
+            ),
+            );
+            },
+            );
+            },
+            ),
+            );
+            },
+            ),
+            );
+            }
+            }</code></pre>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-label">EJERCICIO · 20 MIN</div>
+        <h4>Experiencia completa de una lista remota</h4>
+        <p>Mejoren la lista agregando estados visuales y navegación usando la API de usuarios.</p>
+        <ul class="check-list">
+          <li><input type="checkbox" id="s3-5"><label for="s3-5">Mostrar loading mientras llega la respuesta</label></li>
+          <li><input type="checkbox" id="s3-6"><label for="s3-6">Mostrar mensaje de error y botón reintentar</label></li>
+          <li><input type="checkbox" id="s3-7"><label for="s3-7">Agregar refresh manual</label></li>
+          <li><input type="checkbox" id="s3-8"><label for="s3-8">Abrir una pantalla de detalle al tocar un item</label></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="block">
+      <h2 class="block-title"><span class="block-num">4</span> Separar model, service y pages</h2>
+      <span class="block-time">45 minutos · organizar para no dejar todo en main.dart</span>
+
+      <p class="txt">Una vez que aparece la API, el archivo <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">main.dart</code> no debería seguir creciendo indefinidamente. Conviene separar los modelos, el acceso a red y las pantallas. Como esta sesión ya trabaja con <code style="font-family:'JetBrains Mono',monospace; color:var(--flutter);">api_ucv</code>, abajo queda la estructura aplicada al recurso <code style="font-family:'JetBrains Mono',monospace;">usuarios</code>.</p>
+
+      <div class="codeblock">
+        <div class="bar"><span class="fname">Estructura sugerida</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+        <pre><code>lib/
+            main.dart
+            models/
+              usuario.dart
+            services/
+              api_service.dart
+            pages/
+              usuarios_page.dart
+              usuario_detail_page.dart</code></pre>
+      </div>
+
+      <div class="codeblock">
+        <div class="bar"><span class="fname">lib/services/api_service.dart</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+        <pre><code><span class="tk-key">import</span> <span class="tk-str">'dart:convert'</span>; <span class="tk-com">// parseo de JSON</span>
+            <span class="tk-key">import</span> <span class="tk-str">'package:http/http.dart'</span> <span class="tk-key">as</span> http; <span class="tk-com">// cliente HTTP</span>
+            <span class="tk-key">import</span> <span class="tk-str">'package:flutter/foundation.dart'</span>; <span class="tk-com">// debugPrint</span>
+            <span class="tk-key">import</span> <span class="tk-str">'../models/usuario.dart'</span>;
+
+            <span class="tk-key">class</span> <span class="tk-type">ApiService</span> { <span class="tk-com">// concentra la comunicación con el backend</span>
+            <span class="tk-key">Future</span>&lt;<span class="tk-type">List</span>&lt;<span class="tk-type">Usuario</span>&gt;&gt; <span class="tk-fn">obtenerUsuarios</span>() <span class="tk-key">async</span> {
+            debugPrint(<span class="tk-str">'[API] Iniciando petición GET de usuarios'</span>);
+            <span class="tk-key">final</span> uri = Uri.<span class="tk-fn">parse</span>(<span class="tk-str">'http://10.0.2.2/api_ucv/usuarios'</span>); <span class="tk-com">// URL para emulador Android</span>
+            <span class="tk-key">final</span> response = <span class="tk-key">await</span> http.<span class="tk-fn">get</span>(uri); <span class="tk-com">// llamada GET al backend</span>
+            debugPrint(<span class="tk-str">'[API] statusCode: ${response.statusCode}'</span>);
+
+            <span class="tk-key">if</span> (response.statusCode == <span class="tk-num">200</span>) {
+            <span class="tk-key">final</span> <span class="tk-type">List</span> data = json.<span class="tk-fn">decode</span>(response.body);
+            debugPrint(<span class="tk-str">'[API] usuarios recibidos: ${data.length}'</span>);
+            <span class="tk-key">return</span> data.<span class="tk-fn">map</span>((item) =&gt; <span class="tk-fn">Usuario</span>.fromJson(item)).<span class="tk-fn">toList</span>();
+            } <span class="tk-key">else</span> {
+            debugPrint(<span class="tk-str">'[API] Error al cargar datos'</span>);
+            <span class="tk-key">throw</span> Exception(<span class="tk-str">'Error al cargar datos'</span>);
+            }
+            }
+            }</code></pre>
+      </div>
+
+      <p class="txt">Para que no quede solo como estructura conceptual, abajo queda el ejemplo completo y funcional separado por archivos.</p>
+
+      <div class="codeblock">
+        <div class="bar"><span class="fname">lib/models/usuario.dart</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+        <pre><code><span class="tk-key">class</span> <span class="tk-type">Usuario</span> { <span class="tk-com">// define cómo se verán los datos dentro de Flutter</span>
+            <span class="tk-key">final</span> <span class="tk-type">int</span> id;
+            <span class="tk-key">final</span> <span class="tk-type">String</span> nombre;
+            <span class="tk-key">final</span> <span class="tk-type">String</span> apellido;
+            <span class="tk-key">final</span> <span class="tk-type">String</span> email;
+            <span class="tk-key">final</span> <span class="tk-type">String</span> telefono;
+            <span class="tk-key">final</span> <span class="tk-type">int</span> activo;
+
+            <span class="tk-type">Usuario</span>({
+            <span class="tk-key">required</span> <span class="tk-type">this</span>.id,
+            <span class="tk-key">required</span> <span class="tk-type">this</span>.nombre,
+            <span class="tk-key">required</span> <span class="tk-type">this</span>.apellido,
+            <span class="tk-key">required</span> <span class="tk-type">this</span>.email,
+            <span class="tk-key">required</span> <span class="tk-type">this</span>.telefono,
+            <span class="tk-key">required</span> <span class="tk-type">this</span>.activo,
+            });
+
+            <span class="tk-key">factory</span> <span class="tk-type">Usuario</span>.<span class="tk-fn">fromJson</span>(<span class="tk-type">Map</span>&lt;<span class="tk-type">String</span>, <span class="tk-type">dynamic</span>&gt; json) {
+            <span class="tk-key">return</span> <span class="tk-fn">Usuario</span>(
+            id: json[<span class="tk-str">'id'</span>],
+            nombre: json[<span class="tk-str">'nombre'</span>] ?? <span class="tk-str">''</span>,
+            apellido: json[<span class="tk-str">'apellido'</span>] ?? <span class="tk-str">''</span>,
+            email: json[<span class="tk-str">'email'</span>] ?? <span class="tk-str">''</span>,
+            telefono: json[<span class="tk-str">'telefono'</span>] ?? <span class="tk-str">''</span>,
+            activo: json[<span class="tk-str">'activo'</span>] ?? <span class="tk-num">0</span>,
+            );
+            }
+            }</code></pre>
+      </div>
+
+      <div class="codeblock">
+        <div class="bar"><span class="fname">lib/pages/usuario_detail_page.dart</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+        <pre><code><span class="tk-key">import</span> <span class="tk-str">'package:flutter/material.dart'</span>; <span class="tk-com">// componentes visuales</span>
+            <span class="tk-key">import</span> <span class="tk-str">'../models/usuario.dart'</span>;
+
+            <span class="tk-key">class</span> <span class="tk-type">UsuarioDetailPage</span> <span class="tk-key">extends</span> <span class="tk-type">StatelessWidget</span> { <span class="tk-com">// pantalla de detalle</span>
+            <span class="tk-key">final</span> <span class="tk-type">Usuario</span> usuario; <span class="tk-com">// usuario recibido desde la lista</span>
+
+            <span class="tk-key">const</span> <span class="tk-fn">UsuarioDetailPage</span>({<span class="tk-key">super</span>.key, <span class="tk-key">required</span> <span class="tk-type">this</span>.usuario});
+
+            <span class="tk-key">@override</span>
+            <span class="tk-type">Widget</span> <span class="tk-fn">build</span>(<span class="tk-type">BuildContext</span> context) {
+            <span class="tk-key">return</span> <span class="tk-fn">Scaffold</span>(
+            appBar: <span class="tk-fn">AppBar</span>(
+            title: <span class="tk-fn">Text</span>(<span class="tk-str">'Detalle del usuario'</span>),
+            ),
+            body: <span class="tk-fn">Padding</span>(
+            padding: EdgeInsets.<span class="tk-fn">all</span>(<span class="tk-num">16</span>),
+            child: <span class="tk-fn">Column</span>(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+            <span class="tk-fn">Text</span>(
+            <span class="tk-str">'ID: ${usuario.id}'</span>,
+            style: <span class="tk-fn">TextStyle</span>(fontWeight: FontWeight.bold),
+            ),
+            <span class="tk-fn">SizedBox</span>(height: <span class="tk-num">16</span>),
+            <span class="tk-fn">Text</span>(
+            <span class="tk-str">'${usuario.nombre} ${usuario.apellido}'</span>,
+            style: <span class="tk-fn">TextStyle</span>(fontSize: <span class="tk-num">22</span>, fontWeight: FontWeight.bold),
+            ),
+            <span class="tk-fn">SizedBox</span>(height: <span class="tk-num">12</span>),
+            <span class="tk-fn">Text</span>(<span class="tk-str">'Correo: ${usuario.email}'</span>),
+            <span class="tk-fn">SizedBox</span>(height: <span class="tk-num">8</span>),
+            <span class="tk-fn">Text</span>(<span class="tk-str">'Teléfono: ${usuario.telefono}'</span>),
+            <span class="tk-fn">SizedBox</span>(height: <span class="tk-num">8</span>),
+            <span class="tk-fn">Text</span>(<span class="tk-str">'Estado: ${usuario.activo == 1 ? 'Activo' : 'Inactivo'}'</span>),
+            ],
+            ),
+            ),
+            );
+            }
+            }</code></pre>
+      </div>
+
+      <div class="codeblock">
+        <div class="bar"><span class="fname">lib/pages/usuarios_page.dart</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+        <pre><code><span class="tk-key">import</span> <span class="tk-str">'package:flutter/foundation.dart'</span>; <span class="tk-com">// utilidades como debugPrint</span>
+            <span class="tk-key">import</span> <span class="tk-str">'package:flutter/material.dart'</span>; <span class="tk-com">// interfaz</span>
+            <span class="tk-key">import</span> <span class="tk-str">'../models/usuario.dart'</span>;
+            <span class="tk-key">import</span> <span class="tk-str">'../pages/usuario_detail_page.dart'</span>;
+            <span class="tk-key">import</span> <span class="tk-str">'../services/api_service.dart'</span>;
+
+            <span class="tk-key">class</span> <span class="tk-type">UsuariosPage</span> <span class="tk-key">extends</span> <span class="tk-type">StatefulWidget</span> { <span class="tk-com">// necesita estado por la carga remota</span>
+            <span class="tk-key">const</span> <span class="tk-fn">UsuariosPage</span>({<span class="tk-key">super</span>.key});
+
+            <span class="tk-key">@override</span>
+            <span class="tk-type">State</span>&lt;<span class="tk-type">UsuariosPage</span>&gt; <span class="tk-fn">createState</span>() =&gt; _UsuariosPageState();
+            }
+
+            <span class="tk-key">class</span> _UsuariosPageState <span class="tk-key">extends</span> <span class="tk-type">State</span>&lt;<span class="tk-type">UsuariosPage</span>&gt; {
+            <span class="tk-key">final</span> apiService = <span class="tk-fn">ApiService</span>(); <span class="tk-com">// service encargado de hablar con la API</span>
+            <span class="tk-key">late</span> <span class="tk-key">Future</span>&lt;<span class="tk-type">List</span>&lt;<span class="tk-type">Usuario</span>&gt;&gt; futureUsuarios; <span class="tk-com">// petición en curso</span>
+
+            <span class="tk-key">@override</span>
+            <span class="tk-key">void</span> <span class="tk-fn">initState</span>() {
+            <span class="tk-key">super</span>.<span class="tk-fn">initState</span>();
+            debugPrint(<span class="tk-str">'[UI] initState de UsuariosPage'</span>);
+            futureUsuarios = apiService.<span class="tk-fn">obtenerUsuarios</span>(); <span class="tk-com">// dispara la carga inicial</span>
+            }
+
+            <span class="tk-key">Future</span>&lt;<span class="tk-key">void</span>&gt; <span class="tk-fn">recargar</span>() <span class="tk-key">async</span> {
+            debugPrint(<span class="tk-str">'[UI] recargando lista'</span>);
+            <span class="tk-fn">setState</span>(() {
+            futureUsuarios = apiService.<span class="tk-fn">obtenerUsuarios</span>(); <span class="tk-com">// crea una nueva petición para refrescar</span>
+            });
+            }
+
+            <span class="tk-key">@override</span>
+            <span class="tk-type">Widget</span> <span class="tk-fn">build</span>(<span class="tk-type">BuildContext</span> context) {
+            debugPrint(<span class="tk-str">'[UI] build de UsuariosPage'</span>);
+            <span class="tk-key">return</span> <span class="tk-fn">Scaffold</span>(
+            appBar: <span class="tk-fn">AppBar</span>(
+            title: <span class="tk-fn">Text</span>(<span class="tk-str">'Usuarios remotos'</span>),
+            ),
+            body: <span class="tk-fn">FutureBuilder</span>&lt;<span class="tk-type">List</span>&lt;<span class="tk-type">Usuario</span>&gt;&gt;( <span class="tk-com">// reacciona según el estado del Future</span>
+            future: futureUsuarios,
+            builder: (context, snapshot) {
+            <span class="tk-key">if</span> (snapshot.connectionState == ConnectionState.waiting) {
+            <span class="tk-key">return</span> <span class="tk-fn">Center</span>(
+            child: <span class="tk-fn">CircularProgressIndicator</span>(),
+            );
+            }
+
+            <span class="tk-key">if</span> (snapshot.hasError) {
+            <span class="tk-key">return</span> <span class="tk-fn">Center</span>(
+            child: <span class="tk-fn">Column</span>(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+            <span class="tk-fn">Text</span>(<span class="tk-str">'No se pudo cargar la API de usuarios'</span>),
+            <span class="tk-fn">SizedBox</span>(height: <span class="tk-num">12</span>),
+            <span class="tk-fn">ElevatedButton</span>(
+            onPressed: recargar,
+            child: <span class="tk-fn">Text</span>(<span class="tk-str">'Reintentar'</span>),
+            ),
+            ],
+            ),
+            );
+            }
+
+            <span class="tk-key">final</span> usuarios = snapshot.data ?? []; <span class="tk-com">// evita null si la data todavía no existe</span>
+
+            <span class="tk-key">return</span> <span class="tk-fn">RefreshIndicator</span>(
+            onRefresh: recargar, <span class="tk-com">// función que se ejecuta al arrastrar</span>
+            child: <span class="tk-fn">ListView</span>.<span class="tk-fn">builder</span>(
+            itemCount: usuarios.length,
+            itemBuilder: (context, index) {
+            <span class="tk-key">final</span> usuario = usuarios[index];
+            <span class="tk-key">return</span> <span class="tk-fn">Card</span>(
+            margin: EdgeInsets.<span class="tk-fn">symmetric</span>(horizontal: <span class="tk-num">12</span>, vertical: <span class="tk-num">6</span>),
+            child: <span class="tk-fn">ListTile</span>(
+            leading: <span class="tk-fn">CircleAvatar</span>(child: <span class="tk-fn">Text</span>(usuario.id.toString())),
+            title: <span class="tk-fn">Text</span>(<span class="tk-str">'${usuario.nombre} ${usuario.apellido}'</span>),
+            subtitle: <span class="tk-fn">Text</span>(
+            usuario.email,
+            maxLines: <span class="tk-num">1</span>,
+            overflow: TextOverflow.ellipsis,
+            ),
+            onTap: () {
+            debugPrint(<span class="tk-str">'[UI] abrir detalle del usuario ${usuario.id}'</span>); <span class="tk-com">// log útil para seguir el flujo</span>
+            Navigator.<span class="tk-fn">push</span>(
+            context,
+            MaterialPageRoute(
+            builder: (context) =&gt; <span class="tk-fn">UsuarioDetailPage</span>(usuario: usuario),
+            ),
+            );
+            },
+            ),
+            );
+            },
+            ),
+            );
+            },
+            ),
+            );
+            }
+            }</code></pre>
+      </div>
+
+      <div class="codeblock">
+        <div class="bar"><span class="fname">lib/main.dart</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+        <pre><code><span class="tk-key">import</span> <span class="tk-str">'package:flutter/material.dart'</span>; <span class="tk-com">// componentes Material</span>
+            <span class="tk-key">import</span> <span class="tk-str">'pages/usuarios_page.dart'</span>;
+
+            <span class="tk-key">void</span> <span class="tk-fn">main</span>() { <span class="tk-com">// punto de inicio</span>
+            <span class="tk-fn">runApp</span>(<span class="tk-fn">MiApp</span>());
+            }
+
+            <span class="tk-key">class</span> <span class="tk-type">MiApp</span> <span class="tk-key">extends</span> <span class="tk-type">StatelessWidget</span> {
+            <span class="tk-key">@override</span>
+            <span class="tk-type">Widget</span> <span class="tk-fn">build</span>(<span class="tk-type">BuildContext</span> context) {
+            <span class="tk-key">return</span> <span class="tk-fn">MaterialApp</span>(
+            debugShowCheckedModeBanner: <span class="tk-key">false</span>,
+            theme: <span class="tk-fn">ThemeData</span>(
+            useMaterial3: <span class="tk-key">true</span>,
+            colorScheme: ColorScheme.<span class="tk-fn">fromSeed</span>(seedColor: Colors.indigo),
+            ),
+            home: <span class="tk-fn">UsuariosPage</span>(), <span class="tk-com">// pantalla principal de la sesión 3</span>
+            );
+            }
+            }</code></pre>
+      </div>
+
+      <div class="tip">
+        <div class="ic">💡</div>
+        <p><b>Regla práctica:</b> el modelo define la forma de los datos, el service habla con la API y la page se concentra en mostrar la interfaz. Además, los <code style="font-family:'JetBrains Mono',monospace;">debugPrint()</code> ayudan a seguir el flujo en terminal mientras cargan, refrescan o abren detalle. Esta misma estructura luego puede ampliarse para <code style="font-family:'JetBrains Mono',monospace;">POST</code>, <code style="font-family:'JetBrains Mono',monospace;">PUT</code> y <code style="font-family:'JetBrains Mono',monospace;">DELETE</code>.</p>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-label">EJERCICIO FINAL</div>
+        <h4>Mini app remota organizada</h4>
+        <p>Cierren la sesion construyendo una pequeña app remota organizada por archivos.</p>
+        <ul class="check-list">
+          <li><input type="checkbox" id="s3-9"><label for="s3-9">Modelo con <code style="font-family:'JetBrains Mono',monospace;">fromJson</code></label></li>
+          <li><input type="checkbox" id="s3-10"><label for="s3-10">Service separado para la petición GET</label></li>
+          <li><input type="checkbox" id="s3-11"><label for="s3-11">Lista remota en una page</label></li>
+          <li><input type="checkbox" id="s3-12"><label for="s3-12">Pantalla detalle separada</label></li>
+          <li><input type="checkbox" id="s3-13"><label for="s3-13">Estados de loading, error y data visibles</label></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="checkpoint">
+      <div class="ck-label">CHECKPOINT DE CIERRE</div>
+      <h3>Al final de esta sesion tendran:</h3>
+      <p>Una app capaz de consumir una API REST, convertir JSON a objetos Dart, mostrar listas remotas, manejar loading y error, navegar a detalle y separar la logica en modelos, servicios y pantallas. Con esto ya tienen una base real para pasar de maquetas locales a apps conectadas con datos externos.</p>
+    </div>
+
+  </div>
+</body>
+</html>
