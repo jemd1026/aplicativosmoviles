@@ -1,566 +1,766 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Spinner en Android - Guía Completa</title>
-    <style>
-      * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guía: Spinner en Android con Kotlin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Source+Code+Pro:wght@500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f7f7f2;
+      --soft: #e7eee9;
+      --panel: #fff;
+      --ink: #18252b;
+      --muted: #657278;
+      --line: #dfe5e1;
+      --coral: #ef714c;
+      --coral-dark: #da5e3b;
+      --coral-tint: #fff0e9;
+      --green: #16745a;
+      --green-tint: #e4f0e9;
+      --amber: #d29b35;
+      --amber-tint: #fff8df;
+      --code: #172a31;
+      --code-top: #243c42;
+      --code-ink: #d8e5df;
+      --shadow: 0 24px 60px rgba(24, 37, 43, .12);
+      --sans: 'DM Sans', sans-serif;
+      --display: 'Space Grotesk', sans-serif;
+      --mono: 'Source Code Pro', Consolas, monospace
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    html {
+      scroll-behavior: smooth
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font: 16px/1.6 var(--sans)
+    }
+
+    #progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 300;
+      width: 0;
+      height: 3px;
+      background: var(--coral)
+    }
+
+    nav {
+      position: fixed;
+      inset: 0 auto 0 0;
+      z-index: 100;
+      width: 260px;
+      overflow-y: auto;
+      background: var(--bg);
+      border-right: 1px solid var(--line)
+    }
+
+    .navrow {
+      padding: 42px 26px
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 30px;
+      padding: 18px 16px;
+      color: #fff;
+      background: var(--code);
+      border-radius: 4px 22px 22px 22px;
+      font-weight: 700
+    }
+
+    .dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: var(--coral)
+    }
+
+    .navlinks {
+      display: flex;
+      flex-direction: column;
+      gap: 3px
+    }
+
+    .navlinks:before {
+      content: 'CONTENIDO';
+      margin: 0 12px 10px;
+      color: #9aa6a7;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px
+    }
+
+    .navlinks a {
+      padding: 10px 12px;
+      border-radius: 8px;
+      color: var(--muted);
+      font-size: 14px;
+      text-decoration: none
+    }
+
+    .navlinks a:hover,
+    .navlinks a.active {
+      background: var(--soft);
+      color: var(--green);
+      font-weight: 700
+    }
+
+    main {
+      max-width: 1100px;
+      min-height: 100vh;
+      margin-left: 260px;
+      padding: 80px 6vw 62px
+    }
+
+    .head {
+      max-width: 810px;
+      padding-bottom: 48px;
+      border-bottom: 1px solid var(--line)
+    }
+
+    .pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 18px
+    }
+
+    .pill {
+      padding: 5px 11px;
+      border-radius: 20px;
+      color: var(--green);
+      background: var(--green-tint);
+      font-size: 12px;
+      font-weight: 700
+    }
+
+    .kicker {
+      margin: 0 0 8px;
+      color: var(--green);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase
+    }
+
+    h1,
+    h2,
+    h3 {
+      font-family: var(--display);
+      letter-spacing: -1.2px
+    }
+
+    h1 {
+      max-width: 15ch;
+      margin: 0 0 16px;
+      font-size: clamp(42px, 5vw, 70px);
+      line-height: .98
+    }
+
+    h2 {
+      max-width: 23ch;
+      margin: 62px 0 14px;
+      font-size: clamp(31px, 4vw, 51px);
+      line-height: 1.03;
+      scroll-margin-top: 30px
+    }
+
+    h3 {
+      margin: 34px 0 8px;
+      font-size: 22px
+    }
+
+    .lead {
+      max-width: 62ch;
+      margin: 0;
+      color: var(--muted);
+      font-size: 18px
+    }
+
+    .box,
+    .note,
+    .ok {
+      margin: 22px 0;
+      padding: 16px 18px;
+      border-radius: 4px 14px 14px 4px
+    }
+
+    .box {
+      background: var(--green-tint);
+      border: 1px solid #bddbcf;
+      border-left: 5px solid var(--green)
+    }
+
+    .note {
+      background: var(--amber-tint);
+      border: 1px solid #ecd69d;
+      border-left: 5px solid var(--amber)
+    }
+
+    .ok {
+      background: var(--coral-tint);
+      border: 1px solid #f1c7b9;
+      border-left: 5px solid var(--coral)
+    }
+
+    .box ul,
+    .note ul,
+    .ok ul,
+    .box ol,
+    .note ol,
+    .ok ol {
+      margin: 8px 0 0;
+      padding-left: 20px
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin: 24px 0
+    }
+
+    .cards.two {
+      grid-template-columns: repeat(2, 1fr)
+    }
+
+    .card {
+      padding: 20px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-top: 3px solid var(--coral);
+      border-radius: 4px 18px 18px 18px
+    }
+
+    .card.green {
+      border-top-color: var(--green)
+    }
+
+    .card h3 {
+      margin: 0 0 7px;
+      font-size: 20px
+    }
+
+    .card p,
+    .card ul {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px
+    }
+
+    .card ul {
+      padding-left: 18px
+    }
+
+    table {
+      width: 100%;
+      margin: 22px 0;
+      border-collapse: collapse;
+      border: 1px solid var(--line);
+      box-shadow: 0 8px 24px -18px rgba(24, 37, 43, .3)
+    }
+
+    th,
+    td {
+      padding: 12px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--line)
+    }
+
+    th {
+      background: var(--coral);
+      color: #fff;
+      font-size: 13px
+    }
+
+    tr:nth-child(even) td {
+      background: var(--soft)
+    }
+
+    code {
+      padding: .08em .28em;
+      border-radius: 4px;
+      color: var(--coral-dark);
+      background: var(--coral-tint);
+      font: .9em var(--mono)
+    }
+
+    /* Bloque de código con cabecera (archivo + botón copiar) */
+    .codeblock {
+      margin: 18px 0;
+      overflow: hidden;
+      background: var(--code);
+      border-radius: 4px 20px 20px 20px;
+      box-shadow: var(--shadow)
+    }
+
+    .codehead {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px 12px 8px 20px;
+      background: var(--code-top)
+    }
+
+    .codehead .file {
+      overflow: hidden;
+      color: #9fb5ad;
+      font: 600 12px var(--mono);
+      text-overflow: ellipsis;
+      white-space: nowrap
+    }
+
+    .copy-btn {
+      flex-shrink: 0;
+      padding: 4px 12px;
+      color: var(--code-ink);
+      background: transparent;
+      border: 1px solid #3b5a60;
+      border-radius: 999px;
+      font: 600 12px var(--sans);
+      cursor: pointer;
+      transition: .18s
+    }
+
+    .copy-btn:hover {
+      color: #fff;
+      background: var(--coral);
+      border-color: var(--coral)
+    }
+
+    .copy-btn.done {
+      color: #fff;
+      background: var(--green);
+      border-color: var(--green)
+    }
+
+    pre {
+      margin: 0;
+      padding: 20px 24px;
+      overflow: auto;
+      color: var(--code-ink);
+      font: 13px/1.6 var(--mono)
+    }
+
+    pre code {
+      padding: 0;
+      color: inherit;
+      background: transparent;
+      font-size: inherit
+    }
+
+    .tree {
+      margin: 18px 0;
+      padding: 20px 24px;
+      color: var(--green);
+      background: var(--green-tint);
+      border: 1px solid var(--line);
+      border-radius: 4px 14px 14px 14px;
+      font: 600 13px/1.6 var(--mono);
+      white-space: pre;
+      overflow: auto
+    }
+
+    .caption {
+      margin: 20px 0 8px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700
+    }
+
+    .result {
+      padding: 16px 18px;
+      border: 1px solid var(--line);
+      border-radius: 4px 14px 14px 14px;
+      background: var(--panel);
+      font-family: var(--mono)
+    }
+
+    /* Maqueta visual del Spinner */
+    .mock-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      margin: 24px 0
+    }
+
+    .mock {
+      width: 260px;
+      max-width: 100%
+    }
+
+    .mock-field {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 12px 14px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      font-weight: 600
+    }
+
+    .mock-field.open {
+      border-color: var(--coral);
+      border-radius: 8px 8px 0 0
+    }
+
+    .mock-field span:last-child {
+      color: var(--coral)
+    }
+
+    .mock-list {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-top: 0;
+      border-radius: 0 0 8px 8px;
+      box-shadow: 0 12px 24px -16px rgba(24, 37, 43, .4)
+    }
+
+    .mock-list div {
+      padding: 10px 14px;
+      border-bottom: 1px solid var(--line)
+    }
+
+    .mock-list div:last-child {
+      border-bottom: 0
+    }
+
+    .mock-cap {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center
+    }
+
+    .footer {
+      margin-top: 62px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 13px
+    }
+
+    .footer a {
+      color: var(--green)
+    }
+
+    /* Resaltado Kotlin */
+    .kt-keyword {
+      color: #ef9470
+    }
+
+    .kt-type {
+      color: #78c5d4
+    }
+
+    .kt-string {
+      color: #f5cd62
+    }
+
+    .kt-comment {
+      color: #8fb6a8;
+      font-style: italic
+    }
+
+    .kt-number,
+    .kt-literal,
+    .kt-annotation {
+      color: #c9a7ed
+    }
+
+    /* Resaltado XML */
+    .xml-tag {
+      color: #ef9470
+    }
+
+    .xml-attr {
+      color: #78c5d4
+    }
+
+    .xml-string {
+      color: #f5cd62
+    }
+
+    .xml-comment {
+      color: #8fb6a8;
+      font-style: italic
+    }
+
+    #copyToast {
+      position: fixed;
+      left: 50%;
+      bottom: 26px;
+      z-index: 400;
+      max-width: 88vw;
+      padding: 11px 18px;
+      border-radius: 999px;
+      color: var(--bg);
+      background: var(--ink);
+      box-shadow: var(--shadow);
+      font-weight: 600;
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(-50%) translateY(12px);
+      transition: .22s
+    }
+
+    #copyToast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0)
+    }
+
+    @media(max-width:760px) {
+      nav {
+        position: sticky;
+        inset: 0;
+        width: 100%;
+        border-right: 0;
+        border-bottom: 1px solid var(--line)
       }
 
-      body {
-          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-          background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-          padding: 20px;
-          line-height: 1.6;
+      .navrow {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        padding: 12px 18px
       }
 
-      .container {
-          max-width: 1200px;
-          margin: 0 auto;
-          background: white;
-          border-radius: 20px;
-          box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-          overflow: hidden;
+      .brand {
+        flex-shrink: 0;
+        margin: 0;
+        padding: 10px 12px
       }
 
-      .header {
-          background: linear-gradient(135deg, #ff9a56 0%, #ff6a88 100%);
-          color: white;
-          padding: 40px;
-          text-align: center;
+      .navlinks {
+        flex-direction: row;
+        overflow-x: auto
       }
 
-      .header h1 {
-          font-size: 2.5em;
-          margin-bottom: 10px;
-          text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+      .navlinks:before {
+        display: none
       }
 
-      .header p {
-          font-size: 1.2em;
+      .navlinks a {
+        white-space: nowrap
       }
 
-      .schedule {
-          background: #f8f9fa;
-          padding: 30px;
-          border-bottom: 3px solid #ff6a88;
+      main {
+        margin-left: 0;
+        padding: 52px 16px 40px
       }
 
-      .schedule h2 {
-          color: #ff6a88;
-          margin-bottom: 20px;
-          font-size: 1.8em;
+      .cards,
+      .cards.two {
+        grid-template-columns: 1fr
       }
 
-      .schedule-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-          gap: 15px;
+      th,
+      td {
+        padding: 10px
       }
-
-      .schedule-item {
-          background: white;
-          padding: 20px;
-          border-radius: 10px;
-          border-left: 5px solid #ff6a88;
-          box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-          transition: transform 0.3s;
-      }
-
-      .schedule-item:hover {
-          transform: translateX(5px);
-      }
-
-      .schedule-item h3 {
-          color: #ff6a88;
-          margin-bottom: 10px;
-      }
-
-      .section {
-          padding: 40px;
-          margin: 0;
-      }
-
-      .section:nth-child(odd) {
-          background: linear-gradient(135deg, #fff5f5 0%, #ffe4e9 100%);
-      }
-
-      .section:nth-child(even) {
-          background: linear-gradient(135deg, #fff9e6 0%, #ffeeb3 100%);
-      }
-
-      .section:nth-child(3) {
-          background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
-      }
-
-      .section:nth-child(4) {
-          background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
-      }
-
-      .section:nth-child(5) {
-          background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
-      }
-
-      .section:nth-child(6) {
-          background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
-      }
-
-      .section h2 {
-          font-size: 2em;
-          margin-bottom: 20px;
-          border-bottom: 3px solid rgba(255,106,136,0.5);
-          padding-bottom: 10px;
-          color: #333;
-      }
-
-      .section h3 {
-          color: #444;
-          margin-top: 20px;
-          margin-bottom: 15px;
-      }
-
-      .theory {
-          background: rgba(255,255,255,0.7);
-          padding: 20px;
-          border-radius: 10px;
-          margin: 20px 0;
-          backdrop-filter: blur(10px);
-          border: 1px solid rgba(0,0,0,0.1);
-          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      }
-
-      .theory h3 {
-          margin-bottom: 10px;
-          font-size: 1.3em;
-          color: #333;
-      }
-
-      .theory h4 {
-          color: #555;
-          font-size: 1.2em;
-          margin: 15px 0 10px 0;
-      }
-
-      .theory p, .theory li {
-          color: #444;
-          font-size: 1.05em;
-      }
-
-      .visual-example {
-          background: rgba(0,0,0,0.05);
-          padding: 20px;
-          border-radius: 10px;
-          margin: 15px 0;
-          text-align: center;
-          border: 2px dashed rgba(0,0,0,0.2);
-      }
-
-      .visual-example h4 {
-          margin-bottom: 15px;
-          color: #555;
-      }
-
-      .spinner-visual {
-          background: white;
-          padding: 15px;
-          border-radius: 8px;
-          box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-          display: inline-block;
-          margin: 10px;
-      }
-
-      .code-section {
-          background: #1e1e1e;
-          color: #d4d4d4;
-          padding: 20px;
-          border-radius: 10px;
-          margin: 20px 0;
-          overflow-x: auto;
-      }
-
-      .code-section h4 {
-          color: #4ec9b0;
-          margin-bottom: 15px;
-          font-size: 1.1em;
-      }
-
-      pre {
-          margin: 0;
-          font-family: 'Courier New', monospace;
-          font-size: 0.9em;
-      }
-
-      .kotlin {
-          color: #ce9178;
-      }
-
-      .xml {
-          color: #9cdcfe;
-      }
-
-      .comment {
-          color: #6a9955;
-      }
-
-      .keyword {
-          color: #569cd6;
-      }
-
-      .string {
-          color: #ce9178;
-      }
-
-      .function {
-          color: #dcdcaa;
-      }
-
-      .exercise {
-          background: rgba(255,255,255,0.8);
-          padding: 20px;
-          border-radius: 10px;
-          margin: 20px 0;
-          border-left: 5px solid #ffa726;
-          border: 1px solid rgba(255,167,38,0.3);
-          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      }
-
-      .exercise h4 {
-          color: #f57c00;
-          margin-bottom: 10px;
-          font-size: 1.2em;
-      }
-
-      .exercise p, .exercise ul, .exercise li {
-          color: #444;
-          font-size: 1.05em;
-      }
-
-      .tips {
-          background: rgba(255,255,255,0.8);
-          padding: 15px;
-          border-radius: 10px;
-          margin: 15px 0;
-          border-left: 5px solid #66bb6a;
-          border: 1px solid rgba(102,187,106,0.3);
-          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      }
-
-      .tips strong {
-          color: #388e3c;
-      }
-
-      .tips p, .tips li, .tips td {
-          color: #444;
-          font-size: 1.05em;
-      }
-
-      .note {
-          background: rgba(255, 255, 255, 0.8);
-          padding: 15px;
-          border-radius: 8px;
-          margin: 15px 0;
-          border-left: 5px solid #42a5f5;
-          border: 1px solid rgba(66,165,245,0.3);
-          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      }
-
-      .note strong {
-          color: #1976d2;
-      }
-
-      .note p, .note code {
-          color: #444;
-          font-size: 1.05em;
-      }
-
-      .highlight {
-          background: rgba(66,165,245,0.2);
-          padding: 2px 6px;
-          border-radius: 3px;
-          font-weight: bold;
-          color: #1565c0;
-      }
-
-      .comparison-table {
-          width: 100%;
-          margin: 20px 0;
-          border-collapse: collapse;
-          background: white;
-          border-radius: 10px;
-          overflow: hidden;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      }
-
-      .comparison-table th {
-          background: #ff6a88;
-          color: white;
-          padding: 12px;
-          text-align: left;
-      }
-
-      .comparison-table td {
-          padding: 12px;
-          border-bottom: 1px solid #eee;
-          color: #444;
-      }
-
-      .comparison-table tr:hover {
-          background: #f5f5f5;
-      }
-
-      .summary {
-          background: #f8f9fa;
-          padding: 40px;
-      }
-
-      .summary h2 {
-          color: #ff6a88;
-          font-size: 2em;
-          margin-bottom: 20px;
-      }
-
-      .checklist {
-          list-style: none;
-          padding: 0;
-      }
-
-      .checklist li {
-          padding: 15px;
-          margin: 10px 0;
-          background: white;
-          border-radius: 10px;
-          border-left: 5px solid #4ade80;
-          box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-      }
-
-      .checklist li:before {
-          content: "✅ ";
-          font-size: 1.2em;
-      }
-
-      .resources {
-          background: linear-gradient(135deg, #ff9a56 0%, #ff6a88 100%);
-          color: white;
-          padding: 40px;
-      }
-
-      .resources h2 {
-          font-size: 2em;
-          margin-bottom: 20px;
-      }
-
-      @media (max-width: 768px) {
-          .header h1 {
-              font-size: 1.8em;
-          }
-
-          .schedule-grid {
-              grid-template-columns: 1fr;
-          }
-
-          .section {
-              padding: 20px;
-          }
-      }
-    </style>
-  </head>
-  <body>
-    <div class="container">
-      <!-- HEADER -->
-      <div class="header">
-        <h1>🔽 Spinner en Android con Kotlin</h1>
-        <p>Guía Completa de Desarrollo Android</p>
-        <p>🎯 Nivel: Básico-Intermedio</p>
+    }
+  </style>
+</head>
+<body>
+  <div id="progress"></div>
+  <nav aria-label="Navegación de la guía">
+    <div class="navrow">
+      <div class="brand"><span class="dot"></span>Spinner.kt</div>
+      <div class="navlinks">
+        <a href="#inicio">Inicio</a>
+        <a href="#proyecto">Proyecto</a>
+        <a href="#fundamentos">Fundamentos</a>
+        <a href="#primer-spinner">Primer Spinner</a>
+        <a href="#arrays">arrays.xml</a>
+        <a href="#eventos">Eventos</a>
+        <a href="#listview">Spinner + ListView</a>
+        <a href="#dependientes">Dependientes</a>
+        <a href="#preferencias">SharedPreferences</a>
+        <a href="#dinamico">Array dinámico</a>
+        <a href="#resumen">Resumen</a>
       </div>
+    </div>
+  </nav>
 
-      <!-- SCHEDULE -->
-      <div class="schedule">
-        <h2>📋 Contenido del Manual</h2>
-        <div class="schedule-grid">
-          <div class="schedule-item">
-            <h3>📚 Parte 1</h3>
-            <p><strong>Fundamentos de Spinner</strong></p>
-            <p>✅ ¿Qué es y cuándo usar?</p>
-          </div>
-          <div class="schedule-item">
-            <h3>🎨 Parte 2</h3>
-            <p><strong>Layouts del Spinner</strong></p>
-            <p>✅ Layouts predefinidos</p>
-          </div>
-          <div class="schedule-item">
-            <h3>💾 Parte 3</h3>
-            <p><strong>Datos desde XML</strong></p>
-            <p>✅ Arrays.xml</p>
-          </div>
-          <div class="schedule-item">
-            <h3>⚡ Parte 4</h3>
-            <p><strong>Eventos y Listeners</strong></p>
-            <p>✅ OnItemSelectedListener</p>
-          </div>
-          <div class="schedule-item">
-            <h3>🔗 Parte 5</h3>
-            <p><strong>Spinner con ListView</strong></p>
-            <p>✅ Integración y filtros</p>
-          </div>
-          <div class="schedule-item">
-            <h3>🚀 Parte 6</h3>
-            <p><strong>Ejemplos Avanzados</strong></p>
-            <p>✅ Casos de uso reales</p>
-          </div>
-        </div>
+  <main id="inicio">
+    <header class="head">
+      <div class="pills"><span class="pill">Android · Kotlin</span><span class="pill">Spinner</span><span class="pill">Nivel básico-intermedio</span></div>
+      <p class="kicker">Guía práctica</p>
+      <h1>Spinner en Android con Kotlin</h1>
+      <p class="lead">Todas las prácticas se realizan en la actividad <code>SpinnerActivity</code> y su layout <code>activity_spinner.xml</code>, dentro del paquete <code>com.example.spinnerlistrecycler</code>.</p>
+    </header>
+
+    <!-- ============ PROYECTO ============ -->
+    <h2 id="proyecto">1. Preparar el proyecto</h2>
+    <p>Trabaja en un proyecto con el paquete <code>com.example.spinnerlistrecycler</code>. Los archivos utilizados en la guía son:</p>
+    <div class="tree">app/src/main
+│
+├── java/com/example/spinnerlistrecycler
+│   ├── MainActivity.kt
+│   └── SpinnerActivity.kt        ← se crea en esta guía
+│
+├── res/layout
+│   ├── activity_main.xml
+│   └── activity_spinner.xml      ← se crea en esta guía
+│
+├── res/values
+│   └── arrays.xml                ← se crea en la Parte 4
+│
+└── AndroidManifest.xml</div>
+
+    <h3>1.1 Crear <code>SpinnerActivity</code></h3>
+    <ol>
+      <li>En el panel <strong>Project</strong>, haz clic derecho en el paquete <code>com.example.spinnerlistrecycler</code>.</li>
+      <li>Selecciona <strong>New → Activity → Empty Views Activity</strong>.</li>
+      <li>En <strong>Activity Name</strong> escribe <code>SpinnerActivity</code>. El campo <strong>Layout Name</strong> se completa como <code>activity_spinner</code>.</li>
+      <li>Verifica que <strong>Language</strong> sea <strong>Kotlin</strong> y pulsa <strong>Finish</strong>.</li>
+    </ol>
+
+    <h3>1.2 Abrir <code>SpinnerActivity</code> al iniciar la app</h3>
+    <p>En <code>AndroidManifest.xml</code>, mueve el <code>intent-filter</code> de <code>MainActivity</code> a <code>SpinnerActivity</code>. Así la app abre directamente la actividad de la práctica.</p>
+    <pre data-lang="xml" data-file="AndroidManifest.xml (dentro de &lt;application&gt;)"><code>&lt;activity
+    android:name=".SpinnerActivity"
+    android:exported="true"&gt;
+    &lt;intent-filter&gt;
+        &lt;action android:name="android.intent.action.MAIN" /&gt;
+        &lt;category android:name="android.intent.category.LAUNCHER" /&gt;
+    &lt;/intent-filter&gt;
+&lt;/activity&gt;
+
+&lt;activity
+    android:name=".MainActivity"
+    android:exported="false" /&gt;</code></pre>
+    <div class="note"><strong>Importante:</strong> cada práctica <strong>reemplaza</strong> el contenido completo de <code>activity_spinner.xml</code> y <code>SpinnerActivity.kt</code>. Usa el botón <strong>Copiar</strong> de cada bloque y pega el código en Android Studio.</div>
+
+    <!-- ============ FUNDAMENTOS ============ -->
+    <h2 id="fundamentos">2. ¿Qué es un Spinner?</h2>
+    <p>Un <strong>Spinner</strong> es un componente que permite seleccionar un valor de un conjunto. Equivale a una lista desplegable (<em>dropdown</em>) de una página web: muestra el elemento seleccionado y, al tocarlo, despliega las opciones disponibles.</p>
+
+    <div class="mock-row" aria-hidden="true">
+      <div class="mock">
+        <div class="mock-field"><span>🇵🇪 Perú</span><span>▼</span></div>
+        <div class="mock-cap">Estado cerrado</div>
       </div>
-
-      <!-- PARTE 1 -->
-      <div class="section">
-        <h2>📚 PARTE 1: Fundamentos de Spinner</h2>
-
-        <div class="theory">
-          <h3>¿Qué es un Spinner?</h3>
-
-          <div style="margin-bottom: 20px;">
-            <h4>🔽 Definición</h4>
-            <p style="font-size: 1.1em; line-height: 1.8;">
-              Un <strong>Spinner</strong> es un componente de Android que proporciona una forma rápida de seleccionar un valor de un conjunto. Es similar a un <strong>dropdown list</strong> o lista
-              desplegable en aplicaciones web. Muestra un item seleccionado y al hacer clic, despliega una lista de opciones disponibles.
-            </p>
-          </div>
-
-          <div class="visual-example">
-            <h4>📱 Apariencia Visual</h4>
-            <div style="margin: 20px 0;">
-              <div class="spinner-visual" style="width: 250px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
-                  <span style="color: #333;">🇵🇪 Perú</span>
-                  <span style="color: #666;">▼</span>
-                </div>
-                <div style="text-align: center; margin-top: 5px; color: #888; font-size: 0.9em;">Estado cerrado</div>
-              </div>
-            </div>
-
-            <div style="margin: 20px 0;">
-              <div class="spinner-visual" style="width: 250px;">
-                <div style="display: flex; justify-content: space-between; align-items: center; padding: 10px; border: 1px solid #ff6a88; border-radius: 5px; background: #fff5f5;">
-                  <span style="color: #333; font-weight: bold;">🇵🇪 Perú</span>
-                  <span style="color: #ff6a88;">▲</span>
-                </div>
-                <div style="border: 1px solid #ddd; border-top: none; border-radius: 0 0 5px 5px; background: white;">
-                  <div style="padding: 10px; border-bottom: 1px solid #eee;">🇨🇴 Colombia</div>
-                  <div style="padding: 10px; border-bottom: 1px solid #eee;">🇦🇷 Argentina</div>
-                  <div style="padding: 10px; border-bottom: 1px solid #eee;">🇨🇱 Chile</div>
-                  <div style="padding: 10px;">🇲🇽 México</div>
-                </div>
-                <div style="text-align: center; margin-top: 5px; color: #888; font-size: 0.9em;">Estado desplegado</div>
-              </div>
-            </div>
-          </div>
-
-          <div style="margin-bottom: 20px;">
-            <h4>✅ ¿Cuándo usar un Spinner?</h4>
-            <ul style="margin-top: 10px;">
-              <li>📋 Formularios de registro (país, ciudad, género)</li>
-              <li>⚙️ Configuraciones de la aplicación (tema, idioma)</li>
-              <li>🎯 Filtros de búsqueda (categorías, ordenamiento)</li>
-              <li>📅 Selección de fechas predefinidas (mes, año)</li>
-              <li>💱 Conversores (monedas, unidades)</li>
-            </ul>
-          </div>
-
-          <div style="margin-bottom: 20px;">
-            <h4>❌ ¿Cuándo NO usar un Spinner?</h4>
-            <ul style="margin-top: 10px;">
-              <li>🔢 Más de 20-30 opciones (mejor usar ListView con búsqueda)</li>
-              <li>📊 Necesitas mostrar múltiples datos por item</li>
-              <li>✅ Selección múltiple (usa CheckBox)</li>
-              <li>🔘 Solo 2-3 opciones (usa RadioButton)</li>
-            </ul>
-          </div>
-
-          <div>
-            <h4>🧩 Componentes del Spinner</h4>
-            <div style="background: rgba(0,0,0,0.05); padding: 15px; border-radius: 8px; margin-top: 10px;">
-              <p style="margin-bottom: 10px;"><strong style="color: #555;">1. Spinner:</strong> El componente visual principal</p>
-              <p style="margin-bottom: 10px;"><strong style="color: #555;">2. Adapter:</strong> Conecta los datos con el Spinner</p>
-              <p style="margin-bottom: 10px;"><strong style="color: #555;">3. Item seleccionado:</strong> Vista cuando está cerrado (simple_spinner_item)</p>
-              <p><strong style="color: #555;">4. Lista desplegable:</strong> Vista cuando está abierto (simple_spinner_dropdown_item)</p>
-            </div>
-          </div>
+      <div class="mock">
+        <div class="mock-field open"><span>🇵🇪 Perú</span><span>▲</span></div>
+        <div class="mock-list">
+          <div>🇨🇴 Colombia</div>
+          <div>🇦🇷 Argentina</div>
+          <div>🇨🇱 Chile</div>
+          <div>🇲🇽 México</div>
         </div>
-
-        <div class="tips">
-          <strong>💡 Diferencia clave: Spinner vs ListView</strong>
-          <table class="comparison-table" style="margin-top: 10px;">
-            <tr>
-              <th>Característica</th>
-              <th>Spinner</th>
-              <th>ListView</th>
-            </tr>
-            <tr>
-              <td><strong>Items visibles</strong></td>
-              <td>1 (seleccionado)</td>
-              <td>Múltiples</td>
-            </tr>
-            <tr>
-              <td><strong>Espacio en UI</strong></td>
-              <td>Muy pequeño</td>
-              <td>Grande</td>
-            </tr>
-            <tr>
-              <td><strong>Uso principal</strong></td>
-              <td>Selección única</td>
-              <td>Ver lista completa</td>
-            </tr>
-            <tr>
-              <td><strong>Scrollable</strong></td>
-              <td>Solo al desplegar</td>
-              <td>Siempre</td>
-            </tr>
-          </table>
-        </div>
+        <div class="mock-cap">Estado desplegado</div>
       </div>
+    </div>
 
-      <!-- PARTE 2 -->
-      <div class="section">
-        <h2>🎨 PARTE 2: Primer Spinner</h2>
+    <div class="cards two">
+      <article class="card green">
+        <h3>Cuándo usarlo</h3>
+        <ul>
+          <li>Formularios de registro (país, ciudad, género).</li>
+          <li>Configuraciones (tema, idioma).</li>
+          <li>Filtros de búsqueda (categorías, orden).</li>
+          <li>Conversores (monedas, unidades).</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>Cuándo no usarlo</h3>
+        <ul>
+          <li>Más de 20–30 opciones: mejor una lista con búsqueda.</li>
+          <li>Varios datos por elemento: usa ListView o RecyclerView.</li>
+          <li>Selección múltiple: usa CheckBox.</li>
+          <li>Solo 2–3 opciones: usa RadioButton.</li>
+        </ul>
+      </article>
+    </div>
 
-        <div class="theory">
-          <h3>📚 Teoría: Layouts del Spinner</h3>
-          <p>Android proporciona 2 layouts específicos para Spinner:</p>
+    <h3>2.1 Componentes que intervienen</h3>
+    <div class="cards">
+      <article class="card">
+        <h3>Spinner</h3>
+        <p>Componente visual declarado en el layout.</p>
+      </article>
+      <article class="card">
+        <h3>ArrayAdapter</h3>
+        <p>Conecta los datos (un arreglo) con el Spinner.</p>
+      </article>
+      <article class="card">
+        <h3>Layouts de ítem</h3>
+        <p><code>simple_spinner_item</code> (cerrado) y <code>simple_spinner_dropdown_item</code> (desplegado).</p>
+      </article>
+    </div>
 
-          <div style="margin: 15px 0;">
-            <h4>1️⃣ android.R.layout.simple_spinner_item</h4>
-            <p><strong>Uso:</strong> Layout del item SELECCIONADO (cuando el Spinner está cerrado)</p>
-            <p><strong>Características:</strong></p>
-            <ul>
-              <li>TextView simple y compacto</li>
-              <li>Ocupa poco espacio vertical</li>
-              <li>Sin padding extra</li>
-            </ul>
-          </div>
+    <table>
+      <tr>
+        <th>Característica</th>
+        <th>Spinner</th>
+        <th>ListView</th>
+      </tr>
+      <tr>
+        <td>Ítems visibles</td>
+        <td>1 (el seleccionado)</td>
+        <td>Varios</td>
+      </tr>
+      <tr>
+        <td>Espacio en pantalla</td>
+        <td>Muy pequeño</td>
+        <td>Grande</td>
+      </tr>
+      <tr>
+        <td>Uso principal</td>
+        <td>Selección única</td>
+        <td>Mostrar una lista completa</td>
+      </tr>
+      <tr>
+        <td>Desplazamiento</td>
+        <td>Solo al desplegar</td>
+        <td>Siempre</td>
+      </tr>
+    </table>
 
-          <div style="margin: 15px 0;">
-            <h4>2️⃣ android.R.layout.simple_spinner_dropdown_item</h4>
-            <p><strong>Uso:</strong> Layout de los items en la LISTA DESPLEGABLE (cuando está abierto)</p>
-            <p><strong>Características:</strong></p>
-            <ul>
-              <li>TextView con más padding</li>
-              <li>Fondo con efecto seleccionable</li>
-              <li>Optimizado para touch</li>
-              <li>Mejor separación visual</li>
-            </ul>
-          </div>
-        </div>
+    <!-- ============ PRIMER SPINNER ============ -->
+    <h2 id="primer-spinner">3. Primer Spinner</h2>
+    <p>Android proporciona dos layouts predefinidos para el Spinner:</p>
+    <table>
+      <tr>
+        <th>Layout</th>
+        <th>Se usa para</th>
+        <th>Características</th>
+      </tr>
+      <tr>
+        <td><code>android.R.layout.simple_spinner_item</code></td>
+        <td>El ítem seleccionado (Spinner cerrado)</td>
+        <td>TextView compacto, sin padding extra.</td>
+      </tr>
+      <tr>
+        <td><code>android.R.layout.simple_spinner_dropdown_item</code></td>
+        <td>Los ítems de la lista desplegada</td>
+        <td>Más padding, efecto de selección, optimizado para toque.</td>
+      </tr>
+    </table>
 
-        <h3>💻 Práctica 1: Tu Primer Spinner</h3>
-
-        <div class="code-section">
-          <h4>📄 activity_main.xml</h4>
-          <pre><code class="xml">&lt;?xml version="1.0" encoding="utf-8"?&gt;
-&lt;LinearLayout 
+    <h3>3.1 Layout</h3>
+    <pre data-lang="xml" data-file="res/layout/activity_spinner.xml"><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -569,140 +769,118 @@
     &lt;TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Mi Primer Spinner"
+        android:text="Mi primer Spinner"
         android:textSize="20sp"
         android:textStyle="bold"
-        android:layout_marginBottom="16dp"/&gt;
+        android:layout_marginBottom="16dp" /&gt;
 
     &lt;TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Selecciona una fruta:"
         android:textSize="16sp"
-        android:layout_marginBottom="8dp"/&gt;
+        android:layout_marginBottom="8dp" /&gt;
 
     &lt;Spinner
         android:id="@+id/spinner"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="12dp"/&gt;
+        android:padding="12dp" /&gt;
 
     &lt;TextView
         android:id="@+id/tvSeleccion"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Selección: Ninguna"
-        android:textSize="16sp"
         android:layout_marginTop="24dp"
-        android:textColor="#ff6a88"
-        android:textStyle="bold"/&gt;
+        android:text="Selección: Ninguna"
+        android:textColor="#EF714C"
+        android:textSize="16sp"
+        android:textStyle="bold" /&gt;
 
 &lt;/LinearLayout&gt;</code></pre>
-        </div>
 
-        <div class="code-section">
-          <h4>📱 MainActivity.kt</h4>
-          <pre><code class="kotlin"><span class="keyword">package</span> com.example.ucv_b
+    <h3>3.2 Actividad</h3>
+    <pre data-lang="kotlin" data-file="SpinnerActivity.kt"><code>package com.example.spinnerlistrecycler
 
-<span class="keyword">import</span> android.os.Bundle
-<span class="keyword">import</span> android.widget.ArrayAdapter
-<span class="keyword">import</span> android.widget.Spinner
-<span class="keyword">import</span> android.widget.TextView
-<span class="keyword">import</span> androidx.appcompat.app.AppCompatActivity
+import android.os.Bundle
+import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.Spinner
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 
-<span class="keyword">class</span> <span class="function">MainActivity</span> : AppCompatActivity() {
-    
-    <span class="keyword">override fun</span> <span class="function">onCreate</span>(savedInstanceState: Bundle?) {
-        <span class="keyword">super</span>.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        
-        <span class="comment">// 1. Referenciar el Spinner</span>
-        <span class="keyword">val</span> spinner = findViewById&lt;Spinner&gt;(R.id.spinner)
-        <span class="keyword">val</span> tvSeleccion: TextView = findViewById(R.id.tvSeleccion)
-        
-        <span class="comment">// 2. Datos hardcoded</span>
-        <span class="keyword">val</span> frutas = arrayOf(
-            <span class="string">"🍎 Manzana"</span>,
-            <span class="string">"🍌 Plátano"</span>,
-            <span class="string">"🍊 Naranja"</span>,
-            <span class="string">"🍇 Uva"</span>,
-            <span class="string">"🍉 Sandía"</span>
+class SpinnerActivity : AppCompatActivity() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_spinner)
+
+        // 1. Referenciar las vistas
+        val spinner = findViewById&lt;Spinner&gt;(R.id.spinner)
+        val tvSeleccion = findViewById&lt;TextView&gt;(R.id.tvSeleccion)
+
+        // 2. Datos escritos directamente en el código
+        val frutas = arrayOf(
+            "🍎 Manzana",
+            "🍌 Plátano",
+            "🍊 Naranja",
+            "🍇 Uva",
+            "🍉 Sandía"
         )
-        
-        <span class="comment">// 3. Crear adapter</span>
-        <span class="keyword">val</span> adapter = ArrayAdapter(
-            <span class="keyword">this</span>,
-            android.R.layout.simple_spinner_item,  <span class="comment">// Item seleccionado</span>
+
+        // 3. Crear el adapter (layout del ítem seleccionado)
+        val adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_spinner_item,
             frutas
         )
-        
-        <span class="comment">// 4. ⭐ Configurar layout del dropdown</span>
+
+        // 4. Layout de los ítems de la lista desplegada
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-        
-        <span class="comment">// 5. Conectar adapter con Spinner</span>
+
+        // 5. Conectar el adapter con el Spinner
         spinner.adapter = adapter
-        
-        <span class="comment">// 6. ⭐ Agregar listener para eventos</span>
-        spinner.onItemSelectedListener = <span class="keyword">object</span> : AdapterView.OnItemSelectedListener {
-            <span class="keyword">override fun</span> <span class="function">onItemSelected</span>(parent: AdapterView&lt;*&gt;, view: View?, position: Int, id: Long) {
-                <span class="keyword">val</span> frutaSeleccionada = parent.getItemAtPosition(position).toString()
-                tvSeleccion.text = <span class="string">"Selección: $frutaSeleccionada"</span>
+
+        // 6. Escuchar la selección del usuario
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(parent: AdapterView&lt;*&gt;?, view: View?, position: Int, id: Long) {
+                val frutaSeleccionada = parent?.getItemAtPosition(position).toString()
+                tvSeleccion.text = "Selección: $frutaSeleccionada"
             }
 
-            <span class="keyword">override fun</span> <span class="function">onNothingSelected</span>(parent: AdapterView&lt;*&gt;) {
-                tvSeleccion.text = <span class="string">"Selección: Ninguna"</span>
+            override fun onNothingSelected(parent: AdapterView&lt;*&gt;?) {
+                tvSeleccion.text = "Selección: Ninguna"
             }
         }
     }
 }</code></pre>
-        </div>
+    <p class="caption">Resultado al elegir «Uva»:</p>
+    <div class="result">Selección: 🍇 Uva</div>
+    <div class="note"><strong>Nota:</strong> <code>setDropDownViewResource()</code> define cómo se ven los ítems cuando el Spinner se despliega. Sin esta línea, la lista usa el layout compacto y resulta difícil de tocar.</div>
 
-        <div class="note">
-          <strong>📝 Nota importante:</strong>
-          <p>La línea <code class="highlight">setDropDownViewResource()</code> es OBLIGATORIA para configurar cómo se verán los items cuando el Spinner se despliegue.</p>
-        </div>
+    <div class="box"><strong>Pasos para crear un Spinner:</strong>
+      <ol>
+        <li>Agregar <code>&lt;Spinner&gt;</code> al layout.</li>
+        <li>Crear el arreglo de datos.</li>
+        <li>Crear un <code>ArrayAdapter</code> con <code>simple_spinner_item</code>.</li>
+        <li>Configurar <code>setDropDownViewResource()</code>.</li>
+        <li>Asignar el adapter al Spinner.</li>
+      </ol>
+    </div>
+    <div class="ok"><strong>Ejercicio rápido:</strong> modifica el arreglo para mostrar países de Sudamérica: «🇵🇪 Perú», «🇨🇴 Colombia», «🇦🇷 Argentina», «🇨🇱 Chile».</div>
 
-        <div class="exercise">
-          <h4>✏️ Ejercicio Rápido</h4>
-          <p>Modifica el código para mostrar un Spinner con <strong>países de Sudamérica</strong></p>
-          <p>Ejemplo: "🇵🇪 Perú", "🇨🇴 Colombia", "🇦🇷 Argentina", "🇨🇱 Chile"</p>
-        </div>
-
-        <div class="tips">
-          <strong>💡 Pasos para crear un Spinner:</strong>
-          <ol style="margin-top: 10px;">
-            <li>Agregar <code>&lt;Spinner&gt;</code> al XML</li>
-            <li>Crear array de datos</li>
-            <li>Crear ArrayAdapter con <code>simple_spinner_item</code></li>
-            <li>Configurar <code>setDropDownViewResource()</code></li>
-            <li>Asignar adapter al Spinner</li>
-          </ol>
-        </div>
-      </div>
-
-      <!-- PARTE 3 -->
-      <div class="section">
-        <h2>💾 PARTE 3: Datos desde Resources XML</h2>
-
-        <div class="theory">
-          <h3>📚 Ventajas de usar arrays.xml</h3>
-          <ul>
-            <li>✅ Separación de datos y lógica</li>
-            <li>✅ Fácil mantenimiento</li>
-            <li>✅ Soporte multiidioma</li>
-            <li>✅ Reutilización en múltiples Activities</li>
-          </ul>
-        </div>
-
-        <h3>💻 Práctica 2: Spinner con arrays.xml</h3>
-
-        <div class="note"><strong>📝 Crear archivo:</strong> <span class="highlight">res/values/arrays.xml</span></div>
-
-        <div class="code-section">
-          <h4>📄 res/values/arrays.xml</h4>
-          <pre><code class="xml">&lt;?xml version="1.0" encoding="utf-8"?&gt;
+    <!-- ============ ARRAYS ============ -->
+    <h2 id="arrays">4. Datos desde <code>arrays.xml</code></h2>
+    <p>Guardar las opciones en recursos XML separa los datos de la lógica, facilita el mantenimiento, permite traducir la app y reutilizar las listas en varias actividades.</p>
+    <h3>4.1 Crear el recurso</h3>
+    <ol>
+      <li>Haz clic derecho en <code>res/values</code> y selecciona <strong>New → Values Resource File</strong>.</li>
+      <li>Escribe <code>arrays</code> como nombre y pulsa <strong>OK</strong>.</li>
+    </ol>
+    <pre data-lang="xml" data-file="res/values/arrays.xml"><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
 &lt;resources&gt;
-    <span class="comment">&lt;!-- Lista de Países --&gt;</span>
+    &lt;!-- Lista de países --&gt;
     &lt;string-array name="lista_paises"&gt;
         &lt;item&gt;🇵🇪 Perú&lt;/item&gt;
         &lt;item&gt;🇨🇴 Colombia&lt;/item&gt;
@@ -711,8 +889,8 @@
         &lt;item&gt;🇲🇽 México&lt;/item&gt;
         &lt;item&gt;🇧🇷 Brasil&lt;/item&gt;
     &lt;/string-array&gt;
-    
-    <span class="comment">&lt;!-- Lista de Idiomas --&gt;</span>
+
+    &lt;!-- Lista de idiomas --&gt;
     &lt;string-array name="lista_idiomas"&gt;
         &lt;item&gt;🇪🇸 Español&lt;/item&gt;
         &lt;item&gt;🇬🇧 English&lt;/item&gt;
@@ -720,15 +898,15 @@
         &lt;item&gt;🇫🇷 Français&lt;/item&gt;
         &lt;item&gt;🇩🇪 Deutsch&lt;/item&gt;
     &lt;/string-array&gt;
-    
-    <span class="comment">&lt;!-- Lista de Temas --&gt;</span>
+
+    &lt;!-- Lista de temas --&gt;
     &lt;string-array name="lista_temas"&gt;
-        &lt;item&gt;🌞 Tema Claro&lt;/item&gt;
-        &lt;item&gt;🌙 Tema Oscuro&lt;/item&gt;
+        &lt;item&gt;🌞 Tema claro&lt;/item&gt;
+        &lt;item&gt;🌙 Tema oscuro&lt;/item&gt;
         &lt;item&gt;⚙️ Automático&lt;/item&gt;
     &lt;/string-array&gt;
-    
-    <span class="comment">&lt;!-- Lista de Meses --&gt;</span>
+
+    &lt;!-- Lista de meses --&gt;
     &lt;string-array name="lista_meses"&gt;
         &lt;item&gt;Enero&lt;/item&gt;
         &lt;item&gt;Febrero&lt;/item&gt;
@@ -744,182 +922,172 @@
         &lt;item&gt;Diciembre&lt;/item&gt;
     &lt;/string-array&gt;
 &lt;/resources&gt;</code></pre>
-        </div>
 
-        <div class="code-section">
-          <h4>📱 MainActivity.kt (Con XML)</h4>
-          <pre><code class="kotlin"><span class="keyword">class</span> <span class="function">MainActivity</span> : AppCompatActivity() {
-    
-    <span class="keyword">override fun</span> <span class="function">onCreate</span>(savedInstanceState: Bundle?) {
-        <span class="keyword">super</span>.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        
-        <span class="keyword">val</span> spinner = findViewById&lt;Spinner&gt;(R.id.spinner)
-        
-        <span class="comment">// ⭐ Cargar datos desde arrays.xml</span>
-        <span class="keyword">val</span> paises = resources.getStringArray(R.array.lista_paises)
-        
-        <span class="keyword">val</span> adapter = ArrayAdapter(
-            <span class="keyword">this</span>,
+    <h3>4.2 Cargar el arreglo en la actividad</h3>
+    <p>El layout de la Parte 3 se mantiene. Solo cambia el origen de los datos:</p>
+    <pre data-lang="kotlin" data-file="SpinnerActivity.kt"><code>package com.example.spinnerlistrecycler
+
+import android.os.Bundle
+import android.widget.ArrayAdapter
+import android.widget.Spinner
+import androidx.appcompat.app.AppCompatActivity
+
+class SpinnerActivity : AppCompatActivity() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_spinner)
+
+        val spinner = findViewById&lt;Spinner&gt;(R.id.spinner)
+
+        // Cargar los datos desde res/values/arrays.xml
+        val paises = resources.getStringArray(R.array.lista_paises)
+
+        val adapter = ArrayAdapter(
+            this,
             android.R.layout.simple_spinner_item,
             paises
         )
-        
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinner.adapter = adapter
     }
 }</code></pre>
-        </div>
+    <div class="box"><strong>Alternativa sin código:</strong> también puedes asignar el arreglo directamente en el layout con <code>android:entries="@array/lista_paises"</code> dentro de la etiqueta <code>&lt;Spinner&gt;</code>.</div>
+    <div class="ok"><strong>Ejercicio:</strong> crea un formulario con tres Spinners: país de nacimiento, género (Masculino, Femenino, Otro, Prefiero no decir) y mes de nacimiento.</div>
 
-        <div class="exercise">
-          <h4>✏️ Ejercicio</h4>
-          <p><strong>Crear formulario de registro con 3 Spinners:</strong></p>
-          <ul>
-            <li>Spinner 1: País de nacimiento</li>
-            <li>Spinner 2: Género (Masculino, Femenino, Otro, Prefiero no decir)</li>
-            <li>Spinner 3: Mes de nacimiento</li>
-          </ul>
-        </div>
-      </div>
+    <!-- ============ EVENTOS ============ -->
+    <h2 id="eventos">5. Eventos con <code>OnItemSelectedListener</code></h2>
+    <p>Es el listener propio del Spinner. Se activa cuando el usuario selecciona un ítem y exige implementar dos métodos:</p>
+    <table>
+      <tr>
+        <th>Método</th>
+        <th>Se ejecuta cuando…</th>
+      </tr>
+      <tr>
+        <td><code>onItemSelected()</code></td>
+        <td>Se selecciona un ítem.</td>
+      </tr>
+      <tr>
+        <td><code>onNothingSelected()</code></td>
+        <td>La selección desaparece (por ejemplo, el adapter queda vacío).</td>
+      </tr>
+    </table>
+    <table>
+      <tr>
+        <th>Parámetro de <code>onItemSelected</code></th>
+        <th>Significado</th>
+      </tr>
+      <tr>
+        <td><code>parent</code></td>
+        <td>El Spinner (un <code>AdapterView</code>).</td>
+      </tr>
+      <tr>
+        <td><code>view</code></td>
+        <td>La vista del ítem seleccionado.</td>
+      </tr>
+      <tr>
+        <td><code>position</code></td>
+        <td>Posición del ítem: 0, 1, 2…</td>
+      </tr>
+      <tr>
+        <td><code>id</code></td>
+        <td>Identificador de la fila.</td>
+      </tr>
+    </table>
 
-      <!-- PARTE 4 -->
-      <div class="section">
-        <h2>⚡ PARTE 4: Eventos - OnItemSelectedListener</h2>
+    <h3>5.1 Spinner con Toast</h3>
+    <pre data-lang="kotlin" data-file="SpinnerActivity.kt"><code>package com.example.spinnerlistrecycler
 
-        <div class="theory">
-          <h3>📚 Teoría: OnItemSelectedListener</h3>
-          <p><strong>Listener específico para Spinner</strong> que se activa cuando el usuario selecciona un item.</p>
+import android.os.Bundle
+import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.Spinner
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 
-          <div style="margin-top: 15px;">
-            <h4>Métodos principales:</h4>
-            <ul>
-              <li><code>onItemSelected()</code> → Se ejecuta cuando se selecciona un item</li>
-              <li><code>onNothingSelected()</code> → Se ejecuta cuando no hay selección</li>
-            </ul>
-          </div>
+class SpinnerActivity : AppCompatActivity() {
 
-          <div style="margin-top: 15px;">
-            <h4>Parámetros de onItemSelected:</h4>
-            <ul>
-              <li><code>parent</code> → El Spinner (AdapterView)</li>
-              <li><code>view</code> → La vista del item seleccionado</li>
-              <li><code>position</code> → Posición (0, 1, 2...)</li>
-              <li><code>id</code> → ID del item</li>
-            </ul>
-          </div>
-        </div>
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_spinner)
 
-        <h3>💻 Práctica 3: Spinner con Eventos</h3>
+        val spinner = findViewById&lt;Spinner&gt;(R.id.spinner)
+        val tvSeleccion = findViewById&lt;TextView&gt;(R.id.tvSeleccion)
 
-        <div class="code-section">
-          <h4>📱 MainActivity.kt (Con Listener)</h4>
-          <pre><code class="kotlin"><span class="keyword">import</span> android.view.View
-<span class="keyword">import</span> android.widget.AdapterView
-<span class="keyword">import</span> android.widget.Toast
+        val paises = resources.getStringArray(R.array.lista_paises)
 
-<span class="keyword">class</span> <span class="function">MainActivity</span> : AppCompatActivity() {
-    
-    <span class="keyword">override fun</span> <span class="function">onCreate</span>(savedInstanceState: Bundle?) {
-        <span class="keyword">super</span>.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        
-        <span class="keyword">val</span> spinner = findViewById&lt;Spinner&gt;(R.id.spinner)
-        <span class="keyword">val</span> tvSeleccion = findViewById&lt;TextView&gt;(R.id.tvSeleccion)
-        
-        <span class="keyword">val</span> paises = resources.getStringArray(R.array.lista_paises)
-        
-        <span class="keyword">val</span> adapter = ArrayAdapter(
-            <span class="keyword">this</span>,
+        val adapter = ArrayAdapter(
+            this,
             android.R.layout.simple_spinner_item,
             paises
         )
-        
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinner.adapter = adapter
-        
-        <span class="comment">// ⭐ Agregar listener</span>
-        spinner.onItemSelectedListener = <span class="keyword">object</span> : AdapterView.OnItemSelectedListener {
-            <span class="keyword">override fun</span> <span class="function">onItemSelected</span>(
+
+        // Listener de selección
+        spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
                 parent: AdapterView&lt;*&gt;?,
                 view: View?,
                 position: Int,
                 id: Long
             ) {
-                <span class="keyword">val</span> paisSeleccionado = paises[position]
-                tvSeleccion.text = <span class="string">"Selección: $paisSeleccionado"</span>
-                
+                val paisSeleccionado = paises[position]
+                tvSeleccion.text = "Selección: $paisSeleccionado"
+
                 Toast.makeText(
-                    <span class="keyword">this@MainActivity</span>,
-                    <span class="string">"Seleccionaste: $paisSeleccionado"</span>,
+                    this@SpinnerActivity,
+                    "Seleccionaste: $paisSeleccionado",
                     Toast.LENGTH_SHORT
                 ).show()
             }
-            
-            <span class="keyword">override fun</span> <span class="function">onNothingSelected</span>(parent: AdapterView&lt;*&gt;?) {
-                tvSeleccion.text = <span class="string">"Selección: Ninguna"</span>
+
+            override fun onNothingSelected(parent: AdapterView&lt;*&gt;?) {
+                tvSeleccion.text = "Selección: Ninguna"
             }
         }
     }
 }</code></pre>
-        </div>
+    <div class="box"><strong><code>this@SpinnerActivity</code>:</strong> dentro del <code>object</code> anónimo, <code>this</code> apunta al listener. Para obtener el contexto de la actividad se escribe <code>this@SpinnerActivity</code>.</div>
 
-        <div class="note">
-          <strong>📝 Obtener el item seleccionado:</strong>
-          <pre style="margin-top: 10px;"><code>// Opción 1: Desde el array original
-val item = paises[position]
+    <h3>5.2 Tres formas de obtener el ítem seleccionado</h3>
+    <pre data-lang="kotlin" data-file="Dentro de onItemSelected()"><code>// Opción 1: desde el arreglo original
+val item1 = paises[position]
 
-// Opción 2: Desde el parent
-val item = parent?.getItemAtPosition(position) as String
+// Opción 2: desde el parent (el Spinner)
+val item2 = parent?.getItemAtPosition(position).toString()
 
-// Opción 3: Desde el adapter
-val item = adapter.getItem(position)</code></pre>
-        </div>
+// Opción 3: desde el adapter
+val item3 = adapter.getItem(position)</code></pre>
 
-        <div class="tips">
-          <strong>💡 Tip importante:</strong>
-          <p style="margin-top: 10px;">
-            El evento <code>onItemSelected()</code> se dispara automáticamente cuando se carga el Spinner por primera vez (selección del primer item). Si no quieres este comportamiento, usa un flag:
-          </p>
-          <pre style="margin-top: 10px;"><code>var primeraCarga = true
+    <h3>5.3 Ignorar la selección automática inicial</h3>
+    <p><code>onItemSelected()</code> se ejecuta automáticamente al cargar el Spinner, con la posición 0. Si no quieres reaccionar a esa primera llamada, usa una bandera:</p>
+    <pre data-lang="kotlin" data-file="SpinnerActivity.kt (fragmento)"><code>var primeraCarga = true
 
 spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
-    override fun onItemSelected(...) {
+    override fun onItemSelected(parent: AdapterView&lt;*&gt;?, view: View?, position: Int, id: Long) {
         if (primeraCarga) {
             primeraCarga = false
             return
         }
-        // Tu código aquí
+        // Tu código aquí: solo se ejecuta cuando el usuario elige
+        tvSeleccion.text = "Selección: ${paises[position]}"
     }
-    ...
+
+    override fun onNothingSelected(parent: AdapterView&lt;*&gt;?) {
+    }
 }</code></pre>
-        </div>
+    <div class="ok"><strong>Ejercicio — Conversor de monedas:</strong> Spinner de moneda de origen (Soles, Dólares, Euros), un EditText con la cantidad, Spinner de moneda de destino y un TextView con el resultado.</div>
 
-        <div class="exercise">
-          <h4>✏️ Ejercicio</h4>
-          <p><strong>Conversor de Monedas:</strong></p>
-          <ul>
-            <li>Spinner 1: Moneda origen (Soles, Dólares, Euros)</li>
-            <li>EditText: Cantidad a convertir</li>
-            <li>Spinner 2: Moneda destino</li>
-            <li>TextView: Resultado de la conversión</li>
-          </ul>
-        </div>
-      </div>
+    <!-- ============ LISTVIEW ============ -->
+    <h2 id="listview">6. Spinner que filtra un ListView</h2>
+    <p>Un uso habitual del Spinner es filtrar el contenido de una lista según la categoría seleccionada.</p>
 
-      <!-- PARTE 5 -->
-      <div class="section">
-        <h2>🔗 PARTE 5: Spinner con ListView</h2>
-
-        <div class="theory">
-          <h3>📚 Caso de uso: Filtrar ListView con Spinner</h3>
-          <p>Uno de los usos más comunes del Spinner es filtrar el contenido de un ListView según la categoría seleccionada.</p>
-        </div>
-
-        <h3>💻 Práctica 4: Filtrar ListView con Spinner</h3>
-
-        <div class="code-section">
-          <h4>📄 arrays.xml (Agregar)</h4>
-          <pre><code class="xml"><span class="comment">&lt;!-- Categorías --&gt;</span>
+    <h3>6.1 Agregar los arreglos</h3>
+    <p>Agrega estos arreglos dentro de <code>&lt;resources&gt;</code> en <code>arrays.xml</code>:</p>
+    <pre data-lang="xml" data-file="res/values/arrays.xml (agregar)"><code>&lt;!-- Categorías --&gt;
 &lt;string-array name="categorias"&gt;
     &lt;item&gt;Todos&lt;/item&gt;
     &lt;item&gt;Frutas&lt;/item&gt;
@@ -927,7 +1095,7 @@ spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
     &lt;item&gt;Carnes&lt;/item&gt;
 &lt;/string-array&gt;
 
-<span class="comment">&lt;!-- Productos --&gt;</span>
+&lt;!-- Productos --&gt;
 &lt;string-array name="productos_frutas"&gt;
     &lt;item&gt;🍎 Manzana&lt;/item&gt;
     &lt;item&gt;🍌 Plátano&lt;/item&gt;
@@ -945,12 +1113,12 @@ spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
     &lt;item&gt;🍗 Pollo&lt;/item&gt;
     &lt;item&gt;🐟 Pescado&lt;/item&gt;
 &lt;/string-array&gt;</code></pre>
-        </div>
 
-        <div class="code-section">
-          <h4>📄 activity_main.xml</h4>
-          <pre><code class="xml">&lt;LinearLayout
+    <h3>6.2 Layout</h3>
+    <pre data-lang="xml" data-file="res/layout/activity_spinner.xml"><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -961,69 +1129,67 @@ spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
         android:layout_height="wrap_content"
         android:text="Categoría:"
         android:textSize="16sp"
-        android:layout_marginBottom="8dp"/&gt;
+        android:layout_marginBottom="8dp" /&gt;
 
     &lt;Spinner
         android:id="@+id/spinnerCategoria"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="16dp"/&gt;
+        android:layout_marginBottom="16dp" /&gt;
 
     &lt;TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Productos:"
         android:textSize="16sp"
-        android:layout_marginBottom="8dp"/&gt;
+        android:layout_marginBottom="8dp" /&gt;
 
     &lt;ListView
         android:id="@+id/listView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"/&gt;
+        android:layout_height="match_parent" /&gt;
 
 &lt;/LinearLayout&gt;</code></pre>
-        </div>
 
-        <div class="code-section">
-          <h4>📱 MainActivity.kt (Completo)</h4>
-          <pre><code class="kotlin"><span class="keyword">package</span> com.example.ucv_b
+    <h3>6.3 Actividad</h3>
+    <pre data-lang="kotlin" data-file="SpinnerActivity.kt"><code>package com.example.spinnerlistrecycler
 
-<span class="keyword">import</span> android.os.Bundle
-<span class="keyword">import</span> android.view.View
-<span class="keyword">import</span> android.widget.AdapterView
-<span class="keyword">import</span> android.widget.ArrayAdapter
-<span class="keyword">import</span> android.widget.ListView
-<span class="keyword">import</span> android.widget.Spinner
-<span class="keyword">import</span> android.widget.Toast
-<span class="keyword">import</span> androidx.appcompat.app.AppCompatActivity
+import android.os.Bundle
+import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.ListView
+import android.widget.Spinner
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 
-<span class="keyword">class</span> <span class="function">MainActivity</span> : AppCompatActivity() {
-    
-    <span class="keyword">private lateinit var</span> spinnerCategoria: Spinner
-    <span class="keyword">private lateinit var</span> listView: ListView
-    <span class="keyword">private lateinit var</span> listAdapter: ArrayAdapter&lt;String&gt;
-    
-    <span class="keyword">override fun</span> <span class="function">onCreate</span>(savedInstanceState: Bundle?) {
-        <span class="keyword">super</span>.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        
-        <span class="comment">// 1. Referenciar las vistas</span>
+class SpinnerActivity : AppCompatActivity() {
+
+    private lateinit var spinnerCategoria: Spinner
+    private lateinit var listView: ListView
+    private lateinit var listAdapter: ArrayAdapter&lt;String&gt;
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_spinner)
+
+        // 1. Referenciar las vistas
         spinnerCategoria = findViewById(R.id.spinnerCategoria)
         listView = findViewById(R.id.listView)
-        
-        <span class="comment">// 2. Configurar Spinner de Categorías</span>
-        <span class="keyword">val</span> categorias = resources.getStringArray(R.array.categorias)
-        <span class="keyword">val</span> spinnerAdapter = ArrayAdapter(
-            <span class="keyword">this</span>,
+
+        // 2. Configurar el Spinner de categorías
+        val categorias = resources.getStringArray(R.array.categorias)
+        val spinnerAdapter = ArrayAdapter(
+            this,
             android.R.layout.simple_spinner_item,
             categorias
         )
         spinnerAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerCategoria.adapter = spinnerAdapter
-        
-        <span class="comment">// 3. ⭐ Listener para filtrar ListView según categoría</span>
-        spinnerCategoria.onItemSelectedListener = <span class="keyword">object</span> : AdapterView.OnItemSelectedListener {
-            <span class="keyword">override fun</span> <span class="function">onItemSelected</span>(
+
+        // 3. Filtrar el ListView según la categoría elegida
+        spinnerCategoria.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
                 parent: AdapterView&lt;*&gt;?,
                 view: View?,
                 position: Int,
@@ -1031,104 +1197,112 @@ spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             ) {
                 actualizarListView(position)
             }
-            
-            <span class="keyword">override fun</span> <span class="function">onNothingSelected</span>(parent: AdapterView&lt;*&gt;?) {
-                <span class="comment">// Limpiar ListView si no hay selección</span>
-                listView.adapter = <span class="keyword">null</span>
+
+            override fun onNothingSelected(parent: AdapterView&lt;*&gt;?) {
+                listView.adapter = null
             }
         }
-        
-        <span class="comment">// 4. ⭐ Listener de click en items del ListView</span>
-        listView.setOnItemClickListener { parent, view, position, id ->
-            <span class="keyword">val</span> productoSeleccionado = parent.getItemAtPosition(position).toString()
-            <span class="keyword">val</span> categoriaActual = categorias[spinnerCategoria.selectedItemPosition]
-            
+
+        // 4. Clic en un producto del ListView
+        listView.setOnItemClickListener { parent, _, position, _ -&gt;
+            val productoSeleccionado = parent.getItemAtPosition(position).toString()
+            val categoriaActual = categorias[spinnerCategoria.selectedItemPosition]
+
             Toast.makeText(
-                <span class="keyword">this</span>,
-                <span class="string">"Seleccionaste: $productoSeleccionado\nCategoría: $categoriaActual"</span>,
+                this,
+                "Seleccionaste: $productoSeleccionado\nCategoría: $categoriaActual",
                 Toast.LENGTH_SHORT
             ).show()
         }
     }
-    
-    <span class="comment">// 5. ⭐ Función para actualizar el ListView según la categoría</span>
-    <span class="keyword">private fun</span> <span class="function">actualizarListView</span>(categoria: Int) {
-        <span class="keyword">val</span> productos = <span class="keyword">when</span> (categoria) {
-            0 -> { <span class="comment">// Todos los productos</span>
-                <span class="keyword">val</span> frutas = resources.getStringArray(R.array.productos_frutas)
-                <span class="keyword">val</span> verduras = resources.getStringArray(R.array.productos_verduras)
-                <span class="keyword">val</span> carnes = resources.getStringArray(R.array.productos_carnes)
+
+    // 5. Cargar los productos de la categoría seleccionada
+    private fun actualizarListView(categoria: Int) {
+        val productos = when (categoria) {
+            0 -&gt; {
+                val frutas = resources.getStringArray(R.array.productos_frutas)
+                val verduras = resources.getStringArray(R.array.productos_verduras)
+                val carnes = resources.getStringArray(R.array.productos_carnes)
                 frutas + verduras + carnes
             }
-            1 -> resources.getStringArray(R.array.productos_frutas)  <span class="comment">// Solo Frutas</span>
-            2 -> resources.getStringArray(R.array.productos_verduras)  <span class="comment">// Solo Verduras</span>
-            3 -> resources.getStringArray(R.array.productos_carnes)  <span class="comment">// Solo Carnes</span>
-            <span class="keyword">else</span> -> emptyArray()
+            1 -&gt; resources.getStringArray(R.array.productos_frutas)
+            2 -&gt; resources.getStringArray(R.array.productos_verduras)
+            3 -&gt; resources.getStringArray(R.array.productos_carnes)
+            else -&gt; emptyArray()
         }
-        
-        <span class="comment">// Crear y asignar nuevo adapter al ListView</span>
+
         listAdapter = ArrayAdapter(
-            <span class="keyword">this</span>,
+            this,
             android.R.layout.simple_list_item_1,
             productos
         )
         listView.adapter = listAdapter
     }
 }</code></pre>
-        </div>
 
-        <div class="tips">
-          <strong>💡 Puntos clave del código:</strong>
-          <ul style="margin-top: 10px;">
-            <li><strong>actualizarListView():</strong> Función separada para organizar mejor el código</li>
-            <li><strong>when (categoria):</strong> Selecciona qué array cargar según la posición del Spinner</li>
-            <li><strong>frutas + verduras + carnes:</strong> Concatena arrays para la opción "Todos"</li>
-            <li><strong>setOnItemClickListener:</strong> Maneja clicks en items del ListView</li>
-            <li><strong>lateinit var:</strong> Variables que se inicializan en onCreate()</li>
-          </ul>
-        </div>
+    <table>
+      <tr>
+        <th>Elemento</th>
+        <th>Función</th>
+      </tr>
+      <tr>
+        <td><code>lateinit var</code></td>
+        <td>Variables que se inicializan después, en <code>onCreate()</code>.</td>
+      </tr>
+      <tr>
+        <td><code>actualizarListView()</code></td>
+        <td>Separa la lógica de filtrado en una función propia.</td>
+      </tr>
+      <tr>
+        <td><code>when (categoria)</code></td>
+        <td>Elige qué arreglo cargar según la posición del Spinner.</td>
+      </tr>
+      <tr>
+        <td><code>frutas + verduras + carnes</code></td>
+        <td>Concatena los arreglos para la opción «Todos».</td>
+      </tr>
+      <tr>
+        <td><code>setOnItemClickListener</code></td>
+        <td>Responde al clic en un producto del ListView.</td>
+      </tr>
+    </table>
+    <div class="note"><strong>Flujo:</strong> el usuario elige una categoría → <code>onItemSelected()</code> llama a <code>actualizarListView()</code> → se carga el arreglo correspondiente → el ListView se actualiza → al tocar un producto aparece un Toast.</div>
+    <div class="ok"><strong>Ejercicio avanzado — Biblioteca:</strong> Spinner con categorías de libros (Ficción, No ficción, Ciencia, Historia), ListView con los libros de la categoría y un AlertDialog con los detalles al tocar un libro.</div>
 
-        <div class="note">
-          <strong>🎯 Flujo de la aplicación:</strong>
-          <ol style="margin-top: 10px;">
-            <li>Usuario selecciona categoría en el Spinner</li>
-            <li>Se ejecuta onItemSelected() → llama a actualizarListView()</li>
-            <li>Se cargan los productos correspondientes según la categoría</li>
-            <li>Se actualiza el ListView con los nuevos productos</li>
-            <li>Usuario hace click en un producto → Muestra Toast con información</li>
-          </ol>
-        </div>
+    <!-- ============ DEPENDIENTES ============ -->
+    <h2 id="dependientes">7. Spinners dependientes: país → ciudad</h2>
+    <p>La selección del primer Spinner (país) determina las opciones del segundo (ciudad). Es un patrón muy común en formularios de registro.</p>
 
-        <div class="exercise">
-          <h4>✏️ Ejercicio Avanzado</h4>
-          <p><strong>App de Biblioteca:</strong></p>
-          <ul>
-            <li>Spinner: Categorías de libros (Ficción, No Ficción, Ciencia, Historia)</li>
-            <li>ListView: Libros de la categoría seleccionada</li>
-            <li>Click en libro: Mostrar detalles en AlertDialog</li>
-          </ul>
-        </div>
-      </div>
+    <h3>7.1 Agregar los arreglos</h3>
+    <pre data-lang="xml" data-file="res/values/arrays.xml (agregar)"><code>&lt;!-- Países --&gt;
+&lt;string-array name="paises"&gt;
+    &lt;item&gt;🇵🇪 Perú&lt;/item&gt;
+    &lt;item&gt;🇨🇴 Colombia&lt;/item&gt;
+&lt;/string-array&gt;
 
-      <!-- PARTE 6 -->
-      <div class="section">
-        <h2>🚀 PARTE 6: Ejemplos Avanzados</h2>
+&lt;!-- Ciudades de Perú --&gt;
+&lt;string-array name="ciudades_peru"&gt;
+    &lt;item&gt;Lima&lt;/item&gt;
+    &lt;item&gt;Arequipa&lt;/item&gt;
+    &lt;item&gt;Cusco&lt;/item&gt;
+    &lt;item&gt;Trujillo&lt;/item&gt;
+    &lt;item&gt;Chiclayo&lt;/item&gt;
+&lt;/string-array&gt;
 
-        <h3>💻 Ejemplo Completo: Múltiples Spinners Dependientes</h3>
+&lt;!-- Ciudades de Colombia --&gt;
+&lt;string-array name="ciudades_colombia"&gt;
+    &lt;item&gt;Bogotá&lt;/item&gt;
+    &lt;item&gt;Medellín&lt;/item&gt;
+    &lt;item&gt;Cali&lt;/item&gt;
+    &lt;item&gt;Barranquilla&lt;/item&gt;
+    &lt;item&gt;Cartagena&lt;/item&gt;
+&lt;/string-array&gt;</code></pre>
 
-        <div class="theory">
-          <h3>📚 Caso de uso real: Selector País → Ciudades</h3>
-          <p>
-            Este ejemplo muestra cómo crear spinners dependientes donde la selección del primer Spinner (País) determina las opciones del segundo Spinner (Ciudad). Es un patrón muy común en
-            formularios de registro.
-          </p>
-        </div>
-
-        <div class="code-section">
-          <h4>📄 activity_main.xml</h4>
-          <pre><code class="xml">&lt;?xml version="1.0" encoding="utf-8"?&gt;
-&lt;LinearLayout 
+    <h3>7.2 Layout</h3>
+    <pre data-lang="xml" data-file="res/layout/activity_spinner.xml"><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -1137,437 +1311,550 @@ spinner.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
     &lt;TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Spinners Dependientes"
+        android:text="Spinners dependientes"
         android:textSize="20sp"
         android:textStyle="bold"
-        android:layout_marginBottom="24dp"/&gt;
+        android:layout_marginBottom="24dp" /&gt;
 
     &lt;TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Selecciona tu país:"
         android:textSize="16sp"
-        android:layout_marginBottom="8dp"/&gt;
+        android:layout_marginBottom="8dp" /&gt;
 
     &lt;Spinner
         android:id="@+id/spinnerPais"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="12dp"
-        android:layout_marginBottom="16dp"/&gt;
+        android:layout_marginBottom="16dp" /&gt;
 
     &lt;TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Selecciona tu ciudad:"
         android:textSize="16sp"
-        android:layout_marginBottom="8dp"/&gt;
+        android:layout_marginBottom="8dp" /&gt;
 
     &lt;Spinner
         android:id="@+id/spinnerCiudad"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:padding="12dp"
-        android:layout_marginBottom="24dp"/&gt;
+        android:layout_marginBottom="24dp" /&gt;
 
     &lt;TextView
         android:id="@+id/tvUbicacion"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Ubicación: -"
+        android:textColor="#EF714C"
         android:textSize="16sp"
-        android:textColor="#ff6a88"
-        android:textStyle="bold"/&gt;
+        android:textStyle="bold" /&gt;
 
 &lt;/LinearLayout&gt;</code></pre>
-        </div>
 
-        <div class="code-section">
-          <h4>📄 res/values/arrays.xml</h4>
-          <pre><code class="xml">&lt;?xml version="1.0" encoding="utf-8"?&gt;
-&lt;resources&gt;
-    <span class="comment">&lt;!-- Lista de Países --&gt;</span>
-    &lt;string-array name="paises"&gt;
-        &lt;item&gt;🇵🇪 Perú&lt;/item&gt;
-        &lt;item&gt;🇨🇴 Colombia&lt;/item&gt;
-    &lt;/string-array&gt;
+    <h3>7.3 Actividad</h3>
+    <pre data-lang="kotlin" data-file="SpinnerActivity.kt"><code>package com.example.spinnerlistrecycler
 
-    <span class="comment">&lt;!-- Ciudades de Perú --&gt;</span>
-    &lt;string-array name="ciudades_peru"&gt;
-        &lt;item&gt;Lima&lt;/item&gt;
-        &lt;item&gt;Arequipa&lt;/item&gt;
-        &lt;item&gt;Cusco&lt;/item&gt;
-        &lt;item&gt;Trujillo&lt;/item&gt;
-        &lt;item&gt;Chiclayo&lt;/item&gt;
-    &lt;/string-array&gt;
+import android.os.Bundle
+import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.Spinner
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 
-    <span class="comment">&lt;!-- Ciudades de Colombia --&gt;</span>
-    &lt;string-array name="ciudades_colombia"&gt;
-        &lt;item&gt;Bogotá&lt;/item&gt;
-        &lt;item&gt;Medellín&lt;/item&gt;
-        &lt;item&gt;Cali&lt;/item&gt;
-        &lt;item&gt;Barranquilla&lt;/item&gt;
-        &lt;item&gt;Cartagena&lt;/item&gt;
-    &lt;/string-array&gt;
-&lt;/resources&gt;</code></pre>
-        </div>
+class SpinnerActivity : AppCompatActivity() {
 
-        <div class="code-section">
-          <h4>📱 MainActivity.kt (Completo)</h4>
-          <pre><code class="kotlin"><span class="keyword">package</span> com.example.ucv_b
+    private lateinit var spinnerPais: Spinner
+    private lateinit var spinnerCiudad: Spinner
+    private lateinit var tvUbicacion: TextView
 
-<span class="keyword">import</span> android.os.Bundle
-<span class="keyword">import</span> android.view.View
-<span class="keyword">import</span> android.widget.AdapterView
-<span class="keyword">import</span> android.widget.ArrayAdapter
-<span class="keyword">import</span> android.widget.Spinner
-<span class="keyword">import</span> android.widget.TextView
-<span class="keyword">import</span> androidx.appcompat.app.AppCompatActivity
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_spinner)
 
-<span class="keyword">class</span> <span class="function">MainActivity</span> : AppCompatActivity() {
-    
-    <span class="keyword">private lateinit var</span> spinnerPais: Spinner
-    <span class="keyword">private lateinit var</span> spinnerCiudad: Spinner
-    <span class="keyword">private lateinit var</span> tvUbicacion: TextView
-    
-    <span class="keyword">override fun</span> <span class="function">onCreate</span>(savedInstanceState: Bundle?) {
-        <span class="keyword">super</span>.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        
-        <span class="comment">// 1. Referenciar las vistas</span>
+        // 1. Referenciar las vistas
         spinnerPais = findViewById(R.id.spinnerPais)
         spinnerCiudad = findViewById(R.id.spinnerCiudad)
         tvUbicacion = findViewById(R.id.tvUbicacion)
-        
-        <span class="comment">// 2. Configurar Spinner de Países</span>
-        <span class="keyword">val</span> paises = resources.getStringArray(R.array.paises)
-        <span class="keyword">val</span> paisAdapter = ArrayAdapter(
-            <span class="keyword">this</span>,
+
+        // 2. Configurar el Spinner de países
+        val paises = resources.getStringArray(R.array.paises)
+        val paisAdapter = ArrayAdapter(
+            this,
             android.R.layout.simple_spinner_item,
             paises
         )
         paisAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerPais.adapter = paisAdapter
-        
-        <span class="comment">// 3. ⭐ Listener del Spinner de Países (Actualiza ciudades)</span>
-        spinnerPais.onItemSelectedListener = <span class="keyword">object</span> : AdapterView.OnItemSelectedListener {
-            <span class="keyword">override fun</span> <span class="function">onItemSelected</span>(
+
+        // 3. Al cambiar de país se recargan las ciudades
+        spinnerPais.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
                 parent: AdapterView&lt;*&gt;?,
                 view: View?,
                 position: Int,
                 id: Long
             ) {
-                <span class="comment">// Cargar ciudades según el país seleccionado</span>
-                <span class="keyword">val</span> ciudades = <span class="keyword">when</span> (position) {
-                    0 -> resources.getStringArray(R.array.ciudades_peru)
-                    1 -> resources.getStringArray(R.array.ciudades_colombia)
-                    <span class="keyword">else</span> -> emptyArray()
+                val ciudades = when (position) {
+                    0 -&gt; resources.getStringArray(R.array.ciudades_peru)
+                    1 -&gt; resources.getStringArray(R.array.ciudades_colombia)
+                    else -&gt; emptyArray()
                 }
-                
-                <span class="comment">// Actualizar el Spinner de Ciudades</span>
-                <span class="keyword">val</span> ciudadAdapter = ArrayAdapter(
-                    <span class="keyword">this@MainActivity</span>,
+
+                val ciudadAdapter = ArrayAdapter(
+                    this@SpinnerActivity,
                     android.R.layout.simple_spinner_item,
                     ciudades
                 )
                 ciudadAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 spinnerCiudad.adapter = ciudadAdapter
             }
-            
-            <span class="keyword">override fun</span> <span class="function">onNothingSelected</span>(parent: AdapterView&lt;*&gt;?) {
-                tvUbicacion.text = <span class="string">"Ubicación: -"</span>
+
+            override fun onNothingSelected(parent: AdapterView&lt;*&gt;?) {
+                tvUbicacion.text = "Ubicación: -"
             }
         }
-        
-        <span class="comment">// 4. ⭐ Listener del Spinner de Ciudades (Muestra ubicación completa)</span>
-        spinnerCiudad.onItemSelectedListener = <span class="keyword">object</span> : AdapterView.OnItemSelectedListener {
-            <span class="keyword">override fun</span> <span class="function">onItemSelected</span>(
+
+        // 4. Al elegir ciudad se muestra la ubicación completa
+        spinnerCiudad.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
                 parent: AdapterView&lt;*&gt;?,
                 view: View?,
                 position: Int,
                 id: Long
             ) {
-                <span class="keyword">val</span> paisSeleccionado = spinnerPais.selectedItem.toString()
-                <span class="keyword">val</span> ciudadSeleccionada = parent?.getItemAtPosition(position).toString()
-                
-                tvUbicacion.text = <span class="string">"Ubicación: $ciudadSeleccionada, $paisSeleccionado"</span>
+                val paisSeleccionado = spinnerPais.selectedItem.toString()
+                val ciudadSeleccionada = parent?.getItemAtPosition(position).toString()
+
+                tvUbicacion.text = "Ubicación: $ciudadSeleccionada, $paisSeleccionado"
             }
-            
-            <span class="keyword">override fun</span> <span class="function">onNothingSelected</span>(parent: AdapterView&lt;*&gt;?) {
-                <span class="keyword">val</span> paisSeleccionado = spinnerPais.selectedItem.toString()
-                tvUbicacion.text = <span class="string">"Ubicación: $paisSeleccionado"</span>
+
+            override fun onNothingSelected(parent: AdapterView&lt;*&gt;?) {
+                val paisSeleccionado = spinnerPais.selectedItem.toString()
+                tvUbicacion.text = "Ubicación: $paisSeleccionado"
             }
         }
     }
 }</code></pre>
-        </div>
+    <p class="caption">Resultado al elegir Colombia y Medellín:</p>
+    <div class="result">Ubicación: Medellín, 🇨🇴 Colombia</div>
+    <div class="box"><strong>Cascada de eventos:</strong> cambiar país → se crea un nuevo adapter de ciudades → el Spinner de ciudades dispara <code>onItemSelected()</code> → se actualiza el TextView.</div>
+    <div class="note"><strong>Primer evento:</strong> al abrir la actividad, <code>onItemSelected()</code> se ejecuta automáticamente en ambos Spinners con la posición 0. Es el comportamiento normal de Android.</div>
 
-        <div class="tips">
-          <strong>💡 Puntos clave del código:</strong>
-          <ul style="margin-top: 10px;">
-            <li><strong>lateinit var:</strong> Variables que se inicializan después en onCreate()</li>
-            <li><strong>when (position):</strong> Estructura similar a switch para cargar ciudades según país</li>
-            <li><strong>this@MainActivity:</strong> Referencia al contexto de la Activity dentro del listener</li>
-            <li><strong>selectedItem:</strong> Obtiene el item actualmente seleccionado en el Spinner</li>
-            <li><strong>Cascada de eventos:</strong> Cambiar país → Actualiza ciudades → Actualiza TextView</li>
-          </ul>
-        </div>
+    <!-- ============ PREFERENCIAS ============ -->
+    <h2 id="preferencias">8. Recordar la selección con SharedPreferences</h2>
+    <p>Se amplía el ejemplo anterior para <strong>guardar</strong> el país y la ciudad elegidos. Al cerrar y volver a abrir la app, los Spinners muestran la última selección. El layout y los arreglos de la Parte 7 se mantienen.</p>
+    <pre data-lang="kotlin" data-file="SpinnerActivity.kt"><code>package com.example.spinnerlistrecycler
 
-        <div class="note">
-          <strong>⚠️ Nota importante sobre el primer evento:</strong>
-          <p style="margin-top: 10px;">
-            Cuando se carga la Activity, <code>onItemSelected()</code> se ejecuta automáticamente en ambos Spinners con la posición 0. Esto puede causar que el TextView se actualice dos veces al
-            inicio. Es un comportamiento normal de Android.
-          </p>
-        </div>
+import android.os.Bundle
+import android.view.View
+import android.widget.AdapterView
+import android.widget.ArrayAdapter
+import android.widget.Spinner
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
 
-        <h3 style="margin-top: 40px;">💻 Ejemplo 2: Países y Ciudades con SharedPreferences</h3>
+class SpinnerActivity : AppCompatActivity() {
 
-        <div class="theory">
-          <h3>📚 Persistencia de datos</h3>
-          <p>
-            Extendemos el ejemplo anterior agregando SharedPreferences para <strong>guardar y recordar</strong> la ubicación seleccionada (país y ciudad) del usuario. Al cerrar y volver a abrir la
-            app, los Spinners mostrarán la última selección guardada.
-          </p>
-        </div>
+    private lateinit var spinnerPais: Spinner
+    private lateinit var spinnerCiudad: Spinner
+    private lateinit var tvUbicacion: TextView
+    private var isFirstLoad = true  // Evita sobrescribir la ciudad en la carga inicial
 
-        <div class="code-section">
-          <h4>📱 MainActivity.kt (Con SharedPreferences)</h4>
-          <pre><code class="kotlin"><span class="keyword">package</span> com.example.ucv_b
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_spinner)
 
-<span class="keyword">import</span> android.os.Bundle
-<span class="keyword">import</span> android.view.View
-<span class="keyword">import</span> android.widget.AdapterView
-<span class="keyword">import</span> android.widget.ArrayAdapter
-<span class="keyword">import</span> android.widget.Spinner
-<span class="keyword">import</span> android.widget.TextView
-<span class="keyword">import</span> androidx.appcompat.app.AppCompatActivity
-
-<span class="keyword">class</span> <span class="function">MainActivity</span> : AppCompatActivity() {
-    
-    <span class="keyword">private lateinit var</span> spinnerPais: Spinner
-    <span class="keyword">private lateinit var</span> spinnerCiudad: Spinner
-    <span class="keyword">private lateinit var</span> tvUbicacion: TextView
-    <span class="keyword">private var</span> isFirstLoad = <span class="keyword">true</span>  <span class="comment">// Evitar guardar en la carga inicial</span>
-    
-    <span class="keyword">override fun</span> <span class="function">onCreate</span>(savedInstanceState: Bundle?) {
-        <span class="keyword">super</span>.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-        
-        <span class="comment">// 1. Referenciar las vistas</span>
+        // 1. Referenciar las vistas
         spinnerPais = findViewById(R.id.spinnerPais)
         spinnerCiudad = findViewById(R.id.spinnerCiudad)
         tvUbicacion = findViewById(R.id.tvUbicacion)
-        
-        <span class="comment">// 2. ⭐ Obtener SharedPreferences</span>
-        <span class="keyword">val</span> prefs = getSharedPreferences(<span class="string">"UbicacionPrefs"</span>, MODE_PRIVATE)
-        
-        <span class="comment">// 3. Configurar Spinner de Países</span>
-        <span class="keyword">val</span> paises = resources.getStringArray(R.array.paises)
-        <span class="keyword">val</span> paisAdapter = ArrayAdapter(
-            <span class="keyword">this</span>,
+
+        // 2. Abrir el archivo de preferencias
+        val prefs = getSharedPreferences("UbicacionPrefs", MODE_PRIVATE)
+
+        // 3. Configurar el Spinner de países
+        val paises = resources.getStringArray(R.array.paises)
+        val paisAdapter = ArrayAdapter(
+            this,
             android.R.layout.simple_spinner_item,
             paises
         )
         paisAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
         spinnerPais.adapter = paisAdapter
-        
-        <span class="comment">// 4. ⭐ Cargar país guardado</span>
-        <span class="keyword">val</span> paisGuardado = prefs.getInt(<span class="string">"pais_seleccionado"</span>, 0)
+
+        // 4. Restaurar el país guardado
+        val paisGuardado = prefs.getInt("pais_seleccionado", 0)
         spinnerPais.setSelection(paisGuardado)
-        
-        <span class="comment">// 5. Listener del Spinner de Países</span>
-        spinnerPais.onItemSelectedListener = <span class="keyword">object</span> : AdapterView.OnItemSelectedListener {
-            <span class="keyword">override fun</span> <span class="function">onItemSelected</span>(
+
+        // 5. Listener del Spinner de países
+        spinnerPais.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
                 parent: AdapterView&lt;*&gt;?,
                 view: View?,
                 position: Int,
                 id: Long
             ) {
-                <span class="comment">// Cargar ciudades según el país</span>
-                <span class="keyword">val</span> ciudades = <span class="keyword">when</span> (position) {
-                    0 -> resources.getStringArray(R.array.ciudades_peru)
-                    1 -> resources.getStringArray(R.array.ciudades_colombia)
-                    <span class="keyword">else</span> -> emptyArray()
+                val ciudades = when (position) {
+                    0 -&gt; resources.getStringArray(R.array.ciudades_peru)
+                    1 -&gt; resources.getStringArray(R.array.ciudades_colombia)
+                    else -&gt; emptyArray()
                 }
-                
-                <span class="comment">// Actualizar Spinner de Ciudades</span>
-                <span class="keyword">val</span> ciudadAdapter = ArrayAdapter(
-                    <span class="keyword">this@MainActivity</span>,
+
+                val ciudadAdapter = ArrayAdapter(
+                    this@SpinnerActivity,
                     android.R.layout.simple_spinner_item,
                     ciudades
                 )
                 ciudadAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
                 spinnerCiudad.adapter = ciudadAdapter
-                
-                <span class="comment">// ⭐ Cargar ciudad guardada (solo en primera carga)</span>
-                <span class="keyword">if</span> (isFirstLoad) {
-                    <span class="keyword">val</span> ciudadGuardada = prefs.getInt(<span class="string">"ciudad_seleccionada"</span>, 0)
+
+                // Restaurar la ciudad guardada solo en la primera carga
+                if (isFirstLoad) {
+                    val ciudadGuardada = prefs.getInt("ciudad_seleccionada", 0)
                     spinnerCiudad.setSelection(ciudadGuardada)
-                    isFirstLoad = <span class="keyword">false</span>
+                    isFirstLoad = false
                 }
-                
-                <span class="comment">// ⭐ Guardar país seleccionado</span>
-                prefs.edit().putInt(<span class="string">"pais_seleccionado"</span>, position).apply()
+
+                // Guardar el país seleccionado
+                prefs.edit().putInt("pais_seleccionado", position).apply()
             }
-            
-            <span class="keyword">override fun</span> <span class="function">onNothingSelected</span>(parent: AdapterView&lt;*&gt;?) {
-                tvUbicacion.text = <span class="string">"Ubicación: -"</span>
+
+            override fun onNothingSelected(parent: AdapterView&lt;*&gt;?) {
+                tvUbicacion.text = "Ubicación: -"
             }
         }
-        
-        <span class="comment">// 6. Listener del Spinner de Ciudades</span>
-        spinnerCiudad.onItemSelectedListener = <span class="keyword">object</span> : AdapterView.OnItemSelectedListener {
-            <span class="keyword">override fun</span> <span class="function">onItemSelected</span>(
+
+        // 6. Listener del Spinner de ciudades
+        spinnerCiudad.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
+            override fun onItemSelected(
                 parent: AdapterView&lt;*&gt;?,
                 view: View?,
                 position: Int,
                 id: Long
             ) {
-                <span class="keyword">val</span> paisSeleccionado = spinnerPais.selectedItem.toString()
-                <span class="keyword">val</span> ciudadSeleccionada = parent?.getItemAtPosition(position).toString()
-                
-                tvUbicacion.text = <span class="string">"Ubicación: $ciudadSeleccionada, $paisSeleccionado"</span>
-                
-                <span class="comment">// ⭐ Guardar ciudad seleccionada</span>
-                prefs.edit().putInt(<span class="string">"ciudad_seleccionada"</span>, position).apply()
+                val paisSeleccionado = spinnerPais.selectedItem.toString()
+                val ciudadSeleccionada = parent?.getItemAtPosition(position).toString()
+
+                tvUbicacion.text = "Ubicación: $ciudadSeleccionada, $paisSeleccionado"
+
+                // Guardar la ciudad seleccionada
+                prefs.edit().putInt("ciudad_seleccionada", position).apply()
             }
-            
-            <span class="keyword">override fun</span> <span class="function">onNothingSelected</span>(parent: AdapterView&lt;*&gt;?) {
-                <span class="keyword">val</span> paisSeleccionado = spinnerPais.selectedItem.toString()
-                tvUbicacion.text = <span class="string">"Ubicación: $paisSeleccionado"</span>
+
+            override fun onNothingSelected(parent: AdapterView&lt;*&gt;?) {
+                val paisSeleccionado = spinnerPais.selectedItem.toString()
+                tvUbicacion.text = "Ubicación: $paisSeleccionado"
             }
         }
     }
 }</code></pre>
-        </div>
+    <table>
+      <tr>
+        <th>Instrucción</th>
+        <th>Función</th>
+      </tr>
+      <tr>
+        <td><code>getSharedPreferences("UbicacionPrefs", MODE_PRIVATE)</code></td>
+        <td>Crea o abre un archivo de preferencias privado de la app.</td>
+      </tr>
+      <tr>
+        <td><code>prefs.getInt("clave", 0)</code></td>
+        <td>Lee un valor guardado; devuelve 0 si no existe.</td>
+      </tr>
+      <tr>
+        <td><code>prefs.edit().putInt("clave", valor).apply()</code></td>
+        <td>Guarda un valor de forma asíncrona.</td>
+      </tr>
+      <tr>
+        <td><code>setSelection(posicion)</code></td>
+        <td>Selecciona un ítem del Spinner desde el código.</td>
+      </tr>
+      <tr>
+        <td><code>isFirstLoad</code></td>
+        <td>Bandera que restaura la ciudad solo al abrir la actividad.</td>
+      </tr>
+    </table>
+    <div class="ok"><strong>Prueba:</strong> elige un país y una ciudad, cierra la app por completo y vuelve a abrirla. Los Spinners deben mostrar tu última selección.</div>
 
-        <div class="tips">
-          <strong>💡 Explicación del código de SharedPreferences:</strong>
-          <ul style="margin-top: 10px;">
-            <li><strong>getSharedPreferences("UbicacionPrefs", MODE_PRIVATE):</strong> Crea/abre archivo de preferencias privado</li>
-            <li><strong>prefs.getInt("clave", valorPorDefecto):</strong> Lee un valor guardado (0 si no existe)</li>
-            <li><strong>prefs.edit().putInt("clave", valor).apply():</strong> Guarda un valor de forma asíncrona</li>
-            <li><strong>isFirstLoad:</strong> Flag para evitar sobrescribir la ciudad al cargar el país guardado</li>
-            <li><strong>setSelection(position):</strong> Establece el item seleccionado programáticamente</li>
-          </ul>
-        </div>
+    <!-- ============ DINÁMICO ============ -->
+    <h2 id="dinamico">9. Generar el arreglo dinámicamente</h2>
+    <p>Algunas listas no necesitan escribirse a mano. Por ejemplo, un Spinner con los años desde 1950 hasta el año actual.</p>
+    <h3>9.1 Layout</h3>
+    <pre data-lang="xml" data-file="res/layout/activity_spinner.xml"><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"&gt;
 
-        <div class="note">
-          <strong>🎯 Flujo completo:</strong>
-          <ol style="margin-top: 10px;">
-            <li>App se abre → Lee país y ciudad guardados</li>
-            <li>Usuario selecciona país → Se guarda automáticamente</li>
-            <li>Usuario selecciona ciudad → Se guarda automáticamente</li>
-            <li>Usuario cierra la app</li>
-            <li>Usuario vuelve a abrir → Ve su última selección ✅</li>
-          </ol>
-        </div>
+    &lt;TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Año de nacimiento:"
+        android:textSize="16sp"
+        android:layout_marginBottom="8dp" /&gt;
 
-        <h3 style="margin-top: 40px;">💻 Ejemplo 3: Generar Array Dinámicamente (Años)</h3>
+    &lt;Spinner
+        android:id="@+id/spinnerAnio"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="12dp" /&gt;
 
-        <div class="code-section">
-          <h4>📱 Spinner con años 1950-2024</h4>
-          <pre><code class="kotlin"><span class="keyword">val</span> spinnerAnio = findViewById&lt;Spinner&gt;(R.id.spinnerAnio)
+&lt;/LinearLayout&gt;</code></pre>
+    <h3>9.2 Actividad</h3>
+    <pre data-lang="kotlin" data-file="SpinnerActivity.kt"><code>package com.example.spinnerlistrecycler
 
-<span class="comment">// ⭐ Generar array de años dinámicamente</span>
-<span class="keyword">val</span> anios = (1950..2024).map { it.toString() }.toTypedArray()
+import android.os.Bundle
+import android.widget.ArrayAdapter
+import android.widget.Spinner
+import androidx.appcompat.app.AppCompatActivity
+import java.util.Calendar
 
-<span class="keyword">val</span> adapter = ArrayAdapter(
-    <span class="keyword">this</span>,
-    android.R.layout.simple_spinner_item,
-    anios
-)
-adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
-spinnerAnio.adapter = adapter
+class SpinnerActivity : AppCompatActivity() {
 
-<span class="comment">// Seleccionar 2000 por defecto</span>
-<span class="keyword">val</span> posicion2000 = anios.indexOf(<span class="string">"2000"</span>)
-spinnerAnio.setSelection(posicion2000)</code></pre>
-        </div>
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_spinner)
 
-        <div class="exercise">
-          <h4>✏️ Proyecto Final</h4>
-          <p><strong>"Formulario de Registro Completo"</strong></p>
-          <ul>
-            <li>Spinner: País</li>
-            <li>Spinner: Ciudad (dependiente del país)</li>
-            <li>Spinner: Género</li>
-            <li>Spinner: Mes de nacimiento</li>
-            <li>Spinner: Año de nacimiento (generar dinámicamente 1950-2024)</li>
-            <li>Botón "Registrar": Mostrar todos los datos en un AlertDialog</li>
-            <li>Guardar preferencias con SharedPreferences</li>
-          </ul>
-        </div>
-      </div>
+        val spinnerAnio = findViewById&lt;Spinner&gt;(R.id.spinnerAnio)
 
-      <!-- RESUMEN -->
-      <div class="summary">
-        <h2>📚 Resumen Completo</h2>
-        <ul class="checklist">
-          <li><strong>Spinner:</strong> Componente dropdown para selección única</li>
-          <li><strong>Layouts:</strong> simple_spinner_item y simple_spinner_dropdown_item</li>
-          <li><strong>Datos:</strong> Hardcoded o desde arrays.xml</li>
-          <li><strong>Evento:</strong> OnItemSelectedListener con onItemSelected()</li>
-          <li><strong>Integración:</strong> Filtrar ListView según Spinner</li>
-          <li><strong>Avanzado:</strong> Spinners dependientes y SharedPreferences</li>
-        </ul>
+        // Generar los años desde 1950 hasta el año actual
+        val anioActual = Calendar.getInstance().get(Calendar.YEAR)
+        val anios = (1950..anioActual).map { it.toString() }.toTypedArray()
 
-        <div style="background: white; padding: 20px; border-radius: 10px; margin-top: 30px;">
-          <h3 style="color: #ff6a88;">Diferencias Clave: Spinner vs ListView</h3>
-          <table class="comparison-table">
-            <tr>
-              <th>Aspecto</th>
-              <th>Spinner</th>
-              <th>ListView</th>
-            </tr>
-            <tr>
-              <td>Items visibles</td>
-              <td>1 (cerrado)</td>
-              <td>Múltiples</td>
-            </tr>
-            <tr>
-              <td>Espacio UI</td>
-              <td>Mínimo</td>
-              <td>Grande</td>
-            </tr>
-            <tr>
-              <td>Selección</td>
-              <td>Única</td>
-              <td>Única/Múltiple</td>
-            </tr>
-            <tr>
-              <td>Uso principal</td>
-              <td>Formularios</td>
-              <td>Ver listas completas</td>
-            </tr>
-            <tr>
-              <td>Listener</td>
-              <td>OnItemSelectedListener</td>
-              <td>OnItemClickListener</td>
-            </tr>
-          </table>
-        </div>
-      </div>
+        val adapter = ArrayAdapter(
+            this,
+            android.R.layout.simple_spinner_item,
+            anios
+        )
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
+        spinnerAnio.adapter = adapter
 
-      <!-- RECURSOS -->
-      <div class="resources">
-        <h2>📦 Recursos Adicionales</h2>
-
-        <div style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 10px; margin-top: 30px;">
-          <h3>🔗 Enlaces Útiles:</h3>
-          <ul>
-            <li><a href="https://developer.android.com/reference/android/widget/Spinner" style="color: white; text-decoration: underline;">Documentación Oficial - Spinner</a></li>
-            <li><a href="https://developer.android.com/guide/topics/ui/controls/spinner" style="color: white; text-decoration: underline;">Android Developers Guide - Spinner</a></li>
-            <li><a href="https://kotlinlang.org/docs/home.html" style="color: white; text-decoration: underline;">Kotlin Documentation</a></li>
-          </ul>
-        </div>
-
-        <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 2px solid rgba(255,255,255,0.3);">
-          <p style="font-size: 1.2em; margin-bottom: 10px;">¡Manual Completado! 🎉</p>
-          <p style="opacity: 0.7; margin-top: 20px;">Desarrollado con ❤️ para estudiantes</p>
-        </div>
-      </div>
+        // Seleccionar 2000 por defecto
+        val posicion2000 = anios.indexOf("2000")
+        spinnerAnio.setSelection(posicion2000)
+    }
+}</code></pre>
+    <div class="ok"><strong>Proyecto final — Formulario de registro completo:</strong>
+      <ul>
+        <li>Spinner de país y Spinner de ciudad dependiente del país.</li>
+        <li>Spinner de género y Spinner de mes de nacimiento.</li>
+        <li>Spinner de año generado dinámicamente (1950 – año actual).</li>
+        <li>Botón «Registrar» que muestre todos los datos en un AlertDialog.</li>
+        <li>Guardar las selecciones con SharedPreferences.</li>
+      </ul>
     </div>
-  </body>
+
+    <!-- ============ RESUMEN ============ -->
+    <h2 id="resumen">10. Resumen</h2>
+    <table>
+      <tr>
+        <th>Concepto</th>
+        <th>Kotlin / Android</th>
+        <th>Finalidad</th>
+      </tr>
+      <tr>
+        <td>Componente</td>
+        <td><code>Spinner</code></td>
+        <td>Lista desplegable de selección única.</td>
+      </tr>
+      <tr>
+        <td>Adapter</td>
+        <td><code>ArrayAdapter</code></td>
+        <td>Conectar un arreglo con el Spinner.</td>
+      </tr>
+      <tr>
+        <td>Layouts</td>
+        <td><code>simple_spinner_item</code> / <code>simple_spinner_dropdown_item</code></td>
+        <td>Vista cerrada y vista desplegada.</td>
+      </tr>
+      <tr>
+        <td>Datos</td>
+        <td><code>arrayOf()</code> o <code>getStringArray()</code></td>
+        <td>Datos en el código o en <code>arrays.xml</code>.</td>
+      </tr>
+      <tr>
+        <td>Evento</td>
+        <td><code>OnItemSelectedListener</code></td>
+        <td>Reaccionar a la selección del usuario.</td>
+      </tr>
+      <tr>
+        <td>Integración</td>
+        <td>Spinner + <code>ListView</code></td>
+        <td>Filtrar una lista por categoría.</td>
+      </tr>
+      <tr>
+        <td>Avanzado</td>
+        <td>Spinners dependientes + <code>SharedPreferences</code></td>
+        <td>Formularios encadenados que recuerdan la selección.</td>
+      </tr>
+    </table>
+    <table>
+      <tr>
+        <th>Aspecto</th>
+        <th>Spinner</th>
+        <th>ListView</th>
+      </tr>
+      <tr>
+        <td>Ítems visibles</td>
+        <td>1 (cerrado)</td>
+        <td>Varios</td>
+      </tr>
+      <tr>
+        <td>Selección</td>
+        <td>Única</td>
+        <td>Única o múltiple</td>
+      </tr>
+      <tr>
+        <td>Uso principal</td>
+        <td>Formularios</td>
+        <td>Mostrar listas completas</td>
+      </tr>
+      <tr>
+        <td>Listener</td>
+        <td><code>OnItemSelectedListener</code></td>
+        <td><code>OnItemClickListener</code></td>
+      </tr>
+    </table>
+    <div class="box"><strong>Secuencia:</strong> Spinner en el layout → arreglo de datos → <code>ArrayAdapter</code> → <code>setDropDownViewResource()</code> → <code>spinner.adapter</code> → <code>OnItemSelectedListener</code>.</div>
+
+    <div class="footer">Aplicativos Móviles — Android / Kotlin · Documentación: <a href="https://developer.android.com/develop/ui/views/components/spinner" target="_blank" rel="noopener">Spinners (Android Developers)</a></div>
+  </main>
+  <div id="copyToast" role="status" aria-live="polite"></div>
+
+  <script>
+    (function () {
+      // Interruptor interno: true muestra el botón «Copiar» en cada bloque de código.
+      var CONFIG = { allowCodeCopy: true };
+
+      function escapeHtml(text) {
+        return text.replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; });
+      }
+
+      function highlight(source, pattern, classify) {
+        var result = '', last = 0, match;
+        while ((match = pattern.exec(source)) !== null) {
+          var kind = classify(match[0]);
+          result += escapeHtml(source.slice(last, match.index));
+          result += kind ? '<span class="' + kind + '">' + escapeHtml(match[0]) + '</span>' : escapeHtml(match[0]);
+          last = pattern.lastIndex;
+        }
+        return result + escapeHtml(source.slice(last));
+      }
+
+      var KT_KEYWORDS = /^(package|import|class|object|override|fun|val|var|private|lateinit|when|else|if|return|as|super|this)$/;
+      var KT_TYPES = /^(Bundle|View|AdapterView|ArrayAdapter|Spinner|TextView|ListView|Toast|AppCompatActivity|SpinnerActivity|String|Int|Long|Calendar)$/;
+
+      function highlightKotlin(source) {
+        var pattern = /\/\/[^\n]*|"(?:\\.|[^"\\])*"|this@\w+|@\w+|\b(?:package|import|class|object|override|fun|val|var|private|lateinit|when|else|if|return|as|super|this)\b|\b(?:Bundle|View|AdapterView|ArrayAdapter|Spinner|TextView|ListView|Toast|AppCompatActivity|SpinnerActivity|String|Int|Long|Calendar)\b|\b(?:true|false|null)\b|\b\d+\b/g;
+        return highlight(source, pattern, function (t) {
+          if (t.indexOf('//') === 0) return 'kt-comment';
+          if (t.charAt(0) === '"') return 'kt-string';
+          if (t.indexOf('this@') === 0) return 'kt-keyword';
+          if (t.charAt(0) === '@') return 'kt-annotation';
+          if (KT_KEYWORDS.test(t)) return 'kt-keyword';
+          if (KT_TYPES.test(t)) return 'kt-type';
+          if (/^(true|false|null)$/.test(t)) return 'kt-literal';
+          return 'kt-number';
+        });
+      }
+
+      function highlightXml(source) {
+        var pattern = /<!--[\s\S]*?-->|"[^"]*"|<\?\w+|\?>|<\/?[\w.:-]+|\/?>|[\w:.-]+(?==)/g;
+        return highlight(source, pattern, function (t) {
+          if (t.indexOf('<!--') === 0) return 'xml-comment';
+          if (t.charAt(0) === '"') return 'xml-string';
+          if (t.charAt(0) === '<' || t.charAt(t.length - 1) === '>') return 'xml-tag';
+          return 'xml-attr';
+        });
+      }
+
+      var toast = document.getElementById('copyToast'), toastTimer;
+      function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () { toast.classList.remove('show'); }, 2200);
+      }
+
+      function copyText(text) {
+        if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+        return new Promise(function (resolve, reject) {
+          var area = document.createElement('textarea');
+          area.value = text;
+          area.setAttribute('readonly', '');
+          area.style.position = 'fixed';
+          area.style.opacity = '0';
+          document.body.appendChild(area);
+          area.select();
+          try { document.execCommand('copy') ? resolve() : reject(); } catch (e) { reject(e); }
+          document.body.removeChild(area);
+        });
+      }
+
+      // Envolver cada <pre> en un bloque con cabecera: nombre de archivo + botón Copiar.
+      document.querySelectorAll('pre[data-lang]').forEach(function (pre) {
+        var code = pre.querySelector('code');
+        var raw = code.textContent;
+        var lang = pre.getAttribute('data-lang');
+        code.innerHTML = lang === 'xml' ? highlightXml(raw) : highlightKotlin(raw);
+
+        var wrap = document.createElement('div');
+        wrap.className = 'codeblock';
+        var head = document.createElement('div');
+        head.className = 'codehead';
+        var file = document.createElement('span');
+        file.className = 'file';
+        file.textContent = pre.getAttribute('data-file') || (lang === 'xml' ? 'XML' : 'Kotlin');
+        head.appendChild(file);
+
+        if (CONFIG.allowCodeCopy) {
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'copy-btn';
+          btn.textContent = 'Copiar';
+          btn.addEventListener('click', function () {
+            copyText(raw).then(function () {
+              btn.textContent = '✓ Copiado';
+              btn.classList.add('done');
+              showToast('Código copiado. Pégalo en Android Studio.');
+              setTimeout(function () { btn.textContent = 'Copiar'; btn.classList.remove('done'); }, 1800);
+            }, function () {
+              showToast('No se pudo copiar. Selecciona el código manualmente.');
+            });
+          });
+          head.appendChild(btn);
+        }
+
+        pre.parentNode.insertBefore(wrap, pre);
+        wrap.appendChild(head);
+        wrap.appendChild(pre);
+      });
+
+      var bar = document.getElementById('progress');
+      var links = document.querySelectorAll('.navlinks a');
+      var sections = Array.prototype.slice.call(document.querySelectorAll('main, h2[id]'));
+
+      function update() {
+        var root = document.documentElement;
+        var total = root.scrollHeight - root.clientHeight;
+        var pos = window.scrollY + 130;
+        var current = sections[0];
+        bar.style.width = (total > 0 ? root.scrollTop / total * 100 : 0) + '%';
+        sections.forEach(function (section) { if (section.offsetTop <= pos) current = section; });
+        links.forEach(function (link) { link.classList.toggle('active', link.getAttribute('href') === '#' + current.id); });
+      }
+
+      document.addEventListener('scroll', update, { passive: true });
+      update();
+    })();
+  </script>
+</body>
 </html>
