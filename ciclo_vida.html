@@ -3,419 +3,1965 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Ciclo de Vida de una Aplicación Android</title>
+  <title>Guía: Ciclo de vida de una Activity</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Source+Code+Pro:wght@500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --bg: #f7f7f2;
+      --soft: #e7eee9;
+      --panel: #fff;
+      --ink: #18252b;
+      --muted: #657278;
+      --line: #dfe5e1;
+      --coral: #ef714c;
+      --coral-dark: #da5e3b;
+      --coral-tint: #fff0e9;
+      --green: #16745a;
+      --green-tint: #e4f0e9;
+      --amber: #d29b35;
+      --amber-tint: #fff8df;
+      --code: #172a31;
+      --code-top: #243c42;
+      --code-ink: #d8e5df;
+      --shadow: 0 24px 60px rgba(24, 37, 43, .12);
+      --sans: 'DM Sans', sans-serif;
+      --display: 'Space Grotesk', sans-serif;
+      --mono: 'Source Code Pro', Consolas, monospace
+    }
+
     * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+      box-sizing: border-box
+    }
+
+    html {
+      scroll-behavior: smooth
     }
 
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      padding: 20px;
-      min-height: 100vh;
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font: 16px/1.6 var(--sans)
     }
 
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      background: white;
+    #progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 300;
+      width: 0;
+      height: 3px;
+      background: var(--coral)
+    }
+
+    nav {
+      position: fixed;
+      inset: 0 auto 0 0;
+      z-index: 100;
+      width: 260px;
+      overflow-y: auto;
+      background: var(--bg);
+      border-right: 1px solid var(--line)
+    }
+
+    .navrow {
+      padding: 42px 26px
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 30px;
+      padding: 18px 16px;
+      color: #fff;
+      background: var(--code);
+      border-radius: 4px 22px 22px 22px;
+      font-weight: 700
+    }
+
+    .dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: var(--coral)
+    }
+
+    .navlinks {
+      display: flex;
+      flex-direction: column;
+      gap: 3px
+    }
+
+    .navlinks:before {
+      content: 'CONTENIDO';
+      margin: 0 12px 10px;
+      color: #9aa6a7;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px
+    }
+
+    .navlinks a {
+      padding: 10px 12px;
+      border-radius: 8px;
+      color: var(--muted);
+      font-size: 14px;
+      text-decoration: none
+    }
+
+    .navlinks a:hover,
+    .navlinks a.active {
+      background: var(--soft);
+      color: var(--green);
+      font-weight: 700
+    }
+
+    main {
+      max-width: 1100px;
+      min-height: 100vh;
+      margin-left: 260px;
+      padding: 80px 6vw 62px
+    }
+
+    .head {
+      max-width: 810px;
+      padding-bottom: 48px;
+      border-bottom: 1px solid var(--line)
+    }
+
+    .pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 18px
+    }
+
+    .pill {
+      padding: 5px 11px;
       border-radius: 20px;
-      padding: 40px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      color: var(--green);
+      background: var(--green-tint);
+      font-size: 12px;
+      font-weight: 700
+    }
+
+    .kicker {
+      margin: 0 0 8px;
+      color: var(--green);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase
+    }
+
+    h1,
+    h2,
+    h3 {
+      font-family: var(--display);
+      letter-spacing: -1.2px
     }
 
     h1 {
-      text-align: center;
-      color: #3ddc84;
-      margin-bottom: 10px;
-      font-size: 2.5em;
-      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+      max-width: 15ch;
+      margin: 0 0 16px;
+      font-size: clamp(42px, 5vw, 70px);
+      line-height: .98
     }
 
-    .subtitle {
-      text-align: center;
-      color: #666;
-      margin-bottom: 40px;
-      font-size: 1.2em;
+    h2 {
+      max-width: 23ch;
+      margin: 62px 0 14px;
+      font-size: clamp(31px, 4vw, 51px);
+      line-height: 1.03;
+      scroll-margin-top: 30px
     }
 
-    .intro {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 25px;
-      border-radius: 15px;
-      margin-bottom: 40px;
-      font-size: 1.1em;
-      line-height: 1.6;
+    h3 {
+      margin: 34px 0 8px;
+      font-size: 22px
     }
 
-    .lifecycle-container {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      margin: 40px 0;
+    .lead {
+      max-width: 62ch;
+      margin: 0;
+      color: var(--muted);
+      font-size: 18px
     }
 
-    .state-box {
-      width: 100%;
-      max-width: 600px;
-      padding: 25px;
-      margin: 15px 0;
-      border-radius: 15px;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-      transition: transform 0.3s, box-shadow 0.3s;
-      cursor: pointer;
-      position: relative;
+    .box,
+    .note,
+    .ok {
+      margin: 22px 0;
+      padding: 16px 18px;
+      border-radius: 4px 14px 14px 4px
     }
 
-    .state-box:hover {
-      transform: translateY(-5px) scale(1.02);
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
-    }
-
-    .state-box h3 {
-      margin-bottom: 15px;
-      font-size: 1.8em;
-      display: flex;
-      align-items: center;
-    }
-
-    .state-box p {
-      line-height: 1.6;
-      font-size: 1.1em;
-    }
-
-    .icon {
-      font-size: 1.5em;
-      margin-right: 15px;
-    }
-
-    .arrow {
-      font-size: 3em;
-      color: #3ddc84;
-      text-align: center;
-      margin: 10px 0;
-      animation: bounce 2s infinite;
-    }
-
-    @keyframes bounce {
-
-      0%,
-      100% {
-        transform: translateY(0);
-      }
-
-      50% {
-        transform: translateY(-10px);
-      }
-    }
-
-    /* Colores específicos para cada estado */
-    .create {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-    }
-
-    .start {
-      background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
-      color: white;
-    }
-
-    .restart {
-      background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-      color: white;
-    }
-
-    .resume {
-      background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-      color: white;
-    }
-
-    .pause {
-      background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-      color: white;
-    }
-
-    .stop {
-      background: linear-gradient(135deg, #ff9a56 0%, #ff6a88 100%);
-      color: white;
-    }
-
-    .destroy {
-      background: linear-gradient(135deg, #ff6b6b 0%, #c92a2a 100%);
-      color: white;
-    }
-
-    .code-example {
-      background: #2d2d2d;
-      color: #f8f8f2;
-      padding: 20px;
-      border-radius: 10px;
-      margin: 20px 0;
-      overflow-x: auto;
-      font-family: 'Courier New', monospace;
-      font-size: 0.95em;
-      line-height: 1.6;
-      white-space: pre-wrap;
-      word-break: normal;
-      tab-size: 2;
-    }
-
-    .code-example .keyword {
-      color: #ff79c6;
-    }
-
-    .code-example .function {
-      color: #50fa7b;
-    }
-
-    .code-example .comment {
-      color: #6272a4;
-      font-style: italic;
-    }
-
-    .flow-diagram {
-      background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
-      padding: 30px;
-      border-radius: 15px;
-      margin: 40px 0;
-    }
-
-    .flow-diagram h2 {
-      color: #c92a2a;
-      margin-bottom: 20px;
-      text-align: center;
+    .box {
+      background: var(--green-tint);
+      border: 1px solid #bddbcf;
+      border-left: 5px solid var(--green)
     }
 
     .note {
-      background: #fff3bf;
-      border-left: 5px solid #ffd43b;
+      background: var(--amber-tint);
+      border: 1px solid #ecd69d;
+      border-left: 5px solid var(--amber)
+    }
+
+    .ok {
+      background: var(--coral-tint);
+      border: 1px solid #f1c7b9;
+      border-left: 5px solid var(--coral)
+    }
+
+    .box ul,
+    .note ul,
+    .ok ul,
+    .box ol,
+    .note ol,
+    .ok ol {
+      margin: 8px 0 0;
+      padding-left: 20px
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin: 24px 0
+    }
+
+    .cards.two {
+      grid-template-columns: repeat(2, 1fr)
+    }
+
+    .card {
       padding: 20px;
-      margin: 20px 0;
-      border-radius: 5px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-top: 3px solid var(--coral);
+      border-radius: 4px 18px 18px 18px
     }
 
-    .note strong {
-      color: #e67700;
+    .card.green {
+      border-top-color: var(--green)
     }
 
-    .legend {
-      background: #f8f9fa;
-      padding: 25px;
-      border-radius: 15px;
-      margin: 30px 0;
+    .card.amber {
+      border-top-color: var(--amber)
     }
 
-    .legend h3 {
-      color: #495057;
-      margin-bottom: 15px;
+    .card.ink {
+      border-top-color: var(--ink)
     }
 
-    .legend-item {
+    .card h3 {
+      margin: 0 0 7px;
+      font-size: 20px
+    }
+
+    .card p,
+    .card ul {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px
+    }
+
+    .card p + p {
+      margin-top: 6px
+    }
+
+    .card ul {
+      padding-left: 18px
+    }
+
+    .card .tag {
+      display: inline-block;
+      margin-bottom: 6px;
+      padding: 2px 8px;
+      color: #fff;
+      background: var(--code);
+      border-radius: 999px;
+      font: 600 11px var(--mono)
+    }
+
+    table {
+      width: 100%;
+      margin: 22px 0;
+      border-collapse: collapse;
+      border: 1px solid var(--line);
+      box-shadow: 0 8px 24px -18px rgba(24, 37, 43, .3)
+    }
+
+    th,
+    td {
+      padding: 12px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top
+    }
+
+    th {
+      background: var(--coral);
+      color: #fff;
+      font-size: 13px
+    }
+
+    tr:nth-child(even) td {
+      background: var(--soft)
+    }
+
+    code {
+      padding: .08em .28em;
+      border-radius: 4px;
+      color: var(--coral-dark);
+      background: var(--coral-tint);
+      font: .9em var(--mono)
+    }
+
+    /* Bloque de código con cabecera (archivo + botón copiar) */
+    .codeblock {
+      margin: 18px 0;
+      overflow: hidden;
+      background: var(--code);
+      border-radius: 4px 20px 20px 20px;
+      box-shadow: var(--shadow)
+    }
+
+    .codehead {
       display: flex;
       align-items: center;
-      margin: 10px 0;
-      font-size: 1.05em;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px 12px 8px 20px;
+      background: var(--code-top)
     }
 
-    .legend-color {
-      width: 30px;
-      height: 30px;
-      border-radius: 5px;
-      margin-right: 15px;
+    .codehead .file {
+      overflow: hidden;
+      color: #9fb5ad;
+      font: 600 12px var(--mono);
+      text-overflow: ellipsis;
+      white-space: nowrap
     }
 
-    @media (max-width: 768px) {
-      .container {
-        padding: 20px;
+    .copy-btn {
+      flex-shrink: 0;
+      padding: 4px 12px;
+      color: var(--code-ink);
+      background: transparent;
+      border: 1px solid #3b5a60;
+      border-radius: 999px;
+      font: 600 12px var(--sans);
+      cursor: pointer;
+      transition: .18s
+    }
+
+    .copy-btn:hover {
+      color: #fff;
+      background: var(--coral);
+      border-color: var(--coral)
+    }
+
+    .copy-btn.done {
+      color: #fff;
+      background: var(--green);
+      border-color: var(--green)
+    }
+
+    pre {
+      margin: 0;
+      padding: 20px 24px;
+      overflow: auto;
+      color: var(--code-ink);
+      font: 13px/1.6 var(--mono)
+    }
+
+    pre code {
+      padding: 0;
+      color: inherit;
+      background: transparent;
+      font-size: inherit
+    }
+
+    .tree {
+      margin: 18px 0;
+      padding: 20px 24px;
+      color: var(--green);
+      background: var(--green-tint);
+      border: 1px solid var(--line);
+      border-radius: 4px 14px 14px 14px;
+      font: 600 13px/1.6 var(--mono);
+      white-space: pre;
+      overflow: auto
+    }
+
+    .flow {
+      margin: 22px 0;
+      padding: 20px;
+      color: var(--green);
+      background: var(--green-tint);
+      border: 1px solid var(--line);
+      border-radius: 4px 14px 14px 14px;
+      font: 600 15px var(--mono);
+      text-align: center
+    }
+
+    .caption {
+      margin: 20px 0 8px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700
+    }
+
+    .result {
+      padding: 16px 18px;
+      border: 1px solid var(--line);
+      border-radius: 4px 14px 14px 14px;
+      background: var(--panel);
+      font-family: var(--mono)
+    }
+
+    /* Diagrama del ciclo de vida */
+    .diagram {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      gap: 24px;
+      align-items: start;
+      margin: 24px 0
+    }
+
+    .lc {
+      display: flex;
+      flex-direction: column;
+      align-items: stretch;
+      gap: 0
+    }
+
+    .lc-step {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 12px 16px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-left: 5px solid var(--muted);
+      border-radius: 4px 12px 12px 4px;
+      font: 600 14px var(--mono)
+    }
+
+    .lc-step small {
+      color: var(--muted);
+      font: 500 12px var(--sans)
+    }
+
+    .lc-step.s-create {
+      border-left-color: #5b6ee1
+    }
+
+    .lc-step.s-start {
+      border-left-color: var(--amber)
+    }
+
+    .lc-step.s-resume {
+      border-left-color: var(--green)
+    }
+
+    .lc-step.s-pause {
+      border-left-color: #e0a526
+    }
+
+    .lc-step.s-stop {
+      border-left-color: var(--coral)
+    }
+
+    .lc-step.s-destroy {
+      border-left-color: #b8322a
+    }
+
+    .lc-step.running {
+      justify-content: center;
+      color: #fff;
+      background: var(--green);
+      border-color: var(--green);
+      border-radius: 999px;
+      font-family: var(--sans)
+    }
+
+    .lc-arrow {
+      padding: 2px 0;
+      color: var(--muted);
+      text-align: center;
+      font-size: 14px
+    }
+
+    figure {
+      margin: 0;
+      padding: 14px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 4px 18px 18px 18px
+    }
+
+    figure img {
+      display: block;
+      max-width: 100%;
+      height: auto;
+      margin: 0 auto
+    }
+
+    figcaption {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center
+    }
+
+    /* Maqueta de teléfono */
+    .mock-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      margin: 24px 0
+    }
+
+    .phone {
+      width: 250px;
+      max-width: 100%;
+      padding: 16px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: 0 12px 24px -16px rgba(24, 37, 43, .4)
+    }
+
+    .phone .title {
+      margin-bottom: 10px;
+      font: 700 16px var(--display)
+    }
+
+    .phone .big {
+      margin: 8px 0;
+      font: 700 38px var(--display);
+      text-align: center
+    }
+
+    .phone .btn {
+      margin-top: 8px;
+      padding: 8px;
+      color: #fff;
+      background: var(--coral);
+      border-radius: 8px;
+      font: 700 13px var(--sans);
+      text-align: center
+    }
+
+    .phone .btn.alt {
+      background: var(--code)
+    }
+
+    .phone .log {
+      margin-top: 10px;
+      padding: 8px 10px;
+      color: var(--muted);
+      background: var(--soft);
+      border-radius: 8px;
+      font: 500 12px/1.5 var(--mono)
+    }
+
+    .mock-cap {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center
+    }
+
+    .footer {
+      margin-top: 62px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 13px
+    }
+
+    .footer a {
+      color: var(--green)
+    }
+
+    /* Resaltado Kotlin */
+    .kt-keyword {
+      color: #ef9470
+    }
+
+    .kt-type {
+      color: #78c5d4
+    }
+
+    .kt-string {
+      color: #f5cd62
+    }
+
+    .kt-comment {
+      color: #8fb6a8;
+      font-style: italic
+    }
+
+    .kt-number,
+    .kt-literal,
+    .kt-annotation {
+      color: #c9a7ed
+    }
+
+    /* Resaltado XML */
+    .xml-tag {
+      color: #ef9470
+    }
+
+    .xml-attr {
+      color: #78c5d4
+    }
+
+    .xml-string {
+      color: #f5cd62
+    }
+
+    .xml-comment {
+      color: #8fb6a8;
+      font-style: italic
+    }
+
+    #copyToast {
+      position: fixed;
+      left: 50%;
+      bottom: 26px;
+      z-index: 400;
+      max-width: 88vw;
+      padding: 11px 18px;
+      border-radius: 999px;
+      color: var(--bg);
+      background: var(--ink);
+      box-shadow: var(--shadow);
+      font-weight: 600;
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(-50%) translateY(12px);
+      transition: .22s
+    }
+
+    #copyToast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0)
+    }
+
+    @media(max-width:860px) {
+      .diagram {
+        grid-template-columns: 1fr
+      }
+    }
+
+    @media(max-width:760px) {
+      nav {
+        position: sticky;
+        inset: 0;
+        width: 100%;
+        border-right: 0;
+        border-bottom: 1px solid var(--line)
       }
 
-      h1 {
-        font-size: 1.8em;
+      .navrow {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        padding: 12px 18px
       }
 
-      .state-box {
-        padding: 20px;
+      .brand {
+        flex-shrink: 0;
+        margin: 0;
+        padding: 10px 12px
       }
 
-      .state-box h3 {
-        font-size: 1.4em;
+      .navlinks {
+        flex-direction: row;
+        overflow-x: auto
+      }
+
+      .navlinks:before {
+        display: none
+      }
+
+      .navlinks a {
+        white-space: nowrap
+      }
+
+      main {
+        margin-left: 0;
+        padding: 52px 16px 40px
+      }
+
+      .cards,
+      .cards.two {
+        grid-template-columns: 1fr
+      }
+
+      th,
+      td {
+        padding: 10px
       }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>🤖 Ciclo de Vida de una Aplicación Android</h1>
-    <p class="subtitle">Guía visual para principiantes</p>
-
-    <div class="intro">
-      <strong>¿Qué es el Ciclo de Vida?</strong><br>
-      El ciclo de vida de una actividad en Android es el conjunto de estados por los que pasa una aplicación desde que se crea hasta que se destruye. Cada estado tiene un método asociado que podemos programar para controlar el comportamiento de nuestra app.
-    </div>
-
-    <div class="legend">
-      <h3>📌 Leyenda de Estados</h3>
-      <div class="legend-item">
-        <div class="legend-color" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
-        <span><strong>Creación:</strong> La actividad nace</span>
-      </div>
-      <div class="legend-item">
-        <div class="legend-color" style="background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);"></div>
-        <span><strong>Activa:</strong> El usuario puede interactuar</span>
-      </div>
-      <div class="legend-item">
-        <div class="legend-color" style="background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);"></div>
-        <span><strong>Pausa:</strong> Parcialmente visible</span>
-      </div>
-      <div class="legend-item">
-        <div class="legend-color" style="background: linear-gradient(135deg, #ff9a56 0%, #ff6a88 100%);"></div>
-        <span><strong>Detenida:</strong> No visible</span>
-      </div>
-      <div class="legend-item">
-        <div class="legend-color" style="background: linear-gradient(135deg, #ff6b6b 0%, #c92a2a 100%);"></div>
-        <span><strong>Destrucción:</strong> La actividad se elimina</span>
+  <div id="progress"></div>
+  <nav aria-label="Navegación de la guía">
+    <div class="navrow">
+      <div class="brand"><span class="dot"></span>CicloVida.kt</div>
+      <div class="navlinks">
+        <a href="#inicio">Inicio</a>
+        <a href="#proyecto">Proyecto</a>
+        <a href="#concepto">¿Qué es?</a>
+        <a href="#metodos">Los 7 métodos</a>
+        <a href="#logcat">Práctica 1: Logcat</a>
+        <a href="#estado">Práctica 2: Rotación</a>
+        <a href="#musica">Práctica 3: Música</a>
+        <a href="#chat">Caso: ChatApp</a>
+        <a href="#practicas">Buenas prácticas</a>
+        <a href="#resumen">Resumen</a>
       </div>
     </div>
+  </nav>
 
-    <div class="flow-diagram">
-      <h2>📊 Flujo del Ciclo de Vida</h2>
+  <main id="inicio">
+    <header class="head">
+      <div class="pills"><span class="pill">Android · Kotlin</span><span class="pill">Ciclo de vida</span><span class="pill">Nivel básico</span></div>
+      <p class="kicker">Guía práctica</p>
+      <h1>Ciclo de vida de una Activity</h1>
+      <p class="lead">Qué ocurre con una pantalla desde que se abre hasta que se cierra, y qué código conviene escribir en cada momento. Tres prácticas en el proyecto <code>com.example.ciclovida</code> y un caso de estudio.</p>
+    </header>
 
-      <div class="lifecycle-container">
-        <!-- onCreate -->
-        <div class="state-box create">
-          <h3><span class="icon">🎬</span>onCreate(Bundle)</h3>
-          <p><strong>¿Cuándo ocurre?</strong> Cuando la actividad se crea por primera vez.</p>
-          <p><strong>¿Qué hacer aquí?</strong> Inicializar variables, configurar la interfaz (setContentView), conectar bases de datos.</p>
-          <p><strong>💡 Ejemplo:</strong> Es como encender tu teléfono por primera vez.</p>
+    <!-- ============ PROYECTO ============ -->
+    <h2 id="proyecto">1. Preparar el proyecto</h2>
+    <ol>
+      <li>En Android Studio: <strong>File → New → New Project → Empty Views Activity</strong>.</li>
+      <li><strong>Name:</strong> <code>CicloVida</code>. <strong>Package name:</strong> <code>com.example.ciclovida</code>. <strong>Language:</strong> Kotlin.</li>
+      <li>Pulsa <strong>Finish</strong>. El asistente crea <code>MainActivity.kt</code> y <code>activity_main.xml</code>.</li>
+    </ol>
+    <div class="tree">app/src/main
+│
+├── java/com/example/ciclovida
+│   ├── MainActivity.kt          ← Prácticas 1 y 2
+│   ├── SegundaActivity.kt       ← Práctica 1 (se crea con el asistente)
+│   └── MusicaActivity.kt        ← Práctica 3 (se crea con el asistente)
+│
+├── res/layout
+│   ├── activity_main.xml
+│   ├── activity_segunda.xml
+│   └── activity_musica.xml
+│
+├── res/raw
+│   └── cancion.mp3              ← Práctica 3
+│
+└── AndroidManifest.xml</div>
+    <div class="note"><strong>Importante:</strong> cuando una práctica indique «reemplazar», copia el bloque completo con el botón <strong>Copiar</strong> y sustituye todo el contenido del archivo.</div>
+
+    <!-- ============ CONCEPTO ============ -->
+    <h2 id="concepto">2. ¿Qué es el ciclo de vida?</h2>
+    <p>Una <strong>Activity</strong> es una pantalla de la app. Mientras el usuario la abre, cambia a otra app, gira el teléfono o la cierra, Android la hace pasar por distintos <strong>estados</strong>. En cada cambio de estado llama a un método (<em>callback</em>) que tú puedes sobrescribir para reaccionar en el momento correcto.</p>
+
+    <div class="diagram">
+      <div class="lc" aria-label="Secuencia de métodos del ciclo de vida">
+        <div class="lc-step s-create">onCreate() <small>se crea</small></div>
+        <div class="lc-arrow">↓</div>
+        <div class="lc-step s-start">onStart() <small>visible</small></div>
+        <div class="lc-arrow">↓</div>
+        <div class="lc-step s-resume">onResume() <small>en primer plano</small></div>
+        <div class="lc-arrow">↓</div>
+        <div class="lc-step running">La actividad se está ejecutando</div>
+        <div class="lc-arrow">↓</div>
+        <div class="lc-step s-pause">onPause() <small>pierde el foco</small></div>
+        <div class="lc-arrow">↓</div>
+        <div class="lc-step s-stop">onStop() <small>ya no es visible</small></div>
+        <div class="lc-arrow">↓</div>
+        <div class="lc-step s-destroy">onDestroy() <small>se elimina</small></div>
+      </div>
+      <figure>
+        <img src="ciclo_vida.jpg" alt="Diagrama oficial del ciclo de vida de una Activity: onCreate, onStart, onResume, onPause, onStop, onRestart y onDestroy, con los caminos de regreso.">
+        <figcaption>Diagrama del ciclo de vida con los caminos de regreso.</figcaption>
+      </figure>
+    </div>
+
+    <h3>2.1 Caminos de regreso</h3>
+    <table>
+      <tr>
+        <th>Desde</th>
+        <th>Qué pasa</th>
+        <th>Métodos que se ejecutan</th>
+      </tr>
+      <tr>
+        <td><code>onPause()</code></td>
+        <td>El usuario vuelve antes de que la pantalla quede oculta (por ejemplo, cierra un diálogo de permisos).</td>
+        <td><code>onResume()</code></td>
+      </tr>
+      <tr>
+        <td><code>onStop()</code></td>
+        <td>El usuario regresa a la actividad que estaba oculta.</td>
+        <td><code>onRestart()</code> → <code>onStart()</code> → <code>onResume()</code></td>
+      </tr>
+      <tr>
+        <td><code>onStop()</code></td>
+        <td>Android necesita memoria y elimina el proceso; luego el usuario vuelve.</td>
+        <td><code>onCreate()</code> → <code>onStart()</code> → <code>onResume()</code></td>
+      </tr>
+    </table>
+
+    <h3>2.2 Estados y visibilidad</h3>
+    <table>
+      <tr>
+        <th>Estado</th>
+        <th>¿Visible?</th>
+        <th>¿Interactúa el usuario?</th>
+        <th>Se llega con</th>
+      </tr>
+      <tr>
+        <td>Creada</td>
+        <td>No</td>
+        <td>No</td>
+        <td><code>onCreate()</code></td>
+      </tr>
+      <tr>
+        <td>Iniciada</td>
+        <td>Sí</td>
+        <td>No</td>
+        <td><code>onStart()</code></td>
+      </tr>
+      <tr>
+        <td>Reanudada (activa)</td>
+        <td>Sí, en primer plano</td>
+        <td>Sí</td>
+        <td><code>onResume()</code></td>
+      </tr>
+      <tr>
+        <td>Pausada</td>
+        <td>Parcialmente</td>
+        <td>No</td>
+        <td><code>onPause()</code></td>
+      </tr>
+      <tr>
+        <td>Detenida</td>
+        <td>No</td>
+        <td>No</td>
+        <td><code>onStop()</code></td>
+      </tr>
+      <tr>
+        <td>Destruida</td>
+        <td>No</td>
+        <td>No</td>
+        <td><code>onDestroy()</code></td>
+      </tr>
+    </table>
+
+    <!-- ============ MÉTODOS ============ -->
+    <h2 id="metodos">3. Los 7 métodos</h2>
+    <div class="cards">
+      <article class="card ink"><span class="tag">onCreate(Bundle?)</span>
+        <h3>Crear</h3>
+        <p><strong>Cuándo:</strong> la actividad se crea por primera vez (o se recrea, por ejemplo al girar).</p>
+        <p><strong>Qué hacer:</strong> <code>setContentView()</code>, <code>findViewById()</code>, listeners, adapters, cargar datos iniciales.</p>
+        <p><strong>Analogía:</strong> encender el teléfono.</p>
+      </article>
+      <article class="card amber"><span class="tag">onStart()</span>
+        <h3>Mostrar</h3>
+        <p><strong>Cuándo:</strong> la pantalla está por hacerse visible.</p>
+        <p><strong>Qué hacer:</strong> preparar lo que el usuario debe ver actualizado; registrar observadores.</p>
+        <p><strong>Analogía:</strong> abrir la cortina antes de que alguien entre.</p>
+      </article>
+      <article class="card green"><span class="tag">onResume()</span>
+        <h3>Activar</h3>
+        <p><strong>Cuándo:</strong> la actividad está en primer plano y el usuario puede interactuar.</p>
+        <p><strong>Qué hacer:</strong> iniciar animaciones, cámara, sensores; refrescar datos.</p>
+        <p><strong>Analogía:</strong> empezar a usar tu app favorita.</p>
+      </article>
+      <article class="card amber"><span class="tag">onPause()</span>
+        <h3>Pausar</h3>
+        <p><strong>Cuándo:</strong> otra ventana toma el foco (diálogo, llamada, cambio de app).</p>
+        <p><strong>Qué hacer:</strong> detener animaciones y sensores; guardar cambios rápidos. Debe ser <strong>breve</strong>.</p>
+        <p><strong>Analogía:</strong> recibir una llamada mientras juegas.</p>
+      </article>
+      <article class="card"><span class="tag">onStop()</span>
+        <h3>Ocultar</h3>
+        <p><strong>Cuándo:</strong> la actividad ya no es visible.</p>
+        <p><strong>Qué hacer:</strong> liberar recursos que no se necesitan ocultos; guardar datos más pesados.</p>
+        <p><strong>Analogía:</strong> pulsar Inicio y dejar la app en segundo plano.</p>
+      </article>
+      <article class="card green"><span class="tag">onRestart()</span>
+        <h3>Regresar</h3>
+        <p><strong>Cuándo:</strong> el usuario vuelve a una actividad detenida. Le sigue <code>onStart()</code>.</p>
+        <p><strong>Qué hacer:</strong> recargar lo que pudo cambiar mientras estaba oculta.</p>
+        <p><strong>Analogía:</strong> volver a la app desde recientes.</p>
+      </article>
+      <article class="card ink"><span class="tag">onDestroy()</span>
+        <h3>Destruir</h3>
+        <p><strong>Cuándo:</strong> la actividad termina (<code>finish()</code>, botón Atrás) o se recrea (rotación).</p>
+        <p><strong>Qué hacer:</strong> liberar todo: reproductores, conexiones, referencias.</p>
+        <p><strong>Analogía:</strong> apagar el teléfono.</p>
+      </article>
+    </div>
+    <div class="note"><strong>Regla de oro:</strong> siempre llama primero a <code>super.onXxx()</code> dentro de cada método. Si lo omites, la app se cierra con <code>SuperNotCalledException</code>.</div>
+    <div class="box"><strong>No hace falta implementarlos todos.</strong> Solo sobrescribe los que necesitas. Los más usados son <code>onCreate()</code>, <code>onResume()</code>, <code>onPause()</code> y <code>onDestroy()</code>.</div>
+
+    <!-- ============ PRÁCTICA 1 ============ -->
+    <h2 id="logcat">4. Práctica 1: ver el ciclo en Logcat</h2>
+    <p>Registrarás cada método con <code>Log.d()</code> y también en pantalla, para observar el orden real en que Android los llama.</p>
+
+    <h3>4.1 Crear <code>SegundaActivity</code></h3>
+    <ol>
+      <li>Clic derecho en <code>com.example.ciclovida</code> → <strong>New → Activity → Empty Views Activity</strong>.</li>
+      <li><strong>Activity Name:</strong> <code>SegundaActivity</code>. <strong>Layout Name:</strong> <code>activity_segunda</code>. Pulsa <strong>Finish</strong>.</li>
+    </ol>
+    <pre data-lang="xml" data-file="res/layout/activity_segunda.xml"><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="24dp"&gt;
+
+    &lt;TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Segunda pantalla"
+        android:textSize="22sp"
+        android:textStyle="bold" /&gt;
+
+    &lt;Button
+        android:id="@+id/btnVolver"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Volver" /&gt;
+
+&lt;/LinearLayout&gt;</code></pre>
+    <pre data-lang="kotlin" data-file="SegundaActivity.kt"><code>package com.example.ciclovida
+
+import android.os.Bundle
+import android.util.Log
+import android.widget.Button
+import androidx.appcompat.app.AppCompatActivity
+
+class SegundaActivity : AppCompatActivity() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_segunda)
+
+        // finish() cierra esta pantalla y regresa a MainActivity
+        findViewById&lt;Button&gt;(R.id.btnVolver).setOnClickListener {
+            finish()
+        }
+
+        Log.d("CicloVida", "SegundaActivity: 🎬 onCreate")
+    }
+
+    override fun onStart() {
+        super.onStart()
+        Log.d("CicloVida", "SegundaActivity: 👁️ onStart")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        Log.d("CicloVida", "SegundaActivity: ▶️ onResume")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        Log.d("CicloVida", "SegundaActivity: ⏸️ onPause")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        Log.d("CicloVida", "SegundaActivity: ⏹️ onStop")
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        Log.d("CicloVida", "SegundaActivity: 🔄 onRestart")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d("CicloVida", "SegundaActivity: 💥 onDestroy")
+    }
+}</code></pre>
+
+    <h3>4.2 Layout de <code>MainActivity</code></h3>
+    <p><strong>Reemplaza</strong> <code>activity_main.xml</code>:</p>
+    <pre data-lang="xml" data-file="res/layout/activity_main.xml"><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp"&gt;
+
+    &lt;TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ciclo de vida"
+        android:textSize="22sp"
+        android:textStyle="bold" /&gt;
+
+    &lt;Button
+        android:id="@+id/btnSegunda"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Abrir segunda pantalla" /&gt;
+
+    &lt;!-- Historial de métodos ejecutados --&gt;
+    &lt;TextView
+        android:id="@+id/tvHistorial"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:fontFamily="monospace"
+        android:textSize="14sp" /&gt;
+
+&lt;/LinearLayout&gt;</code></pre>
+
+    <h3>4.3 <code>MainActivity</code> con los 7 métodos</h3>
+    <p><strong>Reemplaza</strong> <code>MainActivity.kt</code>:</p>
+    <pre data-lang="kotlin" data-file="MainActivity.kt"><code>package com.example.ciclovida
+
+import android.content.Intent
+import android.os.Bundle
+import android.util.Log
+import android.widget.Button
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+
+class MainActivity : AppCompatActivity() {
+
+    companion object {
+        // Etiqueta para filtrar en Logcat
+        const val TAG = "CicloVida"
+    }
+
+    private lateinit var tvHistorial: TextView
+
+    // Se ejecuta cuando la actividad se crea
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        tvHistorial = findViewById(R.id.tvHistorial)
+
+        findViewById&lt;Button&gt;(R.id.btnSegunda).setOnClickListener {
+            startActivity(Intent(this, SegundaActivity::class.java))
+        }
+
+        registrar("🎬 onCreate")
+    }
+
+    // La actividad va a ser visible
+    override fun onStart() {
+        super.onStart()
+        registrar("👁️ onStart")
+    }
+
+    // El usuario puede interactuar
+    override fun onResume() {
+        super.onResume()
+        registrar("▶️ onResume")
+    }
+
+    // La actividad pierde el foco
+    override fun onPause() {
+        super.onPause()
+        registrar("⏸️ onPause")
+    }
+
+    // La actividad ya no es visible
+    override fun onStop() {
+        super.onStop()
+        registrar("⏹️ onStop")
+    }
+
+    // Regresa de onStop: le sigue onStart
+    override fun onRestart() {
+        super.onRestart()
+        registrar("🔄 onRestart")
+    }
+
+    // La actividad será destruida
+    override fun onDestroy() {
+        super.onDestroy()
+        registrar("💥 onDestroy")
+    }
+
+    // Escribe en Logcat y agrega una línea al historial en pantalla
+    private fun registrar(metodo: String) {
+        Log.d(TAG, "MainActivity: $metodo")
+        tvHistorial.append("$metodo\n")
+    }
+}</code></pre>
+    <div class="box"><strong>Ver los mensajes:</strong> abre <strong>View → Tool Windows → Logcat</strong> y escribe <code>tag:CicloVida</code> en el filtro. Todas las actividades de esta guía usan la misma etiqueta <code>CicloVida</code>; el inicio de cada mensaje (<code>MainActivity:</code>, <code>SegundaActivity:</code>, <code>MusicaActivity:</code>) indica qué pantalla lo generó.</div>
+
+    <div class="mock-row" aria-hidden="true">
+      <div>
+        <div class="phone">
+          <div class="title">Ciclo de vida</div>
+          <div class="btn">ABRIR SEGUNDA PANTALLA</div>
+          <div class="log">🎬 onCreate<br>👁️ onStart<br>▶️ onResume<br>⏸️ onPause<br>⏹️ onStop<br>🔄 onRestart<br>👁️ onStart<br>▶️ onResume</div>
         </div>
-
-        <div class="arrow">⬇️</div>
-
-        <!-- onStart -->
-        <div class="state-box start">
-          <h3><span class="icon">👁️</span>onStart()</h3>
-          <p><strong>¿Cuándo ocurre?</strong> La actividad está a punto de ser visible en pantalla.</p>
-          <p><strong>¿Qué hacer aquí?</strong> Preparar recursos que necesitan estar listos cuando el usuario vea la pantalla.</p>
-          <p><strong>💡 Ejemplo:</strong> Es como abrir una cortina antes de que alguien entre a una habitación.</p>
-        </div>
-
-        <div class="arrow">⬇️</div>
-
-        <!-- onResume -->
-        <div class="state-box resume">
-          <h3><span class="icon">▶️</span>onResume()</h3>
-          <p><strong>¿Cuándo ocurre?</strong> La actividad está en primer plano y el usuario puede interactuar.</p>
-          <p><strong>¿Qué hacer aquí?</strong> Iniciar animaciones, reproducir música, activar la cámara.</p>
-          <p><strong>💡 Ejemplo:</strong> Es como cuando empiezas a usar tu app favorita.</p>
-        </div>
-
-        <div class="note">
-          <strong>⚡ Estado Activo:</strong> Aquí es donde el usuario realmente usa tu aplicación. Todo debe funcionar perfectamente.
-        </div>
-
-        <div class="arrow">⬇️</div>
-
-        <!-- onPause -->
-        <div class="state-box pause">
-          <h3><span class="icon">⏸️</span>onPause()</h3>
-          <p><strong>¿Cuándo ocurre?</strong> Otra actividad va a tomar el control (como una llamada entrante).</p>
-          <p><strong>¿Qué hacer aquí?</strong> Pausar animaciones, guardar datos importantes, liberar recursos pesados.</p>
-          <p><strong>💡 Ejemplo:</strong> Es como cuando recibes una llamada mientras juegas.</p>
-        </div>
-
-        <div class="arrow">⬇️</div>
-
-        <!-- onStop -->
-        <div class="state-box stop">
-          <h3><span class="icon">⏹️</span>onStop()</h3>
-          <p><strong>¿Cuándo ocurre?</strong> La actividad ya no es visible para el usuario.</p>
-          <p><strong>¿Qué hacer aquí?</strong> Liberar recursos que no se necesitan, cerrar conexiones.</p>
-          <p><strong>💡 Ejemplo:</strong> Es como cuando presionas el botón HOME y tu app queda en segundo plano.</p>
-        </div>
-
-        <div class="arrow">⬇️</div>
-
-        <!-- onDestroy -->
-        <div class="state-box destroy">
-          <h3><span class="icon">💥</span>onDestroy()</h3>
-          <p><strong>¿Cuándo ocurre?</strong> La actividad va a ser completamente eliminada de la memoria.</p>
-          <p><strong>¿Qué hacer aquí?</strong> Limpiar todos los recursos, cerrar conexiones finales.</p>
-          <p><strong>💡 Ejemplo:</strong> Es como apagar tu teléfono completamente.</p>
-        </div>
-
-        <div class="note" style="background: #d3f9d8; border-left-color: #2b8a3e;">
-          <strong>🔄 Ciclo Especial - onRestart():</strong> Se ejecuta cuando vuelves a una actividad que estaba detenida (después de onStop). Luego continúa con onStart().
-        </div>
+        <div class="mock-cap">Tras abrir y volver de la segunda pantalla</div>
       </div>
     </div>
 
-    <h2 style="color: #495057; margin: 40px 0 20px 0; text-align: center;">💻 Ejemplo de Código</h2>
+    <h3>4.4 Experimentos</h3>
+    <p>Ejecuta la app y realiza cada acción. Compara Logcat con la secuencia esperada:</p>
+    <table>
+      <tr>
+        <th>Acción</th>
+        <th>Secuencia en <code>MainActivity</code></th>
+      </tr>
+      <tr>
+        <td>Abrir la app</td>
+        <td><code>onCreate → onStart → onResume</code></td>
+      </tr>
+      <tr>
+        <td>Pulsar «Abrir segunda pantalla»</td>
+        <td><code>onPause → onStop</code></td>
+      </tr>
+      <tr>
+        <td>Pulsar «Volver» en la segunda pantalla</td>
+        <td><code>onRestart → onStart → onResume</code></td>
+      </tr>
+      <tr>
+        <td>Pulsar el botón Inicio</td>
+        <td><code>onPause → onStop</code></td>
+      </tr>
+      <tr>
+        <td>Volver desde aplicaciones recientes</td>
+        <td><code>onRestart → onStart → onResume</code></td>
+      </tr>
+      <tr>
+        <td>Girar el teléfono</td>
+        <td><code>onPause → onStop → onDestroy → onCreate → onStart → onResume</code></td>
+      </tr>
+      <tr>
+        <td>Pulsar Atrás en la pantalla principal</td>
+        <td><code>onPause → onStop</code> (Android 12+) o <code>onPause → onStop → onDestroy</code> (versiones anteriores)</td>
+      </tr>
+    </table>
+    <h3>4.5 Dos pantallas en Logcat</h3>
+    <p>Con el filtro <code>tag:CicloVida</code> se ve cómo se <strong>intercalan</strong> los métodos de ambas actividades:</p>
+    <p class="caption">Al pulsar «Abrir segunda pantalla»:</p>
+    <div class="result">MainActivity: ⏸️ onPause<br>SegundaActivity: 🎬 onCreate<br>SegundaActivity: 👁️ onStart<br>SegundaActivity: ▶️ onResume<br>MainActivity: ⏹️ onStop</div>
+    <p class="caption">Al pulsar «Volver»:</p>
+    <div class="result">SegundaActivity: ⏸️ onPause<br>MainActivity: 🔄 onRestart<br>MainActivity: 👁️ onStart<br>MainActivity: ▶️ onResume<br>SegundaActivity: ⏹️ onStop<br>SegundaActivity: 💥 onDestroy</div>
+    <div class="box"><strong>¿Por qué este orden?</strong> Android primero pausa la pantalla actual, luego muestra la nueva y <strong>solo después</strong> detiene la anterior. Por eso <code>onPause()</code> debe ser rápido: la siguiente pantalla espera a que termine.</div>
 
-    <div class="code-example">
-      <span class="comment">// Se ejecuta cuando la actividad se crea por primera vez</span>
-      <span class="keyword">override fun</span> <span class="function">onCreate</span>(savedInstanceState: Bundle?) {
-          <span class="keyword">super</span>.onCreate(savedInstanceState)
-          setContentView(R.layout.activity_main)
-          <span class="comment">// Inicializar componentes de la interfaz</span>
-          Log.d(<span class="function">"Ciclo"</span>, <span class="function">"🎬 onCreate - Actividad creada"</span>)
-      }
+    <div class="note"><strong>Observa la rotación:</strong> al girar, el historial en pantalla se borra y empieza de nuevo. Android <strong>destruye y vuelve a crear</strong> la actividad, así que todas las variables vuelven a su valor inicial. La Práctica 2 resuelve este problema.</div>
+    <div class="box"><strong>Android 12 o superior:</strong> al pulsar Atrás en la actividad principal, el sistema no la destruye; solo la envía al fondo para que reabrir la app sea más rápido. Por eso no aparece <code>onDestroy</code>.</div>
 
-      <span class="comment">// La actividad va a ser visible</span>
-      <span class="keyword">override fun</span> <span class="function">onStart</span>() {
-          <span class="keyword">super</span>.onStart()
-          Log.d(<span class="function">"Ciclo"</span>, <span class="function">"👁️ onStart - Actividad visible"</span>)
-      }
+    <!-- ============ PRÁCTICA 2 ============ -->
+    <h2 id="estado">5. Práctica 2: conservar datos al girar</h2>
+    <p>Un contador que se incrementa con un botón. Primero verás que se pierde al girar; luego lo conservarás con <code>onSaveInstanceState()</code>.</p>
 
-      <span class="comment">// El usuario puede interactuar</span>
-      <span class="keyword">override fun</span> <span class="function">onResume</span>() {
-          <span class="keyword">super</span>.onResume()
-          Log.d(<span class="function">"Ciclo"</span>, <span class="function">"▶️ onResume - Usuario puede interactuar"</span>)
-      }
+    <h3>5.1 Layout con contador</h3>
+    <p><strong>Reemplaza</strong> <code>activity_main.xml</code>:</p>
+    <pre data-lang="xml" data-file="res/layout/activity_main.xml"><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="24dp"&gt;
 
-      <span class="comment">// La actividad pierde el foco</span>
-      <span class="keyword">override fun</span> <span class="function">onPause</span>() {
-          <span class="keyword">super</span>.onPause()
-          Log.d(<span class="function">"Ciclo"</span>, <span class="function">"⏸️ onPause - Actividad pausada"</span>)
-      }
+    &lt;TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Ciclo de vida"
+        android:textSize="22sp"
+        android:textStyle="bold" /&gt;
 
-      <span class="comment">// La actividad ya no es visible</span>
-      <span class="keyword">override fun</span> <span class="function">onStop</span>() {
-          <span class="keyword">super</span>.onStop()
-          Log.d(<span class="function">"Ciclo"</span>, <span class="function">"⏹️ onStop - Actividad detenida"</span>)
-      }
+    &lt;TextView
+        android:id="@+id/tvContador"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:text="0"
+        android:textSize="48sp"
+        android:textStyle="bold" /&gt;
 
-      <span class="comment">// Volver de onStop a onStart</span>
-      <span class="keyword">override fun</span> <span class="function">onRestart</span>() {
-          <span class="keyword">super</span>.onRestart()
-          Log.d(<span class="function">"Ciclo"</span>, <span class="function">"🔄 onRestart - Reiniciando actividad"</span>)
-      }
+    &lt;Button
+        android:id="@+id/btnSumar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Sumar 1" /&gt;
 
-      <span class="comment">// La actividad será destruida</span>
-      <span class="keyword">override fun</span> <span class="function">onDestroy</span>() {
-          <span class="keyword">super</span>.onDestroy()
-          Log.d(<span class="function">"Ciclo"</span>, <span class="function">"💥 onDestroy - Actividad destruida"</span>)
-      }
+    &lt;Button
+        android:id="@+id/btnSegunda"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Abrir segunda pantalla" /&gt;
+
+    &lt;Button
+        android:id="@+id/btnMusica"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:text="Abrir reproductor" /&gt;
+
+    &lt;TextView
+        android:id="@+id/tvHistorial"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:fontFamily="monospace"
+        android:textSize="14sp" /&gt;
+
+&lt;/LinearLayout&gt;</code></pre>
+    <div class="note"><strong><code>btnMusica</code></strong> se programa en la Práctica 3. Por ahora no hace nada.</div>
+
+    <h3>5.2 Guardar y restaurar el contador</h3>
+    <p><strong>Reemplaza</strong> <code>MainActivity.kt</code>:</p>
+    <pre data-lang="kotlin" data-file="MainActivity.kt"><code>package com.example.ciclovida
+
+import android.content.Intent
+import android.os.Bundle
+import android.util.Log
+import android.widget.Button
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+
+class MainActivity : AppCompatActivity() {
+
+    companion object {
+        const val TAG = "CicloVida"
+        const val KEY_CONTADOR = "contador"
+    }
+
+    private lateinit var tvHistorial: TextView
+    private lateinit var tvContador: TextView
+    private var contador = 0
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        tvHistorial = findViewById(R.id.tvHistorial)
+        tvContador = findViewById(R.id.tvContador)
+
+        // Si la actividad se está RECREANDO (rotación), el Bundle trae los datos guardados.
+        // Si se crea por primera vez, savedInstanceState es null y el contador empieza en 0.
+        contador = savedInstanceState?.getInt(KEY_CONTADOR) ?: 0
+        tvContador.text = contador.toString()
+
+        findViewById&lt;Button&gt;(R.id.btnSumar).setOnClickListener {
+            contador++
+            tvContador.text = contador.toString()
+        }
+
+        findViewById&lt;Button&gt;(R.id.btnSegunda).setOnClickListener {
+            startActivity(Intent(this, SegundaActivity::class.java))
+        }
+
+        registrar("🎬 onCreate (contador = $contador)")
+    }
+
+    // Android lo llama antes de destruir la actividad por un cambio de configuración
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putInt(KEY_CONTADOR, contador)
+        registrar("💾 onSaveInstanceState (contador = $contador)")
+    }
+
+    override fun onStart() {
+        super.onStart()
+        registrar("👁️ onStart")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        registrar("▶️ onResume")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        registrar("⏸️ onPause")
+    }
+
+    override fun onStop() {
+        super.onStop()
+        registrar("⏹️ onStop")
+    }
+
+    override fun onRestart() {
+        super.onRestart()
+        registrar("🔄 onRestart")
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        registrar("💥 onDestroy")
+    }
+
+    private fun registrar(metodo: String) {
+        Log.d(TAG, "MainActivity: $metodo")
+        tvHistorial.append("$metodo\n")
+    }
+}</code></pre>
+
+    <div class="mock-row" aria-hidden="true">
+      <div>
+        <div class="phone">
+          <div class="title">Ciclo de vida</div>
+          <div class="big">5</div>
+          <div class="btn">SUMAR 1</div>
+          <div class="btn alt">ABRIR SEGUNDA PANTALLA</div>
+          <div class="log">🎬 onCreate (contador = 5)<br>👁️ onStart<br>▶️ onResume</div>
+        </div>
+        <div class="mock-cap">Después de girar: el contador se conserva</div>
+      </div>
     </div>
 
-    <div class="note">
-      <strong>📚 Consejo para Principiantes:</strong> No necesitas implementar todos estos métodos en tu app. Solo usa los que realmente necesites. Lo más común es trabajar con onCreate(), onResume(), onPause() y onDestroy().
+    <table>
+      <tr>
+        <th>Prueba</th>
+        <th>Sin <code>onSaveInstanceState</code></th>
+        <th>Con <code>onSaveInstanceState</code></th>
+      </tr>
+      <tr>
+        <td>Sumar hasta 5 y girar</td>
+        <td>El contador vuelve a 0</td>
+        <td>El contador sigue en 5</td>
+      </tr>
+      <tr>
+        <td>Historial en pantalla</td>
+        <td>Se borra</td>
+        <td>Se borra (no se guardó en el Bundle)</td>
+      </tr>
+    </table>
+    <div class="box"><strong>Para comprobarlo:</strong> comenta temporalmente la línea <code>outState.putInt(...)</code>, gira el teléfono y observa que el contador se pierde. Luego quita el comentario.</div>
+    <div class="note"><strong>El Bundle es para datos pequeños</strong> (números, textos, ids). Si cierras la app por completo, el Bundle se descarta. Para datos que deben durar, usa <code>SharedPreferences</code> o SQLite.</div>
+    <div class="ok"><strong>Reto:</strong> guarda también el texto de <code>tvHistorial</code> en el Bundle para que el historial sobreviva a la rotación.</div>
+
+    <!-- ============ PRÁCTICA 3 ============ -->
+    <h2 id="musica">6. Práctica 3: reproductor de música</h2>
+    <p><strong>Escenario:</strong> MusicApp reproduce una canción. La música debe seguir sonando si el usuario abre WhatsApp un momento, y el reproductor debe liberarse al cerrar la pantalla.</p>
+    <div class="flow">Abre MusicApp → Play → llega un mensaje → abre WhatsApp → regresa a MusicApp → cierra</div>
+
+    <h3>6.1 Recurso de audio</h3>
+    <ol>
+      <li>Clic derecho en <code>res</code> → <strong>New → Android Resource Directory</strong> → <strong>Resource type:</strong> <code>raw</code> → <strong>OK</strong>.</li>
+      <li>Copia un archivo de audio dentro de <code>res/raw</code> con el nombre <code>cancion.mp3</code>: minúsculas, sin espacios, sin empezar con número.</li>
+      <li>Android genera la referencia <code>R.raw.cancion</code>.</li>
+    </ol>
+
+    <h3>6.2 Crear <code>MusicaActivity</code></h3>
+    <p>Clic derecho en <code>com.example.ciclovida</code> → <strong>New → Activity → Empty Views Activity</strong> → <code>MusicaActivity</code> / <code>activity_musica</code>.</p>
+    <pre data-lang="xml" data-file="res/layout/activity_musica.xml"><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="20dp"
+    tools:context=".MusicaActivity"&gt;
+
+    &lt;TextView
+        android:id="@+id/tvCancion"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Presiona Play para escuchar"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toTopOf="@+id/btnPlay"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" /&gt;
+
+    &lt;Button
+        android:id="@+id/btnPlay"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:text="Reproducir"
+        app:layout_constraintBottom_toTopOf="@+id/btnPause"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvCancion" /&gt;
+
+    &lt;Button
+        android:id="@+id/btnPause"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Pausar"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnPlay" /&gt;
+
+&lt;/androidx.constraintlayout.widget.ConstraintLayout&gt;</code></pre>
+    <pre data-lang="kotlin" data-file="MusicaActivity.kt"><code>package com.example.ciclovida
+
+import android.media.MediaPlayer
+import android.os.Bundle
+import android.util.Log
+import android.widget.Button
+import android.widget.TextView
+import androidx.appcompat.app.AppCompatActivity
+
+class MusicaActivity : AppCompatActivity() {
+
+    companion object {
+        const val TAG = "CicloVida"
+    }
+
+    private var mediaPlayer: MediaPlayer? = null
+    private lateinit var tvCancion: TextView
+
+    // 🎬 Preparar: reproductor y botones
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_musica)
+
+        tvCancion = findViewById(R.id.tvCancion)
+
+        // create() devuelve null si el audio no se puede abrir
+        mediaPlayer = MediaPlayer.create(this, R.raw.cancion)
+        if (mediaPlayer == null) {
+            Log.e(TAG, "MusicaActivity: ❌ No se pudo crear el MediaPlayer. Revisa res/raw/cancion.mp3")
+        }
+
+        findViewById&lt;Button&gt;(R.id.btnPlay).setOnClickListener {
+            mediaPlayer?.start()
+            tvCancion.text = "🎵 Reproduciendo..."
+        }
+
+        findViewById&lt;Button&gt;(R.id.btnPause).setOnClickListener {
+            mediaPlayer?.pause()
+            tvCancion.text = "⏸️ Pausado"
+        }
+
+        Log.d(TAG, "MusicaActivity: 🎬 onCreate: reproductor listo")
+    }
+
+    // 👁️ Mostrar: refleja el estado real del reproductor
+    override fun onStart() {
+        super.onStart()
+        if (mediaPlayer?.isPlaying == true) {
+            tvCancion.text = "🎵 Reproduciendo..."
+        }
+        Log.d(TAG, "MusicaActivity: 👁️ onStart: pantalla visible")
+    }
+
+    // ▶️ Activar: el usuario puede usar los botones
+    override fun onResume() {
+        super.onResume()
+        Log.d(TAG, "MusicaActivity: ▶️ onResume: interactuando")
+    }
+
+    // ⏸️ Pausar: NO se detiene la música; solo se registraría la posición o animaciones
+    override fun onPause() {
+        super.onPause()
+        Log.d(TAG, "MusicaActivity: ⏸️ onPause: posición = ${mediaPlayer?.currentPosition ?: 0} ms")
+    }
+
+    // ⏹️ Ocultar: la música sigue sonando en segundo plano
+    override fun onStop() {
+        super.onStop()
+        Log.d(TAG, "MusicaActivity: ⏹️ onStop: oculta, la música continúa")
+    }
+
+    // 🔄 Regresar
+    override fun onRestart() {
+        super.onRestart()
+        Log.d(TAG, "MusicaActivity: 🔄 onRestart: el usuario regresó")
+    }
+
+    // 💥 Destruir: detener y liberar el reproductor
+    override fun onDestroy() {
+        super.onDestroy()
+        mediaPlayer?.release()
+        mediaPlayer = null
+        Log.d(TAG, "MusicaActivity: 💥 onDestroy: reproductor liberado")
+    }
+}</code></pre>
+
+    <h3>6.3 Abrir el reproductor desde <code>MainActivity</code></h3>
+    <p>En <code>MainActivity.kt</code> (Práctica 2), agrega este listener dentro de <code>onCreate()</code>, junto al de <code>btnSegunda</code>:</p>
+    <pre data-lang="kotlin" data-file="MainActivity.kt (agregar en onCreate)"><code>findViewById&lt;Button&gt;(R.id.btnMusica).setOnClickListener {
+    startActivity(Intent(this, MusicaActivity::class.java))
+}</code></pre>
+    <div class="box"><strong>En Logcat</strong> (filtro <code>tag:CicloVida</code>): pulsa Play, luego Inicio y abre otra app. Verás <code>MusicaActivity: ⏸️ onPause</code> y <code>⏹️ onStop</code> mientras la música <strong>sigue sonando</strong>. Al pulsar Atrás aparece <code>💥 onDestroy</code> y la música se detiene.</div>
+
+    <table>
+      <tr>
+        <th>Método</th>
+        <th>Qué hace el usuario</th>
+        <th>Qué hace la app</th>
+        <th>¿Suena la música?</th>
+      </tr>
+      <tr>
+        <td><code>onCreate()</code></td>
+        <td>Abre el reproductor</td>
+        <td>Crea el <code>MediaPlayer</code> y configura botones</td>
+        <td>No</td>
+      </tr>
+      <tr>
+        <td><code>onStart()</code> / <code>onResume()</code></td>
+        <td>Ve la pantalla y pulsa Play</td>
+        <td>Muestra el estado; <code>start()</code> al pulsar</td>
+        <td>Sí, tras pulsar Play</td>
+      </tr>
+      <tr>
+        <td><code>onPause()</code> / <code>onStop()</code></td>
+        <td>Abre WhatsApp</td>
+        <td>Registra la posición; no detiene</td>
+        <td>Sí, continúa</td>
+      </tr>
+      <tr>
+        <td><code>onRestart()</code></td>
+        <td>Vuelve al reproductor</td>
+        <td>Restaura la interfaz</td>
+        <td>Sí</td>
+      </tr>
+      <tr>
+        <td><code>onDestroy()</code></td>
+        <td>Pulsa Atrás</td>
+        <td><code>release()</code> del reproductor</td>
+        <td>No</td>
+      </tr>
+    </table>
+    <div class="note"><strong>Limitación importante:</strong> al <strong>girar</strong> el teléfono, <code>onDestroy()</code> libera el reproductor y la canción se detiene. Las apps reales reproducen música desde un <strong>Service</strong>, que no depende del ciclo de vida de la pantalla.</div>
+    <div class="ok"><strong>Reto:</strong> haz que la música se pause en <code>onStop()</code> y se reanude en <code>onStart()</code> solo si estaba sonando. Pista: guarda un <code>Boolean estabaSonando</code> antes de pausar.</div>
+
+    <!-- ============ CHAT ============ -->
+    <h2 id="chat">7. Caso de estudio: ChatApp</h2>
+    <p><strong>Escenario:</strong> una app de mensajería tipo WhatsApp que mantiene conexión con el servidor, muestra mensajes en tiempo real, notifica mensajes nuevos y los marca como «leídos» solo cuando el usuario los ve.</p>
+
+    <h3>7.1 Historia del usuario</h3>
+    <table>
+      <tr>
+        <th>#</th>
+        <th>El usuario…</th>
+        <th>Métodos</th>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td>Abre ChatApp para revisar mensajes</td>
+        <td><code>onCreate → onStart → onResume</code></td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>Abre el chat con Carlos: los mensajes se marcan ✓✓</td>
+        <td><code>onResume</code></td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td>Recibe una llamada y deja la app</td>
+        <td><code>onPause → onStop</code></td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td>Mientras habla llega un mensaje: aparece una notificación 🔔</td>
+        <td>(la actividad sigue detenida)</td>
+      </tr>
+      <tr>
+        <td>5</td>
+        <td>Vuelve a ChatApp, ve el mensaje y responde</td>
+        <td><code>onRestart → onStart → onResume</code></td>
+      </tr>
+      <tr>
+        <td>6</td>
+        <td>Cierra la app</td>
+        <td><code>onPause → onStop → onDestroy</code></td>
+      </tr>
+    </table>
+
+    <h3>7.2 Qué hace cada método</h3>
+    <div class="cards">
+      <article class="card ink"><span class="tag">onCreate()</span>
+        <ul>
+          <li>Conectar con el servidor (WebSocket).</li>
+          <li>Cargar conversaciones desde SQLite.</li>
+          <li>Inicializar el RecyclerView de mensajes.</li>
+          <li>Obtener el usuario logueado.</li>
+        </ul>
+      </article>
+      <article class="card amber"><span class="tag">onStart()</span>
+        <ul>
+          <li>Registrar el listener de mensajes nuevos.</li>
+          <li>Sincronizar mensajes pendientes.</li>
+          <li>Estado del usuario: «En línea».</li>
+        </ul>
+      </article>
+      <article class="card green"><span class="tag">onResume()</span>
+        <ul>
+          <li>Marcar mensajes como leídos ✓✓.</li>
+          <li>Cancelar notificaciones de este chat.</li>
+          <li>Restaurar el borrador.</li>
+        </ul>
+      </article>
+      <article class="card amber"><span class="tag">onPause()</span>
+        <ul>
+          <li>Guardar el borrador del mensaje.</li>
+          <li>Ocultar el teclado.</li>
+          <li>Activar notificaciones.</li>
+          <li>Guardar la posición del scroll.</li>
+        </ul>
+      </article>
+      <article class="card"><span class="tag">onStop()</span>
+        <ul>
+          <li>Estado: «Última vez…».</li>
+          <li>Mantener la conexión para notificar.</li>
+          <li>Liberar imágenes en caché.</li>
+        </ul>
+      </article>
+      <article class="card ink"><span class="tag">onDestroy()</span>
+        <ul>
+          <li>Desconectar el WebSocket.</li>
+          <li>Estado: «Desconectado».</li>
+          <li>Cerrar la base de datos.</li>
+          <li>Liberar referencias.</li>
+        </ul>
+      </article>
     </div>
 
-    <div style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 15px; margin-top: 40px; text-align: center;">
-      <h2 style="margin-bottom: 15px;">🎯 Resumen Rápido</h2>
-      <p style="font-size: 1.1em; line-height: 1.8;">
-        <strong>onCreate</strong> → Crear 🎬<br>
-        <strong>onStart</strong> → Preparar 👁️<br>
-        <strong>onResume</strong> → Usar ▶️<br>
-        <strong>onPause</strong> → Pausar ⏸️<br>
-        <strong>onStop</strong> → Ocultar ⏹️<br>
-        <strong>onDestroy</strong> → Eliminar 💥
-      </p>
+    <h3>7.3 Esquema de <code>ChatActivity</code></h3>
+    <p>Este código muestra <strong>dónde</strong> va cada responsabilidad. Usa clases de ejemplo (<code>ChatSocket</code>, <code>MessageAdapter</code>, <code>DatabaseHelper</code>) que no forman parte de Android: es un esquema para analizar, no un proyecto para ejecutar.</p>
+    <pre data-lang="kotlin" data-file="ChatActivity.kt (esquema)"><code>class ChatActivity : AppCompatActivity() {
+
+    private var socket: ChatSocket? = null
+    private lateinit var editMessage: EditText
+    private lateinit var dbHelper: DatabaseHelper
+    private var contactId = ""
+
+    // 🎬 Crear y preparar
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_chat)
+
+        contactId = intent.getStringExtra("CONTACT_ID") ?: ""
+        editMessage = findViewById(R.id.editMessage)
+        dbHelper = DatabaseHelper(this)
+
+        cargarMensajesLocales()         // SQLite: la app funciona sin internet
+        socket = ChatSocket(contactId)   // Conexión con el servidor
+        socket?.connect()
+
+        Log.d("CicloVida", "ChatActivity: 🎬 onCreate: chat con $contactId")
+    }
+
+    // 👁️ Visible: escuchar mensajes y ponerse "En línea"
+    override fun onStart() {
+        super.onStart()
+        socket?.setListener { mensaje -&gt; mostrarMensaje(mensaje) }
+        sincronizarPendientes()
+        actualizarEstado("online")
+        Log.d("CicloVida", "ChatActivity: 👁️ onStart: en línea, escuchando mensajes")
+    }
+
+    // ▶️ El usuario está viendo el chat
+    override fun onResume() {
+        super.onResume()
+        marcarComoLeidos(contactId)      // ✓✓ solo cuando realmente los ve
+        cancelarNotificaciones(contactId)
+        editMessage.setText(leerBorrador(contactId))
+        Log.d("CicloVida", "ChatActivity: ▶️ onResume: mensajes leídos ✓✓")
+    }
+
+    // ⏸️ Llamada o cambio de app
+    override fun onPause() {
+        super.onPause()
+        guardarBorrador(contactId, editMessage.text.toString())
+        activarNotificaciones(true)
+        Log.d("CicloVida", "ChatActivity: ⏸️ onPause: borrador guardado")
+    }
+
+    // ⏹️ En segundo plano: la conexión sigue para notificar
+    override fun onStop() {
+        super.onStop()
+        actualizarEstado("away")
+        Log.d("CicloVida", "ChatActivity: ⏹️ onStop: usuario ausente")
+    }
+
+    // 🔄 Regresa: traer lo que llegó mientras estaba oculta
+    override fun onRestart() {
+        super.onRestart()
+        cargarMensajesNuevos()
+        Log.d("CicloVida", "ChatActivity: 🔄 onRestart: el usuario regresó")
+    }
+
+    // 💥 Cerrar todo para evitar fugas de memoria
+    override fun onDestroy() {
+        super.onDestroy()
+        socket?.disconnect()
+        socket = null
+        actualizarEstado("offline")
+        dbHelper.close()
+        Log.d("CicloVida", "ChatActivity: 💥 onDestroy: chat cerrado")
+    }
+
+    // ... métodos auxiliares: cargarMensajesLocales(), guardarBorrador(), etc.
+}</code></pre>
+
+    <table>
+      <tr>
+        <th>Estado del chat</th>
+        <th>Método</th>
+        <th>Situación</th>
+      </tr>
+      <tr>
+        <td>Activo</td>
+        <td><code>onResume()</code></td>
+        <td>Mensajes leídos, notificaciones canceladas, el usuario escribe.</td>
+      </tr>
+      <tr>
+        <td>En segundo plano</td>
+        <td><code>onPause()</code> / <code>onStop()</code></td>
+        <td>Borrador guardado, notificaciones activas, conexión abierta.</td>
+      </tr>
+      <tr>
+        <td>Cerrado</td>
+        <td><code>onDestroy()</code></td>
+        <td>Conexión y base de datos cerradas, estado «offline».</td>
+      </tr>
+    </table>
+    <div class="ok"><strong>Ejercicio — «está escribiendo…»:</strong> detecta la escritura con un <code>TextWatcher</code>, envía un evento «typing» al servidor, muestra el indicador al recibir el evento del otro usuario, ocúltalo en <code>onPause()</code> y después de 3 segundos de inactividad.</div>
+
+    <!-- ============ PRÁCTICAS ============ -->
+    <h2 id="practicas">8. Buenas prácticas y errores comunes</h2>
+    <div class="cards two">
+      <article class="card green">
+        <h3>Buenas prácticas</h3>
+        <ul>
+          <li>Llamar siempre a <code>super.onXxx()</code>.</li>
+          <li>Mantener <code>onPause()</code> breve: la siguiente pantalla espera a que termine.</li>
+          <li>Iniciar en <code>onResume()</code> lo que se detiene en <code>onPause()</code> (cámara, sensores, animaciones).</li>
+          <li>Guardar borradores y cambios del usuario en <code>onPause()</code>.</li>
+          <li>Conservar datos pequeños con <code>onSaveInstanceState()</code>.</li>
+          <li>Liberar recursos pesados (<code>MediaPlayer</code>, conexiones) en <code>onDestroy()</code>.</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>Errores comunes</h3>
+        <ul>
+          <li>Olvidar <code>super</code>: la app se cierra.</li>
+          <li>Suponer que <code>onDestroy()</code> siempre se ejecuta: si Android elimina el proceso, puede no llamarse.</li>
+          <li>Perder datos al girar por no guardarlos.</li>
+          <li>No liberar listeners, cursores o reproductores: fugas de memoria.</li>
+          <li>Hacer tareas lentas en <code>onPause()</code>.</li>
+        </ul>
+      </article>
     </div>
-  </div>
+    <div class="note"><strong>Fugas de memoria (memory leaks):</strong> ocurren cuando un objeto sigue apuntando a una actividad ya destruida. Causas típicas: listeners no desregistrados, cursores sin cerrar y referencias al contexto guardadas en objetos que viven más que la pantalla. Límpialas en <code>onStop()</code> u <code>onDestroy()</code>.</div>
+
+    <!-- ============ RESUMEN ============ -->
+    <h2 id="resumen">9. Resumen</h2>
+    <table>
+      <tr>
+        <th>Método</th>
+        <th>En una palabra</th>
+        <th>Uso típico</th>
+      </tr>
+      <tr>
+        <td><code>onCreate()</code></td>
+        <td>Crear 🎬</td>
+        <td>Layout, vistas, listeners, datos iniciales, restaurar el Bundle.</td>
+      </tr>
+      <tr>
+        <td><code>onStart()</code></td>
+        <td>Mostrar 👁️</td>
+        <td>Registrar observadores, actualizar la interfaz.</td>
+      </tr>
+      <tr>
+        <td><code>onResume()</code></td>
+        <td>Activar ▶️</td>
+        <td>Cámara, sensores, animaciones, marcar como leído.</td>
+      </tr>
+      <tr>
+        <td><code>onPause()</code></td>
+        <td>Pausar ⏸️</td>
+        <td>Detener lo iniciado en <code>onResume()</code>, guardar borradores.</td>
+      </tr>
+      <tr>
+        <td><code>onStop()</code></td>
+        <td>Ocultar ⏹️</td>
+        <td>Liberar recursos visuales, guardar datos pesados.</td>
+      </tr>
+      <tr>
+        <td><code>onRestart()</code></td>
+        <td>Regresar 🔄</td>
+        <td>Recargar lo que cambió mientras estaba oculta.</td>
+      </tr>
+      <tr>
+        <td><code>onDestroy()</code></td>
+        <td>Eliminar 💥</td>
+        <td>Liberar reproductores, conexiones y referencias.</td>
+      </tr>
+      <tr>
+        <td><code>onSaveInstanceState()</code></td>
+        <td>Guardar 💾</td>
+        <td>Conservar datos pequeños ante una rotación.</td>
+      </tr>
+    </table>
+    <div class="box"><strong>Secuencia completa:</strong> <code>onCreate → onStart → onResume</code> → (la app se usa) → <code>onPause → onStop</code> → (<code>onRestart → onStart → onResume</code> si regresa) → <code>onDestroy</code>.</div>
+
+    <div class="footer">Aplicativos Móviles — Android / Kotlin · Documentación: <a href="https://developer.android.com/guide/components/activities/activity-lifecycle" target="_blank" rel="noopener">El ciclo de vida de la actividad (Android Developers)</a></div>
+  </main>
+  <div id="copyToast" role="status" aria-live="polite"></div>
+
+  <script>
+    (function () {
+      // Interruptor interno: true muestra el botón «Copiar» en cada bloque de código.
+      var CONFIG = { allowCodeCopy: true };
+
+      function escapeHtml(text) {
+        return text.replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; });
+      }
+
+      function highlight(source, pattern, classify) {
+        var result = '', last = 0, match;
+        pattern.lastIndex = 0;
+        while ((match = pattern.exec(source)) !== null) {
+          var kind = classify(match[0]);
+          result += escapeHtml(source.slice(last, match.index));
+          result += kind ? '<span class="' + kind + '">' + escapeHtml(match[0]) + '</span>' : escapeHtml(match[0]);
+          last = pattern.lastIndex;
+        }
+        return result + escapeHtml(source.slice(last));
+      }
+
+      var KT_KEYWORDS = 'package|import|class|data|object|companion|const|override|fun|val|var|private|lateinit|when|else|if|for|in|return|as|super|this|try|catch';
+      var KT_TYPES = 'Bundle|Intent|Log|MediaPlayer|Button|TextView|EditText|AppCompatActivity|MainActivity|SegundaActivity|MusicaActivity|ChatActivity|ChatSocket|DatabaseHelper|String|Int|Long|Boolean|Exception';
+      var KT_KEYWORD_RE = new RegExp('^(' + KT_KEYWORDS + ')$');
+      var KT_TYPE_RE = new RegExp('^(' + KT_TYPES + ')$');
+      var KT_PATTERN = new RegExp('\\/\\/[^\\n]*|"(?:\\\\.|[^"\\\\])*"|this@\\w+|@\\w+|\\b(?:' + KT_KEYWORDS + ')\\b|\\b(?:' + KT_TYPES + ')\\b|\\b(?:true|false|null)\\b|\\b\\d+\\b', 'g');
+
+      function highlightKotlin(source) {
+        return highlight(source, KT_PATTERN, function (t) {
+          if (t.indexOf('//') === 0) return 'kt-comment';
+          if (t.charAt(0) === '"') return 'kt-string';
+          if (t.indexOf('this@') === 0) return 'kt-keyword';
+          if (t.charAt(0) === '@') return 'kt-annotation';
+          if (KT_KEYWORD_RE.test(t)) return 'kt-keyword';
+          if (KT_TYPE_RE.test(t)) return 'kt-type';
+          if (/^(true|false|null)$/.test(t)) return 'kt-literal';
+          return 'kt-number';
+        });
+      }
+
+      var XML_PATTERN = /<!--[\s\S]*?-->|"[^"]*"|<\?\w+|\?>|<\/?[\w.:-]+|\/?>|[\w:.-]+(?==)/g;
+
+      function highlightXml(source) {
+        return highlight(source, XML_PATTERN, function (t) {
+          if (t.indexOf('<!--') === 0) return 'xml-comment';
+          if (t.charAt(0) === '"') return 'xml-string';
+          if (t.charAt(0) === '<' || t.charAt(t.length - 1) === '>') return 'xml-tag';
+          return 'xml-attr';
+        });
+      }
+
+      var HIGHLIGHTERS = { kotlin: highlightKotlin, xml: highlightXml };
+      var LABELS = { kotlin: 'Kotlin', xml: 'XML' };
+
+      var toast = document.getElementById('copyToast'), toastTimer;
+      function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () { toast.classList.remove('show'); }, 2200);
+      }
+
+      function copyText(text) {
+        if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+        return new Promise(function (resolve, reject) {
+          var area = document.createElement('textarea');
+          area.value = text;
+          area.setAttribute('readonly', '');
+          area.style.position = 'fixed';
+          area.style.opacity = '0';
+          document.body.appendChild(area);
+          area.select();
+          try { document.execCommand('copy') ? resolve() : reject(); } catch (e) { reject(e); }
+          document.body.removeChild(area);
+        });
+      }
+
+      // Envolver cada <pre> en un bloque con cabecera: nombre de archivo + botón Copiar.
+      document.querySelectorAll('pre[data-lang]').forEach(function (pre) {
+        var code = pre.querySelector('code');
+        var raw = code.textContent;
+        var lang = pre.getAttribute('data-lang');
+        code.innerHTML = (HIGHLIGHTERS[lang] || highlightKotlin)(raw);
+
+        var wrap = document.createElement('div');
+        wrap.className = 'codeblock';
+        var head = document.createElement('div');
+        head.className = 'codehead';
+        var file = document.createElement('span');
+        file.className = 'file';
+        file.textContent = pre.getAttribute('data-file') || LABELS[lang] || 'Código';
+        head.appendChild(file);
+
+        if (CONFIG.allowCodeCopy) {
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'copy-btn';
+          btn.textContent = 'Copiar';
+          btn.addEventListener('click', function () {
+            copyText(raw).then(function () {
+              btn.textContent = '✓ Copiado';
+              btn.classList.add('done');
+              showToast('Código copiado. Pégalo en Android Studio.');
+              setTimeout(function () { btn.textContent = 'Copiar'; btn.classList.remove('done'); }, 1800);
+            }, function () {
+              showToast('No se pudo copiar. Selecciona el código manualmente.');
+            });
+          });
+          head.appendChild(btn);
+        }
+
+        pre.parentNode.insertBefore(wrap, pre);
+        wrap.appendChild(head);
+        wrap.appendChild(pre);
+      });
+
+      var bar = document.getElementById('progress');
+      var links = document.querySelectorAll('.navlinks a');
+      var sections = Array.prototype.slice.call(document.querySelectorAll('main, h2[id]'));
+
+      function update() {
+        var root = document.documentElement;
+        var total = root.scrollHeight - root.clientHeight;
+        var pos = window.scrollY + 130;
+        var current = sections[0];
+        bar.style.width = (total > 0 ? root.scrollTop / total * 100 : 0) + '%';
+        sections.forEach(function (section) { if (section.offsetTop <= pos) current = section; });
+        links.forEach(function (link) { link.classList.toggle('active', link.getAttribute('href') === '#' + current.id); });
+      }
+
+      document.addEventListener('scroll', update, { passive: true });
+      update();
+    })();
+  </script>
 </body>
 </html>
