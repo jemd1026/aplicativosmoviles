@@ -1,0 +1,1956 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guía: SQLite básico en Android</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Source+Code+Pro:wght@500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #f7f7f2;
+      --soft: #e7eee9;
+      --panel: #fff;
+      --ink: #18252b;
+      --muted: #657278;
+      --line: #dfe5e1;
+      --coral: #ef714c;
+      --coral-dark: #da5e3b;
+      --coral-tint: #fff0e9;
+      --green: #16745a;
+      --green-tint: #e4f0e9;
+      --amber: #d29b35;
+      --amber-tint: #fff8df;
+      --code: #172a31;
+      --code-top: #243c42;
+      --code-ink: #d8e5df;
+      --shadow: 0 24px 60px rgba(24, 37, 43, .12);
+      --sans: 'DM Sans', sans-serif;
+      --display: 'Space Grotesk', sans-serif;
+      --mono: 'Source Code Pro', Consolas, monospace
+    }
+
+    * {
+      box-sizing: border-box
+    }
+
+    html {
+      scroll-behavior: smooth
+    }
+
+    body {
+      margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font: 16px/1.6 var(--sans)
+    }
+
+    #progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 300;
+      width: 0;
+      height: 3px;
+      background: var(--coral)
+    }
+
+    nav {
+      position: fixed;
+      inset: 0 auto 0 0;
+      z-index: 100;
+      width: 260px;
+      overflow-y: auto;
+      background: var(--bg);
+      border-right: 1px solid var(--line)
+    }
+
+    .navrow {
+      padding: 42px 26px
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 30px;
+      padding: 18px 16px;
+      color: #fff;
+      background: var(--code);
+      border-radius: 4px 22px 22px 22px;
+      font-weight: 700
+    }
+
+    .dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: var(--coral)
+    }
+
+    .navlinks {
+      display: flex;
+      flex-direction: column;
+      gap: 3px
+    }
+
+    .navlinks:before {
+      content: 'CONTENIDO';
+      margin: 0 12px 10px;
+      color: #9aa6a7;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px
+    }
+
+    .navlinks a {
+      padding: 10px 12px;
+      border-radius: 8px;
+      color: var(--muted);
+      font-size: 14px;
+      text-decoration: none
+    }
+
+    .navlinks a:hover,
+    .navlinks a.active {
+      background: var(--soft);
+      color: var(--green);
+      font-weight: 700
+    }
+
+    main {
+      max-width: 1100px;
+      min-height: 100vh;
+      margin-left: 260px;
+      padding: 80px 6vw 62px
+    }
+
+    .head {
+      max-width: 810px;
+      padding-bottom: 48px;
+      border-bottom: 1px solid var(--line)
+    }
+
+    .pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 18px
+    }
+
+    .pill {
+      padding: 5px 11px;
+      border-radius: 20px;
+      color: var(--green);
+      background: var(--green-tint);
+      font-size: 12px;
+      font-weight: 700
+    }
+
+    .kicker {
+      margin: 0 0 8px;
+      color: var(--green);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase
+    }
+
+    h1,
+    h2,
+    h3 {
+      font-family: var(--display);
+      letter-spacing: -1.2px
+    }
+
+    h1 {
+      max-width: 15ch;
+      margin: 0 0 16px;
+      font-size: clamp(42px, 5vw, 70px);
+      line-height: .98
+    }
+
+    h2 {
+      max-width: 23ch;
+      margin: 62px 0 14px;
+      font-size: clamp(31px, 4vw, 51px);
+      line-height: 1.03;
+      scroll-margin-top: 30px
+    }
+
+    h3 {
+      margin: 34px 0 8px;
+      font-size: 22px
+    }
+
+    .lead {
+      max-width: 62ch;
+      margin: 0;
+      color: var(--muted);
+      font-size: 18px
+    }
+
+    .box,
+    .note,
+    .ok {
+      margin: 22px 0;
+      padding: 16px 18px;
+      border-radius: 4px 14px 14px 4px
+    }
+
+    .box {
+      background: var(--green-tint);
+      border: 1px solid #bddbcf;
+      border-left: 5px solid var(--green)
+    }
+
+    .note {
+      background: var(--amber-tint);
+      border: 1px solid #ecd69d;
+      border-left: 5px solid var(--amber)
+    }
+
+    .ok {
+      background: var(--coral-tint);
+      border: 1px solid #f1c7b9;
+      border-left: 5px solid var(--coral)
+    }
+
+    .box ul,
+    .note ul,
+    .ok ul,
+    .box ol,
+    .note ol,
+    .ok ol {
+      margin: 8px 0 0;
+      padding-left: 20px
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin: 24px 0
+    }
+
+    .cards.two {
+      grid-template-columns: repeat(2, 1fr)
+    }
+
+    .cards.four {
+      grid-template-columns: repeat(4, 1fr)
+    }
+
+    .card {
+      padding: 20px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-top: 3px solid var(--coral);
+      border-radius: 4px 18px 18px 18px
+    }
+
+    .card.green {
+      border-top-color: var(--green)
+    }
+
+    .card.amber {
+      border-top-color: var(--amber)
+    }
+
+    .card.ink {
+      border-top-color: var(--ink)
+    }
+
+    .card h3 {
+      margin: 0 0 7px;
+      font-size: 20px
+    }
+
+    .card p,
+    .card ul {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px
+    }
+
+    .card ul {
+      padding-left: 18px
+    }
+
+    .card .tag {
+      display: inline-block;
+      margin-bottom: 6px;
+      padding: 2px 8px;
+      color: #fff;
+      background: var(--code);
+      border-radius: 999px;
+      font: 600 11px var(--mono)
+    }
+
+    table {
+      width: 100%;
+      margin: 22px 0;
+      border-collapse: collapse;
+      border: 1px solid var(--line);
+      box-shadow: 0 8px 24px -18px rgba(24, 37, 43, .3)
+    }
+
+    th,
+    td {
+      padding: 12px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top
+    }
+
+    th {
+      background: var(--coral);
+      color: #fff;
+      font-size: 13px
+    }
+
+    tr:nth-child(even) td {
+      background: var(--soft)
+    }
+
+    code {
+      padding: .08em .28em;
+      border-radius: 4px;
+      color: var(--coral-dark);
+      background: var(--coral-tint);
+      font: .9em var(--mono)
+    }
+
+    /* Bloque de código con cabecera (archivo + botón copiar) */
+    .codeblock {
+      margin: 18px 0;
+      overflow: hidden;
+      background: var(--code);
+      border-radius: 4px 20px 20px 20px;
+      box-shadow: var(--shadow)
+    }
+
+    .codehead {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px 12px 8px 20px;
+      background: var(--code-top)
+    }
+
+    .codehead .file {
+      overflow: hidden;
+      color: #9fb5ad;
+      font: 600 12px var(--mono);
+      text-overflow: ellipsis;
+      white-space: nowrap
+    }
+
+    .copy-btn {
+      flex-shrink: 0;
+      padding: 4px 12px;
+      color: var(--code-ink);
+      background: transparent;
+      border: 1px solid #3b5a60;
+      border-radius: 999px;
+      font: 600 12px var(--sans);
+      cursor: pointer;
+      transition: .18s
+    }
+
+    .copy-btn:hover {
+      color: #fff;
+      background: var(--coral);
+      border-color: var(--coral)
+    }
+
+    .copy-btn.done {
+      color: #fff;
+      background: var(--green);
+      border-color: var(--green)
+    }
+
+    pre {
+      margin: 0;
+      padding: 20px 24px;
+      overflow: auto;
+      color: var(--code-ink);
+      font: 13px/1.6 var(--mono)
+    }
+
+    pre code {
+      padding: 0;
+      color: inherit;
+      background: transparent;
+      font-size: inherit
+    }
+
+    .tree {
+      margin: 18px 0;
+      padding: 20px 24px;
+      color: var(--green);
+      background: var(--green-tint);
+      border: 1px solid var(--line);
+      border-radius: 4px 14px 14px 14px;
+      font: 600 13px/1.6 var(--mono);
+      white-space: pre;
+      overflow: auto
+    }
+
+    .flow {
+      margin: 22px 0;
+      padding: 20px;
+      color: var(--green);
+      background: var(--green-tint);
+      border: 1px solid var(--line);
+      border-radius: 4px 14px 14px 14px;
+      font: 600 15px var(--mono);
+      text-align: center
+    }
+
+    .caption {
+      margin: 20px 0 8px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700
+    }
+
+    .result {
+      padding: 16px 18px;
+      border: 1px solid var(--line);
+      border-radius: 4px 14px 14px 14px;
+      background: var(--panel);
+      font-family: var(--mono)
+    }
+
+    /* Tabla de datos de ejemplo (estilo registro) */
+    .dbtable td:first-child,
+    .dbtable th:first-child {
+      width: 90px
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 1px 8px;
+      border-radius: 999px;
+      font: 700 12px var(--sans)
+    }
+
+    .badge.on {
+      color: var(--green);
+      background: var(--green-tint)
+    }
+
+    .badge.off {
+      color: var(--coral-dark);
+      background: var(--coral-tint)
+    }
+
+    /* Maqueta del formulario */
+    .mock-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      margin: 24px 0
+    }
+
+    .phone {
+      width: 270px;
+      max-width: 100%;
+      padding: 16px;
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      box-shadow: 0 12px 24px -16px rgba(24, 37, 43, .4)
+    }
+
+    .phone .title {
+      margin-bottom: 8px;
+      font: 700 16px var(--display)
+    }
+
+    .phone .field {
+      margin-bottom: 8px;
+      padding: 6px 2px;
+      color: var(--muted);
+      border-bottom: 2px solid var(--coral);
+      font-size: 13px
+    }
+
+    .phone .check {
+      margin: 6px 0 10px;
+      font-size: 13px
+    }
+
+    .phone .btns {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 6px;
+      margin-bottom: 6px
+    }
+
+    .phone .btns.two {
+      grid-template-columns: 1fr 1fr
+    }
+
+    .phone .btn {
+      padding: 7px 4px;
+      color: #fff;
+      background: var(--coral);
+      border-radius: 8px;
+      font: 700 11px var(--sans);
+      text-align: center
+    }
+
+    .phone .btn.alt {
+      background: var(--code)
+    }
+
+    .phone .list {
+      margin-top: 10px;
+      padding: 8px 10px;
+      color: var(--ink);
+      background: var(--soft);
+      border-radius: 8px;
+      font: 500 12px/1.6 var(--mono)
+    }
+
+    .mock-cap {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center
+    }
+
+    .footer {
+      margin-top: 62px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 13px
+    }
+
+    .footer a {
+      color: var(--green)
+    }
+
+    /* Resaltado Kotlin / SQL */
+    .kt-keyword {
+      color: #ef9470
+    }
+
+    .kt-type {
+      color: #78c5d4
+    }
+
+    .kt-string {
+      color: #f5cd62
+    }
+
+    .kt-comment {
+      color: #8fb6a8;
+      font-style: italic
+    }
+
+    .kt-number,
+    .kt-literal,
+    .kt-annotation {
+      color: #c9a7ed
+    }
+
+    /* Resaltado XML */
+    .xml-tag {
+      color: #ef9470
+    }
+
+    .xml-attr {
+      color: #78c5d4
+    }
+
+    .xml-string {
+      color: #f5cd62
+    }
+
+    .xml-comment {
+      color: #8fb6a8;
+      font-style: italic
+    }
+
+    #copyToast {
+      position: fixed;
+      left: 50%;
+      bottom: 26px;
+      z-index: 400;
+      max-width: 88vw;
+      padding: 11px 18px;
+      border-radius: 999px;
+      color: var(--bg);
+      background: var(--ink);
+      box-shadow: var(--shadow);
+      font-weight: 600;
+      text-align: center;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(-50%) translateY(12px);
+      transition: .22s
+    }
+
+    #copyToast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0)
+    }
+
+    @media(max-width:960px) {
+      .cards.four {
+        grid-template-columns: repeat(2, 1fr)
+      }
+    }
+
+    @media(max-width:760px) {
+      nav {
+        position: sticky;
+        inset: 0;
+        width: 100%;
+        border-right: 0;
+        border-bottom: 1px solid var(--line)
+      }
+
+      .navrow {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        padding: 12px 18px
+      }
+
+      .brand {
+        flex-shrink: 0;
+        margin: 0;
+        padding: 10px 12px
+      }
+
+      .navlinks {
+        flex-direction: row;
+        overflow-x: auto
+      }
+
+      .navlinks:before {
+        display: none
+      }
+
+      .navlinks a {
+        white-space: nowrap
+      }
+
+      main {
+        margin-left: 0;
+        padding: 52px 16px 40px
+      }
+
+      .cards,
+      .cards.two,
+      .cards.four {
+        grid-template-columns: 1fr
+      }
+
+      th,
+      td {
+        padding: 10px
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="progress"></div>
+  <nav aria-label="Navegación de la guía">
+    <div class="navrow">
+      <div class="brand"><span class="dot"></span>SQLite.kt</div>
+      <div class="navlinks">
+        <a href="#inicio">Inicio</a>
+        <a href="#que-es">¿Qué es SQLite?</a>
+        <a href="#proyecto">Proyecto</a>
+        <a href="#conceptos">Conceptos</a>
+        <a href="#tabla">Tabla paises</a>
+        <a href="#crear-bd">Crear la BD</a>
+        <a href="#crud">CRUD en el helper</a>
+        <a href="#formulario">Formulario</a>
+        <a href="#actividad">MainActivity</a>
+        <a href="#pruebas">Pruebas</a>
+        <a href="#errores">Errores comunes</a>
+        <a href="#resumen">Resumen</a>
+      </div>
+    </div>
+  </nav>
+
+  <main id="inicio">
+    <header class="head">
+      <div class="pills"><span class="pill">Android · Kotlin</span><span class="pill">SQLite</span><span class="pill">Nivel básico</span></div>
+      <p class="kicker">Guía práctica</p>
+      <h1>SQLite básico: tabla de países</h1>
+      <p class="lead">Insertar, actualizar y eliminar registros en una base de datos local. Un formulario sencillo trabaja sobre la tabla <code>paises</code> del proyecto <code>com.example.sqlitepaises</code>.</p>
+    </header>
+
+    <!-- ============ QUÉ ES SQLITE ============ -->
+    <h2 id="que-es">Antes de empezar: ¿qué es SQLite?</h2>
+    <p><strong>SQLite</strong> es un motor de base de datos <strong>relacional</strong> (tablas con filas y columnas, consultadas con SQL) que funciona <strong>dentro de la propia aplicación</strong>. No necesita un servidor, ni instalación, ni usuario y contraseña: toda la base de datos es <strong>un solo archivo</strong> guardado en el dispositivo.</p>
+    <div class="box"><strong>En una frase:</strong> SQLite es como tener una pequeña base de datos MySQL guardada en un archivo dentro del celular, que solo tu app puede leer y escribir, y que funciona sin internet.</div>
+
+    <h3>¿Cómo se maneja?</h3>
+    <div class="cards two">
+      <article class="card">
+        <h3>Base de datos cliente-servidor</h3>
+        <p>MySQL, PostgreSQL, SQL Server. La app envía las consultas por la red a un servidor que guarda los datos.</p>
+        <div class="flow">App → internet → servidor → disco</div>
+        <p>Necesita conexión, un servidor encendido y credenciales.</p>
+      </article>
+      <article class="card green">
+        <h3>SQLite (embebida)</h3>
+        <p>La app usa una biblioteca incluida en Android que lee y escribe directamente el archivo <code>.db</code>.</p>
+        <div class="flow">App → SQLite → archivo paises.db</div>
+        <p>Sin red, sin servidor, sin configuración.</p>
+      </article>
+    </div>
+    <table>
+      <tr>
+        <th>Característica</th>
+        <th>Detalle</th>
+      </tr>
+      <tr>
+        <td>Dónde vive</td>
+        <td>En Android: <code>/data/data/com.example.sqlitepaises/databases/paises.db</code>. Es privada: otras apps no pueden abrirla.</td>
+      </tr>
+      <tr>
+        <td>Lenguaje</td>
+        <td>SQL estándar: <code>CREATE TABLE</code>, <code>INSERT</code>, <code>SELECT</code>, <code>UPDATE</code>, <code>DELETE</code>.</td>
+      </tr>
+      <tr>
+        <td>Tipos de datos</td>
+        <td>Solo cinco: <code>NULL</code>, <code>INTEGER</code>, <code>REAL</code>, <code>TEXT</code> y <code>BLOB</code>. No hay booleano ni fecha: se guardan como número o texto.</td>
+      </tr>
+      <tr>
+        <td>Confiabilidad</td>
+        <td>Transacciones ACID: si la app se cierra a mitad de una escritura, los datos no quedan corruptos.</td>
+      </tr>
+      <tr>
+        <td>Desde Android</td>
+        <td>Con <code>SQLiteOpenHelper</code> (esta guía) o con <strong>Room</strong>, la biblioteca recomendada por Google, que se construye sobre SQLite.</td>
+      </tr>
+      <tr>
+        <td>Origen</td>
+        <td>Creada por D. Richard Hipp en el año 2000. Es de dominio público: gratuita para cualquier uso.</td>
+      </tr>
+    </table>
+
+    <h3>¿Quién lo usa?</h3>
+    <p>SQLite es el motor de base de datos <strong>más usado del mundo</strong>: sus creadores estiman más de un billón de bases de datos SQLite en uso. Probablemente tu celular tiene cientos en este momento.</p>
+    <div class="cards">
+      <article class="card"><span class="tag">Sistemas operativos</span>
+        <h3>Android e iOS</h3>
+        <p>Los contactos, los mensajes SMS, el calendario y el registro de llamadas se guardan en bases SQLite.</p>
+      </article>
+      <article class="card"><span class="tag">Mensajería</span>
+        <h3>WhatsApp</h3>
+        <p>El historial de chats se almacena localmente en una base SQLite; por eso puedes leer tus mensajes sin conexión.</p>
+      </article>
+      <article class="card"><span class="tag">Navegadores</span>
+        <h3>Chrome y Firefox</h3>
+        <p>Historial, marcadores, cookies y contraseñas guardadas se manejan con archivos SQLite.</p>
+      </article>
+      <article class="card green"><span class="tag">Apps de escritorio</span>
+        <h3>Programas instalados</h3>
+        <p>Editores de fotos, reproductores de música y gestores de notas guardan sus catálogos y configuraciones en SQLite.</p>
+      </article>
+      <article class="card green"><span class="tag">Lenguajes</span>
+        <h3>Python, PHP, Node.js</h3>
+        <p>Incluyen soporte para SQLite: se usa mucho para prototipos, pruebas y aplicaciones pequeñas.</p>
+      </article>
+      <article class="card green"><span class="tag">Dispositivos</span>
+        <h3>Televisores, autos, IoT</h3>
+        <p>Sistemas embebidos que necesitan guardar datos sin un servidor usan SQLite por su tamaño reducido.</p>
+      </article>
+    </div>
+
+    <h3>¿Cuándo usarlo?</h3>
+    <div class="cards two">
+      <article class="card green">
+        <h3>Úsalo cuando…</h3>
+        <ul>
+          <li>Los datos pertenecen a <strong>un solo usuario y dispositivo</strong>: notas, tareas, gastos, favoritos.</li>
+          <li>La app debe funcionar <strong>sin internet</strong>.</li>
+          <li>Necesitas guardar una <strong>copia local</strong> de datos que llegan de una API para mostrarlos rápido.</li>
+          <li>Los datos tienen estructura: varias columnas, búsquedas, filtros u ordenamiento.</li>
+        </ul>
+      </article>
+      <article class="card">
+        <h3>No es la mejor opción cuando…</h3>
+        <ul>
+          <li>Varios usuarios deben ver y modificar <strong>los mismos datos</strong> en tiempo real: usa un servidor (MySQL + API) o Firebase.</li>
+          <li>Solo guardas un par de valores sueltos (tema oscuro, último usuario): basta con <code>SharedPreferences</code>.</li>
+          <li>Guardas archivos grandes (fotos, videos): van en el almacenamiento de archivos; en la BD solo su ruta.</li>
+        </ul>
+      </article>
+    </div>
+    <table>
+      <tr>
+        <th>Opción en Android</th>
+        <th>Qué guarda</th>
+        <th>Ejemplo</th>
+      </tr>
+      <tr>
+        <td><code>SharedPreferences</code></td>
+        <td>Valores sueltos clave → valor</td>
+        <td>Tema oscuro activado, idioma elegido</td>
+      </tr>
+      <tr>
+        <td><strong>SQLite</strong></td>
+        <td>Muchos registros con estructura, en el dispositivo</td>
+        <td>Lista de países, tareas, gastos</td>
+      </tr>
+      <tr>
+        <td>Room</td>
+        <td>Lo mismo que SQLite, con menos código y validación al compilar</td>
+        <td>Proyectos profesionales</td>
+      </tr>
+      <tr>
+        <td>Servidor remoto (API)</td>
+        <td>Datos compartidos entre usuarios y dispositivos</td>
+        <td>Usuarios de una red social, pedidos de una tienda</td>
+      </tr>
+    </table>
+
+    <h3>Vocabulario básico</h3>
+    <table>
+      <tr>
+        <th>Término</th>
+        <th>Significado</th>
+        <th>En esta guía</th>
+      </tr>
+      <tr>
+        <td>Tabla</td>
+        <td>Conjunto de datos del mismo tipo, organizado en filas y columnas.</td>
+        <td><code>paises</code></td>
+      </tr>
+      <tr>
+        <td>Registro (fila)</td>
+        <td>Un elemento de la tabla.</td>
+        <td>El país «Perú»</td>
+      </tr>
+      <tr>
+        <td>Campo (columna)</td>
+        <td>Un dato de cada registro.</td>
+        <td><code>nombre</code>, <code>estado</code></td>
+      </tr>
+      <tr>
+        <td>Clave primaria</td>
+        <td>Campo que identifica a cada registro de forma única.</td>
+        <td><code>id_pais</code></td>
+      </tr>
+      <tr>
+        <td>SQL</td>
+        <td>Lenguaje para crear tablas y consultar o modificar datos.</td>
+        <td><code>INSERT INTO paises …</code></td>
+      </tr>
+      <tr>
+        <td>CRUD</td>
+        <td>Create, Read, Update, Delete: las cuatro operaciones básicas.</td>
+        <td>Insertar, buscar/listar, actualizar, eliminar</td>
+      </tr>
+    </table>
+    <div class="ok"><strong>Lo que harás en esta guía:</strong> crear la base de datos <code>paises.db</code> con la tabla <code>paises</code> y programar un formulario que <strong>inserta</strong>, <strong>actualiza</strong> y <strong>elimina</strong> países, comprobando cada cambio en pantalla, en Logcat y en Database Inspector.</div>
+
+    <!-- ============ PROYECTO ============ -->
+    <h2 id="proyecto">1. Preparar el proyecto</h2>
+    <ol>
+      <li>En Android Studio: <strong>File → New → New Project → Empty Views Activity</strong>.</li>
+      <li><strong>Name:</strong> <code>SQLitePaises</code>. <strong>Package name:</strong> <code>com.example.sqlitepaises</code>. <strong>Language:</strong> Kotlin.</li>
+      <li>Pulsa <strong>Finish</strong>. El asistente crea <code>MainActivity.kt</code> y <code>activity_main.xml</code>.</li>
+    </ol>
+    <p>SQLite viene incluido en Android: <strong>no se agrega ninguna dependencia</strong>.</p>
+    <pre class="tree">app/src/main
+│
+├── java/com/example/sqlitepaises
+│   ├── MainActivity.kt           ← formulario y botones (Partes 4 y 7)
+│   ├── model/
+│   │   └── Pais.kt               ← Parte 4
+│   └── data/
+│       └── PaisDbHelper.kt       ← Parte 4 (se completa en la Parte 5)
+│
+└── res/layout
+    └── activity_main.xml         ← Parte 6</pre>
+    <div class="box"><strong>Crear un subpaquete:</strong> clic derecho en <code>com.example.sqlitepaises</code> → <strong>New → Package</strong> → escribe <code>model</code> o <code>data</code>. Luego, clic derecho en el subpaquete → <strong>New → Kotlin Class/File</strong>.</div>
+    <div class="note"><strong>Importante:</strong> cuando una parte indique «reemplazar», copia el bloque completo con el botón <strong>Copiar</strong> y sustituye todo el contenido del archivo.</div>
+
+    <!-- ============ CONCEPTOS ============ -->
+    <h2 id="conceptos">2. Conceptos clave</h2>
+    <p><strong>SQLite</strong> es una base de datos que vive en un archivo dentro del teléfono. Los datos se conservan aunque cierres la app o apagues el dispositivo, y funciona sin internet.</p>
+    <div class="cards four">
+      <article class="card ink">
+        <h3>Base de datos</h3>
+        <p>Archivo <code>paises.db</code> guardado en la memoria interna de la app.</p>
+      </article>
+      <article class="card">
+        <h3>Tabla</h3>
+        <p><code>paises</code>: filas (registros) y columnas (campos).</p>
+      </article>
+      <article class="card amber">
+        <h3>SQLiteOpenHelper</h3>
+        <p>Clase de Android que crea la BD y la tabla, y controla las versiones.</p>
+      </article>
+      <article class="card green">
+        <h3>Modelo</h3>
+        <p><code>Pais</code>: un objeto Kotlin por cada fila.</p>
+      </article>
+    </div>
+    <div class="flow">Formulario → MainActivity → PaisDbHelper → SQL → paises.db</div>
+
+    <h3>2.1 Las operaciones de la guía</h3>
+    <table>
+      <tr>
+        <th>Operación</th>
+        <th>SQL</th>
+        <th>Método de Android</th>
+        <th>Devuelve</th>
+      </tr>
+      <tr>
+        <td>Insertar</td>
+        <td><code>INSERT INTO paises …</code></td>
+        <td><code>db.insert()</code></td>
+        <td>El id generado, o <code>-1</code> si falla</td>
+      </tr>
+      <tr>
+        <td>Actualizar</td>
+        <td><code>UPDATE paises SET … WHERE id_pais = ?</code></td>
+        <td><code>db.update()</code></td>
+        <td>Cantidad de filas modificadas</td>
+      </tr>
+      <tr>
+        <td>Eliminar</td>
+        <td><code>DELETE FROM paises WHERE id_pais = ?</code></td>
+        <td><code>db.delete()</code></td>
+        <td>Cantidad de filas eliminadas</td>
+      </tr>
+      <tr>
+        <td>Consultar (apoyo)</td>
+        <td><code>SELECT * FROM paises …</code></td>
+        <td><code>db.rawQuery()</code></td>
+        <td>Un <code>Cursor</code> para recorrer filas</td>
+      </tr>
+    </table>
+    <div class="box"><strong>¿Por qué consultar si el tema es insertar, actualizar y eliminar?</strong> Para actualizar o eliminar necesitas conocer el <code>id_pais</code> del registro. Una búsqueda por id y un listado simple en pantalla te permiten ver el efecto de cada operación.</div>
+
+    <!-- ============ TABLA ============ -->
+    <h2 id="tabla">3. Diseño de la tabla <code>paises</code></h2>
+    <table>
+      <tr>
+        <th>Columna</th>
+        <th>Tipo SQLite</th>
+        <th>Restricciones</th>
+        <th>Significado</th>
+      </tr>
+      <tr>
+        <td><code>id_pais</code></td>
+        <td><code>INTEGER</code></td>
+        <td><code>PRIMARY KEY AUTOINCREMENT</code></td>
+        <td>Identificador único; SQLite lo genera al insertar.</td>
+      </tr>
+      <tr>
+        <td><code>nombre</code></td>
+        <td><code>TEXT</code></td>
+        <td><code>NOT NULL UNIQUE</code></td>
+        <td>Nombre del país; obligatorio y sin repetirse.</td>
+      </tr>
+      <tr>
+        <td><code>estado</code></td>
+        <td><code>INTEGER</code></td>
+        <td><code>NOT NULL DEFAULT 1</code></td>
+        <td><code>1</code> = activo, <code>0</code> = inactivo.</td>
+      </tr>
+    </table>
+    <pre data-lang="sql" data-file="Sentencia SQL de la tabla"><code>CREATE TABLE paises (
+    id_pais INTEGER PRIMARY KEY AUTOINCREMENT,
+    nombre  TEXT    NOT NULL UNIQUE,
+    estado  INTEGER NOT NULL DEFAULT 1
+);</code></pre>
+
+    <table class="dbtable">
+      <tr>
+        <th>id_pais</th>
+        <th>nombre</th>
+        <th>estado</th>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td>Perú</td>
+        <td><span class="badge on">1 · Activo</span></td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>Chile</td>
+        <td><span class="badge on">1 · Activo</span></td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td>Colombia</td>
+        <td><span class="badge off">0 · Inactivo</span></td>
+      </tr>
+    </table>
+
+    <h3>3.1 Decisiones de diseño</h3>
+    <div class="cards">
+      <article class="card"><span class="tag">estado INTEGER</span>
+        <h3>¿Por qué 1 y 0?</h3>
+        <p>SQLite no tiene tipo booleano. Se usa <code>INTEGER</code> con <code>1</code>/<code>0</code>, que se asocia directamente a un <code>CheckBox</code>.</p>
+      </article>
+      <article class="card"><span class="tag">UNIQUE</span>
+        <h3>Sin duplicados</h3>
+        <p>La base de datos rechaza un segundo «Perú». Así el control no depende solo del código Kotlin.</p>
+      </article>
+      <article class="card"><span class="tag">AUTOINCREMENT</span>
+        <h3>Ids que no se reutilizan</h3>
+        <p>Si eliminas el país 3, el siguiente será el 4. Un id eliminado no vuelve a asignarse.</p>
+      </article>
+    </div>
+    <div class="note"><strong>Eliminación física vs. lógica:</strong> <code>DELETE</code> borra la fila para siempre (eliminación física). Cambiar <code>estado</code> a <code>0</code> la «desactiva» pero conserva el dato (eliminación lógica). Muchas apps reales prefieren la lógica para no perder historial. En esta guía practicarás las dos.</div>
+
+    <!-- ============ CREAR BD ============ -->
+    <h2 id="crear-bd">4. Crear la base de datos</h2>
+
+    <h3>4.1 Modelo <code>Pais</code></h3>
+    <p>Clic derecho en el paquete <code>model</code> → <strong>New → Kotlin Class/File</strong> → <code>Pais</code>.</p>
+    <pre data-lang="kotlin" data-file="model/Pais.kt"><code>package com.example.sqlitepaises.model
+
+// Representa una fila de la tabla paises
+data class Pais(
+    // 0 porque SQLite genera el id al insertar
+    val idPais: Int = 0,
+    val nombre: String,
+    // 1 = activo, 0 = inactivo
+    val estado: Int = 1
+) {
+    // Texto legible del estado para mostrarlo en pantalla
+    fun estadoTexto(): String = if (estado == 1) "Activo" else "Inactivo"
+}</code></pre>
+
+    <h3>4.2 Helper con la tabla</h3>
+    <p>Clic derecho en el paquete <code>data</code> → <strong>New → Kotlin Class/File</strong> → <code>PaisDbHelper</code>.</p>
+    <pre data-lang="kotlin" data-file="data/PaisDbHelper.kt"><code>package com.example.sqlitepaises.data
+
+import android.content.Context
+import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteOpenHelper
+import android.util.Log
+
+class PaisDbHelper(context: Context) :
+    SQLiteOpenHelper(context, DB_NAME, null, DB_VERSION) {
+
+    companion object {
+        // Etiqueta para filtrar en Logcat
+        const val TAG = "SQLitePaises"
+
+        // Archivo de la base de datos y su versión
+        const val DB_NAME = "paises.db"
+        const val DB_VERSION = 1
+
+        // Tabla y columnas
+        const val TABLE_PAISES = "paises"
+        const val COL_ID = "id_pais"
+        const val COL_NOMBRE = "nombre"
+        const val COL_ESTADO = "estado"
+    }
+
+    // Se ejecuta UNA sola vez: cuando la base de datos todavía no existe
+    override fun onCreate(db: SQLiteDatabase) {
+        val sql = """
+            CREATE TABLE $TABLE_PAISES (
+                $COL_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                $COL_NOMBRE TEXT NOT NULL UNIQUE,
+                $COL_ESTADO INTEGER NOT NULL DEFAULT 1
+            )
+        """.trimIndent()
+
+        db.execSQL(sql)
+        Log.d(TAG, "onCreate(): tabla $TABLE_PAISES creada")
+    }
+
+    // Se ejecuta cuando aumentas DB_VERSION
+    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+        Log.d(TAG, "onUpgrade(): de la versión $oldVersion a la $newVersion")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_PAISES")
+        onCreate(db)
+    }
+}</code></pre>
+    <table>
+      <tr>
+        <th>Parte</th>
+        <th>Función</th>
+      </tr>
+      <tr>
+        <td><code>SQLiteOpenHelper(context, DB_NAME, null, DB_VERSION)</code></td>
+        <td>Indica el archivo de la BD y su versión.</td>
+      </tr>
+      <tr>
+        <td><code>companion object</code></td>
+        <td>Constantes con los nombres de tabla y columnas: evitan errores de escritura.</td>
+      </tr>
+      <tr>
+        <td><code>onCreate()</code></td>
+        <td>Crea la tabla la primera vez. <code>execSQL()</code> ejecuta la sentencia.</td>
+      </tr>
+      <tr>
+        <td><code>onUpgrade()</code></td>
+        <td>Rehace la tabla al subir la versión. <strong>Borra los datos</strong>: úsalo solo en práctica.</td>
+      </tr>
+    </table>
+
+    <h3>4.3 Probar que la BD se crea</h3>
+    <p>La tabla no existe por escribir la clase: se crea al abrir la base de datos por primera vez. <strong>Reemplaza</strong> <code>MainActivity.kt</code> con esta prueba:</p>
+    <pre data-lang="kotlin" data-file="MainActivity.kt (prueba)"><code>package com.example.sqlitepaises
+
+import android.os.Bundle
+import android.util.Log
+import androidx.appcompat.app.AppCompatActivity
+import com.example.sqlitepaises.data.PaisDbHelper
+
+class MainActivity : AppCompatActivity() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        // Al pedir writableDatabase, Android crea paises.db
+        // y ejecuta onCreate() del helper si todavía no existe
+        val dbHelper = PaisDbHelper(this)
+        val db = dbHelper.writableDatabase
+        Log.d(PaisDbHelper.TAG, "MainActivity: base de datos lista")
+        db.close()
+    }
+}</code></pre>
+    <p>Ejecuta la app y filtra Logcat con <code>tag:SQLitePaises</code>. En la primera ejecución verás:</p>
+    <div class="result">onCreate(): tabla paises creada<br>MainActivity: base de datos lista</div>
+    <div class="box"><strong>En las siguientes ejecuciones</strong> solo aparece «base de datos lista»: la tabla ya existe y <code>onCreate()</code> no se repite.</div>
+
+    <h3>4.4 Revisar la tabla en Database Inspector</h3>
+    <ol>
+      <li>Con la app ejecutándose: <strong>View → Tool Windows → App Inspection</strong> → pestaña <strong>Database Inspector</strong>.</li>
+      <li>Selecciona el proceso <code>com.example.sqlitepaises</code> y abre <code>paises.db</code> → <code>paises</code>.</li>
+      <li>Pulsa <strong>New Query</strong> para escribir SQL directamente.</li>
+    </ol>
+    <pre data-lang="sql" data-file="Database Inspector → New Query"><code>-- Estructura de la tabla
+PRAGMA table_info(paises);
+
+-- Datos de prueba
+INSERT INTO paises (nombre, estado) VALUES
+('Perú', 1),
+('Chile', 1),
+('Colombia', 1),
+('Argentina', 1),
+('Ecuador', 0);
+
+-- Ver los registros
+SELECT * FROM paises;</code></pre>
+    <div class="note"><strong>BD «closed»:</strong> como el código cierra la conexión con <code>db.close()</code>, el inspector puede mostrar <code>paises.db (closed)</code>. No es un error. Activa el botón <strong>Keep database connections open</strong> (ícono de candado) en la barra del Database Inspector y vuelve a ejecutar la app: así la BD queda disponible para consultar.</div>
+
+    <!-- ============ CRUD ============ -->
+    <h2 id="crud">5. CRUD en el helper</h2>
+    <p><strong>Reemplaza</strong> <code>PaisDbHelper.kt</code>. Se agregan los métodos para insertar, actualizar y eliminar, más dos consultas de apoyo:</p>
+    <pre data-lang="kotlin" data-file="data/PaisDbHelper.kt"><code>package com.example.sqlitepaises.data
+
+import android.content.ContentValues
+import android.content.Context
+import android.database.sqlite.SQLiteConstraintException
+import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteOpenHelper
+import android.util.Log
+import com.example.sqlitepaises.model.Pais
+
+class PaisDbHelper(context: Context) :
+    SQLiteOpenHelper(context, DB_NAME, null, DB_VERSION) {
+
+    companion object {
+        const val TAG = "SQLitePaises"
+        const val DB_NAME = "paises.db"
+        const val DB_VERSION = 1
+
+        const val TABLE_PAISES = "paises"
+        const val COL_ID = "id_pais"
+        const val COL_NOMBRE = "nombre"
+        const val COL_ESTADO = "estado"
+    }
+
+    override fun onCreate(db: SQLiteDatabase) {
+        val sql = """
+            CREATE TABLE $TABLE_PAISES (
+                $COL_ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                $COL_NOMBRE TEXT NOT NULL UNIQUE,
+                $COL_ESTADO INTEGER NOT NULL DEFAULT 1
+            )
+        """.trimIndent()
+
+        db.execSQL(sql)
+        Log.d(TAG, "onCreate(): tabla $TABLE_PAISES creada")
+    }
+
+    override fun onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int) {
+        Log.d(TAG, "onUpgrade(): de la versión $oldVersion a la $newVersion")
+        db.execSQL("DROP TABLE IF EXISTS $TABLE_PAISES")
+        onCreate(db)
+    }
+
+    // ===================== INSERTAR =====================
+    // Devuelve el id generado, o -1 si falla (por ejemplo, nombre repetido)
+    fun insertar(pais: Pais): Long {
+        val db = writableDatabase
+
+        // ContentValues: pares columna → valor. El id no se envía: lo genera SQLite
+        val valores = ContentValues().apply {
+            put(COL_NOMBRE, pais.nombre)
+            put(COL_ESTADO, pais.estado)
+        }
+
+        val id = db.insert(TABLE_PAISES, null, valores)
+        Log.d(TAG, "insertar(): ${pais.nombre} → id = $id")
+        db.close()
+        return id
+    }
+
+    // ===================== ACTUALIZAR =====================
+    // Devuelve filas modificadas: 1 = OK, 0 = no existe ese id, -1 = nombre repetido
+    fun actualizar(pais: Pais): Int {
+        val db = writableDatabase
+
+        val valores = ContentValues().apply {
+            put(COL_NOMBRE, pais.nombre)
+            put(COL_ESTADO, pais.estado)
+        }
+
+        val filas = try {
+            // WHERE id_pais = ?  → el ? se reemplaza por el valor del arreglo
+            db.update(TABLE_PAISES, valores, "$COL_ID = ?", arrayOf(pais.idPais.toString()))
+        } catch (e: SQLiteConstraintException) {
+            // UNIQUE: ya existe otro país con ese nombre
+            -1
+        }
+
+        Log.d(TAG, "actualizar(): id = ${pais.idPais} → filas = $filas")
+        db.close()
+        return filas
+    }
+
+    // ===================== ELIMINAR =====================
+    // Devuelve filas eliminadas: 1 = OK, 0 = no existe ese id
+    fun eliminar(idPais: Int): Int {
+        val db = writableDatabase
+        val filas = db.delete(TABLE_PAISES, "$COL_ID = ?", arrayOf(idPais.toString()))
+        Log.d(TAG, "eliminar(): id = $idPais → filas = $filas")
+        db.close()
+        return filas
+    }
+
+    // ===================== CONSULTAS DE APOYO =====================
+    // Busca un país por su id; devuelve null si no existe
+    fun buscarPorId(idPais: Int): Pais? {
+        val db = readableDatabase
+        val cursor = db.rawQuery(
+            "SELECT * FROM $TABLE_PAISES WHERE $COL_ID = ?",
+            arrayOf(idPais.toString())
+        )
+
+        var pais: Pais? = null
+        if (cursor.moveToFirst()) {
+            pais = Pais(
+                idPais = cursor.getInt(cursor.getColumnIndexOrThrow(COL_ID)),
+                nombre = cursor.getString(cursor.getColumnIndexOrThrow(COL_NOMBRE)),
+                estado = cursor.getInt(cursor.getColumnIndexOrThrow(COL_ESTADO))
+            )
+        }
+
+        cursor.close()
+        db.close()
+        return pais
+    }
+
+    // Devuelve todos los países ordenados por id
+    fun listar(): List&lt;Pais&gt; {
+        val lista = mutableListOf&lt;Pais&gt;()
+        val db = readableDatabase
+        val cursor = db.rawQuery("SELECT * FROM $TABLE_PAISES ORDER BY $COL_ID", null)
+
+        if (cursor.moveToFirst()) {
+            do {
+                lista.add(
+                    Pais(
+                        idPais = cursor.getInt(cursor.getColumnIndexOrThrow(COL_ID)),
+                        nombre = cursor.getString(cursor.getColumnIndexOrThrow(COL_NOMBRE)),
+                        estado = cursor.getInt(cursor.getColumnIndexOrThrow(COL_ESTADO))
+                    )
+                )
+            } while (cursor.moveToNext())
+        }
+
+        cursor.close()
+        db.close()
+        return lista
+    }
+}</code></pre>
+
+    <h3>5.1 Cómo funciona cada método</h3>
+    <div class="cards">
+      <article class="card green"><span class="tag">insertar()</span>
+        <h3>INSERT</h3>
+        <p>Arma un <code>ContentValues</code> con <code>nombre</code> y <code>estado</code>. <code>db.insert()</code> devuelve el nuevo <code>id_pais</code>, o <code>-1</code> si el nombre ya existe.</p>
+      </article>
+      <article class="card amber"><span class="tag">actualizar()</span>
+        <h3>UPDATE</h3>
+        <p>Cambia nombre y estado <strong>solo</strong> en la fila con ese id (<code>WHERE id_pais = ?</code>). Si el nombre choca con otro país, captura el error y devuelve <code>-1</code>.</p>
+      </article>
+      <article class="card"><span class="tag">eliminar()</span>
+        <h3>DELETE</h3>
+        <p>Borra la fila con ese id. Devuelve <code>1</code> si la eliminó y <code>0</code> si no existía.</p>
+      </article>
+    </div>
+    <div class="box"><strong>El signo <code>?</code>:</strong> es un parámetro. El valor real va aparte en <code>arrayOf(...)</code>. Así Android escapa las comillas y evita la inyección SQL. Nunca concatenes lo que escribe el usuario dentro del SQL.</div>
+    <div class="note"><strong>¡Cuidado con el WHERE!</strong> <code>db.delete(TABLE_PAISES, null, null)</code> sin condición borra <strong>todos</strong> los países. Lo mismo pasa con <code>update</code> sin <code>WHERE</code>: modifica todas las filas.</div>
+
+    <!-- ============ FORMULARIO ============ -->
+    <h2 id="formulario">6. Formulario</h2>
+    <div class="mock-row" aria-hidden="true">
+      <div>
+        <div class="phone">
+          <div class="title">Países</div>
+          <div class="field">Id del país (para buscar, actualizar o eliminar)</div>
+          <div class="field">Nombre del país</div>
+          <div class="check">☑ Activo</div>
+          <div class="btns"><div class="btn">GUARDAR</div><div class="btn">ACTUALIZAR</div><div class="btn">ELIMINAR</div></div>
+          <div class="btns two"><div class="btn alt">BUSCAR</div><div class="btn alt">LIMPIAR</div></div>
+          <div class="list">1 | Perú | Activo<br>2 | Chile | Activo<br>3 | Colombia | Activo<br>4 | Argentina | Activo<br>5 | Ecuador | Inactivo</div>
+        </div>
+        <div class="mock-cap">Pantalla final</div>
+      </div>
+    </div>
+    <p><strong>Reemplaza</strong> <code>activity_main.xml</code>:</p>
+    <pre data-lang="xml" data-file="res/layout/activity_main.xml"><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"&gt;
+
+    &lt;LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp"&gt;
+
+        &lt;TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Países"
+            android:textSize="24sp"
+            android:textStyle="bold" /&gt;
+
+        &lt;!-- Id: solo para buscar, actualizar o eliminar --&gt;
+        &lt;EditText
+            android:id="@+id/etIdPais"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:hint="Id del país (buscar, actualizar o eliminar)"
+            android:inputType="number" /&gt;
+
+        &lt;EditText
+            android:id="@+id/etNombre"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="Nombre del país"
+            android:inputType="textCapWords" /&gt;
+
+        &lt;!-- Marcado = 1 (activo), desmarcado = 0 (inactivo) --&gt;
+        &lt;CheckBox
+            android:id="@+id/cbEstado"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:text="Activo" /&gt;
+
+        &lt;LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:orientation="horizontal"&gt;
+
+            &lt;Button
+                android:id="@+id/btnGuardar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Guardar" /&gt;
+
+            &lt;Button
+                android:id="@+id/btnActualizar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="6dp"
+                android:text="Actualizar" /&gt;
+
+            &lt;Button
+                android:id="@+id/btnEliminar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="6dp"
+                android:text="Eliminar" /&gt;
+        &lt;/LinearLayout&gt;
+
+        &lt;LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"&gt;
+
+            &lt;Button
+                android:id="@+id/btnBuscar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Buscar" /&gt;
+
+            &lt;Button
+                android:id="@+id/btnLimpiar"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginStart="6dp"
+                android:text="Limpiar" /&gt;
+        &lt;/LinearLayout&gt;
+
+        &lt;TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Registros"
+            android:textStyle="bold" /&gt;
+
+        &lt;!-- Listado simple de la tabla --&gt;
+        &lt;TextView
+            android:id="@+id/tvListado"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:fontFamily="monospace"
+            android:text="Sin registros" /&gt;
+
+    &lt;/LinearLayout&gt;
+&lt;/ScrollView&gt;</code></pre>
+    <table>
+      <tr>
+        <th>Control</th>
+        <th>id</th>
+        <th>Uso</th>
+      </tr>
+      <tr>
+        <td>EditText numérico</td>
+        <td><code>etIdPais</code></td>
+        <td>Id del registro a buscar, actualizar o eliminar. Al guardar no se usa.</td>
+      </tr>
+      <tr>
+        <td>EditText</td>
+        <td><code>etNombre</code></td>
+        <td>Nombre del país.</td>
+      </tr>
+      <tr>
+        <td>CheckBox</td>
+        <td><code>cbEstado</code></td>
+        <td>Marcado → <code>estado = 1</code>; desmarcado → <code>estado = 0</code>.</td>
+      </tr>
+      <tr>
+        <td>TextView</td>
+        <td><code>tvListado</code></td>
+        <td>Muestra todos los registros después de cada operación.</td>
+      </tr>
+    </table>
+
+    <!-- ============ ACTIVIDAD ============ -->
+    <h2 id="actividad">7. MainActivity: conectar botones y BD</h2>
+    <p><strong>Reemplaza</strong> <code>MainActivity.kt</code>:</p>
+    <pre data-lang="kotlin" data-file="MainActivity.kt"><code>package com.example.sqlitepaises
+
+import android.os.Bundle
+import android.widget.Button
+import android.widget.CheckBox
+import android.widget.EditText
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import com.example.sqlitepaises.data.PaisDbHelper
+import com.example.sqlitepaises.model.Pais
+
+class MainActivity : AppCompatActivity() {
+
+    private lateinit var dbHelper: PaisDbHelper
+    private lateinit var etIdPais: EditText
+    private lateinit var etNombre: EditText
+    private lateinit var cbEstado: CheckBox
+    private lateinit var tvListado: TextView
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        dbHelper = PaisDbHelper(this)
+
+        etIdPais = findViewById(R.id.etIdPais)
+        etNombre = findViewById(R.id.etNombre)
+        cbEstado = findViewById(R.id.cbEstado)
+        tvListado = findViewById(R.id.tvListado)
+
+        findViewById&lt;Button&gt;(R.id.btnGuardar).setOnClickListener { guardar() }
+        findViewById&lt;Button&gt;(R.id.btnActualizar).setOnClickListener { actualizar() }
+        findViewById&lt;Button&gt;(R.id.btnEliminar).setOnClickListener { confirmarEliminar() }
+        findViewById&lt;Button&gt;(R.id.btnBuscar).setOnClickListener { buscar() }
+        findViewById&lt;Button&gt;(R.id.btnLimpiar).setOnClickListener { limpiar() }
+
+        listar()
+    }
+
+    // ===================== INSERTAR =====================
+    private fun guardar() {
+        val nombre = leerNombre() ?: return
+        val pais = Pais(nombre = nombre, estado = leerEstado())
+
+        val id = dbHelper.insertar(pais)
+        if (id == -1L) {
+            mensaje("No se pudo guardar: «$nombre» ya existe")
+        } else {
+            mensaje("País guardado con id $id")
+            limpiar()
+            listar()
+        }
+    }
+
+    // ===================== ACTUALIZAR =====================
+    private fun actualizar() {
+        val id = leerId() ?: return
+        val nombre = leerNombre() ?: return
+        val pais = Pais(idPais = id, nombre = nombre, estado = leerEstado())
+
+        when (dbHelper.actualizar(pais)) {
+            -1 -&gt; mensaje("Ya existe otro país llamado «$nombre»")
+            0 -&gt; mensaje("No existe un país con id $id")
+            else -&gt; {
+                mensaje("País $id actualizado")
+                limpiar()
+                listar()
+            }
+        }
+    }
+
+    // ===================== ELIMINAR =====================
+    private fun confirmarEliminar() {
+        val id = leerId() ?: return
+
+        // Pedir confirmación: la eliminación no se puede deshacer
+        AlertDialog.Builder(this)
+            .setTitle("Eliminar país")
+            .setMessage("¿Eliminar el país con id $id?")
+            .setPositiveButton("Eliminar") { _, _ -&gt;
+                if (dbHelper.eliminar(id) &gt; 0) {
+                    mensaje("País $id eliminado")
+                    limpiar()
+                    listar()
+                } else {
+                    mensaje("No existe un país con id $id")
+                }
+            }
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+
+    // ===================== APOYO =====================
+    // Carga en el formulario el país del id indicado
+    private fun buscar() {
+        val id = leerId() ?: return
+        val pais = dbHelper.buscarPorId(id)
+
+        if (pais == null) {
+            mensaje("No existe un país con id $id")
+        } else {
+            etNombre.setText(pais.nombre)
+            cbEstado.isChecked = pais.estado == 1
+        }
+    }
+
+    // Muestra todos los registros en el TextView
+    private fun listar() {
+        val paises = dbHelper.listar()
+        tvListado.text = if (paises.isEmpty()) {
+            "Sin registros"
+        } else {
+            paises.joinToString("\n") { "${it.idPais} | ${it.nombre} | ${it.estadoTexto()}" }
+        }
+    }
+
+    private fun limpiar() {
+        etIdPais.text.clear()
+        etNombre.text.clear()
+        cbEstado.isChecked = true
+        etIdPais.requestFocus()
+    }
+
+    // ===================== VALIDACIONES =====================
+    // Devuelve el id escrito o null (y marca el error) si no es un número
+    private fun leerId(): Int? {
+        val id = etIdPais.text.toString().trim().toIntOrNull()
+        if (id == null) etIdPais.error = "Ingresa un id válido"
+        return id
+    }
+
+    // Devuelve el nombre o null (y marca el error) si está vacío
+    private fun leerNombre(): String? {
+        val nombre = etNombre.text.toString().trim()
+        if (nombre.isEmpty()) {
+            etNombre.error = "Ingresa el nombre"
+            return null
+        }
+        return nombre
+    }
+
+    // CheckBox marcado = 1, desmarcado = 0
+    private fun leerEstado(): Int = if (cbEstado.isChecked) 1 else 0
+
+    private fun mensaje(texto: String) {
+        Toast.makeText(this, texto, Toast.LENGTH_SHORT).show()
+    }
+}</code></pre>
+
+    <table>
+      <tr>
+        <th>Botón</th>
+        <th>Necesita</th>
+        <th>Llama a</th>
+        <th>Después</th>
+      </tr>
+      <tr>
+        <td>Guardar</td>
+        <td>Nombre (+ estado)</td>
+        <td><code>dbHelper.insertar()</code></td>
+        <td>Limpia y lista</td>
+      </tr>
+      <tr>
+        <td>Actualizar</td>
+        <td>Id + nombre (+ estado)</td>
+        <td><code>dbHelper.actualizar()</code></td>
+        <td>Limpia y lista</td>
+      </tr>
+      <tr>
+        <td>Eliminar</td>
+        <td>Id</td>
+        <td>Confirmación → <code>dbHelper.eliminar()</code></td>
+        <td>Limpia y lista</td>
+      </tr>
+      <tr>
+        <td>Buscar</td>
+        <td>Id</td>
+        <td><code>dbHelper.buscarPorId()</code></td>
+        <td>Llena el formulario</td>
+      </tr>
+    </table>
+    <div class="box"><strong><code>leerId() ?: return</code>:</strong> el operador Elvis <code>?:</code> sale de la función si la validación devuelve <code>null</code>. Así cada botón se detiene solo cuando falta un dato, sin <code>if</code> anidados.</div>
+
+    <!-- ============ PRUEBAS ============ -->
+    <h2 id="pruebas">8. Pruebas</h2>
+    <p>Ejecuta la app y realiza cada prueba en orden. Observa el listado en pantalla, los mensajes Toast y Logcat (<code>tag:SQLitePaises</code>):</p>
+    <table>
+      <tr>
+        <th>#</th>
+        <th>Acción</th>
+        <th>Resultado esperado</th>
+      </tr>
+      <tr>
+        <td>1</td>
+        <td>Nombre «Bolivia», Activo, pulsar <strong>Guardar</strong></td>
+        <td>«País guardado con id N»; aparece en el listado</td>
+      </tr>
+      <tr>
+        <td>2</td>
+        <td>Guardar otra vez «Bolivia»</td>
+        <td>«No se pudo guardar: «Bolivia» ya existe» (UNIQUE)</td>
+      </tr>
+      <tr>
+        <td>3</td>
+        <td>Guardar con el nombre vacío</td>
+        <td>Error en el campo nombre; no se ejecuta SQL</td>
+      </tr>
+      <tr>
+        <td>4</td>
+        <td>Id de Bolivia → <strong>Buscar</strong></td>
+        <td>El formulario muestra «Bolivia» y Activo</td>
+      </tr>
+      <tr>
+        <td>5</td>
+        <td>Desmarcar Activo → <strong>Actualizar</strong></td>
+        <td>El listado muestra «Bolivia | Inactivo» (eliminación lógica)</td>
+      </tr>
+      <tr>
+        <td>6</td>
+        <td>Id 999 → <strong>Actualizar</strong></td>
+        <td>«No existe un país con id 999»</td>
+      </tr>
+      <tr>
+        <td>7</td>
+        <td>Id de Bolivia → <strong>Eliminar</strong> → Cancelar</td>
+        <td>No cambia nada</td>
+      </tr>
+      <tr>
+        <td>8</td>
+        <td>Id de Bolivia → <strong>Eliminar</strong> → Eliminar</td>
+        <td>Desaparece del listado (eliminación física)</td>
+      </tr>
+      <tr>
+        <td>9</td>
+        <td>Guardar un país nuevo</td>
+        <td>Recibe un id mayor: el de Bolivia no se reutiliza (AUTOINCREMENT)</td>
+      </tr>
+      <tr>
+        <td>10</td>
+        <td>Cerrar la app por completo y volver a abrirla</td>
+        <td>Los datos siguen ahí: persistencia</td>
+      </tr>
+    </table>
+    <p class="caption">Logcat después de las pruebas 1, 5 y 8 (el id depende de tus datos):</p>
+    <div class="result">insertar(): Bolivia → id = 6<br>actualizar(): id = 6 → filas = 1<br>eliminar(): id = 6 → filas = 1</div>
+    <p>Comprueba cada cambio también en <strong>Database Inspector</strong> con:</p>
+    <pre data-lang="sql" data-file="Database Inspector → New Query"><code>SELECT * FROM paises ORDER BY id_pais;
+
+-- Solo los países activos
+SELECT * FROM paises WHERE estado = 1;</code></pre>
+
+    <!-- ============ ERRORES ============ -->
+    <h2 id="errores">9. Errores comunes</h2>
+    <table>
+      <tr>
+        <th>Síntoma</th>
+        <th>Causa</th>
+        <th>Solución</th>
+      </tr>
+      <tr>
+        <td><code>no such table: paises</code></td>
+        <td>Cambiaste el <code>CREATE TABLE</code> pero la BD ya existía, así que <code>onCreate()</code> no se volvió a ejecutar.</td>
+        <td>Sube <code>DB_VERSION</code> a 2, o desinstala la app del emulador y vuelve a ejecutar.</td>
+      </tr>
+      <tr>
+        <td><code>insert()</code> devuelve <code>-1</code></td>
+        <td>El nombre ya existe (UNIQUE) o falta un campo NOT NULL.</td>
+        <td>Revisa Logcat: aparece el error de SQLite con el detalle.</td>
+      </tr>
+      <tr>
+        <td>La app se cierra al actualizar</td>
+        <td><code>update()</code> lanza <code>SQLiteConstraintException</code> con un nombre repetido.</td>
+        <td>Capturarla con <code>try/catch</code>, como hace <code>actualizar()</code>.</td>
+      </tr>
+      <tr>
+        <td>Se modificaron o borraron todas las filas</td>
+        <td><code>update</code> o <code>delete</code> sin <code>WHERE</code>.</td>
+        <td>Siempre pasa <code>"id_pais = ?"</code> y el id.</td>
+      </tr>
+      <tr>
+        <td><code>column index out of range</code> o <code>-1</code></td>
+        <td>El nombre de la columna no coincide.</td>
+        <td>Usa las constantes <code>COL_ID</code>, <code>COL_NOMBRE</code>, <code>COL_ESTADO</code>.</td>
+      </tr>
+    </table>
+
+    <!-- ============ RESUMEN ============ -->
+    <h2 id="resumen">10. Resumen y ejercicios</h2>
+    <table>
+      <tr>
+        <th>Concepto</th>
+        <th>Clave en Kotlin / Android</th>
+      </tr>
+      <tr>
+        <td>Crear BD y tabla</td>
+        <td><code>SQLiteOpenHelper</code> + <code>onCreate()</code> + <code>execSQL()</code></td>
+      </tr>
+      <tr>
+        <td>Insertar</td>
+        <td><code>ContentValues</code> + <code>db.insert()</code> → id o <code>-1</code></td>
+      </tr>
+      <tr>
+        <td>Actualizar</td>
+        <td><code>db.update(tabla, valores, "id_pais = ?", arrayOf(id))</code> → filas</td>
+      </tr>
+      <tr>
+        <td>Eliminar</td>
+        <td><code>db.delete(tabla, "id_pais = ?", arrayOf(id))</code> → filas</td>
+      </tr>
+      <tr>
+        <td>Consultar</td>
+        <td><code>db.rawQuery()</code> + <code>Cursor</code> (<code>moveToFirst</code>, <code>moveToNext</code>, <code>close</code>)</td>
+      </tr>
+      <tr>
+        <td>Estado activo/inactivo</td>
+        <td><code>INTEGER</code> 1/0 ↔ <code>CheckBox.isChecked</code></td>
+      </tr>
+    </table>
+    <div class="box"><strong>Secuencia:</strong> modelo <code>Pais</code> → <code>PaisDbHelper</code> (tabla) → métodos <code>insertar / actualizar / eliminar</code> → formulario → botones en <code>MainActivity</code> → pruebas en Logcat y Database Inspector.</div>
+    <div class="ok"><strong>Ejercicios:</strong>
+      <ul>
+        <li>Agrega un botón «Desactivar» que ponga <code>estado = 0</code> sin tocar el nombre (eliminación lógica con un <code>UPDATE</code> de una sola columna).</li>
+        <li>Agrega un CheckBox «Solo activos» que liste únicamente <code>WHERE estado = 1</code>.</li>
+        <li>Agrega la columna <code>capital TEXT</code>: sube <code>DB_VERSION</code> a 2 y actualiza el modelo, el helper y el formulario.</li>
+        <li>Crea una tabla <code>ciudades</code> con <code>id_pais</code> como clave foránea.</li>
+      </ul>
+    </div>
+
+    <div class="footer">Aplicativos Móviles — Android / Kotlin · Documentación: <a href="https://developer.android.com/training/data-storage/sqlite" target="_blank" rel="noopener">Guardar datos con SQLite (Android Developers)</a></div>
+  </main>
+  <div id="copyToast" role="status" aria-live="polite"></div>
+
+  <script>
+    (function () {
+      // Interruptor interno: true muestra el botón «Copiar» en cada bloque de código.
+      var CONFIG = { allowCodeCopy: true };
+
+      function escapeHtml(text) {
+        return text.replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; });
+      }
+
+      function highlight(source, pattern, classify) {
+        var result = '', last = 0, match;
+        pattern.lastIndex = 0;
+        while ((match = pattern.exec(source)) !== null) {
+          var kind = classify(match[0]);
+          result += escapeHtml(source.slice(last, match.index));
+          result += kind ? '<span class="' + kind + '">' + escapeHtml(match[0]) + '</span>' : escapeHtml(match[0]);
+          last = pattern.lastIndex;
+        }
+        return result + escapeHtml(source.slice(last));
+      }
+
+      var KT_KEYWORDS = 'package|import|class|data|object|companion|const|override|fun|val|var|private|lateinit|when|else|if|for|in|do|while|return|as|super|this|try|catch';
+      var KT_TYPES = 'Bundle|Context|ContentValues|SQLiteDatabase|SQLiteOpenHelper|SQLiteConstraintException|Log|Button|CheckBox|EditText|TextView|Toast|AlertDialog|AppCompatActivity|MainActivity|Pais|PaisDbHelper|String|Int|Long|List';
+      var KT_KEYWORD_RE = new RegExp('^(' + KT_KEYWORDS + ')$');
+      var KT_TYPE_RE = new RegExp('^(' + KT_TYPES + ')$');
+      var KT_PATTERN = new RegExp('\\/\\/[^\\n]*|"(?:\\\\.|[^"\\\\])*"|this@\\w+|@\\w+|\\b(?:' + KT_KEYWORDS + ')\\b|\\b(?:' + KT_TYPES + ')\\b|\\b(?:true|false|null)\\b|\\b\\d+\\b', 'g');
+
+      function highlightKotlin(source) {
+        return highlight(source, KT_PATTERN, function (t) {
+          if (t.indexOf('//') === 0) return 'kt-comment';
+          if (t.charAt(0) === '"') return 'kt-string';
+          if (t.indexOf('this@') === 0) return 'kt-keyword';
+          if (t.charAt(0) === '@') return 'kt-annotation';
+          if (KT_KEYWORD_RE.test(t)) return 'kt-keyword';
+          if (KT_TYPE_RE.test(t)) return 'kt-type';
+          if (/^(true|false|null)$/.test(t)) return 'kt-literal';
+          return 'kt-number';
+        });
+      }
+
+      var SQL_PATTERN = /--[^\n]*|'(?:[^']|'')*'|\b(?:SELECT|FROM|WHERE|INSERT|INTO|VALUES|UPDATE|SET|DELETE|CREATE|TABLE|DROP|IF|EXISTS|PRAGMA|ORDER|BY|ASC|DESC|AND|OR|NOT|NULL|INTEGER|TEXT|PRIMARY|KEY|AUTOINCREMENT|UNIQUE|DEFAULT)\b|\b\d+\b/gi;
+
+      function highlightSql(source) {
+        return highlight(source, SQL_PATTERN, function (t) {
+          if (t.indexOf('--') === 0) return 'kt-comment';
+          if (t.charAt(0) === "'") return 'kt-string';
+          if (/^\d+$/.test(t)) return 'kt-number';
+          return 'kt-keyword';
+        });
+      }
+
+      var XML_PATTERN = /<!--[\s\S]*?-->|"[^"]*"|<\?\w+|\?>|<\/?[\w.:-]+|\/?>|[\w:.-]+(?==)/g;
+
+      function highlightXml(source) {
+        return highlight(source, XML_PATTERN, function (t) {
+          if (t.indexOf('<!--') === 0) return 'xml-comment';
+          if (t.charAt(0) === '"') return 'xml-string';
+          if (t.charAt(0) === '<' || t.charAt(t.length - 1) === '>') return 'xml-tag';
+          return 'xml-attr';
+        });
+      }
+
+      var HIGHLIGHTERS = { kotlin: highlightKotlin, xml: highlightXml, sql: highlightSql };
+      var LABELS = { kotlin: 'Kotlin', xml: 'XML', sql: 'SQL' };
+
+      var toast = document.getElementById('copyToast'), toastTimer;
+      function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () { toast.classList.remove('show'); }, 2200);
+      }
+
+      function copyText(text) {
+        if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+        return new Promise(function (resolve, reject) {
+          var area = document.createElement('textarea');
+          area.value = text;
+          area.setAttribute('readonly', '');
+          area.style.position = 'fixed';
+          area.style.opacity = '0';
+          document.body.appendChild(area);
+          area.select();
+          try { document.execCommand('copy') ? resolve() : reject(); } catch (e) { reject(e); }
+          document.body.removeChild(area);
+        });
+      }
+
+      // Envolver cada <pre> en un bloque con cabecera: nombre de archivo + botón Copiar.
+      document.querySelectorAll('pre[data-lang]').forEach(function (pre) {
+        var code = pre.querySelector('code');
+        var raw = code.textContent;
+        var lang = pre.getAttribute('data-lang');
+        code.innerHTML = (HIGHLIGHTERS[lang] || highlightKotlin)(raw);
+
+        var wrap = document.createElement('div');
+        wrap.className = 'codeblock';
+        var head = document.createElement('div');
+        head.className = 'codehead';
+        var file = document.createElement('span');
+        file.className = 'file';
+        file.textContent = pre.getAttribute('data-file') || LABELS[lang] || 'Código';
+        head.appendChild(file);
+
+        if (CONFIG.allowCodeCopy) {
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'copy-btn';
+          btn.textContent = 'Copiar';
+          btn.addEventListener('click', function () {
+            copyText(raw).then(function () {
+              btn.textContent = '✓ Copiado';
+              btn.classList.add('done');
+              showToast('Código copiado. Pégalo en Android Studio.');
+              setTimeout(function () { btn.textContent = 'Copiar'; btn.classList.remove('done'); }, 1800);
+            }, function () {
+              showToast('No se pudo copiar. Selecciona el código manualmente.');
+            });
+          });
+          head.appendChild(btn);
+        }
+
+        pre.parentNode.insertBefore(wrap, pre);
+        wrap.appendChild(head);
+        wrap.appendChild(pre);
+      });
+
+      var bar = document.getElementById('progress');
+      var links = document.querySelectorAll('.navlinks a');
+      var sections = Array.prototype.slice.call(document.querySelectorAll('main, h2[id]'));
+
+      function update() {
+        var root = document.documentElement;
+        var total = root.scrollHeight - root.clientHeight;
+        var pos = window.scrollY + 130;
+        var current = sections[0];
+        bar.style.width = (total > 0 ? root.scrollTop / total * 100 : 0) + '%';
+        sections.forEach(function (section) { if (section.offsetTop <= pos) current = section; });
+        links.forEach(function (link) { link.classList.toggle('active', link.getAttribute('href') === '#' + current.id); });
+      }
+
+      document.addEventListener('scroll', update, { passive: true });
+      update();
+    })();
+  </script>
+</body>
+</html>
