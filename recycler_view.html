@@ -1,2208 +1,2307 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RecyclerView en Android - Guía Completa</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guía: RecyclerView en Android con Kotlin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Source+Code+Pro:wght@500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <style>
+    :root {
+      --bg: #f7f7f2;
+      --soft: #e7eee9;
+      --panel: #fff;
+      --ink: #18252b;
+      --muted: #657278;
+      --line: #dfe5e1;
+      --coral: #ef714c;
+      --coral-dark: #da5e3b;
+      --coral-tint: #fff0e9;
+      --green: #16745a;
+      --green-tint: #e4f0e9;
+      --amber: #d29b35;
+      --amber-tint: #fff8df;
+      --code: #172a31;
+      --code-top: #243c42;
+      --code-ink: #d8e5df;
+      --shadow: 0 24px 60px rgba(24, 37, 43, .12);
+      --sans: 'DM Sans', sans-serif;
+      --display: 'Space Grotesk', sans-serif;
+      --mono: 'Source Code Pro', Consolas, monospace
+    }
+
     * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
+      box-sizing: border-box
+    }
+
+    html {
+      scroll-behavior: smooth
     }
 
     body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
-      padding: 20px;
-      line-height: 1.6;
-    }
-
-    .container {
-      max-width: 1200px;
-      margin: 0 auto;
-      background: white;
-      border-radius: 20px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-      overflow: hidden;
-    }
-
-    .header {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 40px;
-      text-align: center;
-    }
-
-    .header h1 {
-      font-size: 2.5em;
-      margin-bottom: 10px;
-      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-    }
-
-    .header p {
-      font-size: 1.2em;
-    }
-
-    .schedule {
-      background: #f8f9fa;
-      padding: 30px;
-      border-bottom: 3px solid #667eea;
-    }
-
-    .schedule h2 {
-      color: #667eea;
-      margin-bottom: 20px;
-      font-size: 1.8em;
-    }
-
-    .schedule-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 15px;
-    }
-
-    .schedule-item {
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      border-left: 5px solid #667eea;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-      transition: transform 0.3s;
-    }
-
-    .schedule-item:hover {
-      transform: translateX(5px);
-    }
-
-    .schedule-item h3 {
-      color: #667eea;
-      margin-bottom: 10px;
-    }
-
-    .section {
-      padding: 40px;
       margin: 0;
+      background: var(--bg);
+      color: var(--ink);
+      font: 16px/1.6 var(--sans)
     }
 
-    .section:nth-child(odd) {
-      background: linear-gradient(135deg, #e8eaf6 0%, #c5cae9 100%);
+    #progress {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 300;
+      width: 0;
+      height: 3px;
+      background: var(--coral)
     }
 
-    .section:nth-child(even) {
-      background: linear-gradient(135deg, #e1f5fe 0%, #b3e5fc 100%);
+    nav {
+      position: fixed;
+      inset: 0 auto 0 0;
+      z-index: 100;
+      width: 260px;
+      overflow-y: auto;
+      background: var(--bg);
+      border-right: 1px solid var(--line)
     }
 
-    .section:nth-child(3) {
-      background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+    .navrow {
+      padding: 42px 26px
     }
 
-    .section:nth-child(4) {
-      background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+      margin-bottom: 30px;
+      padding: 18px 16px;
+      color: #fff;
+      background: var(--code);
+      border-radius: 4px 22px 22px 22px;
+      font-weight: 700
     }
 
-    .section:nth-child(5) {
-      background: linear-gradient(135deg, #fce4ec 0%, #f8bbd0 100%);
+    .dot {
+      width: 11px;
+      height: 11px;
+      border-radius: 50%;
+      background: var(--coral)
     }
 
-    .section:nth-child(6) {
-      background: linear-gradient(135deg, #f3e5f5 0%, #e1bee7 100%);
+    .navlinks {
+      display: flex;
+      flex-direction: column;
+      gap: 3px
     }
 
-    .section:nth-child(7) {
-      background: linear-gradient(135deg, #fff9c4 0%, #fff59d 100%);
+    .navlinks:before {
+      content: 'CONTENIDO';
+      margin: 0 12px 10px;
+      color: #9aa6a7;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px
     }
 
-    .section h2 {
-      font-size: 2em;
-      margin-bottom: 20px;
-      border-bottom: 3px solid rgba(102, 126, 234, 0.5);
-      padding-bottom: 10px;
-      color: #333;
+    .navlinks a {
+      padding: 10px 12px;
+      border-radius: 8px;
+      color: var(--muted);
+      font-size: 14px;
+      text-decoration: none
     }
 
-    .section h3 {
-      color: #444;
-      margin-top: 20px;
-      margin-bottom: 15px;
+    .navlinks a:hover,
+    .navlinks a.active {
+      background: var(--soft);
+      color: var(--green);
+      font-weight: 700
     }
 
-    .theory {
-      background: rgba(255, 255, 255, 0.7);
+    main {
+      max-width: 1100px;
+      min-height: 100vh;
+      margin-left: 260px;
+      padding: 80px 6vw 62px
+    }
+
+    .head {
+      max-width: 810px;
+      padding-bottom: 48px;
+      border-bottom: 1px solid var(--line)
+    }
+
+    .pills {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 18px
+    }
+
+    .pill {
+      padding: 5px 11px;
+      border-radius: 20px;
+      color: var(--green);
+      background: var(--green-tint);
+      font-size: 12px;
+      font-weight: 700
+    }
+
+    .kicker {
+      margin: 0 0 8px;
+      color: var(--green);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase
+    }
+
+    h1,
+    h2,
+    h3 {
+      font-family: var(--display);
+      letter-spacing: -1.2px
+    }
+
+    h1 {
+      max-width: 15ch;
+      margin: 0 0 16px;
+      font-size: clamp(42px, 5vw, 70px);
+      line-height: .98
+    }
+
+    h2 {
+      max-width: 23ch;
+      margin: 62px 0 14px;
+      font-size: clamp(31px, 4vw, 51px);
+      line-height: 1.03;
+      scroll-margin-top: 30px
+    }
+
+    h3 {
+      margin: 34px 0 8px;
+      font-size: 22px
+    }
+
+    .lead {
+      max-width: 62ch;
+      margin: 0;
+      color: var(--muted);
+      font-size: 18px
+    }
+
+    .box,
+    .note,
+    .ok {
+      margin: 22px 0;
+      padding: 16px 18px;
+      border-radius: 4px 14px 14px 4px
+    }
+
+    .box {
+      background: var(--green-tint);
+      border: 1px solid #bddbcf;
+      border-left: 5px solid var(--green)
+    }
+
+    .note {
+      background: var(--amber-tint);
+      border: 1px solid #ecd69d;
+      border-left: 5px solid var(--amber)
+    }
+
+    .ok {
+      background: var(--coral-tint);
+      border: 1px solid #f1c7b9;
+      border-left: 5px solid var(--coral)
+    }
+
+    .box ul,
+    .note ul,
+    .ok ul,
+    .box ol,
+    .note ol,
+    .ok ol {
+      margin: 8px 0 0;
+      padding-left: 20px
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin: 24px 0
+    }
+
+    .cards.two {
+      grid-template-columns: repeat(2, 1fr)
+    }
+
+    .card {
       padding: 20px;
-      border-radius: 10px;
-      margin: 20px 0;
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba(0, 0, 0, 0.1);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-top: 3px solid var(--coral);
+      border-radius: 4px 18px 18px 18px
     }
 
-    .theory h3 {
-      margin-bottom: 10px;
-      font-size: 1.3em;
-      color: #333;
+    .card.green {
+      border-top-color: var(--green)
     }
 
-    .theory h4 {
-      color: #555;
-      font-size: 1.2em;
-      margin: 15px 0 10px 0;
+    .card h3 {
+      margin: 0 0 7px;
+      font-size: 20px
     }
 
-    .theory p,
-    .theory li {
-      color: #444;
-      font-size: 1.05em;
+    .card p,
+    .card ul {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px
     }
 
-    .visual-example {
-      background: rgba(0, 0, 0, 0.05);
-      padding: 20px;
-      border-radius: 10px;
-      margin: 15px 0;
-      text-align: center;
-      border: 2px dashed rgba(0, 0, 0, 0.2);
+    .card ul {
+      padding-left: 18px
     }
 
-    .visual-example h4 {
-      margin-bottom: 15px;
-      color: #555;
+    table {
+      width: 100%;
+      margin: 22px 0;
+      border-collapse: collapse;
+      border: 1px solid var(--line);
+      box-shadow: 0 8px 24px -18px rgba(24, 37, 43, .3)
     }
 
-    .code-section {
-      background: #1e1e1e;
-      color: #d4d4d4;
-      padding: 20px;
-      border-radius: 10px;
-      margin: 20px 0;
-      overflow-x: auto;
+    th,
+    td {
+      padding: 12px 14px;
+      text-align: left;
+      border-bottom: 1px solid var(--line)
     }
 
-    .code-section h4 {
-      color: #4ec9b0;
-      margin-bottom: 15px;
-      font-size: 1.1em;
+    th {
+      background: var(--coral);
+      color: #fff;
+      font-size: 13px
+    }
+
+    tr:nth-child(even) td {
+      background: var(--soft)
+    }
+
+    code {
+      padding: .08em .28em;
+      border-radius: 4px;
+      color: var(--coral-dark);
+      background: var(--coral-tint);
+      font: .9em var(--mono)
+    }
+
+    /* Bloque de código con cabecera (archivo + botón copiar) */
+    .codeblock {
+      margin: 18px 0;
+      overflow: hidden;
+      background: var(--code);
+      border-radius: 4px 20px 20px 20px;
+      box-shadow: var(--shadow)
+    }
+
+    .codehead {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 8px 12px 8px 20px;
+      background: var(--code-top)
+    }
+
+    .codehead .file {
+      overflow: hidden;
+      color: #9fb5ad;
+      font: 600 12px var(--mono);
+      text-overflow: ellipsis;
+      white-space: nowrap
+    }
+
+    .copy-btn {
+      flex-shrink: 0;
+      padding: 4px 12px;
+      color: var(--code-ink);
+      background: transparent;
+      border: 1px solid #3b5a60;
+      border-radius: 999px;
+      font: 600 12px var(--sans);
+      cursor: pointer;
+      transition: .18s
+    }
+
+    .copy-btn:hover {
+      color: #fff;
+      background: var(--coral);
+      border-color: var(--coral)
+    }
+
+    .copy-btn.done {
+      color: #fff;
+      background: var(--green);
+      border-color: var(--green)
     }
 
     pre {
       margin: 0;
-      font-family: 'Courier New', monospace;
-      font-size: 0.9em;
+      padding: 20px 24px;
+      overflow: auto;
+      color: var(--code-ink);
+      font: 13px/1.6 var(--mono)
     }
 
-    .kotlin {
-      color: #ce9178;
+    pre code {
+      padding: 0;
+      color: inherit;
+      background: transparent;
+      font-size: inherit
     }
 
-    .xml {
-      color: #9cdcfe;
+    .tree {
+      margin: 18px 0;
+      padding: 20px 24px;
+      color: var(--green);
+      background: var(--green-tint);
+      border: 1px solid var(--line);
+      border-radius: 4px 14px 14px 14px;
+      font: 600 13px/1.6 var(--mono);
+      white-space: pre;
+      overflow: auto
     }
 
-    .comment {
-      color: #6a9955;
-    }
-
-    .keyword {
-      color: #569cd6;
-    }
-
-    .string {
-      color: #ce9178;
-    }
-
-    .function {
-      color: #dcdcaa;
-    }
-
-    .exercise {
-      background: rgba(255, 255, 255, 0.8);
+    .flow {
+      margin: 22px 0;
       padding: 20px;
-      border-radius: 10px;
-      margin: 20px 0;
-      border-left: 5px solid #ffa726;
-      border: 1px solid rgba(255, 167, 38, 0.3);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      color: var(--green);
+      background: var(--green-tint);
+      border: 1px solid var(--line);
+      border-radius: 4px 14px 14px 14px;
+      font: 600 15px var(--mono);
+      text-align: center
     }
 
-    .exercise h4 {
-      color: #f57c00;
-      margin-bottom: 10px;
-      font-size: 1.2em;
+    .caption {
+      margin: 20px 0 8px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700
     }
 
-    .exercise p,
-    .exercise ul,
-    .exercise li {
-      color: #444;
-      font-size: 1.05em;
+    .result {
+      padding: 16px 18px;
+      border: 1px solid var(--line);
+      border-radius: 4px 14px 14px 14px;
+      background: var(--panel);
+      font-family: var(--mono)
     }
 
-    .tips {
-      background: rgba(255, 255, 255, 0.8);
-      padding: 15px;
-      border-radius: 10px;
-      margin: 15px 0;
-      border-left: 5px solid #66bb6a;
-      border: 1px solid rgba(102, 187, 106, 0.3);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    /* Maquetas de LayoutManager */
+    .mock-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 24px;
+      margin: 24px 0
     }
 
-    .tips strong {
-      color: #388e3c;
+    .mock {
+      width: 220px;
+      max-width: 100%
     }
 
-    .tips p,
-    .tips li,
-    .tips td {
-      color: #444;
-      font-size: 1.05em;
-    }
-
-    .warning {
-      background: rgba(255, 235, 59, 0.3);
-      padding: 15px;
-      border-radius: 10px;
-      margin: 15px 0;
-      border-left: 5px solid #fbc02d;
-      border: 1px solid rgba(251, 192, 45, 0.3);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .warning strong {
-      color: #f57f17;
-    }
-
-    .note {
-      background: rgba(255, 255, 255, 0.8);
-      padding: 15px;
-      border-radius: 8px;
-      margin: 15px 0;
-      border-left: 5px solid #42a5f5;
-      border: 1px solid rgba(66, 165, 245, 0.3);
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    }
-
-    .note strong {
-      color: #1976d2;
-    }
-
-    .note p,
-    .note code {
-      color: #444;
-      font-size: 1.05em;
-    }
-
-    .highlight {
-      background: rgba(66, 165, 245, 0.2);
-      padding: 2px 6px;
-      border-radius: 3px;
-      font-weight: bold;
-      color: #1565c0;
-    }
-
-    .comparison-table {
-      width: 100%;
-      margin: 20px 0;
-      border-collapse: collapse;
-      background: white;
-      border-radius: 10px;
+    .lm {
+      display: grid;
+      gap: 6px;
+      height: 200px;
+      padding: 10px;
       overflow: hidden;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 12px 24px -16px rgba(24, 37, 43, .4)
     }
 
-    .comparison-table th {
-      background: #667eea;
-      color: white;
-      padding: 12px;
-      text-align: left;
-    }
-
-    .comparison-table td {
-      padding: 12px;
-      border-bottom: 1px solid #eee;
-      color: #444;
-    }
-
-    .comparison-table tr:hover {
-      background: #f5f5f5;
-    }
-
-    .architecture-box {
-      background: white;
-      padding: 20px;
-      border-radius: 10px;
-      margin: 20px 0;
-      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-    }
-
-    .architecture-box h4 {
-      color: #667eea;
-      margin-bottom: 15px;
-      font-size: 1.3em;
-    }
-
-    .flow-diagram {
+    .lm span {
       display: flex;
       align-items: center;
-      justify-content: space-around;
-      flex-wrap: wrap;
-      margin: 20px 0;
+      justify-content: center;
+      color: var(--coral-dark);
+      background: var(--coral-tint);
+      border: 1px solid #f1c7b9;
+      border-radius: 6px;
+      font: 600 12px var(--mono)
     }
 
-    .flow-box {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 20px;
-      border-radius: 10px;
-      margin: 10px;
-      min-width: 150px;
+    .lm.linear {
+      grid-auto-rows: 38px
+    }
+
+    .lm.horiz {
+      grid-auto-flow: column;
+      grid-auto-columns: 64px
+    }
+
+    .lm.grid2 {
+      grid-template-columns: 1fr 1fr;
+      grid-auto-rows: 56px
+    }
+
+    .lm.stag {
+      grid-template-columns: 1fr 1fr;
+      grid-auto-rows: 14px;
+      grid-auto-flow: dense
+    }
+
+    .lm.stag .r3 {
+      grid-row: span 3
+    }
+
+    .lm.stag .r4 {
+      grid-row: span 4
+    }
+
+    .lm.stag .r5 {
+      grid-row: span 5
+    }
+
+    .mock-cap {
+      margin-top: 8px;
+      color: var(--muted);
+      font-size: 13px;
+      text-align: center
+    }
+
+    .footer {
+      margin-top: 62px;
+      padding-top: 24px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 13px
+    }
+
+    .footer a {
+      color: var(--green)
+    }
+
+    /* Resaltado Kotlin */
+    .kt-keyword {
+      color: #ef9470
+    }
+
+    .kt-type {
+      color: #78c5d4
+    }
+
+    .kt-string {
+      color: #f5cd62
+    }
+
+    .kt-comment {
+      color: #8fb6a8;
+      font-style: italic
+    }
+
+    .kt-number,
+    .kt-literal,
+    .kt-annotation {
+      color: #c9a7ed
+    }
+
+    /* Resaltado XML */
+    .xml-tag {
+      color: #ef9470
+    }
+
+    .xml-attr {
+      color: #78c5d4
+    }
+
+    .xml-string {
+      color: #f5cd62
+    }
+
+    .xml-comment {
+      color: #8fb6a8;
+      font-style: italic
+    }
+
+    #copyToast {
+      position: fixed;
+      left: 50%;
+      bottom: 26px;
+      z-index: 400;
+      max-width: 88vw;
+      padding: 11px 18px;
+      border-radius: 999px;
+      color: var(--bg);
+      background: var(--ink);
+      box-shadow: var(--shadow);
+      font-weight: 600;
       text-align: center;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateX(-50%) translateY(12px);
+      transition: .22s
     }
 
-    .flow-arrow {
-      font-size: 2em;
-      color: #667eea;
-      margin: 0 10px;
+    #copyToast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0)
     }
 
-    .summary {
-      background: #f8f9fa;
-      padding: 40px;
-    }
-
-    .summary h2 {
-      color: #667eea;
-      font-size: 2em;
-      margin-bottom: 20px;
-    }
-
-    .checklist {
-      list-style: none;
-      padding: 0;
-    }
-
-    .checklist li {
-      padding: 15px;
-      margin: 10px 0;
-      background: white;
-      border-radius: 10px;
-      border-left: 5px solid #4ade80;
-      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    }
-
-    .checklist li:before {
-      content: "✅ ";
-      font-size: 1.2em;
-    }
-
-    .resources {
-      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-      color: white;
-      padding: 40px;
-    }
-
-    .resources h2 {
-      font-size: 2em;
-      margin-bottom: 20px;
-    }
-
-    @media (max-width: 768px) {
-      .header h1 {
-        font-size: 1.8em;
+    @media(max-width:760px) {
+      nav {
+        position: sticky;
+        inset: 0;
+        width: 100%;
+        border-right: 0;
+        border-bottom: 1px solid var(--line)
       }
 
-      .schedule-grid {
-        grid-template-columns: 1fr;
+      .navrow {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+        padding: 12px 18px
       }
 
-      .section {
-        padding: 20px;
+      .brand {
+        flex-shrink: 0;
+        margin: 0;
+        padding: 10px 12px
       }
 
-      .flow-diagram {
-        flex-direction: column;
+      .navlinks {
+        flex-direction: row;
+        overflow-x: auto
       }
 
-      .flow-arrow {
-        transform: rotate(90deg);
+      .navlinks:before {
+        display: none
+      }
+
+      .navlinks a {
+        white-space: nowrap
+      }
+
+      main {
+        margin-left: 0;
+        padding: 52px 16px 40px
+      }
+
+      .cards,
+      .cards.two {
+        grid-template-columns: 1fr
+      }
+
+      th,
+      td {
+        padding: 10px
       }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <!-- HEADER -->
-    <div class="header">
-      <h1>♻️ RecyclerView en Android con Kotlin</h1>
-      <p>Guía Completa de Desarrollo Android Moderno</p>
-      <p>🎯 Nivel: Intermedio-Avanzado</p>
-    </div>
-
-    <!-- SCHEDULE -->
-    <div class="schedule">
-      <h2>📋 Contenido del Manual</h2>
-      <div class="schedule-grid">
-        <div class="schedule-item">
-          <h3>📚 Parte 1</h3>
-          <p><strong>¿Qué es RecyclerView?</strong></p>
-          <p>✅ Ventajas sobre ListView</p>
-        </div>
-        <div class="schedule-item">
-          <h3>🏗️ Parte 2</h3>
-          <p><strong>Arquitectura</strong></p>
-          <p>✅ ViewHolder Pattern</p>
-        </div>
-        <div class="schedule-item">
-          <h3>🛠️ Parte 3</h3>
-          <p><strong>Implementación Básica</strong></p>
-          <p>✅ Primer RecyclerView</p>
-        </div>
-        <div class="schedule-item">
-          <h3>🎨 Parte 4</h3>
-          <p><strong>LayoutManagers</strong></p>
-          <p>✅ Linear, Grid, Staggered</p>
-        </div>
-        <div class="schedule-item">
-          <h3>⚡ Parte 5</h3>
-          <p><strong>Eventos Click</strong></p>
-          <p>✅ onClick en items</p>
-        </div>
-        <div class="schedule-item">
-          <h3>🔧 Parte 6</h3>
-          <p><strong>CRUD Dinámico</strong></p>
-          <p>✅ Agregar, Editar, Eliminar</p>
-        </div>
-        <div class="schedule-item">
-          <h3>🚀 Parte 7</h3>
-          <p><strong>Casos Avanzados</strong></p>
-          <p>✅ Imágenes y diseños</p>
-        </div>
+  <div id="progress"></div>
+  <nav aria-label="Navegación de la guía">
+    <div class="navrow">
+      <div class="brand"><span class="dot"></span>RecyclerView.kt</div>
+      <div class="navlinks">
+        <a href="#inicio">Inicio</a>
+        <a href="#proyecto">Proyecto</a>
+        <a href="#fundamentos">Fundamentos</a>
+        <a href="#arquitectura">Arquitectura</a>
+        <a href="#usuarios">Proyecto Usuarios</a>
+        <a href="#frutas">Proyecto Frutas</a>
+        <a href="#layoutmanagers">LayoutManagers</a>
+        <a href="#clics">Eventos de clic</a>
+        <a href="#crud">CRUD</a>
+        <a href="#avanzados">Casos avanzados</a>
+        <a href="#resumen">Resumen</a>
       </div>
     </div>
+  </nav>
 
-    <!-- PARTE 1 -->
-    <div class="section">
-      <h2>📚 PARTE 1: ¿Qué es RecyclerView?</h2>
+  <main id="inicio">
+    <header class="head">
+      <div class="pills"><span class="pill">Android · Kotlin</span><span class="pill">RecyclerView</span><span class="pill">Nivel intermedio-avanzado</span></div>
+      <p class="kicker">Guía práctica</p>
+      <h1>RecyclerView en Android con Kotlin</h1>
+      <p class="lead">Todas las prácticas se realizan en la actividad <code>RecyclerViewActivity</code> y su layout <code>activity_recycler_view.xml</code>, dentro del paquete <code>com.example.spinnerlistrecycler</code>.</p>
+    </header>
 
-      <div class="theory">
-        <h3>Definición</h3>
+    <!-- ============ PROYECTO ============ -->
+    <h2 id="proyecto">1. Preparar el proyecto</h2>
+    <p>Trabaja en el proyecto con el paquete <code>com.example.spinnerlistrecycler</code>. Las clases de apoyo se organizan en los subpaquetes <code>model</code>, <code>adapter</code> y <code>layoutmanager</code>:</p>
+    <div class="tree">app/src/main
+│
+├── java/com/example/spinnerlistrecycler
+│   ├── RecyclerViewActivity.kt        ← actividad de la práctica
+│   ├── model/
+│   │   ├── Usuario.kt                 ← Parte 4
+│   │   └── Fruta.kt                   ← Parte 5
+│   ├── adapter/
+│   │   ├── UsuarioViewHolder.kt       ← Parte 4
+│   │   ├── UsuarioAdapter.kt          ← Parte 4
+│   │   ├── FrutaAdapter.kt            ← Parte 5
+│   │   └── OnFrutaClickListener.kt    ← Parte 7
+│   └── layoutmanager/
+│       └── UsuarioLayoutManager.kt    ← Parte 4
+│
+├── res/layout
+│   ├── activity_recycler_view.xml     ← contenedor del RecyclerView
+│   ├── item_usuario.xml               ← fila de usuario
+│   └── item_fruta.xml                 ← fila de fruta
+│
+├── res/values
+│   └── data_frutas.xml                ← datos de frutas
+│
+└── AndroidManifest.xml</div>
+    <div class="box"><strong>Crear un subpaquete:</strong> clic derecho en <code>com.example.spinnerlistrecycler</code> → <strong>New → Package</strong> → escribe <code>model</code> (o <code>adapter</code>, <code>layoutmanager</code>). Luego, clic derecho en el subpaquete → <strong>New → Kotlin Class/File</strong>.</div>
 
-        <div style="margin-bottom: 20px;">
-          <p style="font-size: 1.1em; line-height: 1.8;">
-            <strong>RecyclerView</strong> es un componente avanzado de Android para mostrar grandes conjuntos de datos de manera eficiente. Es la evolución moderna de ListView, diseñado para
-            optimizar el rendimiento mediante el <strong>reciclaje de vistas</strong>.
-          </p>
-        </div>
+    <h3>1.1 Agregar las dependencias</h3>
+    <p>Abre <code>build.gradle.kts (Module :app)</code> y agrega estas líneas dentro de <code>dependencies</code>. Después pulsa <strong>Sync Now</strong>.</p>
+    <pre data-lang="kotlin" data-file="build.gradle.kts (Module :app)"><code>dependencies {
+    // RecyclerView y CardView
+    implementation("androidx.recyclerview:recyclerview:1.3.2")
+    implementation("androidx.cardview:cardview:1.0.0")
 
-        <div class="visual-example">
-          <h4>🔄 Concepto de Reciclaje</h4>
-          <div style="text-align: left; max-width: 600px; margin: 0 auto;">
-            <p style="margin: 10px 0;"><strong>❌ ListView tradicional:</strong></p>
-            <p style="margin-left: 20px;">Crea una vista nueva para CADA item → 1000 items = 1000 vistas</p>
+    // ... otras dependencias ...
+}</code></pre>
+    <div class="note"><strong>Si tu proyecto usa Groovy</strong> (<code>build.gradle</code> sin <code>.kts</code>), escribe <code>implementation 'androidx.recyclerview:recyclerview:1.3.2'</code> y <code>implementation 'androidx.cardview:cardview:1.0.0'</code>.</div>
 
-            <p style="margin: 20px 0;"><strong>✅ RecyclerView:</strong></p>
-            <p style="margin-left: 20px;">Crea solo las vistas visibles en pantalla (~10 vistas)</p>
-            <p style="margin-left: 20px;">Cuando haces scroll, REUTILIZA esas vistas con nuevos datos</p>
-            <p style="margin-left: 20px;">1000 items = Solo 10-15 vistas creadas ♻️</p>
-          </div>
-        </div>
+    <h3>1.2 Crear <code>RecyclerViewActivity</code></h3>
+    <ol>
+      <li>En el panel <strong>Project</strong>, haz clic derecho en el paquete <code>com.example.spinnerlistrecycler</code>.</li>
+      <li>Selecciona <strong>New → Activity → Empty Views Activity</strong>.</li>
+      <li>En <strong>Activity Name</strong> escribe <code>RecyclerViewActivity</code>. El campo <strong>Layout Name</strong> se completa como <code>activity_recycler_view</code>.</li>
+      <li>Verifica que <strong>Language</strong> sea <strong>Kotlin</strong> y pulsa <strong>Finish</strong>.</li>
+    </ol>
 
-        <h4>✅ Ventajas de RecyclerView</h4>
-        <ul style="margin-top: 10px;">
-          <li>🚀 <strong>Alto rendimiento:</strong> Recicla vistas eficientemente</li>
-          <li>💾 <strong>Menor consumo de memoria:</strong> Solo carga vistas visibles</li>
-          <li>🎨 <strong>Múltiples layouts:</strong> Linear, Grid, Staggered</li>
-          <li>✨ <strong>Animaciones integradas:</strong> Add, remove, move items</li>
-          <li>🔧 <strong>Altamente personalizable:</strong> ItemDecorator, ItemAnimator</li>
-          <li>🔄 <strong>ViewHolder obligatorio:</strong> Mejor organización del código</li>
+    <h3>1.3 Abrir <code>RecyclerViewActivity</code> al iniciar la app</h3>
+    <p>En <code>AndroidManifest.xml</code>, el <code>intent-filter</code> con <code>MAIN</code> y <code>LAUNCHER</code> indica qué actividad arranca primero. Colócalo en <code>RecyclerViewActivity</code> y quítalo de las demás actividades (por ejemplo <code>SpinnerActivity</code> o <code>ListViewActivity</code>), que quedan con <code>android:exported="false"</code>.</p>
+    <pre data-lang="xml" data-file="AndroidManifest.xml (dentro de &lt;application&gt;)"><code>&lt;activity
+    android:name=".RecyclerViewActivity"
+    android:exported="true"&gt;
+    &lt;intent-filter&gt;
+        &lt;!-- Punto de entrada de la app --&gt;
+        &lt;action android:name="android.intent.action.MAIN" /&gt;
+        &lt;category android:name="android.intent.category.LAUNCHER" /&gt;
+    &lt;/intent-filter&gt;
+&lt;/activity&gt;
+
+&lt;activity
+    android:name=".MainActivity"
+    android:exported="false" /&gt;</code></pre>
+    <div class="note"><strong>Importante:</strong> cada práctica <strong>reemplaza</strong> el contenido completo de <code>activity_recycler_view.xml</code>, <code>RecyclerViewActivity.kt</code> y, cuando se indique, <code>FrutaAdapter.kt</code>. Usa el botón <strong>Copiar</strong> de cada bloque y pega el código en Android Studio.</div>
+
+    <h3>1.4 Solución de errores frecuentes de Gradle</h3>
+    <table>
+      <tr>
+        <th>Problema</th>
+        <th>Solución</th>
+      </tr>
+      <tr>
+        <td>Error de compatibilidad de Java</td>
+        <td>Usa <strong>Java 17</strong>. Las librerías modernas de Android ya no son compatibles con Java 11.</td>
+      </tr>
+      <tr>
+        <td>SDK experimental</td>
+        <td>Ajusta <code>compileSdk</code> y <code>targetSdk</code> a una versión estable (34 o 35).</td>
+      </tr>
+      <tr>
+        <td>La app se cierra al iniciar (<code>SIG: 9</code>)</td>
+        <td>Baja <code>core-ktx</code> a una versión estable, por ejemplo <strong>1.13.1</strong>.</td>
+      </tr>
+    </table>
+
+    <!-- ============ FUNDAMENTOS ============ -->
+    <h2 id="fundamentos">2. ¿Qué es RecyclerView?</h2>
+    <p><strong>RecyclerView</strong> muestra grandes conjuntos de datos de forma eficiente. Es la evolución moderna de ListView y optimiza el rendimiento mediante el <strong>reciclaje de vistas</strong>.</p>
+
+    <h3>2.1 Concepto de reciclaje</h3>
+    <div class="cards two">
+      <article class="card">
+        <h3>ListView tradicional</h3>
+        <p>Puede crear una vista nueva para cada ítem: 1000 ítems pueden llegar a generar muchas vistas y llamadas a <code>findViewById()</code>.</p>
+      </article>
+      <article class="card green">
+        <h3>RecyclerView</h3>
+        <p>Crea solo las vistas visibles (~10–15). Al hacer scroll, <strong>reutiliza</strong> esas vistas con datos nuevos. 1000 ítems ≈ 15 vistas.</p>
+      </article>
+    </div>
+    <div class="flow">1000 datos → ~15 ViewHolders → se reciclan al hacer scroll ♻️</div>
+
+    <div class="cards two">
+      <article class="card green">
+        <h3>Ventajas</h3>
+        <ul>
+          <li>Alto rendimiento: recicla vistas.</li>
+          <li>Menor consumo de memoria.</li>
+          <li>Varios diseños: lineal, cuadrícula, escalonado.</li>
+          <li>Animaciones integradas al agregar, eliminar o mover.</li>
+          <li>Personalizable con ItemDecoration e ItemAnimator.</li>
+          <li>ViewHolder obligatorio: código más ordenado.</li>
         </ul>
-
-        <h4>❌ Desventajas / Consideraciones</h4>
-        <ul style="margin-top: 10px;">
-          <li>📚 <strong>Más complejo:</strong> Requiere más código inicial</li>
-          <li>⚙️ <strong>Configuración manual:</strong> Necesitas LayoutManager</li>
-          <li>🎓 <strong>Curva de aprendizaje:</strong> Conceptos de Adapter y ViewHolder</li>
+      </article>
+      <article class="card">
+        <h3>Consideraciones</h3>
+        <ul>
+          <li>Requiere más código inicial.</li>
+          <li>Necesita configurar un LayoutManager.</li>
+          <li>Curva de aprendizaje: Adapter y ViewHolder.</li>
         </ul>
-      </div>
-
-      <div class="tips">
-        <strong>💡 ¿Cuándo usar RecyclerView?</strong>
-        <table class="comparison-table" style="margin-top: 10px;">
-          <tr>
-            <th>Situación</th>
-            <th>ListView</th>
-            <th>RecyclerView</th>
-          </tr>
-          <tr>
-            <td>Lista pequeña (<50 items)</td>
-            <td>✅ OK</td>
-            <td>✅ Mejor</td>
-          </tr>
-          <tr>
-            <td>Lista grande (>100 items)</td>
-            <td>❌ Lento</td>
-            <td>✅✅ Excelente</td>
-          </tr>
-          <tr>
-            <td>Necesitas Grid/Horizontal</td>
-            <td>❌ Complicado</td>
-            <td>✅✅ Fácil</td>
-          </tr>
-          <tr>
-            <td>Animaciones</td>
-            <td>❌ Manual</td>
-            <td>✅✅ Integradas</td>
-          </tr>
-          <tr>
-            <td>Proyecto nuevo</td>
-            <td>❌ Legacy</td>
-            <td>✅✅ Recomendado</td>
-          </tr>
-        </table>
-      </div>
-
-      <div class="warning">
-        <strong>⚠️ Importante:</strong>
-        <p style="margin-top: 10px;">Google recomienda usar <strong>RecyclerView</strong> en lugar de ListView para todos los proyectos nuevos. ListView se considera legacy (obsoleto).</p>
-      </div>
+      </article>
     </div>
 
-    <!-- PARTE 2 -->
-    <div class="section">
-      <h2>🏗️ PARTE 2: Arquitectura de RecyclerView</h2>
+    <table>
+      <tr>
+        <th>Situación</th>
+        <th>ListView</th>
+        <th>RecyclerView</th>
+      </tr>
+      <tr>
+        <td>Lista pequeña (&lt; 50 ítems)</td>
+        <td>Funciona</td>
+        <td>Mejor</td>
+      </tr>
+      <tr>
+        <td>Lista grande (&gt; 100 ítems)</td>
+        <td>Lento</td>
+        <td>Excelente</td>
+      </tr>
+      <tr>
+        <td>Cuadrícula u horizontal</td>
+        <td>Complicado</td>
+        <td>Fácil</td>
+      </tr>
+      <tr>
+        <td>Animaciones</td>
+        <td>Manuales</td>
+        <td>Integradas</td>
+      </tr>
+      <tr>
+        <td>Proyecto nuevo</td>
+        <td>Legacy</td>
+        <td>Recomendado</td>
+      </tr>
+    </table>
+    <div class="note"><strong>Recomendación de Google:</strong> usar RecyclerView en lugar de ListView en proyectos nuevos. ListView se considera legacy.</div>
 
-      <div class="theory">
-        <h3>Componentes Principales</h3>
-
-        <div class="architecture-box">
-          <h4>1️⃣ RecyclerView</h4>
-          <p>El contenedor principal que muestra los items en pantalla</p>
-        </div>
-
-        <div class="architecture-box">
-          <h4>2️⃣ Adapter (Adaptador)</h4>
-          <p>Intermediario entre los datos y el RecyclerView</p>
-          <p><strong>Responsabilidades:</strong></p>
-          <ul>
-            <li>Crear ViewHolders cuando sea necesario</li>
-            <li>Vincular datos con ViewHolders</li>
-            <li>Indicar cuántos items hay</li>
-          </ul>
-        </div>
-
-        <div class="architecture-box">
-          <h4>3️⃣ ViewHolder</h4>
-          <p>Contenedor que guarda las referencias a las vistas de cada item</p>
-          <p><strong>Ventaja:</strong> Evita llamadas repetidas a findViewById()</p>
-        </div>
-
-        <div class="architecture-box">
-          <h4>4️⃣ LayoutManager</h4>
-          <p>Define cómo se organizan los items</p>
-          <p><strong>Tipos:</strong></p>
-          <ul>
-            <li><strong>LinearLayoutManager:</strong> Lista vertical u horizontal</li>
-            <li><strong>GridLayoutManager:</strong> Cuadrícula (como galería)</li>
-            <li><strong>StaggeredGridLayoutManager:</strong> Cuadrícula irregular (Pinterest)</li>
-          </ul>
-        </div>
-
-        <div class="architecture-box">
-          <h4>5️⃣ ItemDecoration (Opcional)</h4>
-          <p>Agrega decoraciones como separadores, márgenes, etc.</p>
-        </div>
-
-        <div class="architecture-box">
-          <h4>6️⃣ ItemAnimator (Opcional)</h4>
-          <p>Controla las animaciones al agregar/eliminar/mover items</p>
-        </div>
-      </div>
-
-      <div class="flow-diagram">
-        <div class="flow-box">📊 Datos<br />(ArrayList)</div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-box">🔌 Adapter</div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-box">📦 ViewHolder</div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-box">♻️ RecyclerView</div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-box">📱 Pantalla</div>
-      </div>
-
-      <div class="theory">
-        <h3>🔄 Ciclo de Vida del RecyclerView</h3>
-
-        <div style="background: rgba(0,0,0,0.05); padding: 20px; border-radius: 10px; margin-top: 15px;">
-          <p style="margin-bottom: 10px;"><strong style="color: #667eea;">1. onCreateViewHolder()</strong></p>
-          <p style="margin-left: 20px; margin-bottom: 15px;">Se llama cuando RecyclerView necesita crear un nuevo ViewHolder. Aquí inflamos el layout del item.</p>
-
-          <p style="margin-bottom: 10px;"><strong style="color: #667eea;">2. onBindViewHolder()</strong></p>
-          <p style="margin-left: 20px; margin-bottom: 15px;">Se llama para vincular datos a un ViewHolder existente. Aquí asignamos los datos a las vistas.</p>
-
-          <p style="margin-bottom: 10px;"><strong style="color: #667eea;">3. getItemCount()</strong></p>
-          <p style="margin-left: 20px;">Retorna la cantidad total de items en la lista.</p>
-        </div>
-      </div>
-
-      <div class="tips">
-        <strong>💡 ViewHolder Pattern:</strong>
-        <p style="margin-top: 10px;">
-          El patrón ViewHolder es OBLIGATORIO en RecyclerView. Guarda las referencias a las vistas para reutilizarlas, evitando múltiples llamadas costosas a findViewById().
-        </p>
-
-        <div style="background: rgba(0,0,0,0.05); padding: 15px; border-radius: 8px; margin-top: 10px;">
-          <p><strong>❌ Sin ViewHolder (ListView antiguo):</strong></p>
-          <p style="margin: 10px 0 10px 20px;">findViewById() se llama cada vez que se muestra un item</p>
-          <p style="margin-left: 20px;">1000 scrolls = 1000 llamadas a findViewById() 🐌</p>
-
-          <p style="margin-top: 15px;"><strong>✅ Con ViewHolder (RecyclerView):</strong></p>
-          <p style="margin: 10px 0 10px 20px;">findViewById() solo se llama al crear el ViewHolder</p>
-          <p style="margin-left: 20px;">1000 scrolls = Solo ~10 llamadas iniciales 🚀</p>
-        </div>
-      </div>
+    <!-- ============ ARQUITECTURA ============ -->
+    <h2 id="arquitectura">3. Arquitectura de RecyclerView</h2>
+    <div class="cards">
+      <article class="card">
+        <h3>1. RecyclerView</h3>
+        <p>Contenedor que muestra los ítems en pantalla.</p>
+      </article>
+      <article class="card">
+        <h3>2. Adapter</h3>
+        <p>Crea los ViewHolders, les asigna los datos e indica cuántos ítems hay.</p>
+      </article>
+      <article class="card">
+        <h3>3. ViewHolder</h3>
+        <p>Guarda las referencias a las vistas de cada ítem. Evita llamadas repetidas a <code>findViewById()</code>.</p>
+      </article>
+      <article class="card green">
+        <h3>4. LayoutManager</h3>
+        <p><code>LinearLayoutManager</code>, <code>GridLayoutManager</code> o <code>StaggeredGridLayoutManager</code>.</p>
+      </article>
+      <article class="card green">
+        <h3>5. ItemDecoration</h3>
+        <p>Opcional. Separadores, márgenes y decoraciones.</p>
+      </article>
+      <article class="card green">
+        <h3>6. ItemAnimator</h3>
+        <p>Opcional. Animaciones al agregar, eliminar o mover ítems.</p>
+      </article>
     </div>
+    <div class="flow">Datos (List) → Adapter → ViewHolder → RecyclerView → Pantalla</div>
 
-    <!-- PROYECTO COMPLETO PASO A PASO -->
-    <div style="background: #0d1117; padding: 50px 40px;">
-      <div style="text-align:center; margin-bottom: 40px;">
-        <h2 style="color:#58a6ff; font-size:2.2em; margin-bottom:10px;">📁 Proyecto Completo: RecyclerView con Usuarios</h2>
-        <p style="color:#8b949e; font-size:1.1em;">Sigue cada paso en orden para construir el proyecto desde cero</p>
-      </div>
+    <h3>3.1 Métodos obligatorios del Adapter</h3>
+    <table>
+      <tr>
+        <th>Método</th>
+        <th>Cuándo se llama</th>
+        <th>Qué hace</th>
+      </tr>
+      <tr>
+        <td><code>onCreateViewHolder()</code></td>
+        <td>Solo cuando se necesita una vista nueva (unas 12–15 veces).</td>
+        <td>Infla el layout del ítem y crea el ViewHolder.</td>
+      </tr>
+      <tr>
+        <td><code>onBindViewHolder()</code></td>
+        <td>Cada vez que un ítem va a mostrarse (muchas veces al hacer scroll).</td>
+        <td>Asigna los datos de la posición indicada a las vistas.</td>
+      </tr>
+      <tr>
+        <td><code>getItemCount()</code></td>
+        <td>Cuando el RecyclerView necesita saber el total.</td>
+        <td>Devuelve la cantidad de ítems.</td>
+      </tr>
+    </table>
+    <div class="box"><strong>Patrón ViewHolder:</strong> es obligatorio en RecyclerView. <code>findViewById()</code> solo se ejecuta al crear el ViewHolder; al reciclarlo, se reutilizan las referencias guardadas. Mil desplazamientos equivalen a unas diez llamadas iniciales, no a mil.</div>
 
-      <!-- Estructura del proyecto -->
-      <div style="background:#161b22; border:1px solid #30363d; border-radius:12px; padding:25px; margin-bottom:30px;">
-        <h3 style="color:#f0f6fc; font-size:1.3em; margin-bottom:15px;">🗂️ Estructura del Proyecto</h3>
-        <pre style="color:#8b949e; font-family:'Courier New',monospace; font-size:0.9em; line-height:1.8;">app/
-          ├── manifests/
-          │ └── <span style="color:#79c0ff;">AndroidManifest.xml</span> ← Paso 9: DNI de la app
-          ├── java/com.example.reciclerviewbb/
-          │ ├── adapter/
-          │ │ ├── <span style="color:#ffa657;">UsuarioAdapter.kt</span> ← Paso 6: Conecta datos y vistas
-          │ │ └── <span style="color:#ffa657;">UsuarioViewHolder.kt</span> ← Paso 5: Guarda referencias de vistas
-          │ ├── layoutmanager/
-          │ │ └── <span style="color:#d2a8ff;">UsuarioLayoutManager.kt</span> ← Paso 7: Cómo se acomodan los ítems
-          │ ├── model/
-          │ │ └── <span style="color:#7ee787;">Usuario.kt</span> ← Paso 2: Modelo de datos
-          │ └── view/
-          │ └── <span style="color:#ff7b72;">MainActivity.kt</span> ← Paso 8: Actividad principal
-          └── res/
-          └── layout/
-          ├── <span style="color:#79c0ff;">activity_main.xml</span> ← Paso 3: Contenedor del RecyclerView
-          └── <span style="color:#79c0ff;">item_usuario.xml</span> ← Paso 4: Diseño de cada fila</pre>
-      </div>
+    <!-- ============ USUARIOS ============ -->
+    <h2 id="usuarios">4. Proyecto 1: lista de usuarios</h2>
+    <p>Sigue los pasos en orden. Cada archivo cumple una función distinta dentro de la arquitectura.</p>
+    <div class="flow">Usuario.kt → item_usuario.xml → UsuarioViewHolder → UsuarioAdapter → RecyclerViewActivity</div>
 
-      <!-- PASO 2 -->
-      <div style="background:#161b22; border:1px solid #30363d; border-left:4px solid #7ee787; border-radius:12px; padding:25px; margin-bottom:25px;">
-        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
-          <span style="background:#238636; color:white; padding:4px 14px; border-radius:20px; font-size:0.85em; font-weight:bold;">PASO 2</span>
-          <h3 style="color:#7ee787; font-size:1.2em; margin:0;">Modelo de Datos — <code style="background:#0d1117; padding:2px 8px; border-radius:4px;">model/Usuario.kt</code></h3>
-        </div>
-        <p style="color:#8b949e; margin-bottom:15px;">Define la estructura de datos que mostrará la lista. Una <code style="color:#ffa657;">data class</code> genera automáticamente <code style="color:#8b949e;">equals()</code>, <code style="color:#8b949e;">hashCode()</code> y <code style="color:#8b949e;">toString()</code>.</p>
-        <div style="background:#0d1117; border-radius:8px; padding:20px; overflow-x:auto;">
-          <p style="color:#4ec9b0; font-size:0.8em; margin-bottom:12px; font-family:monospace;">📄 model/Usuario.kt</p>
-          <pre style="margin:0; font-family:'Courier New',monospace; font-size:0.9em; line-height:1.8; color:#f0f6fc;"><span style="color:#ff7b72;">package</span> <span style="color:#f0f6fc;">com.example.reciclerviewbb.model</span>
+    <h3>4.1 Modelo de datos</h3>
+    <p>Define qué datos mostrará la lista. Una <code>data class</code> genera automáticamente <code>equals()</code>, <code>hashCode()</code> y <code>toString()</code>.</p>
+    <pre data-lang="kotlin" data-file="model/Usuario.kt"><code>package com.example.spinnerlistrecycler.model
 
-            <span style="color:#8b949e;">// MODELO DE DATOS</span>
-            <span style="color:#8b949e;">// Representa la información de cada usuario que mostraremos en la lista</span>
-            <span style="color:#ff7b72;">data class</span> <span style="color:#79c0ff;">Usuario</span>(
-            <span style="color:#ff7b72;">val</span> nombre: <span style="color:#79c0ff;">String</span>,
-            <span style="color:#ff7b72;">val</span> correo: <span style="color:#79c0ff;">String</span>
-            )
-          </pre>
-        </div>
-      </div>
+// MODELO DE DATOS
+// Representa la información de cada usuario que se muestra en la lista
+data class Usuario(
+    val nombre: String,
+    val correo: String
+)</code></pre>
 
-      <!-- PASO 3 -->
-      <div style="background:#161b22; border:1px solid #30363d; border-left:4px solid #79c0ff; border-radius:12px; padding:25px; margin-bottom:25px;">
-        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
-          <span style="background:#1f6feb; color:white; padding:4px 14px; border-radius:20px; font-size:0.85em; font-weight:bold;">PASO 3</span>
-          <h3 style="color:#79c0ff; font-size:1.2em; margin:0;">Contenedor Principal — <code style="background:#0d1117; padding:2px 8px; border-radius:4px;">layout/activity_main.xml</code></h3>
-        </div>
-        <p style="color:#8b949e; margin-bottom:15px;">Define el layout de la actividad. El <code style="color:#79c0ff;">RecyclerView</code> ocupa toda la pantalla y tiene el ID <code style="color:#ffa657;">recyclerViewUsuarios</code> que se usará desde Kotlin.</p>
-        <div style="background:#0d1117; border-radius:8px; padding:20px; overflow-x:auto;">
-          <p style="color:#4ec9b0; font-size:0.8em; margin-bottom:12px; font-family:monospace;">📄 res/layout/activity_main.xml</p>
-          <pre style="margin:0; font-family:'Courier New',monospace; font-size:0.9em; line-height:1.8; color:#f0f6fc;"><span style="color:#8b949e;">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span>
-            <span style="color:#8b949e;">&lt;!-- COMPONENTE 1: RECYCLERVIEW (contenedor en el XML) --&gt;</span>
-            <span style="color:#7ee787;">&lt;androidx.constraintlayout.widget.ConstraintLayout</span>
-            <span style="color:#79c0ff;">xmlns:android</span>=<span style="color:#a5d6ff;">"http://schemas.android.com/apk/res/android"</span>
-            <span style="color:#79c0ff;">xmlns:app</span>=<span style="color:#a5d6ff;">"http://schemas.android.com/apk/res-auto"</span>
-            <span style="color:#79c0ff;">xmlns:tools</span>=<span style="color:#a5d6ff;">"http://schemas.android.com/tools"</span>
-            <span style="color:#79c0ff;">android:id</span>=<span style="color:#a5d6ff;">"@+id/main"</span>
-            <span style="color:#79c0ff;">android:layout_width</span>=<span style="color:#a5d6ff;">"match_parent"</span>
-            <span style="color:#79c0ff;">android:layout_height</span>=<span style="color:#a5d6ff;">"match_parent"</span>
-            <span style="color:#79c0ff;">tools:context</span>=<span style="color:#a5d6ff;">".view.MainActivity"</span><span style="color:#7ee787;">&gt;</span>
+    <h3>4.2 Contenedor principal</h3>
+    <p>El <code>RecyclerView</code> ocupa toda la pantalla. Su id <code>recyclerViewUsuarios</code> se usa desde Kotlin.</p>
+    <pre data-lang="xml" data-file="res/layout/activity_recycler_view.xml"><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;!-- COMPONENTE 1: RECYCLERVIEW (contenedor en el XML) --&gt;
+&lt;androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".RecyclerViewActivity"&gt;
 
-            <span style="color:#8b949e;">&lt;!-- Aquí está el RecyclerView, el contenedor de toda la lista --&gt;</span>
-            <span style="color:#7ee787;">&lt;androidx.recyclerview.widget.RecyclerView</span>
-            <span style="color:#79c0ff;">android:id</span>=<span style="color:#a5d6ff;">"@+id/recyclerViewUsuarios"</span>
-            <span style="color:#79c0ff;">android:layout_width</span>=<span style="color:#a5d6ff;">"match_parent"</span>
-            <span style="color:#79c0ff;">android:layout_height</span>=<span style="color:#a5d6ff;">"match_parent"</span>
-            <span style="color:#79c0ff;">app:layout_constraintBottom_toBottomOf</span>=<span style="color:#a5d6ff;">"parent"</span>
-            <span style="color:#79c0ff;">app:layout_constraintEnd_toEndOf</span>=<span style="color:#a5d6ff;">"parent"</span>
-            <span style="color:#79c0ff;">app:layout_constraintStart_toStartOf</span>=<span style="color:#a5d6ff;">"parent"</span>
-            <span style="color:#79c0ff;">app:layout_constraintTop_toTopOf</span>=<span style="color:#a5d6ff;">"parent"</span> <span style="color:#7ee787;">/&gt;</span>
+    &lt;!-- Contenedor de toda la lista --&gt;
+    &lt;androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewUsuarios"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" /&gt;
 
-            <span style="color:#7ee787;">&lt;/androidx.constraintlayout.widget.ConstraintLayout&gt;</span>
-          </pre>
-        </div>
-      </div>
+&lt;/androidx.constraintlayout.widget.ConstraintLayout&gt;</code></pre>
 
-      <!-- PASO 4 -->
-      <div style="background:#161b22; border:1px solid #30363d; border-left:4px solid #ffa657; border-radius:12px; padding:25px; margin-bottom:25px;">
-        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
-          <span style="background:#9a6700; color:white; padding:4px 14px; border-radius:20px; font-size:0.85em; font-weight:bold;">PASO 4</span>
-          <h3 style="color:#ffa657; font-size:1.2em; margin:0;">Diseño de Cada Ítem — <code style="background:#0d1117; padding:2px 8px; border-radius:4px;">layout/item_usuario.xml</code></h3>
-        </div>
-        <p style="color:#8b949e; margin-bottom:15px;">Este layout define cómo se ve <strong style="color:#ffa657;">una sola fila</strong> de la lista. Se instancia una vez por cada usuario gracias al reciclaje.</p>
-        <div style="background:#0d1117; border-radius:8px; padding:20px; overflow-x:auto;">
-          <p style="color:#4ec9b0; font-size:0.8em; margin-bottom:12px; font-family:monospace;">📄 res/layout/item_usuario.xml</p>
-          <pre style="margin:0; font-family:'Courier New',monospace; font-size:0.9em; line-height:1.8; color:#f0f6fc;"><span style="color:#8b949e;">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span>
-            <span style="color:#8b949e;">&lt;!-- DISEÑO DE CADA ÍTEM (FILA) DE LA LISTA --&gt;</span>
-            <span style="color:#8b949e;">&lt;!-- Se repite tantas veces como usuarios haya --&gt;</span>
-            <span style="color:#7ee787;">&lt;LinearLayout</span>
-            <span style="color:#79c0ff;">xmlns:android</span>=<span style="color:#a5d6ff;">"http://schemas.android.com/apk/res/android"</span>
-            <span style="color:#79c0ff;">android:layout_width</span>=<span style="color:#a5d6ff;">"match_parent"</span>
-            <span style="color:#79c0ff;">android:layout_height</span>=<span style="color:#a5d6ff;">"wrap_content"</span>
-            <span style="color:#79c0ff;">android:orientation</span>=<span style="color:#a5d6ff;">"vertical"</span>
-            <span style="color:#79c0ff;">android:padding</span>=<span style="color:#a5d6ff;">"16dp"</span>
-            <span style="color:#79c0ff;">android:background</span>=<span style="color:#a5d6ff;">"?android:attr/selectableItemBackground"</span><span style="color:#7ee787;">&gt;</span>
+    <h3>4.3 Diseño de cada ítem</h3>
+    <p>Este layout define cómo se ve <strong>una sola fila</strong>. Crea el archivo con clic derecho en <code>res/layout</code> → <strong>New → Layout Resource File</strong> → <code>item_usuario</code>.</p>
+    <pre data-lang="xml" data-file="res/layout/item_usuario.xml"><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;!-- DISEÑO DE CADA ÍTEM (FILA) DE LA LISTA --&gt;
+&lt;LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:background="?android:attr/selectableItemBackground"&gt;
 
-            <span style="color:#8b949e;">&lt;!-- TextView para mostrar el NOMBRE — id usado en UsuarioViewHolder --&gt;</span>
-            <span style="color:#7ee787;">&lt;TextView</span>
-            <span style="color:#79c0ff;">android:id</span>=<span style="color:#a5d6ff;">"@+id/tvNombre"</span>
-            <span style="color:#79c0ff;">android:layout_width</span>=<span style="color:#a5d6ff;">"match_parent"</span>
-            <span style="color:#79c0ff;">android:layout_height</span>=<span style="color:#a5d6ff;">"wrap_content"</span>
-            <span style="color:#79c0ff;">android:textSize</span>=<span style="color:#a5d6ff;">"18sp"</span>
-            <span style="color:#79c0ff;">android:textStyle</span>=<span style="color:#a5d6ff;">"bold"</span>
-            <span style="color:#79c0ff;">android:textColor</span>=<span style="color:#a5d6ff;">"#000000"</span> <span style="color:#7ee787;">/&gt;</span>
+    &lt;!-- NOMBRE: id usado en UsuarioViewHolder --&gt;
+    &lt;TextView
+        android:id="@+id/tvNombre"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:textColor="#000000" /&gt;
 
-            <span style="color:#8b949e;">&lt;!-- TextView para mostrar el CORREO — id usado en UsuarioViewHolder --&gt;</span>
-            <span style="color:#7ee787;">&lt;TextView</span>
-            <span style="color:#79c0ff;">android:id</span>=<span style="color:#a5d6ff;">"@+id/tvCorreo"</span>
-            <span style="color:#79c0ff;">android:layout_width</span>=<span style="color:#a5d6ff;">"match_parent"</span>
-            <span style="color:#79c0ff;">android:layout_height</span>=<span style="color:#a5d6ff;">"wrap_content"</span>
-            <span style="color:#79c0ff;">android:textSize</span>=<span style="color:#a5d6ff;">"14sp"</span>
-            <span style="color:#79c0ff;">android:textColor</span>=<span style="color:#a5d6ff;">"#666666"</span>
-            <span style="color:#79c0ff;">android:layout_marginTop</span>=<span style="color:#a5d6ff;">"4dp"</span> <span style="color:#7ee787;">/&gt;</span>
+    &lt;!-- CORREO: id usado en UsuarioViewHolder --&gt;
+    &lt;TextView
+        android:id="@+id/tvCorreo"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="14sp"
+        android:textColor="#666666"
+        android:layout_marginTop="4dp" /&gt;
 
-            <span style="color:#8b949e;">&lt;!-- Línea divisoria entre cada ítem --&gt;</span>
-            <span style="color:#7ee787;">&lt;View</span>
-            <span style="color:#79c0ff;">android:layout_width</span>=<span style="color:#a5d6ff;">"match_parent"</span>
-            <span style="color:#79c0ff;">android:layout_height</span>=<span style="color:#a5d6ff;">"1dp"</span>
-            <span style="color:#79c0ff;">android:background</span>=<span style="color:#a5d6ff;">"#DDDDDD"</span>
-            <span style="color:#79c0ff;">android:layout_marginTop</span>=<span style="color:#a5d6ff;">"12dp"</span> <span style="color:#7ee787;">/&gt;</span>
+    &lt;!-- Línea divisoria entre ítems --&gt;
+    &lt;View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:background="#DDDDDD"
+        android:layout_marginTop="12dp" /&gt;
 
-            <span style="color:#7ee787;">&lt;/LinearLayout&gt;</span>
-          </pre>
-        </div>
-      </div>
+&lt;/LinearLayout&gt;</code></pre>
 
-      <!-- PASO 5 -->
-      <div style="background:#161b22; border:1px solid #30363d; border-left:4px solid #d2a8ff; border-radius:12px; padding:25px; margin-bottom:25px;">
-        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
-          <span style="background:#6e40c9; color:white; padding:4px 14px; border-radius:20px; font-size:0.85em; font-weight:bold;">PASO 5</span>
-          <h3 style="color:#d2a8ff; font-size:1.2em; margin:0;">ViewHolder — <code style="background:#0d1117; padding:2px 8px; border-radius:4px;">adapter/UsuarioViewHolder.kt</code></h3>
-        </div>
-        <p style="color:#8b949e; margin-bottom:15px;">Guarda las referencias a las vistas del XML. Al hacerlo una sola vez por ítem se evita llamar a <code style="color:#ffa657;">findViewById()</code> repetidamente, lo que mejora el rendimiento.</p>
-        <div style="background:#0d1117; border-radius:8px; padding:20px; overflow-x:auto;">
-          <p style="color:#4ec9b0; font-size:0.8em; margin-bottom:12px; font-family:monospace;">📄 adapter/UsuarioViewHolder.kt</p>
-          <pre style="margin:0; font-family:'Courier New',monospace; font-size:0.9em; line-height:1.8; color:#f0f6fc;"><span style="color:#ff7b72;">package</span> <span style="color:#f0f6fc;">com.example.reciclerviewbb.adapter</span>
+    <h3>4.4 ViewHolder</h3>
+    <p>Guarda las referencias a las vistas del XML. Se hace una sola vez por ítem creado.</p>
+    <pre data-lang="kotlin" data-file="adapter/UsuarioViewHolder.kt"><code>package com.example.spinnerlistrecycler.adapter
 
-            <span style="color:#ff7b72;">import</span> android.view.View
-            <span style="color:#ff7b72;">import</span> android.widget.TextView
-            <span style="color:#ff7b72;">import</span> androidx.recyclerview.widget.RecyclerView
-            <span style="color:#ff7b72;">import</span> com.example.reciclerviewbb.R
+import android.view.View
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import com.example.spinnerlistrecycler.R
 
-            <span style="color:#8b949e;">// ====================================================</span>
-            <span style="color:#8b949e;">// COMPONENTE 3: VIEWHOLDER</span>
-            <span style="color:#8b949e;">// ====================================================</span>
-            <span style="color:#8b949e;">// Guarda las referencias a las vistas de cada ítem.</span>
-            <span style="color:#8b949e;">// Así evitamos llamar a findViewById muchas veces (mejora el rendimiento).</span>
-            <span style="color:#ff7b72;">class</span> <span style="color:#79c0ff;">UsuarioViewHolder</span>(view: <span style="color:#79c0ff;">View</span>) : RecyclerView.<span style="color:#79c0ff;">ViewHolder</span>(view) {
+// COMPONENTE 3: VIEWHOLDER
+// Guarda las referencias a las vistas de cada ítem
+class UsuarioViewHolder(view: View) : RecyclerView.ViewHolder(view) {
 
-            <span style="color:#8b949e;">// Referencias a los TextView del layout item_usuario.xml</span>
-            <span style="color:#ff7b72;">val</span> tvNombre: <span style="color:#79c0ff;">TextView</span> = view.findViewById(R.id.tvNombre)
-            <span style="color:#ff7b72;">val</span> tvCorreo: <span style="color:#79c0ff;">TextView</span> = view.findViewById(R.id.tvCorreo)
-            }
-          </pre>
-        </div>
-      </div>
+    // Referencias a los TextView de item_usuario.xml
+    val tvNombre: TextView = view.findViewById(R.id.tvNombre)
+    val tvCorreo: TextView = view.findViewById(R.id.tvCorreo)
+}</code></pre>
+    <div class="note"><strong>Import de <code>R</code>:</strong> como el archivo está en un subpaquete, debe importar <code>com.example.spinnerlistrecycler.R</code> para acceder a los ids y layouts.</div>
 
-      <!-- PASO 6 -->
-      <div style="background:#161b22; border:1px solid #30363d; border-left:4px solid #ffa657; border-radius:12px; padding:25px; margin-bottom:25px;">
-        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
-          <span style="background:#9a6700; color:white; padding:4px 14px; border-radius:20px; font-size:0.85em; font-weight:bold;">PASO 6</span>
-          <h3 style="color:#ffa657; font-size:1.2em; margin:0;">Adapter — <code style="background:#0d1117; padding:2px 8px; border-radius:4px;">adapter/UsuarioAdapter.kt</code></h3>
-        </div>
-        <p style="color:#8b949e; margin-bottom:15px;">Es el puente entre los datos y la vista. Implementa tres métodos clave: <code style="color:#d2a8ff;">onCreateViewHolder</code>, <code style="color:#d2a8ff;">onBindViewHolder</code> y <code style="color:#d2a8ff;">getItemCount</code>.</p>
-        <div style="background:#0d1117; border-radius:8px; padding:20px; overflow-x:auto;">
-          <p style="color:#4ec9b0; font-size:0.8em; margin-bottom:12px; font-family:monospace;">📄 adapter/UsuarioAdapter.kt</p>
-          <pre style="margin:0; font-family:'Courier New',monospace; font-size:0.9em; line-height:1.8; color:#f0f6fc;"><span style="color:#ff7b72;">package</span> <span style="color:#f0f6fc;">com.example.reciclerviewbb.adapter</span>
+    <h3>4.5 Adapter</h3>
+    <p>Es el puente entre los datos y la vista. Implementa <code>onCreateViewHolder</code>, <code>onBindViewHolder</code> y <code>getItemCount</code>.</p>
+    <pre data-lang="kotlin" data-file="adapter/UsuarioAdapter.kt"><code>package com.example.spinnerlistrecycler.adapter
 
-            <span style="color:#ff7b72;">import</span> android.view.LayoutInflater
-            <span style="color:#ff7b72;">import</span> android.view.ViewGroup
-            <span style="color:#ff7b72;">import</span> android.widget.Toast
-            <span style="color:#ff7b72;">import</span> androidx.recyclerview.widget.RecyclerView
-            <span style="color:#ff7b72;">import</span> com.example.reciclerviewbb.R
-            <span style="color:#ff7b72;">import</span> com.example.reciclerviewbb.model.Usuario
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import android.widget.Toast
+import androidx.recyclerview.widget.RecyclerView
+import com.example.spinnerlistrecycler.R
+import com.example.spinnerlistrecycler.model.Usuario
 
-            <span style="color:#8b949e;">// ====================================================</span>
-            <span style="color:#8b949e;">// COMPONENTE 2: ADAPTER</span>
-            <span style="color:#8b949e;">// ====================================================</span>
-            <span style="color:#8b949e;">// Conecta los datos (lista de usuarios) con el RecyclerView.</span>
-            <span style="color:#ff7b72;">class</span> <span style="color:#79c0ff;">UsuarioAdapter</span>(<span style="color:#ff7b72;">private val</span> listaUsuarios: <span style="color:#79c0ff;">List</span>&lt;<span style="color:#79c0ff;">Usuario</span>&gt;) :
-            RecyclerView.<span style="color:#79c0ff;">Adapter</span>&lt;<span style="color:#79c0ff;">UsuarioViewHolder</span>&gt;() {
+// COMPONENTE 2: ADAPTER
+// Conecta la lista de usuarios con el RecyclerView
+class UsuarioAdapter(private val listaUsuarios: List&lt;Usuario&gt;) :
+    RecyclerView.Adapter&lt;UsuarioViewHolder&gt;() {
 
-            <span style="color:#8b949e;">// 1. CREA un nuevo ViewHolder cuando el RecyclerView lo necesita</span>
-            <span style="color:#8b949e;">// Aquí "inflamos" (convertimos XML a vista) el layout item_usuario.xml</span>
-            <span style="color:#ff7b72;">override fun</span> <span style="color:#d2a8ff;">onCreateViewHolder</span>(parent: <span style="color:#79c0ff;">ViewGroup</span>, viewType: <span style="color:#79c0ff;">Int</span>): <span style="color:#79c0ff;">UsuarioViewHolder</span> {
-            <span style="color:#ff7b72;">val</span> view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_usuario, parent, <span style="color:#79c0ff;">false</span>)
-            <span style="color:#ff7b72;">return</span> <span style="color:#79c0ff;">UsuarioViewHolder</span>(view)
-            }
+    // 1. CREA un ViewHolder: "infla" (convierte XML en vista) item_usuario.xml
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UsuarioViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_usuario, parent, false)
+        return UsuarioViewHolder(view)
+    }
 
-            <span style="color:#8b949e;">// 2. LLENA el ViewHolder con los datos según la posición</span>
-            <span style="color:#ff7b72;">override fun</span> <span style="color:#d2a8ff;">onBindViewHolder</span>(holder: <span style="color:#79c0ff;">UsuarioViewHolder</span>, position: <span style="color:#79c0ff;">Int</span>) {
-            <span style="color:#ff7b72;">val</span> usuario = listaUsuarios[position]
+    // 2. LLENA el ViewHolder con los datos de la posición
+    override fun onBindViewHolder(holder: UsuarioViewHolder, position: Int) {
+        val usuario = listaUsuarios[position]
 
-            holder.tvNombre.text = usuario.nombre
-            holder.tvCorreo.text = usuario.correo
+        holder.tvNombre.text = usuario.nombre
+        holder.tvCorreo.text = usuario.correo
 
-            <span style="color:#8b949e;">// Detectar clic en cada ítem de la lista</span>
-            holder.itemView.setOnClickListener {
+        // Detectar clic en cada ítem
+        holder.itemView.setOnClickListener {
             Toast.makeText(
-            holder.itemView.context,
-            <span style="color:#a5d6ff;">"Tocaste a: ${usuario.nombre}"</span>,
-            Toast.LENGTH_SHORT
+                holder.itemView.context,
+                "Tocaste a: ${usuario.nombre}",
+                Toast.LENGTH_SHORT
             ).show()
-            }
-            }
+        }
+    }
 
-            <span style="color:#8b949e;">// 3. Devuelve la CANTIDAD total de ítems en la lista</span>
-            <span style="color:#ff7b72;">override fun</span> <span style="color:#d2a8ff;">getItemCount</span>(): <span style="color:#79c0ff;">Int</span> = listaUsuarios.size
-            }
-          </pre>
-        </div>
-      </div>
+    // 3. Devuelve la CANTIDAD total de ítems
+    override fun getItemCount(): Int = listaUsuarios.size
+}</code></pre>
 
-      <!-- PASO 7 -->
-      <div style="background:#161b22; border:1px solid #30363d; border-left:4px solid #56d364; border-radius:12px; padding:25px; margin-bottom:25px;">
-        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
-          <span style="background:#238636; color:white; padding:4px 14px; border-radius:20px; font-size:0.85em; font-weight:bold;">PASO 7</span>
-          <h3 style="color:#56d364; font-size:1.2em; margin:0;">LayoutManager — <code style="background:#0d1117; padding:2px 8px; border-radius:4px;">layoutmanager/UsuarioLayoutManager.kt</code></h3>
-        </div>
-        <p style="color:#8b949e; margin-bottom:15px;">Decide <strong style="color:#56d364;">cómo se organizan visualmente</strong> los ítems. Hereda de <code style="color:#ffa657;">LinearLayoutManager</code> para configurar la orientación y permitir futuras personalizaciones.</p>
-        <div style="background:#0d1117; border-radius:8px; padding:20px; overflow-x:auto;">
-          <p style="color:#4ec9b0; font-size:0.8em; margin-bottom:12px; font-family:monospace;">📄 layoutmanager/UsuarioLayoutManager.kt</p>
-          <pre style="margin:0; font-family:'Courier New',monospace; font-size:0.9em; line-height:1.8; color:#f0f6fc;"><span style="color:#ff7b72;">package</span> <span style="color:#f0f6fc;">com.example.reciclerviewbb.layoutmanager</span>
+    <h3>4.6 LayoutManager personalizado</h3>
+    <p>Decide <strong>cómo se organizan</strong> los ítems. Hereda de <code>LinearLayoutManager</code> para fijar la orientación y permitir personalizaciones futuras.</p>
+    <pre data-lang="kotlin" data-file="layoutmanager/UsuarioLayoutManager.kt"><code>package com.example.spinnerlistrecycler.layoutmanager
 
-            <span style="color:#ff7b72;">import</span> android.content.Context
-            <span style="color:#ff7b72;">import</span> androidx.recyclerview.widget.LinearLayoutManager
+import android.content.Context
+import androidx.recyclerview.widget.LinearLayoutManager
 
-            <span style="color:#8b949e;">// ====================================================</span>
-            <span style="color:#8b949e;">// COMPONENTE 4: LAYOUTMANAGER</span>
-            <span style="color:#8b949e;">// ====================================================</span>
-            <span style="color:#8b949e;">// Decide CÓMO se acomodan los elementos en pantalla.</span>
-            <span style="color:#8b949e;">//</span>
-            <span style="color:#8b949e;">// Otras opciones:</span>
-            <span style="color:#8b949e;">// - GridLayoutManager → cuadrícula (ej: 2 columnas)</span>
-            <span style="color:#8b949e;">// - StaggeredGridLayoutManager → estilo Pinterest</span>
-            <span style="color:#ff7b72;">class</span> <span style="color:#79c0ff;">UsuarioLayoutManager</span>(context: <span style="color:#79c0ff;">Context</span>) : <span style="color:#79c0ff;">LinearLayoutManager</span>(context) {
+// COMPONENTE 4: LAYOUTMANAGER
+// Decide CÓMO se acomodan los elementos en pantalla.
+// Otras opciones:
+// - GridLayoutManager → cuadrícula (ej.: 2 columnas)
+// - StaggeredGridLayoutManager → estilo Pinterest
+class UsuarioLayoutManager(context: Context) : LinearLayoutManager(context) {
 
-            <span style="color:#ff7b72;">init</span> {
-            <span style="color:#8b949e;">// Configuramos la orientación: VERTICAL (por defecto) u HORIZONTAL</span>
-            orientation = VERTICAL
+    init {
+        // Orientación: VERTICAL (por defecto) u HORIZONTAL
+        orientation = VERTICAL
 
-            <span style="color:#8b949e;">// Si quisieras invertir el orden (último ítem arriba): reverseLayout = true</span>
-            reverseLayout = <span style="color:#79c0ff;">false</span>
-            }
-            }
-          </pre>
-        </div>
-      </div>
+        // true invierte el orden (último ítem arriba)
+        reverseLayout = false
+    }
+}</code></pre>
 
-      <!-- PASO 8 -->
-      <div style="background:#161b22; border:1px solid #30363d; border-left:4px solid #ff7b72; border-radius:12px; padding:25px; margin-bottom:25px;">
-        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
-          <span style="background:#b91c1c; color:white; padding:4px 14px; border-radius:20px; font-size:0.85em; font-weight:bold;">PASO 8</span>
-          <h3 style="color:#ff7b72; font-size:1.2em; margin:0;">Actividad Principal — <code style="background:#0d1117; padding:2px 8px; border-radius:4px;">view/MainActivity.kt</code></h3>
-        </div>
-        <p style="color:#8b949e; margin-bottom:15px;">Aquí se une todo. Se conecta el RecyclerView, se preparan los datos, se asigna el <code style="color:#56d364;">LayoutManager</code> (⚠️ sin esto la app falla) y finalmente se asigna el Adapter.</p>
-        <div style="background:#0d1117; border-radius:8px; padding:20px; overflow-x:auto;">
-          <p style="color:#4ec9b0; font-size:0.8em; margin-bottom:12px; font-family:monospace;">📄 view/MainActivity.kt</p>
-          <pre style="margin:0; font-family:'Courier New',monospace; font-size:0.9em; line-height:1.8; color:#f0f6fc;"><span style="color:#ff7b72;">package</span> <span style="color:#f0f6fc;">com.example.reciclerviewbb.view</span>
+    <h3>4.7 Actividad</h3>
+    <p>Aquí se une todo: se conecta el RecyclerView, se preparan los datos, se asigna el LayoutManager y finalmente el Adapter.</p>
+    <pre data-lang="kotlin" data-file="RecyclerViewActivity.kt"><code>package com.example.spinnerlistrecycler
 
-            <span style="color:#ff7b72;">import</span> android.os.Bundle
-            <span style="color:#ff7b72;">import</span> androidx.activity.enableEdgeToEdge
-            <span style="color:#ff7b72;">import</span> androidx.appcompat.app.AppCompatActivity
-            <span style="color:#ff7b72;">import</span> androidx.core.view.ViewCompat
-            <span style="color:#ff7b72;">import</span> androidx.core.view.WindowInsetsCompat
-            <span style="color:#ff7b72;">import</span> androidx.recyclerview.widget.LinearLayoutManager
-            <span style="color:#ff7b72;">import</span> androidx.recyclerview.widget.RecyclerView
-            <span style="color:#ff7b72;">import</span> com.example.reciclerviewbb.R
-            <span style="color:#ff7b72;">import</span> com.example.reciclerviewbb.adapter.UsuarioAdapter
-            <span style="color:#ff7b72;">import</span> com.example.reciclerviewbb.model.Usuario
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.RecyclerView
+import com.example.spinnerlistrecycler.adapter.UsuarioAdapter
+import com.example.spinnerlistrecycler.layoutmanager.UsuarioLayoutManager
+import com.example.spinnerlistrecycler.model.Usuario
 
-            <span style="color:#ff7b72;">class</span> <span style="color:#79c0ff;">MainActivity</span> : <span style="color:#79c0ff;">AppCompatActivity</span>() {
+class RecyclerViewActivity : AppCompatActivity() {
 
-            <span style="color:#ff7b72;">private lateinit var</span> recyclerView: <span style="color:#79c0ff;">RecyclerView</span>
+    private lateinit var recyclerView: RecyclerView
 
-            <span style="color:#ff7b72;">override fun</span> <span style="color:#d2a8ff;">onCreate</span>(savedInstanceState: <span style="color:#79c0ff;">Bundle</span>?) {
-            <span style="color:#ff7b72;">super</span>.onCreate(savedInstanceState)
-            enableEdgeToEdge()
-            setContentView(R.layout.activity_main)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_recycler_view)
 
-            ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets -&gt;
-            <span style="color:#ff7b72;">val</span> systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
-            insets
-            }
+        // 1. Conectar con el RecyclerView del XML
+        recyclerView = findViewById(R.id.recyclerViewUsuarios)
 
-            <span style="color:#8b949e;">// 1️⃣ Conectar con el RecyclerView del XML</span>
-            recyclerView = findViewById(R.id.recyclerViewUsuarios)
+        // 2. Preparar la lista de datos
+        val listaUsuarios = listOf(
+            Usuario("Ana García", "ana@correo.com"),
+            Usuario("Luis Pérez", "luis@correo.com"),
+            Usuario("María Torres", "maria@correo.com"),
+            Usuario("Carlos Ruiz", "carlos@correo.com"),
+            Usuario("Sofía Mendoza", "sofia@correo.com"),
+            Usuario("Pedro Sánchez", "pedro@correo.com"),
+            Usuario("Lucía Flores", "lucia@correo.com"),
+            Usuario("Diego Castro", "diego@correo.com")
+        )
 
-            <span style="color:#8b949e;">// 2️⃣ Preparar la lista de datos</span>
-            <span style="color:#ff7b72;">val</span> listaUsuarios = listOf(
-            <span style="color:#79c0ff;">Usuario</span>(<span style="color:#a5d6ff;">"Ana García"</span>, <span style="color:#a5d6ff;">"ana@correo.com"</span>),
-            <span style="color:#79c0ff;">Usuario</span>(<span style="color:#a5d6ff;">"Luis Pérez"</span>, <span style="color:#a5d6ff;">"luis@correo.com"</span>),
-            <span style="color:#79c0ff;">Usuario</span>(<span style="color:#a5d6ff;">"María Torres"</span>, <span style="color:#a5d6ff;">"maria@correo.com"</span>),
-            <span style="color:#79c0ff;">Usuario</span>(<span style="color:#a5d6ff;">"Carlos Ruiz"</span>, <span style="color:#a5d6ff;">"carlos@correo.com"</span>),
-            <span style="color:#79c0ff;">Usuario</span>(<span style="color:#a5d6ff;">"Sofía Mendoza"</span>, <span style="color:#a5d6ff;">"sofia@correo.com"</span>),
-            <span style="color:#79c0ff;">Usuario</span>(<span style="color:#a5d6ff;">"Pedro Sánchez"</span>, <span style="color:#a5d6ff;">"pedro@correo.com"</span>),
-            <span style="color:#79c0ff;">Usuario</span>(<span style="color:#a5d6ff;">"Lucía Flores"</span>, <span style="color:#a5d6ff;">"lucia@correo.com"</span>),
-            <span style="color:#79c0ff;">Usuario</span>(<span style="color:#a5d6ff;">"Diego Castro"</span>, <span style="color:#a5d6ff;">"diego@correo.com"</span>)
-            )
+        // 3. CRÍTICO: asignar el LayoutManager (sin él la lista no se muestra)
+        recyclerView.layoutManager = UsuarioLayoutManager(this)
 
-            <span style="color:#8b949e;">// 3️⃣ ⚠️ CRÍTICO: Asignar LayoutManager (sin esto la app se cierra)</span>
-            recyclerView.layoutManager = <span style="color:#79c0ff;">LinearLayoutManager</span>(<span style="color:#ff7b72;">this</span>)
+        // 4. Asignar el Adapter con la lista de datos
+        recyclerView.adapter = UsuarioAdapter(listaUsuarios)
+    }
+}</code></pre>
+    <div class="note"><strong>Punto crítico:</strong> sin un LayoutManager, el RecyclerView no sabe cómo acomodar los ítems y la lista queda vacía. <code>UsuarioLayoutManager(this)</code> equivale a <code>LinearLayoutManager(this)</code> vertical.</div>
+    <p class="caption">Resultado al tocar el primer usuario:</p>
+    <div class="result">Toast → Tocaste a: Ana García</div>
 
-            <span style="color:#8b949e;">// 4️⃣ Asignar el Adapter con la lista de datos</span>
-            recyclerView.adapter = <span style="color:#79c0ff;">UsuarioAdapter</span>(listaUsuarios)
-            }
-            }
-          </pre>
-        </div>
-      </div>
+    <h3>4.8 Recursos multimedia: carpeta <code>res/raw</code></h3>
+    <p>Para agregar audio o video al proyecto:</p>
+    <ol>
+      <li>Clic derecho en <code>res</code> → <strong>New → Android Resource Directory</strong> → <strong>Resource type:</strong> <code>raw</code>.</li>
+      <li>Nombres en minúsculas, sin espacios y sin números al inicio: <code>musica.mp3</code>.</li>
+      <li>Android genera automáticamente la referencia <code>R.raw.musica</code> en la clase <code>R</code>, el índice de recursos de la app.</li>
+    </ol>
 
-      <!-- PASO 9 -->
-      <div style="background:#161b22; border:1px solid #30363d; border-left:4px solid #79c0ff; border-radius:12px; padding:25px; margin-bottom:30px;">
-        <div style="display:flex; align-items:center; gap:15px; margin-bottom:15px;">
-          <span style="background:#1f6feb; color:white; padding:4px 14px; border-radius:20px; font-size:0.85em; font-weight:bold;">PASO 9</span>
-          <h3 style="color:#79c0ff; font-size:1.2em; margin:0;">Manifiesto — <code style="background:#0d1117; padding:2px 8px; border-radius:4px;">AndroidManifest.xml</code></h3>
-        </div>
-        <p style="color:#8b949e; margin-bottom:15px;">El "DNI" de la aplicación. Define el <code style="color:#ffa657;">intent-filter</code> con acción <code style="color:#56d364;">MAIN</code> y categoría <code style="color:#56d364;">LAUNCHER</code> para indicar cuál actividad arranca primero.</p>
-        <div style="background:#0d1117; border-radius:8px; padding:20px; overflow-x:auto;">
-          <p style="color:#4ec9b0; font-size:0.8em; margin-bottom:12px; font-family:monospace;">📄 manifests/AndroidManifest.xml</p>
-          <pre style="margin:0; font-family:'Courier New',monospace; font-size:0.9em; line-height:1.8; color:#f0f6fc;"><span style="color:#8b949e;">&lt;?xml version="1.0" encoding="utf-8"?&gt;</span>
-            <span style="color:#7ee787;">&lt;manifest</span>
-            <span style="color:#79c0ff;">xmlns:android</span>=<span style="color:#a5d6ff;">"http://schemas.android.com/apk/res/android"</span>
-            <span style="color:#79c0ff;">xmlns:tools</span>=<span style="color:#a5d6ff;">"http://schemas.android.com/tools"</span><span style="color:#7ee787;">&gt;</span>
+    <!-- ============ FRUTAS ============ -->
+    <h2 id="frutas">5. Proyecto 2: frutas con CardView</h2>
+    <p>Segundo ejemplo: cada fila es una tarjeta con un emoji y un nombre. Los datos se cargan desde un recurso XML.</p>
 
-            <span style="color:#7ee787;">&lt;application</span>
-            <span style="color:#79c0ff;">android:allowBackup</span>=<span style="color:#a5d6ff;">"true"</span>
-            <span style="color:#79c0ff;">android:dataExtractionRules</span>=<span style="color:#a5d6ff;">"@xml/data_extraction_rules"</span>
-            <span style="color:#79c0ff;">android:fullBackupContent</span>=<span style="color:#a5d6ff;">"@xml/backup_rules"</span>
-            <span style="color:#79c0ff;">android:icon</span>=<span style="color:#a5d6ff;">"@mipmap/ic_launcher"</span>
-            <span style="color:#79c0ff;">android:label</span>=<span style="color:#a5d6ff;">"@string/app_name"</span>
-            <span style="color:#79c0ff;">android:roundIcon</span>=<span style="color:#a5d6ff;">"@mipmap/ic_launcher_round"</span>
-            <span style="color:#79c0ff;">android:supportsRtl</span>=<span style="color:#a5d6ff;">"true"</span>
-            <span style="color:#79c0ff;">android:theme</span>=<span style="color:#a5d6ff;">"@style/Theme.ReciclerviewBb"</span><span style="color:#7ee787;">&gt;</span>
+    <h3>5.1 Datos en <code>res/values</code></h3>
+    <p>Clic derecho en <code>res/values</code> → <strong>New → Values Resource File</strong> → <code>data_frutas</code>.</p>
+    <pre data-lang="xml" data-file="res/values/data_frutas.xml"><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;resources&gt;
+    &lt;string-array name="frutas_nombres"&gt;
+        &lt;item&gt;Manzana&lt;/item&gt;
+        &lt;item&gt;Plátano&lt;/item&gt;
+        &lt;item&gt;Naranja&lt;/item&gt;
+        &lt;item&gt;Uva&lt;/item&gt;
+        &lt;item&gt;Sandía&lt;/item&gt;
+        &lt;item&gt;Fresa&lt;/item&gt;
+        &lt;item&gt;Piña&lt;/item&gt;
+        &lt;item&gt;Mango&lt;/item&gt;
+        &lt;item&gt;Pera&lt;/item&gt;
+        &lt;item&gt;Durazno&lt;/item&gt;
+        &lt;item&gt;Cereza&lt;/item&gt;
+        &lt;item&gt;Limón&lt;/item&gt;
+        &lt;item&gt;Melón&lt;/item&gt;
+        &lt;item&gt;Kiwi&lt;/item&gt;
+        &lt;item&gt;Papaya&lt;/item&gt;
+        &lt;item&gt;Coco&lt;/item&gt;
+        &lt;item&gt;Granada&lt;/item&gt;
+        &lt;item&gt;Guayaba&lt;/item&gt;
+        &lt;item&gt;Maracuyá&lt;/item&gt;
+        &lt;item&gt;Arándano&lt;/item&gt;
+    &lt;/string-array&gt;
 
-            <span style="color:#8b949e;">&lt;!-- Actividad principal: ubicada en el paquete .view --&gt;</span>
-            <span style="color:#7ee787;">&lt;activity</span>
-            <span style="color:#79c0ff;">android:name</span>=<span style="color:#a5d6ff;">".view.MainActivity"</span>
-            <span style="color:#79c0ff;">android:exported</span>=<span style="color:#a5d6ff;">"true"</span><span style="color:#7ee787;">&gt;</span>
-            <span style="color:#7ee787;">&lt;intent-filter&gt;</span>
-            <span style="color:#8b949e;">&lt;!-- Marca esta actividad como punto de entrada de la app --&gt;</span>
-            <span style="color:#7ee787;">&lt;action</span> <span style="color:#79c0ff;">android:name</span>=<span style="color:#a5d6ff;">"android.intent.action.MAIN"</span> <span style="color:#7ee787;">/&gt;</span>
-            <span style="color:#7ee787;">&lt;category</span> <span style="color:#79c0ff;">android:name</span>=<span style="color:#a5d6ff;">"android.intent.category.LAUNCHER"</span> <span style="color:#7ee787;">/&gt;</span>
-            <span style="color:#7ee787;">&lt;/intent-filter&gt;</span>
-            <span style="color:#7ee787;">&lt;/activity&gt;</span>
-            <span style="color:#7ee787;">&lt;/application&gt;</span>
+    &lt;string-array name="frutas_emojis"&gt;
+        &lt;item&gt;🍎&lt;/item&gt;
+        &lt;item&gt;🍌&lt;/item&gt;
+        &lt;item&gt;🍊&lt;/item&gt;
+        &lt;item&gt;🍇&lt;/item&gt;
+        &lt;item&gt;🍉&lt;/item&gt;
+        &lt;item&gt;🍓&lt;/item&gt;
+        &lt;item&gt;🍍&lt;/item&gt;
+        &lt;item&gt;🥭&lt;/item&gt;
+        &lt;item&gt;🍐&lt;/item&gt;
+        &lt;item&gt;🍑&lt;/item&gt;
+        &lt;item&gt;🍒&lt;/item&gt;
+        &lt;item&gt;🍋&lt;/item&gt;
+        &lt;item&gt;🍈&lt;/item&gt;
+        &lt;item&gt;🥝&lt;/item&gt;
+        &lt;item&gt;🥭&lt;/item&gt;
+        &lt;item&gt;🥥&lt;/item&gt;
+        &lt;item&gt;🍒&lt;/item&gt;
+        &lt;item&gt;🍏&lt;/item&gt;
+        &lt;item&gt;🍋&lt;/item&gt;
+        &lt;item&gt;🫐&lt;/item&gt;
+    &lt;/string-array&gt;
+&lt;/resources&gt;</code></pre>
 
-            <span style="color:#7ee787;">&lt;/manifest&gt;</span>
-          </pre>
-        </div>
-      </div>
+    <h3>5.2 Layout del ítem</h3>
+    <pre data-lang="xml" data-file="res/layout/item_fruta.xml"><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="8dp"
+    app:cardElevation="4dp"&gt;
 
-      <!-- Resumen de flujo -->
-      <div style="background:linear-gradient(135deg,#161b22,#0d1117); border:1px solid #30363d; border-radius:12px; padding:30px; text-align:center;">
-        <h3 style="color:#f0f6fc; font-size:1.3em; margin-bottom:20px;">🔄 Flujo de Ejecución</h3>
-        <div style="display:flex; flex-wrap:wrap; justify-content:center; align-items:center; gap:8px;">
-          <div style="background:#238636; color:white; padding:10px 18px; border-radius:8px; font-size:0.9em;">Usuario.kt<br><span style="font-size:0.8em; opacity:0.8;">Modelo</span></div>
-          <span style="color:#58a6ff; font-size:1.5em;">→</span>
-          <div style="background:#1f6feb; color:white; padding:10px 18px; border-radius:8px; font-size:0.9em;">item_usuario.xml<br><span style="font-size:0.8em; opacity:0.8;">Vista del ítem</span></div>
-          <span style="color:#58a6ff; font-size:1.5em;">→</span>
-          <div style="background:#6e40c9; color:white; padding:10px 18px; border-radius:8px; font-size:0.9em;">UsuarioViewHolder<br><span style="font-size:0.8em; opacity:0.8;">Referencias</span></div>
-          <span style="color:#58a6ff; font-size:1.5em;">→</span>
-          <div style="background:#9a6700; color:white; padding:10px 18px; border-radius:8px; font-size:0.9em;">UsuarioAdapter<br><span style="font-size:0.8em; opacity:0.8;">Datos ↔ Vistas</span></div>
-          <span style="color:#58a6ff; font-size:1.5em;">→</span>
-          <div style="background:#b91c1c; color:white; padding:10px 18px; border-radius:8px; font-size:0.9em;">MainActivity<br><span style="font-size:0.8em; opacity:0.8;">Todo unido</span></div>
-        </div>
-      </div>
-    </div>
+    &lt;LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:padding="16dp"&gt;
 
-    <!-- GUÍA PASO A PASO -->
-    <div style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%); padding: 50px 40px;">
-      <h1 style="color: #e94560; font-size: 2.4em; text-align: center; margin-bottom: 10px; text-shadow: 0 0 20px rgba(233,69,96,0.5);">
-        🗺️ Guía Paso a Paso
-      </h1>
-      <h2 style="color: #a8edea; font-size: 1.6em; text-align: center; margin-bottom: 40px; font-weight: 400;">
-        Implementación de RecyclerView en Android
-      </h2>
-
-      <!-- Fase 1 -->
-      <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(168,237,234,0.3); border-left: 5px solid #a8edea; border-radius: 12px; padding: 25px; margin-bottom: 25px;">
-        <h3 style="color: #a8edea; font-size: 1.4em; margin-bottom: 15px;">⚙️ Fase 1: Configuración del Entorno (Solución de Errores)</h3>
-        <p style="color: #ccc; margin-bottom: 15px;">Antes de programar, es vital que el "motor" del proyecto (Gradle) esté bien configurado. En este proyecto se corrigieron los siguientes puntos:</p>
-        <ol style="color: #ccc; padding-left: 25px; line-height: 2;">
-          <li><strong style="color: #fed6e3;">Versión de Java:</strong> Se cambió de Java 11 a <strong style="color: #a8edea;">Java 17</strong>. Las librerías modernas de Android ya no son compatibles con Java 11.</li>
-          <li><strong style="color: #fed6e3;">SDK:</strong> Se ajustó el <code style="background:#0f3460; padding: 2px 6px; border-radius:4px;">compileSdk</code> y <code style="background:#0f3460; padding: 2px 6px; border-radius:4px;">targetSdk</code> a <strong style="color: #a8edea;">34 o 35</strong> (versiones estables), ya que la 36 es experimental.</li>
-          <li><strong style="color: #fed6e3;">Dependencias:</strong> Se corrigió <code style="background:#0f3460; padding: 2px 6px; border-radius:4px;">core-ktx</code> a la versión <strong style="color: #a8edea;">1.13.1</strong>, ya que la 1.18.0 causaba que la app se cerrara inesperadamente (<code style="background:#0f3460; padding: 2px 6px; border-radius:4px;">SIG: 9</code>).</li>
-        </ol>
-      </div>
-
-      <!-- Fase 2 -->
-      <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(254,214,227,0.3); border-left: 5px solid #fed6e3; border-radius: 12px; padding: 25px; margin-bottom: 25px;">
-        <h3 style="color: #fed6e3; font-size: 1.4em; margin-bottom: 15px;">🗂️ Fase 2: El Modelo de Datos (La Clase <code style="background:#0f3460; padding:2px 8px; border-radius:4px; font-size:0.9em;">Usuario</code>)</h3>
-        <p style="color: #ccc; margin-bottom: 15px;">Antes de mostrar datos, es necesario definir <strong style="color:#fed6e3;">qué datos</strong> se van a mostrar.</p>
-        <ul style="color: #ccc; padding-left: 25px; line-height: 2; margin-bottom: 15px;">
-          <li><strong style="color: #a8edea;">Archivo:</strong> <code style="background:#0f3460; padding:2px 6px; border-radius:4px;">model/Usuario.kt</code></li>
-          <li><strong style="color: #a8edea;">Concepto:</strong> Una <code style="background:#0f3460; padding:2px 6px; border-radius:4px;">data class</code> es una forma concisa de crear objetos que solo contienen información.</li>
-        </ul>
-        <div style="background: #0d1117; border-radius: 8px; padding: 20px; border: 1px solid rgba(168,237,234,0.2);">
-          <p style="color: #4ec9b0; font-size: 0.85em; margin-bottom: 10px; font-family: monospace;">Kotlin</p>
-          <pre style="margin:0; font-family: 'Courier New', monospace; font-size: 0.95em;"><span style="color:#569cd6;">data class</span> <span style="color:#4ec9b0;">Usuario</span>(<span style="color:#569cd6;">val</span> nombre: <span style="color:#4ec9b0;">String</span>, <span style="color:#569cd6;">val</span> correo: <span style="color:#4ec9b0;">String</span>)</pre>
-        </div>
-      </div>
-
-      <!-- Fase 3 -->
-      <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(100,200,120,0.3); border-left: 5px solid #64c878; border-radius: 12px; padding: 25px; margin-bottom: 25px;">
-        <h3 style="color: #64c878; font-size: 1.4em; margin-bottom: 15px;">🎨 Fase 3: El Diseño Visual (XML)</h3>
-        <p style="color: #ccc; margin-bottom: 15px;">Un RecyclerView requiere <strong style="color:#64c878;">dos archivos de diseño</strong>:</p>
-        <ol style="color: #ccc; padding-left: 25px; line-height: 2;">
-          <li><strong style="color: #a8edea;">El contenedor principal:</strong> Donde vive el <code style="background:#0f3460; padding:2px 6px; border-radius:4px;">RecyclerView</code> completo (<code style="background:#0f3460; padding:2px 6px; border-radius:4px;">activity_main.xml</code>).</li>
-          <li><strong style="color: #a8edea;">El diseño del ítem:</strong> Define cómo se verá <strong style="color:#64c878;">una sola fila</strong> de la lista (<code style="background:#0f3460; padding:2px 6px; border-radius:4px;">item_usuario.xml</code>).
-            <ul style="margin-top: 8px;">
-              <li>Se utiliza un <code style="background:#0f3460; padding:2px 6px; border-radius:4px;">TextView</code> para el nombre (<code style="background:#0f3460; padding:2px 6px; border-radius:4px;">tvNombre</code>) y otro para el correo (<code style="background:#0f3460; padding:2px 6px; border-radius:4px;">tvCorreo</code>).</li>
-            </ul>
-          </li>
-        </ol>
-      </div>
-
-      <!-- Fase 4 -->
-      <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,167,38,0.3); border-left: 5px solid #ffa726; border-radius: 12px; padding: 25px; margin-bottom: 25px;">
-        <h3 style="color: #ffa726; font-size: 1.4em; margin-bottom: 15px;">🧠 Fase 4: El Adaptador y el ViewHolder (El "Cerebro")</h3>
-        <p style="color: #ccc; margin-bottom: 15px;">El <strong style="color:#ffa726;">Adapter</strong> es el puente entre los datos y la vista. Es la parte central de la arquitectura.</p>
-        <ul style="color: #ccc; padding-left: 25px; line-height: 2; margin-bottom: 10px;">
-          <li><strong style="color: #a8edea;">ViewHolder:</strong> Su trabajo es "encontrar" las vistas del XML (<code style="background:#0f3460; padding:2px 6px; border-radius:4px;">findViewById</code>) una sola vez para ahorrar memoria.</li>
-          <li><strong style="color: #a8edea;">Funciones principales del Adapter:</strong>
-            <ol style="margin-top: 8px; line-height: 2;">
-              <li><code style="background:#0f3460; padding:2px 6px; border-radius:4px;">onCreateViewHolder</code>: Infla (crea) el diseño del ítem.</li>
-              <li><code style="background:#0f3460; padding:2px 6px; border-radius:4px;">onBindViewHolder</code>: Asigna los datos del usuario (nombre/correo) en los textos correspondientes.</li>
-              <li><code style="background:#0f3460; padding:2px 6px; border-radius:4px;">getItemCount</code>: Indica cuántos elementos tiene la lista.</li>
-            </ol>
-          </li>
-        </ul>
-      </div>
-
-      <!-- Fase 5 -->
-      <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(102,126,234,0.4); border-left: 5px solid #667eea; border-radius: 12px; padding: 25px; margin-bottom: 25px;">
-        <h3 style="color: #667eea; font-size: 1.4em; margin-bottom: 15px;">🔗 Fase 5: La Lógica en <code style="background:#0f3460; padding:2px 8px; border-radius:4px; font-size:0.9em;">MainActivity</code></h3>
-        <p style="color: #ccc; margin-bottom: 15px;">Aquí es donde se une todo. Los pasos clave son:</p>
-        <ol style="color: #ccc; padding-left: 25px; line-height: 2.2;">
-          <li><strong style="color: #a8edea;">Inicializar la vista:</strong> Usar <code style="background:#0f3460; padding:2px 6px; border-radius:4px;">findViewById</code> para conectar con el RecyclerView del XML.</li>
-          <li><strong style="color: #a8edea;">Preparar los datos:</strong> Crear una lista (<code style="background:#0f3460; padding:2px 6px; border-radius:4px;">listOf</code>) de objetos <code style="background:#0f3460; padding:2px 6px; border-radius:4px;">Usuario</code>.</li>
-          <li><strong style="color: #fed6e3;">⚠️ Configurar el LayoutManager (Punto Crítico):</strong> Sin un <code style="background:#0f3460; padding:2px 6px; border-radius:4px;">LayoutManager</code> (como <code style="background:#0f3460; padding:2px 6px; border-radius:4px;">LinearLayoutManager</code>), la lista no sabe si mostrarse vertical u horizontalmente y la app falla.</li>
-          <li><strong style="color: #a8edea;">Asignar el Adaptador:</strong> Indicarle al RecyclerView quién va a gestionar sus datos.</li>
-        </ol>
-      </div>
-
-      <!-- Fase 6 -->
-      <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(156,39,176,0.4); border-left: 5px solid #ab47bc; border-radius: 12px; padding: 25px; margin-bottom: 25px;">
-        <h3 style="color: #ab47bc; font-size: 1.4em; margin-bottom: 15px;">🎵 Fase 6: Recursos Multimedia (Carpeta <code style="background:#0f3460; padding:2px 8px; border-radius:4px; font-size:0.9em;">raw</code>)</h3>
-        <p style="color: #ccc; margin-bottom: 15px;">Para gestionar recursos externos como audio o video en el proyecto:</p>
-        <ol style="color: #ccc; padding-left: 25px; line-height: 2;">
-          <li>Crear el directorio <code style="background:#0f3460; padding:2px 6px; border-radius:4px;">res/raw</code>.</li>
-          <li>Seguir las <strong style="color:#ab47bc;">reglas de nombres</strong>: todo en minúsculas, sin espacios y sin números al inicio.</li>
-          <li><strong style="color: #a8edea;">Uso de la clase <code style="background:#0f3460; padding:2px 6px; border-radius:4px;">R</code>:</strong> Es el índice automático de Android. Al colocar un archivo <code style="background:#0f3460; padding:2px 6px; border-radius:4px;">musica.mp3</code>, Android genera automáticamente <code style="background:#0f3460; padding:2px 6px; border-radius:4px;">R.raw.musica</code>.</li>
-        </ol>
-      </div>
-
-      <!-- Fase 7 -->
-      <div style="background: rgba(255,255,255,0.05); border: 1px solid rgba(38,198,218,0.4); border-left: 5px solid #26c6da; border-radius: 12px; padding: 25px; margin-bottom: 35px;">
-        <h3 style="color: #26c6da; font-size: 1.4em; margin-bottom: 15px;">📋 Fase 7: El Manifiesto (<code style="background:#0f3460; padding:2px 8px; border-radius:4px; font-size:0.9em;">AndroidManifest.xml</code>)</h3>
-        <p style="color: #ccc; margin-bottom: 15px;">Este archivo es el <strong style="color:#26c6da;">"DNI" de la aplicación</strong>. Define su identidad y estructura ante el sistema operativo.</p>
-        <ul style="color: #ccc; padding-left: 25px; line-height: 2;">
-          <li>En este archivo se define qué actividad arranca primero mediante el <code style="background:#0f3460; padding:2px 6px; border-radius:4px;">&lt;intent-filter&gt;</code> con la acción <code style="background:#0f3460; padding:2px 6px; border-radius:4px;">MAIN</code> y categoría <code style="background:#0f3460; padding:2px 6px; border-radius:4px;">LAUNCHER</code>.</li>
-          <li>La <code style="background:#0f3460; padding:2px 6px; border-radius:4px;">MainActivity</code> se ubica dentro del paquete <code style="background:#0f3460; padding:2px 6px; border-radius:4px;">.view</code>.</li>
-        </ul>
-      </div>
-
-    </div>
-
-    <!-- PARTE 3 -->
-    <div class="section">
-      <h2>🛠️ RecyclerView FRUTAS</h2>
-
-      <div class="warning">
-        <strong>⚠️ Prerequisito:</strong>
-        <p style="margin-top: 10px;">RecyclerView NO viene incluido por defecto. Debes agregar la dependencia en <code>build.gradle</code></p>
-      </div>
-
-      <div class="code-section">
-        <h4>📄 build.gradle (Module: app)</h4>
-        <pre><code class="kotlin">dependencies {
-            <span class="comment">// Agregar esta línea</span>
-            implementation <span class="string">'androidx.recyclerview:recyclerview:1.3.2'</span>
-
-            <span class="comment">// ... otras dependencias ...</span>
-            }</code></pre>
-      </div>
-
-      <div class="note"><strong>📝 Nota:</strong> Después de agregar la dependencia, haz click en <span class="highlight">"Sync Now"</span> en Android Studio.</div>
-
-      <div class="architecture-box">
-        <h4>📁 Estructura Recomendada (RecyclerView FRUTAS)</h4>
-        <p style="margin-bottom: 12px; color: #444;">Usa esta estructura para crear las carpetas y archivos del ejemplo de forma ordenada:</p>
-        <div class="code-section" style="margin-top: 10px;">
-          <pre><code class="kotlin">app/
-              ├── manifests/
-              │ └── AndroidManifest.xml
-              ├── java/com.example.ucv_b/
-              │ ├── MainActivity.kt
-              │ ├── Fruta.kt
-              │ └── FrutaAdapter.kt
-              ├── res/
-              │ ├── values/
-              │ │ └── data_frutas.xml
-              │ └── layout/
-              │ ├── activity_main.xml
-              │ └── item_fruta.xml
-              └── build.gradle (Module: app)</code></pre>
-        </div>
-      </div>
-
-      <h3>💻 Paso 1: Crear el Layout del Item</h3>
-
-      <div class="code-section">
-        <h4>📄 res/layout/item_fruta.xml (Nuevo archivo)</h4>
-        <pre><code class="xml">&lt;?xml version="1.0" encoding="utf-8"?&gt;
-            &lt;androidx.cardview.widget.CardView
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            app:cardCornerRadius="8dp"
-            app:cardElevation="4dp"&gt;
-
-            &lt;LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:padding="16dp"&gt;
-
-            &lt;TextView
+        &lt;TextView
             android:id="@+id/tvEmoji"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="🍎"
             android:textSize="32sp"
-            android:layout_marginEnd="16dp"/&gt;
+            android:layout_marginEnd="16dp" /&gt;
 
-            &lt;TextView
+        &lt;TextView
             android:id="@+id/tvNombre"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:layout_gravity="center_vertical"
             android:text="Manzana"
             android:textSize="18sp"
-            android:textStyle="bold"
-            android:layout_gravity="center_vertical"/&gt;
+            android:textStyle="bold" /&gt;
 
-            &lt;/LinearLayout&gt;
+    &lt;/LinearLayout&gt;
 
-            &lt;/androidx.cardview.widget.CardView&gt;</code></pre>
-      </div>
+&lt;/androidx.cardview.widget.CardView&gt;</code></pre>
 
-      <h3>💻 Paso 2: Crear la Clase de Datos</h3>
+    <h3>5.3 Clase de datos</h3>
+    <pre data-lang="kotlin" data-file="model/Fruta.kt"><code>package com.example.spinnerlistrecycler.model
 
-      <div class="code-section">
-        <h4>📱 Fruta.kt (Nueva clase)</h4>
-        <pre><code class="kotlin"><span class="keyword">package</span> com.example.ucv_b
+data class Fruta(
+    val emoji: String,
+    val nombre: String
+)</code></pre>
 
-            <span class="keyword">data class</span> <span class="function">Fruta</span>(
-            <span class="keyword">val</span> emoji: String,
-            <span class="keyword">val</span> nombre: String
-            )</code></pre>
-      </div>
+    <h3>5.4 Adapter con ViewHolder interno</h3>
+    <p>A diferencia del proyecto 1, aquí el ViewHolder se declara <strong>dentro</strong> del Adapter.</p>
+    <pre data-lang="kotlin" data-file="adapter/FrutaAdapter.kt"><code>package com.example.spinnerlistrecycler.adapter
 
-      <h3>💻 Paso 3: Crear el Adapter</h3>
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import com.example.spinnerlistrecycler.R
+import com.example.spinnerlistrecycler.model.Fruta
 
-      <div class="code-section">
-        <h4>📱 FrutaAdapter.kt (Nueva clase)</h4>
-        <pre><code class="kotlin"><span class="keyword">package</span> com.example.ucv_b
+class FrutaAdapter(
+    private val frutas: List&lt;Fruta&gt;
+) : RecyclerView.Adapter&lt;FrutaAdapter.FrutaViewHolder&gt;() {
 
-            <span class="keyword">import</span> android.view.LayoutInflater
-            <span class="keyword">import</span> android.view.View
-            <span class="keyword">import</span> android.view.ViewGroup
-            <span class="keyword">import</span> android.widget.TextView
-            <span class="keyword">import</span> androidx.recyclerview.widget.RecyclerView
+    // ViewHolder: guarda las referencias a las vistas
+    class FrutaViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val tvEmoji: TextView = itemView.findViewById(R.id.tvEmoji)
+        val tvNombre: TextView = itemView.findViewById(R.id.tvNombre)
+    }
 
-            <span class="keyword">class</span> <span class="function">FrutaAdapter</span>(
-            <span class="keyword">private val</span> frutas: List&lt;Fruta&gt;
-            ) : RecyclerView.Adapter&lt;FrutaAdapter.FrutaViewHolder&gt;() {
+    // 1. Crear el ViewHolder (inflar el layout)
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FrutaViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_fruta, parent, false)
+        return FrutaViewHolder(view)
+    }
 
-            <span class="comment">// ViewHolder: Guarda referencias a las vistas</span>
-            <span class="keyword">class</span> <span class="function">FrutaViewHolder</span>(<span class="keyword">itemView</span>: View) : RecyclerView.ViewHolder(itemView) {
-            <span class="keyword">val</span> tvEmoji: TextView = itemView.findViewById(R.id.tvEmoji)
-            <span class="keyword">val</span> tvNombre: TextView = itemView.findViewById(R.id.tvNombre)
-            }
+    // 2. Vincular los datos con el ViewHolder
+    override fun onBindViewHolder(holder: FrutaViewHolder, position: Int) {
+        val fruta = frutas[position]
+        holder.tvEmoji.text = fruta.emoji
+        holder.tvNombre.text = fruta.nombre
+    }
 
-            <span class="comment">// 1. Crear el ViewHolder (inflar el layout)</span>
-            <span class="keyword">override fun</span> <span class="function">onCreateViewHolder</span>(parent: ViewGroup, viewType: Int): FrutaViewHolder {
-            <span class="keyword">val</span> view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_fruta, parent, <span class="keyword">false</span>)
-            <span class="keyword">return</span> FrutaViewHolder(view)
-            }
+    // 3. Cantidad de ítems
+    override fun getItemCount(): Int = frutas.size
+}</code></pre>
 
-            <span class="comment">// 2. Vincular datos con el ViewHolder</span>
-            <span class="keyword">override fun</span> <span class="function">onBindViewHolder</span>(holder: FrutaViewHolder, position: Int) {
-            <span class="keyword">val</span> fruta = frutas[position]
-            holder.tvEmoji.text = fruta.emoji
-            holder.tvNombre.text = fruta.nombre
-            }
+    <table>
+      <tr>
+        <th>Parte</th>
+        <th>Explicación</th>
+        <th>Analogía</th>
+      </tr>
+      <tr>
+        <td>Declaración de la clase</td>
+        <td>Recibe la lista de frutas, hereda de <code>RecyclerView.Adapter</code> y usa <code>FrutaViewHolder</code>.</td>
+        <td>—</td>
+      </tr>
+      <tr>
+        <td><code>FrutaViewHolder</code></td>
+        <td>Guarda las referencias a los <code>TextView</code>.</td>
+        <td>Post-its en las páginas importantes de un libro.</td>
+      </tr>
+      <tr>
+        <td><code>onCreateViewHolder()</code></td>
+        <td>Infla <code>item_fruta.xml</code>. Pocas veces.</td>
+        <td>Construir el molde de la galleta.</td>
+      </tr>
+      <tr>
+        <td><code>onBindViewHolder()</code></td>
+        <td>Asigna la fruta de la posición. Muchas veces.</td>
+        <td>Rellenar el molde con masa.</td>
+      </tr>
+      <tr>
+        <td><code>getItemCount()</code></td>
+        <td>Total de ítems; indica dónde termina el scroll.</td>
+        <td>—</td>
+      </tr>
+    </table>
 
-            <span class="comment">// 3. Retornar cantidad de items</span>
-            <span class="keyword">override fun</span> <span class="function">getItemCount</span>(): Int = frutas.size
-            }</code></pre>
-      </div>
+    <h3>5.5 Genéricos: <code>List&lt;Fruta&gt;</code></h3>
+    <p><code>List</code> es una interfaz incorporada de Kotlin que representa una lista de solo lectura. Los símbolos <code>&lt; &gt;</code> indican el <strong>tipo genérico</strong>: qué objetos contiene la lista.</p>
+    <pre data-lang="kotlin" data-file="Ejemplos de genéricos"><code>List&lt;String&gt;   // Lista de textos
+List&lt;Int&gt;      // Lista de enteros
+List&lt;Fruta&gt;    // Lista de frutas (tu clase de model/Fruta.kt)
+List&lt;Usuario&gt;  // Lista de usuarios</code></pre>
 
-      <div class="theory">
-        <h3>📖 Explicación Detallada del Adapter</h3>
+    <h3>5.6 Layout y actividad</h3>
+    <pre data-lang="xml" data-file="res/layout/activity_recycler_view.xml"><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"&gt;
 
-        <h4>1️⃣ Declaración de la clase</h4>
-        <div style="background: rgba(0,0,0,0.05); padding: 15px; border-radius: 8px; margin: 10px 0;">
-          <ul style="margin-top: 10px;">
-            <li>Recibe la lista de frutas como parámetro</li>
-            <li>Hereda de <code>RecyclerView.Adapter</code> (clase base obligatoria)</li>
-            <li>Especifica que usará <code>FrutaViewHolder</code> como contenedor de vistas</li>
-          </ul>
-        </div>
+    &lt;TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Mi primer RecyclerView"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp" /&gt;
 
-        <h4>🔍 Desglosando List&lt;Fruta&gt;:</h4>
-        <div style="background: rgba(0,0,0,0.05); padding: 15px; border-radius: 8px; margin: 10px 0;">
-          <p><strong>1. List</strong> - Interfaz de Kotlin</p>
-          <ul style="margin-left: 20px; margin-top: 5px;">
-            <li>Es una interfaz <strong>built-in</strong> (incorporada) de Kotlin</li>
-            <li>Viene incluida en el lenguaje, no necesitas declararla</li>
-            <li>Representa una lista inmutable (solo lectura)</li>
-          </ul>
+    &lt;androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" /&gt;
 
-          <p style="margin-top: 15px;"><strong>2. &lt;Fruta&gt;</strong> - Tipo genérico</p>
-          <ul style="margin-left: 20px; margin-top: 5px;">
-            <li>Los <code>&lt; &gt;</code> indican <strong>genéricos</strong> (qué tipo de objetos contiene la lista)</li>
-            <li><code>Fruta</code> es tu clase que se declara en <code>Fruta.kt</code></li>
-            <li>Significa: "Esta es una lista de objetos tipo Fruta"</li>
-          </ul>
+&lt;/LinearLayout&gt;</code></pre>
+    <pre data-lang="kotlin" data-file="RecyclerViewActivity.kt"><code>package com.example.spinnerlistrecycler
 
-          <div style="background: #1e1e1e; color: #d4d4d4; padding: 10px; border-radius: 5px; margin-top: 10px; font-family: 'Courier New', monospace;">
-            <div style="color: #6a9955;">// Ejemplos de genéricos:</div>
-            <div>List&lt;String&gt; <span style="color: #6a9955;">// Lista de Strings</span></div>
-            <div>List&lt;Int&gt; <span style="color: #6a9955;">// Lista de enteros</span></div>
-            <div>List&lt;Fruta&gt; <span style="color: #6a9955;">// Lista de Frutas (tu clase)</span></div>
-            <div>List&lt;Persona&gt; <span style="color: #6a9955;">// Lista de Personas (si tuvieras esa clase)</span></div>
-          </div>
-        </div>
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.spinnerlistrecycler.adapter.FrutaAdapter
+import com.example.spinnerlistrecycler.model.Fruta
 
-        <h4>2️⃣ FrutaViewHolder (Clase interna)</h4>
-        <div style="background: rgba(0,0,0,0.05); padding: 15px; border-radius: 8px; margin: 10px 0;">
-          <ul>
-            <li><strong>Función:</strong> Guarda las referencias a los <code>TextView</code> del layout</li>
-            <li><strong>Por qué:</strong> Evita hacer <code>findViewById</code> repetidamente (más eficiente)</li>
-            <li><strong>Analogía:</strong> Es como marcar con post-its los lugares importantes en un libro para no buscarlos cada vez</li>
-          </ul>
-        </div>
+class RecyclerViewActivity : AppCompatActivity() {
 
-        <h4>3️⃣ onCreateViewHolder() - CREA la vista</h4>
-        <div style="background: rgba(0,0,0,0.05); padding: 15px; border-radius: 8px; margin: 10px 0;">
-          <ul>
-            <li><strong>Cuándo se llama:</strong> Solo cuando se necesita crear una nueva vista (12-15 veces)</li>
-            <li><strong>Qué hace:</strong> Infla el layout <code>item_fruta.xml</code> y crea un <code>ViewHolder</code></li>
-            <li><strong>Analogía:</strong> Construye el molde físico de la galleta</li>
-          </ul>
-        </div>
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_recycler_view)
 
-        <h4>4️⃣ onBindViewHolder() - RELLENA con datos</h4>
-        <div style="background: rgba(0,0,0,0.05); padding: 15px; border-radius: 8px; margin: 10px 0;">
-          <ul>
-            <li><strong>Cuándo se llama:</strong> Cada vez que un item se va a mostrar (miles de veces al hacer scroll)</li>
-            <li><strong>Qué hace:</strong> Toma la fruta en la posición indicada y asigna sus datos a los <code>TextView</code></li>
-            <li><strong>Analogía:</strong> Rellena el molde con la masa (datos específicos)</li>
-          </ul>
-        </div>
+        // 1. Referenciar el RecyclerView
+        val recyclerView = findViewById&lt;RecyclerView&gt;(R.id.recyclerView)
 
-        <h4>5️⃣ getItemCount() - CUENTA total</h4>
-        <div style="background: rgba(0,0,0,0.05); padding: 15px; border-radius: 8px; margin: 10px 0;">
-          <ul>
-            <li><strong>Qué hace:</strong> Devuelve cuántos items hay en total (5 en tu caso, o 5000 si tuvieras más)</li>
-            <li><strong>Para qué:</strong> RecyclerView sabe cuándo dejar de hacer scroll</li>
-          </ul>
-        </div>
+        // 2. Cargar los datos desde res/values/data_frutas.xml
+        val nombres = resources.getStringArray(R.array.frutas_nombres)
+        val emojis = resources.getStringArray(R.array.frutas_emojis)
 
-        <h4>🔄 Proceso Completo</h4>
-        <div style="background: rgba(102,126,234,0.1); padding: 15px; border-radius: 8px; margin: 10px 0; border-left: 4px solid #667eea;">
-          <ol style="margin-left: 20px;">
-            <li><code>getItemCount()</code> → "Tengo 5 frutas"</li>
-            <li><code>onCreateViewHolder()</code> → "Creo 12 vistas físicas" (solo al inicio)</li>
-            <li><code>onBindViewHolder(position=0)</code> → "Relleno vista 1 con 🍎 Manzana"</li>
-            <li><code>onBindViewHolder(position=1)</code> → "Relleno vista 2 con 🍌 Plátano"</li>
-            <li><strong>[Usuario hace scroll]</strong></li>
-            <li><code>onBindViewHolder(position=5)</code> → "Reciclo vista 1, ahora tiene otros datos"</li>
-          </ol>
-        </div>
-      </div>
-
-      <h3>💻 Paso 4: Crear datos en values</h3>
-
-      <div class="code-section">
-        <h4>📄 res/values/data_frutas.xml</h4>
-        <pre><code class="xml">&lt;?xml version="1.0" encoding="utf-8"?&gt;
-            &lt;resources&gt;
-            &lt;string-array name="frutas_nombres"&gt;
-            &lt;item&gt;Manzana&lt;/item&gt;
-            &lt;item&gt;Plátano&lt;/item&gt;
-            &lt;item&gt;Naranja&lt;/item&gt;
-            &lt;item&gt;Uva&lt;/item&gt;
-            &lt;item&gt;Sandía&lt;/item&gt;
-            &lt;item&gt;Fresa&lt;/item&gt;
-            &lt;item&gt;Piña&lt;/item&gt;
-            &lt;item&gt;Mango&lt;/item&gt;
-            &lt;item&gt;Pera&lt;/item&gt;
-            &lt;item&gt;Durazno&lt;/item&gt;
-            &lt;item&gt;Cereza&lt;/item&gt;
-            &lt;item&gt;Limón&lt;/item&gt;
-            &lt;item&gt;Melón&lt;/item&gt;
-            &lt;item&gt;Kiwi&lt;/item&gt;
-            &lt;item&gt;Papaya&lt;/item&gt;
-            &lt;item&gt;Coco&lt;/item&gt;
-            &lt;item&gt;Granada&lt;/item&gt;
-            &lt;item&gt;Guayaba&lt;/item&gt;
-            &lt;item&gt;Maracuyá&lt;/item&gt;
-            &lt;item&gt;Arándano&lt;/item&gt;
-            &lt;/string-array&gt;
-
-            &lt;string-array name="frutas_emojis"&gt;
-            &lt;item&gt;🍎&lt;/item&gt;
-            &lt;item&gt;🍌&lt;/item&gt;
-            &lt;item&gt;🍊&lt;/item&gt;
-            &lt;item&gt;🍇&lt;/item&gt;
-            &lt;item&gt;🍉&lt;/item&gt;
-            &lt;item&gt;🍓&lt;/item&gt;
-            &lt;item&gt;🍍&lt;/item&gt;
-            &lt;item&gt;🥭&lt;/item&gt;
-            &lt;item&gt;🍐&lt;/item&gt;
-            &lt;item&gt;🍑&lt;/item&gt;
-            &lt;item&gt;🍒&lt;/item&gt;
-            &lt;item&gt;🍋&lt;/item&gt;
-            &lt;item&gt;🍈&lt;/item&gt;
-            &lt;item&gt;🥝&lt;/item&gt;
-            &lt;item&gt;🥭&lt;/item&gt;
-            &lt;item&gt;🥥&lt;/item&gt;
-            &lt;item&gt;🍒&lt;/item&gt;
-            &lt;item&gt;🍏&lt;/item&gt;
-            &lt;item&gt;🍋&lt;/item&gt;
-            &lt;item&gt;🫐&lt;/item&gt;
-            &lt;/string-array&gt;
-            &lt;/resources&gt;</code></pre>
-      </div>
-
-      <h3>💻 Paso 5: Configurar RecyclerView en Activity</h3>
-
-      <div class="code-section">
-        <h4>📄 activity_main.xml</h4>
-        <pre><code class="xml">&lt;?xml version="1.0" encoding="utf-8"?&gt;
-            &lt;LinearLayout
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical"
-            android:padding="16dp"&gt;
-
-            &lt;TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Mi Primer RecyclerView"
-            android:textSize="20sp"
-            android:textStyle="bold"
-            android:layout_marginBottom="16dp"/&gt;
-
-            &lt;androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/&gt;
-
-            &lt;/LinearLayout&gt;</code></pre>
-      </div>
-
-      <div class="code-section">
-        <h4>📱 MainActivity.kt</h4>
-        <pre><code class="kotlin"><span class="keyword">package</span> com.example.ucv_b
-
-            <span class="keyword">import</span> android.os.Bundle
-            <span class="keyword">import</span> androidx.appcompat.app.AppCompatActivity
-            <span class="keyword">import</span> androidx.recyclerview.widget.LinearLayoutManager
-            <span class="keyword">import</span> androidx.recyclerview.widget.RecyclerView
-
-            <span class="keyword">class</span> <span class="function">MainActivity</span> : AppCompatActivity() {
-
-            <span class="keyword">override fun</span> <span class="function">onCreate</span>(savedInstanceState: Bundle?) {
-            <span class="keyword">super</span>.onCreate(savedInstanceState)
-            setContentView(R.layout.activity_main)
-
-            <span class="comment">// 1. Referenciar RecyclerView</span>
-            <span class="keyword">val</span> recyclerView = findViewById&lt;RecyclerView&gt;(R.id.recyclerView)
-
-            <span class="comment">// 2. Cargar datos desde res/values/data_frutas.xml</span>
-            <span class="keyword">val</span> nombres = resources.getStringArray(R.array.frutas_nombres)
-            <span class="keyword">val</span> emojis = resources.getStringArray(R.array.frutas_emojis)
-
-            <span class="comment">// Se construye la lista final: Fruta(emoji, nombre)</span>
-            <span class="keyword">val</span> frutas = nombres.zip(emojis) { nombre, emoji -&gt;
+        // Construir la lista final: Fruta(emoji, nombre)
+        val frutas = nombres.zip(emojis) { nombre, emoji -&gt;
             Fruta(emoji, nombre)
-            }
+        }
 
-            <span class="comment">// 3. Crear y asignar adapter</span>
-            <span class="keyword">val</span> adapter = FrutaAdapter(frutas)
-            recyclerView.adapter = adapter
+        // 3. Crear y asignar el adapter
+        recyclerView.adapter = FrutaAdapter(frutas)
 
-            <span class="comment">// 4. ⭐ Configurar LayoutManager (OBLIGATORIO)</span>
-            recyclerView.layoutManager = LinearLayoutManager(<span class="keyword">this</span>)
-            }
-            }</code></pre>
+        // 4. Configurar el LayoutManager (OBLIGATORIO)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+    }
+}</code></pre>
+    <div class="box"><strong><code>zip</code>:</strong> recorre los dos arreglos a la vez y combina el elemento <em>i</em> de cada uno. Así <code>"Manzana"</code> y <code>"🍎"</code> forman <code>Fruta("🍎", "Manzana")</code>.</div>
+
+    <h3>5.7 Proceso completo</h3>
+    <ol>
+      <li><code>getItemCount()</code> → «Tengo 20 frutas».</li>
+      <li><code>onCreateViewHolder()</code> → «Creo ~12 vistas» (solo al inicio).</li>
+      <li><code>onBindViewHolder(0)</code> → «Relleno la vista 1 con 🍎 Manzana».</li>
+      <li><code>onBindViewHolder(1)</code> → «Relleno la vista 2 con 🍌 Plátano».</li>
+      <li><strong>El usuario hace scroll.</strong></li>
+      <li><code>onBindViewHolder(12)</code> → «Reciclo la vista 1 con otros datos».</li>
+    </ol>
+    <div class="box"><strong>Pasos para crear un RecyclerView:</strong>
+      <ol>
+        <li>Agregar la dependencia en <code>build.gradle.kts</code>.</li>
+        <li>Crear el layout del ítem (<code>item_fruta.xml</code>).</li>
+        <li>Crear la data class (<code>Fruta.kt</code>).</li>
+        <li>Crear el Adapter con su ViewHolder.</li>
+        <li>Preparar los datos (<code>data_frutas.xml</code>).</li>
+        <li>Agregar el RecyclerView al layout de la actividad.</li>
+        <li>Configurar LayoutManager y Adapter en la actividad.</li>
+      </ol>
+    </div>
+    <div class="ok"><strong>Ejercicio:</strong> crea un RecyclerView de países con emoji de la bandera, nombre del país y capital (agrega un TextView adicional).</div>
+
+    <!-- ============ LAYOUTMANAGERS ============ -->
+    <h2 id="layoutmanagers">6. LayoutManagers</h2>
+    <p>El LayoutManager define cómo se organizan los ítems. Cambiarlo es una sola línea en la actividad; el Adapter no cambia.</p>
+
+    <div class="mock-row" aria-hidden="true">
+      <div class="mock">
+        <div class="lm linear"><span>Ítem 1</span><span>Ítem 2</span><span>Ítem 3</span><span>Ítem 4</span></div>
+        <div class="mock-cap">LinearLayoutManager (vertical)</div>
       </div>
-
-      <div class="tips">
-        <strong>💡 Pasos para crear RecyclerView:</strong>
-        <ol style="margin-top: 10px;">
-          <li>Agregar dependencia en build.gradle</li>
-          <li>Crear layout del item (item_fruta.xml)</li>
-          <li>Crear data class (Fruta.kt)</li>
-          <li>Crear Adapter con ViewHolder</li>
-          <li>Crear datos en values/data_frutas.xml</li>
-          <li>Agregar RecyclerView al XML</li>
-          <li>Configurar RecyclerView + LayoutManager en Activity</li>
-        </ol>
+      <div class="mock">
+        <div class="lm horiz"><span>1</span><span>2</span><span>3</span><span>4</span></div>
+        <div class="mock-cap">LinearLayoutManager (horizontal)</div>
       </div>
-
-      <div class="exercise">
-        <h4>✏️ Ejercicio</h4>
-        <p>Crea un RecyclerView de <strong>países</strong> con:</p>
-        <ul>
-          <li>Emoji de la bandera</li>
-          <li>Nombre del país</li>
-          <li>Capital (agregar TextView adicional)</li>
-        </ul>
+      <div class="mock">
+        <div class="lm grid2"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span></div>
+        <div class="mock-cap">GridLayoutManager (2 columnas)</div>
+      </div>
+      <div class="mock">
+        <div class="lm stag"><span class="r5">1</span><span class="r3">2</span><span class="r4">3</span><span class="r3">4</span><span class="r4">5</span></div>
+        <div class="mock-cap">StaggeredGridLayoutManager</div>
       </div>
     </div>
 
-    <!-- PARTE 4 -->
-    <div class="section">
-      <h2>🎨 LayoutManagers</h2>
+    <h3>6.1 LinearLayoutManager</h3>
+    <pre data-lang="kotlin" data-file="Lista vertical (por defecto)"><code>recyclerView.layoutManager = LinearLayoutManager(this)</code></pre>
+    <pre data-lang="kotlin" data-file="Lista horizontal (carrusel)"><code>recyclerView.layoutManager = LinearLayoutManager(
+    this,
+    LinearLayoutManager.HORIZONTAL,
+    false
+)</code></pre>
+    <pre data-lang="kotlin" data-file="Lista invertida (útil para chats)"><code>recyclerView.layoutManager = LinearLayoutManager(
+    this,
+    LinearLayoutManager.VERTICAL,
+    true  // reverseLayout
+)</code></pre>
 
-      <div class="theory">
-        <h3>Tipos de LayoutManager</h3>
-        <p>El LayoutManager define cómo se organizan los items en el RecyclerView</p>
-      </div>
+    <h3>6.2 GridLayoutManager</h3>
+    <pre data-lang="kotlin" data-file="Cuadrícula de 2 columnas"><code>recyclerView.layoutManager = GridLayoutManager(this, 2)</code></pre>
+    <pre data-lang="kotlin" data-file="Cuadrícula de 3 columnas"><code>recyclerView.layoutManager = GridLayoutManager(this, 3)</code></pre>
+    <pre data-lang="kotlin" data-file="Cuadrícula horizontal"><code>recyclerView.layoutManager = GridLayoutManager(
+    this,
+    2,  // filas
+    GridLayoutManager.HORIZONTAL,
+    false
+)</code></pre>
 
-      <h3>1️⃣ LinearLayoutManager (Lista Vertical u Horizontal)</h3>
+    <h3>6.3 StaggeredGridLayoutManager</h3>
+    <pre data-lang="kotlin" data-file="Cuadrícula irregular (estilo Pinterest)"><code>recyclerView.layoutManager = StaggeredGridLayoutManager(
+    2,  // columnas
+    StaggeredGridLayoutManager.VERTICAL
+)</code></pre>
+    <div class="note"><strong>Imports:</strong> agrega en la actividad <code>import androidx.recyclerview.widget.GridLayoutManager</code> y <code>import androidx.recyclerview.widget.StaggeredGridLayoutManager</code> según el que uses. Con <code>item_fruta.xml</code> en cuadrícula, cambia el <code>layout_width</code> del CardView a <code>match_parent</code> (ya lo tiene) para que llene cada columna.</div>
+    <div class="ok"><strong>Ejercicio — Mi galería:</strong> agrega tres botones («Lista», «Grid 2», «Grid 3») que cambien el LayoutManager del RecyclerView de frutas al pulsarlos.</div>
 
-      <div class="code-section">
-        <h4>📱 Lista Vertical (Por defecto)</h4>
-        <pre><code class="kotlin"><span class="comment">// Lista vertical normal</span>
-            recyclerView.layoutManager = LinearLayoutManager(<span class="keyword">this</span>)</code></pre>
-      </div>
+    <!-- ============ CLICS ============ -->
+    <h2 id="clics">7. Eventos de clic en los ítems</h2>
+    <div class="note"><strong>Diferencia con ListView:</strong> RecyclerView <strong>no</strong> tiene <code>setOnItemClickListener()</code>. El clic se programa en el Adapter, sobre <code>holder.itemView</code>.</div>
 
-      <div class="code-section">
-        <h4>📱 Lista Horizontal</h4>
-        <pre><code class="kotlin"><span class="comment">// Lista horizontal (como carrusel)</span>
-            recyclerView.layoutManager = LinearLayoutManager(
-            <span class="keyword">this</span>,
-            LinearLayoutManager.HORIZONTAL,
-            <span class="keyword">false</span>
-            )</code></pre>
-      </div>
+    <h3>7.1 Método 1: lambda en el Adapter (recomendado)</h3>
+    <p>Reemplaza <code>FrutaAdapter.kt</code>. El Adapter recibe una función que se ejecuta al tocar un ítem:</p>
+    <pre data-lang="kotlin" data-file="adapter/FrutaAdapter.kt"><code>package com.example.spinnerlistrecycler.adapter
 
-      <div class="code-section">
-        <h4>📱 Lista Invertida (de abajo hacia arriba)</h4>
-        <pre><code class="kotlin"><span class="comment">// Lista invertida (útil para chats)</span>
-            recyclerView.layoutManager = LinearLayoutManager(
-            <span class="keyword">this</span>,
-            LinearLayoutManager.VERTICAL,
-            <span class="keyword">true</span> <span class="comment">// reverseLayout</span>
-            )</code></pre>
-      </div>
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import com.example.spinnerlistrecycler.R
+import com.example.spinnerlistrecycler.model.Fruta
 
-      <h3>2️⃣ GridLayoutManager (Cuadrícula)</h3>
+class FrutaAdapter(
+    private val frutas: List&lt;Fruta&gt;,
+    private val onItemClick: (Fruta) -&gt; Unit  // Lambda para el clic
+) : RecyclerView.Adapter&lt;FrutaAdapter.FrutaViewHolder&gt;() {
 
-      <div class="code-section">
-        <h4>📱 Grid con 2 columnas</h4>
-        <pre><code class="kotlin"><span class="comment">// Cuadrícula de 2 columnas (galería)</span>
-            recyclerView.layoutManager = GridLayoutManager(<span class="keyword">this</span>, 2)</code></pre>
-      </div>
+    class FrutaViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val tvEmoji: TextView = itemView.findViewById(R.id.tvEmoji)
+        val tvNombre: TextView = itemView.findViewById(R.id.tvNombre)
+    }
 
-      <div class="code-section">
-        <h4>📱 Grid con 3 columnas</h4>
-        <pre><code class="kotlin"><span class="comment">// Cuadrícula de 3 columnas</span>
-            recyclerView.layoutManager = GridLayoutManager(<span class="keyword">this</span>, 3)</code></pre>
-      </div>
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FrutaViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_fruta, parent, false)
+        return FrutaViewHolder(view)
+    }
 
-      <div class="code-section">
-        <h4>📱 Grid Horizontal</h4>
-        <pre><code class="kotlin"><span class="comment">// Cuadrícula horizontal</span>
-            recyclerView.layoutManager = GridLayoutManager(
-            <span class="keyword">this</span>,
-            2, <span class="comment">// filas</span>
-            GridLayoutManager.HORIZONTAL,
-            <span class="keyword">false</span>
-            )</code></pre>
-      </div>
+    override fun onBindViewHolder(holder: FrutaViewHolder, position: Int) {
+        val fruta = frutas[position]
+        holder.tvEmoji.text = fruta.emoji
+        holder.tvNombre.text = fruta.nombre
 
-      <h3>3️⃣ StaggeredGridLayoutManager (Grid Irregular)</h3>
-
-      <div class="code-section">
-        <h4>📱 Estilo Pinterest</h4>
-        <pre><code class="kotlin"><span class="comment">// Grid irregular (como Pinterest)</span>
-            recyclerView.layoutManager = StaggeredGridLayoutManager(
-            2, <span class="comment">// columnas</span>
-            StaggeredGridLayoutManager.VERTICAL
-            )</code></pre>
-      </div>
-
-      <div class="visual-example">
-        <h4>📱 Comparación Visual</h4>
-        <div style="text-align: left; max-width: 800px; margin: 0 auto;">
-          <p><strong>LinearLayoutManager (Vertical):</strong></p>
-          <pre style="background: white; padding: 10px; border-radius: 5px; margin: 10px 0;">
-            ┌────────────┐
-            │ Item 1 │
-            ├────────────┤
-            │ Item 2 │
-            ├────────────┤
-            │ Item 3 │
-            └────────────┘</pre>
-
-          <p><strong>GridLayoutManager (2 columnas):</strong></p>
-          <pre style="background: white; padding: 10px; border-radius: 5px; margin: 10px 0;">
-            ┌──────┬──────┐
-            │ Item │ Item │
-            │ 1 │ 2 │
-            ├──────┼──────┤
-            │ Item │ Item │
-            │ 3 │ 4 │
-            └──────┴──────┘</pre>
-
-          <p><strong>StaggeredGridLayoutManager:</strong></p>
-          <pre style="background: white; padding: 10px; border-radius: 5px; margin: 10px 0;">
-            ┌──────┬──────┐
-            │ Item │ Item │
-            │ 1 │ 2 │
-            │ ├──────┤
-            │ │ Item │
-            ├──────┤ 4 │
-            │ Item │ │
-            │ 3 ├──────┤
-            │ │ Item │
-            └──────┴──────┘</pre>
-        </div>
-      </div>
-
-      <div class="exercise">
-        <h4>✏️ Ejercicio</h4>
-        <p><strong>Crear App "Mi Galería":</strong></p>
-        <ul>
-          <li>3 botones: "Lista", "Grid 2", "Grid 3"</li>
-          <li>Al hacer click, cambiar el LayoutManager</li>
-          <li>Usar emojis de diferentes categorías</li>
-        </ul>
-      </div>
-    </div>
-
-    <!-- PARTE 5 -->
-    <div class="section">
-      <h2>⚡ Eventos Click en Items</h2>
-
-      <div class="warning">
-        <strong>⚠️ Diferencia importante:</strong>
-        <p style="margin-top: 10px;">RecyclerView NO tiene <code>setOnItemClickListener()</code> como ListView. Debes implementar el click manualmente.</p>
-      </div>
-
-      <h3>💻 Método 1: Click en el Adapter (Recomendado)</h3>
-
-      <div class="code-section">
-        <h4>📱 FrutaAdapter.kt (Con Click)</h4>
-        <pre><code class="kotlin"><span class="keyword">class</span> <span class="function">FrutaAdapter</span>(
-            <span class="keyword">private val</span> frutas: List&lt;Fruta&gt;,
-            <span class="keyword">private val</span> onItemClick: (Fruta) -> Unit <span class="comment">// ⭐ Lambda para click</span>
-            ) : RecyclerView.Adapter&lt;FrutaAdapter.FrutaViewHolder&gt;() {
-
-            <span class="keyword">class</span> <span class="function">FrutaViewHolder</span>(<span class="keyword">itemView</span>: View) : RecyclerView.ViewHolder(itemView) {
-            <span class="keyword">val</span> tvEmoji: TextView = itemView.findViewById(R.id.tvEmoji)
-            <span class="keyword">val</span> tvNombre: TextView = itemView.findViewById(R.id.tvNombre)
-            }
-
-            <span class="keyword">override fun</span> <span class="function">onCreateViewHolder</span>(parent: ViewGroup, viewType: Int): FrutaViewHolder {
-            <span class="keyword">val</span> view = LayoutInflater.from(parent.context)
-            .inflate(R.layout.item_fruta, parent, <span class="keyword">false</span>)
-            <span class="keyword">return</span> FrutaViewHolder(view)
-            }
-
-            <span class="keyword">override fun</span> <span class="function">onBindViewHolder</span>(holder: FrutaViewHolder, position: Int) {
-            <span class="keyword">val</span> fruta = frutas[position]
-            holder.tvEmoji.text = fruta.emoji
-            holder.tvNombre.text = fruta.nombre
-
-            <span class="comment">// ⭐ Configurar click en el item completo</span>
-            holder.itemView.setOnClickListener {
+        // Clic en el ítem completo
+        holder.itemView.setOnClickListener {
             onItemClick(fruta)
-            }
-            }
+        }
+    }
 
-            <span class="keyword">override fun</span> <span class="function">getItemCount</span>(): Int = frutas.size
-            }</code></pre>
-      </div>
+    override fun getItemCount(): Int = frutas.size
+}</code></pre>
+    <p>El layout de la Parte 5.6 se mantiene. En la actividad se pasa la lambda al crear el Adapter:</p>
+    <pre data-lang="kotlin" data-file="RecyclerViewActivity.kt"><code>package com.example.spinnerlistrecycler
 
-      <div class="code-section">
-        <h4>📱 MainActivity.kt (Usar el Click)</h4>
-        <pre><code class="kotlin"><span class="keyword">import</span> android.widget.Toast
+import android.os.Bundle
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.spinnerlistrecycler.adapter.FrutaAdapter
+import com.example.spinnerlistrecycler.model.Fruta
 
-            <span class="keyword">class</span> <span class="function">MainActivity</span> : AppCompatActivity() {
+class RecyclerViewActivity : AppCompatActivity() {
 
-            <span class="keyword">override fun</span> <span class="function">onCreate</span>(savedInstanceState: Bundle?) {
-            <span class="keyword">super</span>.onCreate(savedInstanceState)
-            setContentView(R.layout.activity_main)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_recycler_view)
 
-            <span class="keyword">val</span> recyclerView = findViewById&lt;RecyclerView&gt;(R.id.recyclerView)
+        val recyclerView = findViewById&lt;RecyclerView&gt;(R.id.recyclerView)
 
-            <span class="comment">// Cargar frutas desde res/values/data_frutas.xml</span>
-            <span class="keyword">val</span> nombres = resources.getStringArray(R.array.frutas_nombres)
-            <span class="keyword">val</span> emojis = resources.getStringArray(R.array.frutas_emojis)
-            <span class="keyword">val</span> frutas = nombres.zip(emojis) { nombre, emoji -&gt;
+        // Cargar frutas desde res/values/data_frutas.xml
+        val nombres = resources.getStringArray(R.array.frutas_nombres)
+        val emojis = resources.getStringArray(R.array.frutas_emojis)
+        val frutas = nombres.zip(emojis) { nombre, emoji -&gt;
             Fruta(emoji, nombre)
-            }
+        }
 
-            <span class="comment">// ⭐ Pasar lambda para manejar clicks</span>
-            <span class="keyword">val</span> adapter = FrutaAdapter(frutas) { fruta ->
+        // Pasar la lambda que maneja el clic
+        val adapter = FrutaAdapter(frutas) { fruta -&gt;
             Toast.makeText(
-            <span class="keyword">this</span>,
-            <span class="string">"Seleccionaste: ${fruta.nombre}"</span>,
-            Toast.LENGTH_SHORT
+                this,
+                "Seleccionaste: ${fruta.nombre}",
+                Toast.LENGTH_SHORT
             ).show()
-            }
+        }
 
-            recyclerView.adapter = adapter
-            recyclerView.layoutManager = LinearLayoutManager(<span class="keyword">this</span>)
-            }
-            }</code></pre>
-      </div>
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(this)
+    }
+}</code></pre>
+    <p class="caption">Resultado al tocar «Uva»:</p>
+    <div class="result">Toast → Seleccionaste: Uva</div>
 
-      <h3>💻 Método 2: Click con Interface</h3>
+    <h3>7.2 Método 2: interface</h3>
+    <p>Crea la interface en el subpaquete <code>adapter</code>:</p>
+    <pre data-lang="kotlin" data-file="adapter/OnFrutaClickListener.kt"><code>package com.example.spinnerlistrecycler.adapter
 
-      <div class="code-section">
-        <h4>📱 OnItemClickListener.kt (Nueva interface)</h4>
-        <pre><code class="kotlin"><span class="keyword">interface</span> <span class="function">OnItemClickListener</span> {
-            <span class="keyword">fun</span> <span class="function">onItemClick</span>(fruta: Fruta, position: Int)
-            }</code></pre>
-      </div>
+import com.example.spinnerlistrecycler.model.Fruta
 
-      <div class="code-section">
-        <h4>📱 FrutaAdapter.kt (Con Interface)</h4>
-        <pre><code class="kotlin"><span class="keyword">class</span> <span class="function">FrutaAdapter</span>(
-            <span class="keyword">private val</span> frutas: List&lt;Fruta&gt;,
-            <span class="keyword">private val</span> listener: OnItemClickListener
-            ) : RecyclerView.Adapter&lt;FrutaAdapter.FrutaViewHolder&gt;() {
+interface OnFrutaClickListener {
+    fun onItemClick(fruta: Fruta, position: Int)
+}</code></pre>
+    <p>Reemplaza <code>FrutaAdapter.kt</code> para que reciba la interface:</p>
+    <pre data-lang="kotlin" data-file="adapter/FrutaAdapter.kt"><code>package com.example.spinnerlistrecycler.adapter
 
-            <span class="comment">// ... ViewHolder ...</span>
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import com.example.spinnerlistrecycler.R
+import com.example.spinnerlistrecycler.model.Fruta
 
-            <span class="keyword">override fun</span> <span class="function">onBindViewHolder</span>(holder: FrutaViewHolder, position: Int) {
-            <span class="keyword">val</span> fruta = frutas[position]
-            holder.tvEmoji.text = fruta.emoji
-            holder.tvNombre.text = fruta.nombre
+class FrutaAdapter(
+    private val frutas: List&lt;Fruta&gt;,
+    private val listener: OnFrutaClickListener
+) : RecyclerView.Adapter&lt;FrutaAdapter.FrutaViewHolder&gt;() {
 
-            holder.itemView.setOnClickListener {
+    class FrutaViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val tvEmoji: TextView = itemView.findViewById(R.id.tvEmoji)
+        val tvNombre: TextView = itemView.findViewById(R.id.tvNombre)
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FrutaViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_fruta, parent, false)
+        return FrutaViewHolder(view)
+    }
+
+    override fun onBindViewHolder(holder: FrutaViewHolder, position: Int) {
+        val fruta = frutas[position]
+        holder.tvEmoji.text = fruta.emoji
+        holder.tvNombre.text = fruta.nombre
+
+        holder.itemView.setOnClickListener {
             listener.onItemClick(fruta, position)
-            }
-            }
+        }
+    }
 
-            <span class="comment">// ... resto del código ...</span>
-            }</code></pre>
-      </div>
+    override fun getItemCount(): Int = frutas.size
+}</code></pre>
+    <p>La actividad implementa la interface y se pasa a sí misma (<code>this</code>) al Adapter:</p>
+    <pre data-lang="kotlin" data-file="RecyclerViewActivity.kt"><code>package com.example.spinnerlistrecycler
 
-      <h3>💻 Click en Elementos Específicos</h3>
+import android.os.Bundle
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.spinnerlistrecycler.adapter.FrutaAdapter
+import com.example.spinnerlistrecycler.adapter.OnFrutaClickListener
+import com.example.spinnerlistrecycler.model.Fruta
 
-      <div class="code-section">
-        <h4>📱 Clicks en diferentes vistas del item</h4>
-        <pre><code class="kotlin"><span class="keyword">override fun</span> <span class="function">onBindViewHolder</span>(holder: FrutaViewHolder, position: Int) {
-            <span class="keyword">val</span> fruta = frutas[position]
-            holder.tvEmoji.text = fruta.emoji
-            holder.tvNombre.text = fruta.nombre
+class RecyclerViewActivity : AppCompatActivity(), OnFrutaClickListener {
 
-            <span class="comment">// Click en el item completo</span>
-            holder.itemView.setOnClickListener {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_recycler_view)
+
+        val recyclerView = findViewById&lt;RecyclerView&gt;(R.id.recyclerView)
+
+        val nombres = resources.getStringArray(R.array.frutas_nombres)
+        val emojis = resources.getStringArray(R.array.frutas_emojis)
+        val frutas = nombres.zip(emojis) { nombre, emoji -&gt;
+            Fruta(emoji, nombre)
+        }
+
+        recyclerView.adapter = FrutaAdapter(frutas, this)
+        recyclerView.layoutManager = LinearLayoutManager(this)
+    }
+
+    // Método de la interface: se ejecuta al tocar un ítem
+    override fun onItemClick(fruta: Fruta, position: Int) {
+        Toast.makeText(this, "Posición $position: ${fruta.nombre}", Toast.LENGTH_SHORT).show()
+    }
+}</code></pre>
+
+    <h3>7.3 Clic en elementos específicos del ítem</h3>
+    <p>Un Adapter puede recibir varias lambdas para distinguir el clic en la fila, en el emoji o el clic largo:</p>
+    <pre data-lang="kotlin" data-file="adapter/FrutaAdapter.kt (fragmento)"><code>class FrutaAdapter(
+    private val frutas: List&lt;Fruta&gt;,
+    private val onItemClick: (Fruta) -&gt; Unit,
+    private val onEmojiClick: (Fruta) -&gt; Unit,
+    private val onItemLongClick: (Fruta) -&gt; Unit
+) : RecyclerView.Adapter&lt;FrutaAdapter.FrutaViewHolder&gt;() {
+
+    // ... ViewHolder, onCreateViewHolder y getItemCount iguales ...
+
+    override fun onBindViewHolder(holder: FrutaViewHolder, position: Int) {
+        val fruta = frutas[position]
+        holder.tvEmoji.text = fruta.emoji
+        holder.tvNombre.text = fruta.nombre
+
+        // Clic en el ítem completo
+        holder.itemView.setOnClickListener {
             onItemClick(fruta)
-            }
+        }
 
-            <span class="comment">// Click solo en el emoji</span>
-            holder.tvEmoji.setOnClickListener {
+        // Clic solo en el emoji
+        holder.tvEmoji.setOnClickListener {
             onEmojiClick(fruta)
-            }
+        }
 
-            <span class="comment">// Long click en el item</span>
-            holder.itemView.setOnLongClickListener {
+        // Clic largo en el ítem
+        holder.itemView.setOnLongClickListener {
             onItemLongClick(fruta)
-            <span class="keyword">true</span>
-            }
-            }</code></pre>
-      </div>
+            true  // Consumir el evento
+        }
+    }
+}</code></pre>
+    <div class="ok"><strong>Ejercicio — Productos con detalles:</strong> RecyclerView de productos (nombre, precio). Clic normal: detalles en un AlertDialog. Clic largo: menú con Editar, Eliminar y Compartir.</div>
 
-      <div class="exercise">
-        <h4>✏️ Ejercicio</h4>
-        <p><strong>Lista de Productos con Detalles:</strong></p>
-        <ul>
-          <li>RecyclerView de productos (nombre, precio)</li>
-          <li>Click normal: Ver detalles en AlertDialog</li>
-          <li>Long Click: Menú con opciones (Editar, Eliminar, Compartir)</li>
-        </ul>
-      </div>
-    </div>
+    <!-- ============ CRUD ============ -->
+    <h2 id="crud">8. CRUD dinámico: agregar, editar y eliminar</h2>
+    <p>Para modificar la lista, el Adapter debe trabajar con un <code>ArrayList</code> (mutable) y notificar cada cambio con el método adecuado.</p>
+    <table>
+      <tr>
+        <th>Método</th>
+        <th>Uso</th>
+        <th>Animación</th>
+      </tr>
+      <tr>
+        <td><code>notifyItemInserted(pos)</code></td>
+        <td>Ítem agregado</td>
+        <td>Sí</td>
+      </tr>
+      <tr>
+        <td><code>notifyItemRemoved(pos)</code></td>
+        <td>Ítem eliminado</td>
+        <td>Sí</td>
+      </tr>
+      <tr>
+        <td><code>notifyItemChanged(pos)</code></td>
+        <td>Ítem modificado</td>
+        <td>Sí</td>
+      </tr>
+      <tr>
+        <td><code>notifyItemMoved(from, to)</code></td>
+        <td>Ítem movido</td>
+        <td>Sí</td>
+      </tr>
+      <tr>
+        <td><code>notifyDataSetChanged()</code></td>
+        <td>Redibujar todo</td>
+        <td>No</td>
+      </tr>
+    </table>
+    <div class="note"><strong>Buena práctica:</strong> usa <code>notifyItemInserted()</code>, <code>notifyItemRemoved()</code> y similares en lugar de <code>notifyDataSetChanged()</code>: obtienes animaciones automáticas y mejor rendimiento.</div>
 
-    <!-- PARTE 6 -->
-    <div class="section">
-      <h2>🔧 CRUD Dinámico</h2>
+    <h3>8.1 Adapter con ArrayList</h3>
+    <pre data-lang="kotlin" data-file="adapter/FrutaAdapter.kt"><code>package com.example.spinnerlistrecycler.adapter
 
-      <div class="theory">
-        <h3>Operaciones CRUD en RecyclerView</h3>
-        <p>A diferencia de ListView, RecyclerView requiere usar ArrayList (mutable) y notificar cambios específicos.</p>
-      </div>
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
+import androidx.recyclerview.widget.RecyclerView
+import com.example.spinnerlistrecycler.R
+import com.example.spinnerlistrecycler.model.Fruta
 
-      <h3>💻 Agregar Items (Create)</h3>
+class FrutaAdapter(
+    private val frutas: ArrayList&lt;Fruta&gt;,             // ArrayList mutable
+    private val onEditar: (Int, Fruta) -&gt; Unit        // Clic: editar
+) : RecyclerView.Adapter&lt;FrutaAdapter.FrutaViewHolder&gt;() {
 
-      <div class="code-section">
-        <h4>📱 Adapter con ArrayList Mutable</h4>
-        <pre><code class="kotlin"><span class="keyword">class</span> <span class="function">FrutaAdapter</span>(
-            <span class="keyword">private val</span> frutas: ArrayList&lt;Fruta&gt; <span class="comment">// ⭐ ArrayList mutable</span>
-            ) : RecyclerView.Adapter&lt;FrutaAdapter.FrutaViewHolder&gt;() {
+    class FrutaViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val tvEmoji: TextView = itemView.findViewById(R.id.tvEmoji)
+        val tvNombre: TextView = itemView.findViewById(R.id.tvNombre)
+    }
 
-            <span class="comment">// ... ViewHolder y métodos anteriores ...</span>
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FrutaViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_fruta, parent, false)
+        return FrutaViewHolder(view)
+    }
 
-            <span class="comment">// ⭐ Método para agregar</span>
-            <span class="keyword">fun</span> <span class="function">agregarFruta</span>(fruta: Fruta) {
-            frutas.add(fruta)
-            notifyItemInserted(frutas.size - 1) <span class="comment">// Notificar posición específica</span>
-            }
-            }</code></pre>
-      </div>
+    override fun onBindViewHolder(holder: FrutaViewHolder, position: Int) {
+        val fruta = frutas[position]
+        holder.tvEmoji.text = fruta.emoji
+        holder.tvNombre.text = fruta.nombre
 
-      <div class="code-section">
-        <h4>📱 MainActivity.kt - Agregar con diálogo</h4>
-        <pre><code class="kotlin"><span class="keyword">private lateinit var</span> adapter: FrutaAdapter
-            <span class="keyword">private val</span> frutas = ArrayList&lt;Fruta&gt;()
+        // Clic: editar
+        holder.itemView.setOnClickListener {
+            val pos = holder.bindingAdapterPosition
+            if (pos != RecyclerView.NO_POSITION) onEditar(pos, frutas[pos])
+        }
 
-            <span class="keyword">override fun</span> <span class="function">onCreate</span>(savedInstanceState: Bundle?) {
-            <span class="keyword">super</span>.onCreate(savedInstanceState)
-            setContentView(R.layout.activity_main)
-
-            <span class="keyword">val</span> recyclerView = findViewById&lt;RecyclerView&gt;(R.id.recyclerView)
-            <span class="keyword">val</span> btnAgregar = findViewById&lt;Button&gt;(R.id.btnAgregar)
-
-            <span class="comment">// Datos iniciales desde res/values/data_frutas.xml</span>
-            <span class="keyword">val</span> nombres = resources.getStringArray(R.array.frutas_nombres)
-            <span class="keyword">val</span> emojis = resources.getStringArray(R.array.frutas_emojis)
-            frutas.addAll(nombres.zip(emojis) { nombre, emoji -&gt; Fruta(emoji, nombre) })
-
-            adapter = FrutaAdapter(frutas)
-            recyclerView.adapter = adapter
-            recyclerView.layoutManager = LinearLayoutManager(<span class="keyword">this</span>)
-
-            <span class="comment">// ⭐ Botón para agregar</span>
-            btnAgregar.setOnClickListener {
-            mostrarDialogoAgregar()
-            }
-            }
-
-            <span class="keyword">private fun</span> <span class="function">mostrarDialogoAgregar</span>() {
-            <span class="keyword">val</span> input = EditText(<span class="keyword">this</span>)
-            input.hint = <span class="string">"Nombre de la fruta"</span>
-
-            AlertDialog.Builder(<span class="keyword">this</span>)
-            .setTitle(<span class="string">"Agregar Fruta"</span>)
-            .setView(input)
-            .setPositiveButton(<span class="string">"Agregar"</span>) { dialog, which ->
-            <span class="keyword">val</span> nombre = input.text.toString()
-            <span class="keyword">if</span> (nombre.isNotEmpty()) {
-            <span class="keyword">val</span> nuevaFruta = Fruta(<span class="string">"🍓"</span>, nombre)
-            adapter.agregarFruta(nuevaFruta)
-            Toast.makeText(<span class="keyword">this</span>, <span class="string">"Fruta agregada"</span>, Toast.LENGTH_SHORT).show()
-            }
-            }
-            .setNegativeButton(<span class="string">"Cancelar"</span>, <span class="keyword">null</span>)
-            .show()
-            }</code></pre>
-      </div>
-
-      <h3>💻 Eliminar Items (Delete)</h3>
-
-      <div class="code-section">
-        <h4>📱 Adapter - Método eliminar</h4>
-        <pre><code class="kotlin"><span class="comment">// ⭐ Método para eliminar</span>
-            <span class="keyword">fun</span> <span class="function">eliminarFruta</span>(position: Int) {
-            frutas.removeAt(position)
-            notifyItemRemoved(position) <span class="comment">// Notificar posición eliminada</span>
-            }</code></pre>
-      </div>
-
-      <div class="code-section">
-        <h4>📱 Implementar en onBindViewHolder</h4>
-        <pre><code class="kotlin"><span class="keyword">override fun</span> <span class="function">onBindViewHolder</span>(holder: FrutaViewHolder, position: Int) {
-            <span class="keyword">val</span> fruta = frutas[position]
-            holder.tvEmoji.text = fruta.emoji
-            holder.tvNombre.text = fruta.nombre
-
-            <span class="comment">// Long click para eliminar</span>
-            holder.itemView.setOnLongClickListener {
+        // Clic largo: eliminar con confirmación
+        holder.itemView.setOnLongClickListener {
             AlertDialog.Builder(holder.itemView.context)
-            .setTitle(<span class="string">"Eliminar"</span>)
-            .setMessage(<span class="string">"¿Eliminar ${fruta.nombre}?"</span>)
-            .setPositiveButton(<span class="string">"Eliminar"</span>) { dialog, which ->
-            eliminarFruta(holder.adapterPosition)
+                .setTitle("Eliminar")
+                .setMessage("¿Eliminar ${fruta.nombre}?")
+                .setPositiveButton("Eliminar") { _, _ -&gt;
+                    val pos = holder.bindingAdapterPosition
+                    if (pos != RecyclerView.NO_POSITION) eliminarFruta(pos)
+                }
+                .setNegativeButton("Cancelar", null)
+                .show()
+            true
+        }
+    }
+
+    override fun getItemCount(): Int = frutas.size
+
+    // CREATE: agregar al final
+    fun agregarFruta(fruta: Fruta) {
+        frutas.add(fruta)
+        notifyItemInserted(frutas.size - 1)
+    }
+
+    // UPDATE: reemplazar en la posición
+    fun actualizarFruta(position: Int, nuevaFruta: Fruta) {
+        frutas[position] = nuevaFruta
+        notifyItemChanged(position)
+    }
+
+    // DELETE: quitar de la posición
+    fun eliminarFruta(position: Int) {
+        frutas.removeAt(position)
+        notifyItemRemoved(position)
+    }
+}</code></pre>
+    <div class="box"><strong><code>bindingAdapterPosition</code>:</strong> después de eliminar o insertar, la variable <code>position</code> de <code>onBindViewHolder</code> puede quedar desactualizada. <code>holder.bindingAdapterPosition</code> devuelve la posición actual del ítem en el momento del clic.</div>
+
+    <h3>8.2 Layout con botón</h3>
+    <pre data-lang="xml" data-file="res/layout/activity_recycler_view.xml"><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"&gt;
+
+    &lt;Button
+        android:id="@+id/btnAgregar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Agregar fruta" /&gt;
+
+    &lt;androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="8dp" /&gt;
+
+&lt;/LinearLayout&gt;</code></pre>
+
+    <h3>8.3 Actividad</h3>
+    <pre data-lang="kotlin" data-file="RecyclerViewActivity.kt"><code>package com.example.spinnerlistrecycler
+
+import android.os.Bundle
+import android.widget.Button
+import android.widget.EditText
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.spinnerlistrecycler.adapter.FrutaAdapter
+import com.example.spinnerlistrecycler.model.Fruta
+
+class RecyclerViewActivity : AppCompatActivity() {
+
+    private lateinit var adapter: FrutaAdapter
+    private val frutas = ArrayList&lt;Fruta&gt;()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_recycler_view)
+
+        val recyclerView = findViewById&lt;RecyclerView&gt;(R.id.recyclerView)
+        val btnAgregar = findViewById&lt;Button&gt;(R.id.btnAgregar)
+
+        // Datos iniciales desde res/values/data_frutas.xml
+        val nombres = resources.getStringArray(R.array.frutas_nombres)
+        val emojis = resources.getStringArray(R.array.frutas_emojis)
+        frutas.addAll(nombres.zip(emojis) { nombre, emoji -&gt; Fruta(emoji, nombre) })
+
+        // Clic en un ítem: abrir el diálogo de edición
+        adapter = FrutaAdapter(frutas) { position, fruta -&gt;
+            mostrarDialogoEditar(position, fruta)
+        }
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(this)
+
+        // Botón para agregar
+        btnAgregar.setOnClickListener {
+            mostrarDialogoAgregar()
+        }
+    }
+
+    private fun mostrarDialogoAgregar() {
+        val input = EditText(this)
+        input.hint = "Nombre de la fruta"
+
+        AlertDialog.Builder(this)
+            .setTitle("Agregar fruta")
+            .setView(input)
+            .setPositiveButton("Agregar") { _, _ -&gt;
+                val nombre = input.text.toString().trim()
+                if (nombre.isNotEmpty()) {
+                    adapter.agregarFruta(Fruta("🍓", nombre))
+                    Toast.makeText(this, "Fruta agregada", Toast.LENGTH_SHORT).show()
+                }
             }
-            .setNegativeButton(<span class="string">"Cancelar"</span>, <span class="keyword">null</span>)
+            .setNegativeButton("Cancelar", null)
             .show()
-            <span class="keyword">true</span>
+    }
+
+    private fun mostrarDialogoEditar(position: Int, fruta: Fruta) {
+        val input = EditText(this)
+        input.setText(fruta.nombre)
+
+        AlertDialog.Builder(this)
+            .setTitle("Editar fruta")
+            .setView(input)
+            .setPositiveButton("Guardar") { _, _ -&gt;
+                val nombre = input.text.toString().trim()
+                if (nombre.isNotEmpty()) {
+                    adapter.actualizarFruta(position, fruta.copy(nombre = nombre))
+                }
             }
-            }</code></pre>
-      </div>
-
-      <h3>💻 Actualizar Items (Update)</h3>
-
-      <div class="code-section">
-        <h4>📱 Adapter - Método actualizar</h4>
-        <pre><code class="kotlin"><span class="comment">// ⭐ Método para actualizar</span>
-            <span class="keyword">fun</span> <span class="function">actualizarFruta</span>(position: Int, nuevaFruta: Fruta) {
-            frutas[position] = nuevaFruta
-            notifyItemChanged(position) <span class="comment">// Notificar cambio específico</span>
-            }</code></pre>
-      </div>
-
-      <div class="tips">
-        <strong>💡 Métodos de notificación importantes:</strong>
-        <table class="comparison-table" style="margin-top: 10px;">
-          <tr>
-            <th>Método</th>
-            <th>Uso</th>
-            <th>Animación</th>
-          </tr>
-          <tr>
-            <td><code>notifyDataSetChanged()</code></td>
-            <td>Actualizar todo</td>
-            <td>❌ No</td>
-          </tr>
-          <tr>
-            <td><code>notifyItemInserted(position)</code></td>
-            <td>Item agregado</td>
-            <td>✅ Sí</td>
-          </tr>
-          <tr>
-            <td><code>notifyItemRemoved(position)</code></td>
-            <td>Item eliminado</td>
-            <td>✅ Sí</td>
-          </tr>
-          <tr>
-            <td><code>notifyItemChanged(position)</code></td>
-            <td>Item modificado</td>
-            <td>✅ Sí</td>
-          </tr>
-          <tr>
-            <td><code>notifyItemMoved(from, to)</code></td>
-            <td>Item movido</td>
-            <td>✅ Sí</td>
-          </tr>
-        </table>
-      </div>
-
-      <div class="warning">
-        <strong>⚠️ Importante:</strong>
-        <p style="margin-top: 10px;">
-          Usa <code>notifyItemInserted()</code>, <code>notifyItemRemoved()</code>, etc. en lugar de <code>notifyDataSetChanged()</code> para obtener animaciones automáticas y mejor rendimiento.
-        </p>
-      </div>
-
-      <div class="exercise">
-        <h4>✏️ Proyecto CRUD Completo</h4>
-        <p><strong>"Gestor de Tareas":</strong></p>
-        <ul>
-          <li>RecyclerView de tareas</li>
-          <li>Botón "Agregar Tarea" con diálogo</li>
-          <li>Click: Marcar como completada (cambiar color/estilo)</li>
-          <li>Long Click: Menú con "Editar" y "Eliminar"</li>
-          <li>Guardar en SharedPreferences (opcional)</li>
-        </ul>
-      </div>
+            .setNegativeButton("Cancelar", null)
+            .show()
+    }
+}</code></pre>
+    <table>
+      <tr>
+        <th>Acción del usuario</th>
+        <th>Resultado</th>
+      </tr>
+      <tr>
+        <td>Pulsar «Agregar fruta»</td>
+        <td>Diálogo → <code>agregarFruta()</code> → la fruta aparece al final con animación.</td>
+      </tr>
+      <tr>
+        <td>Tocar una fruta</td>
+        <td>Diálogo de edición → <code>actualizarFruta()</code>.</td>
+      </tr>
+      <tr>
+        <td>Mantener presionada una fruta</td>
+        <td>Confirmación → <code>eliminarFruta()</code> → desaparece con animación.</td>
+      </tr>
+    </table>
+    <div class="box"><strong><code>fruta.copy(nombre = nombre)</code>:</strong> las data class incluyen <code>copy()</code>, que crea un objeto nuevo cambiando solo las propiedades indicadas.</div>
+    <div class="ok"><strong>Proyecto CRUD — Gestor de tareas:</strong>
+      <ul>
+        <li>RecyclerView de tareas y botón «Agregar tarea» con diálogo.</li>
+        <li>Clic: marcar como completada (cambiar color o estilo).</li>
+        <li>Clic largo: menú con Editar y Eliminar.</li>
+        <li>Opcional: guardar en SharedPreferences.</li>
+      </ul>
     </div>
 
-    <!-- PARTE 7 -->
-    <div class="section">
-      <h2>Casos Avanzados</h2>
+    <!-- ============ AVANZADOS ============ -->
+    <h2 id="avanzados">9. Casos avanzados</h2>
 
-      <h3>💻 Ejemplo 1: RecyclerView con Imágenes</h3>
+    <h3>9.1 Ítem con imagen</h3>
+    <pre data-lang="xml" data-file="res/layout/item_producto.xml"><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="8dp"
+    app:cardCornerRadius="12dp"
+    app:cardElevation="6dp"&gt;
 
-      <div class="code-section">
-        <h4>📄 item_producto.xml</h4>
-        <pre><code class="xml">&lt;androidx.cardview.widget.CardView
-            xmlns:android="http://schemas.android.com/apk/res/android"
-            xmlns:app="http://schemas.android.com/apk/res-auto"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_margin="8dp"
-            app:cardCornerRadius="12dp"
-            app:cardElevation="6dp"&gt;
+    &lt;LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="16dp"&gt;
 
-            &lt;LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp"&gt;
-
-            &lt;ImageView
+        &lt;ImageView
             android:id="@+id/ivProducto"
             android:layout_width="match_parent"
             android:layout_height="200dp"
             android:scaleType="centerCrop"
-            android:src="@drawable/placeholder"/&gt;
+            android:src="@android:drawable/ic_menu_gallery" /&gt;
 
-            &lt;TextView
+        &lt;TextView
             android:id="@+id/tvNombre"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Producto"
             android:textSize="18sp"
             android:textStyle="bold"
-            android:layout_marginTop="8dp"/&gt;
+            android:layout_marginTop="8dp" /&gt;
 
-            &lt;TextView
+        &lt;TextView
             android:id="@+id/tvPrecio"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="S/. 0.00"
+            android:textColor="#16745A"
             android:textSize="16sp"
-            android:textColor="#4CAF50"
-            android:layout_marginTop="4dp"/&gt;
+            android:layout_marginTop="4dp" /&gt;
 
-            &lt;/LinearLayout&gt;
+    &lt;/LinearLayout&gt;
 
-            &lt;/androidx.cardview.widget.CardView&gt;</code></pre>
-      </div>
+&lt;/androidx.cardview.widget.CardView&gt;</code></pre>
+    <p>Las imágenes se guardan en <code>res/drawable</code> y el modelo guarda su id de recurso:</p>
+    <pre data-lang="kotlin" data-file="model/Producto.kt + onBindViewHolder (fragmento)"><code>// model/Producto.kt
+data class Producto(
+    val nombre: String,
+    val precio: String,
+    val imagen: Int  // Ej.: R.drawable.laptop
+)
 
-      <h3>💻 Ejemplo 2: RecyclerView Horizontal (Carrusel)</h3>
+// En onBindViewHolder del adapter de productos
+holder.ivProducto.setImageResource(producto.imagen)
+holder.tvNombre.text = producto.nombre
+holder.tvPrecio.text = producto.precio</code></pre>
 
-      <div class="code-section">
-        <h4>📱 MainActivity.kt</h4>
-        <pre><code class="kotlin"><span class="comment">// RecyclerView horizontal tipo carrusel</span>
-            recyclerView.layoutManager = LinearLayoutManager(
-            <span class="keyword">this</span>,
-            LinearLayoutManager.HORIZONTAL,
-            <span class="keyword">false</span>
-            )
+    <h3>9.2 Carrusel horizontal</h3>
+    <pre data-lang="kotlin" data-file="RecyclerViewActivity.kt (fragmento)"><code>// import androidx.recyclerview.widget.PagerSnapHelper
 
-            <span class="comment">// Opcional: Snap helper para centrar items</span>
-            <span class="keyword">val</span> snapHelper = PagerSnapHelper()
-            snapHelper.attachToRecyclerView(recyclerView)</code></pre>
-      </div>
+// RecyclerView horizontal tipo carrusel
+recyclerView.layoutManager = LinearLayoutManager(
+    this,
+    LinearLayoutManager.HORIZONTAL,
+    false
+)
 
-      <h3>💻 Ejemplo 3: Separadores entre Items</h3>
+// Opcional: centrar un ítem por vez al deslizar
+val snapHelper = PagerSnapHelper()
+snapHelper.attachToRecyclerView(recyclerView)</code></pre>
 
-      <div class="code-section">
-        <h4>📱 Agregar DividerItemDecoration</h4>
-        <pre><code class="kotlin"><span class="keyword">import</span> androidx.recyclerview.widget.DividerItemDecoration
+    <h3>9.3 Separadores entre ítems</h3>
+    <pre data-lang="kotlin" data-file="RecyclerViewActivity.kt (fragmento)"><code>// import androidx.recyclerview.widget.DividerItemDecoration
 
-            <span class="comment">// Agregar líneas separadoras</span>
-            <span class="keyword">val</span> divider = DividerItemDecoration(
-            <span class="keyword">this</span>,
-            LinearLayoutManager.VERTICAL
-            )
-            recyclerView.addItemDecoration(divider)</code></pre>
-      </div>
+val divider = DividerItemDecoration(
+    this,
+    LinearLayoutManager.VERTICAL
+)
+recyclerView.addItemDecoration(divider)</code></pre>
 
-      <h3>💻 Ejemplo 4: RecyclerView Vacío</h3>
+    <h3>9.4 Mensaje de lista vacía</h3>
+    <pre data-lang="xml" data-file="res/layout/activity_recycler_view.xml"><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"&gt;
 
-      <div class="code-section">
-        <h4>📄 activity_main.xml</h4>
-        <pre><code class="xml">&lt;FrameLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"&gt;
+    &lt;androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" /&gt;
 
-            &lt;androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recyclerView"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"/&gt;
+    &lt;TextView
+        android:id="@+id/tvVacio"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="No hay elementos"
+        android:textSize="18sp"
+        android:visibility="gone" /&gt;
 
-            &lt;TextView
-            android:id="@+id/tvVacio"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="No hay elementos"
-            android:textSize="18sp"
-            android:visibility="gone"/&gt;
+&lt;/FrameLayout&gt;</code></pre>
+    <pre data-lang="kotlin" data-file="RecyclerViewActivity.kt (fragmento)"><code>// Llamar después de cargar datos, agregar o eliminar
+private fun actualizarVista() {
+    if (frutas.isEmpty()) {
+        recyclerView.visibility = View.GONE
+        tvVacio.visibility = View.VISIBLE
+    } else {
+        recyclerView.visibility = View.VISIBLE
+        tvVacio.visibility = View.GONE
+    }
+}</code></pre>
 
-            &lt;/FrameLayout&gt;</code></pre>
-      </div>
+    <h3>9.5 Búsqueda y filtrado</h3>
+    <p>El Adapter guarda la lista completa y una lista filtrada. <strong>Todos</strong> los métodos trabajan con la lista filtrada:</p>
+    <pre data-lang="kotlin" data-file="adapter/FrutaAdapter.kt"><code>package com.example.spinnerlistrecycler.adapter
 
-      <div class="code-section">
-        <h4>📱 MainActivity.kt</h4>
-        <pre><code class="kotlin"><span class="keyword">private fun</span> <span class="function">actualizarVista</span>() {
-            <span class="keyword">if</span> (frutas.isEmpty()) {
-            recyclerView.visibility = View.GONE
-            tvVacio.visibility = View.VISIBLE
-            } <span class="keyword">else</span> {
-            recyclerView.visibility = View.VISIBLE
-            tvVacio.visibility = View.GONE
-            }
-            }</code></pre>
-      </div>
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import com.example.spinnerlistrecycler.R
+import com.example.spinnerlistrecycler.model.Fruta
 
-      <h3>💻 Ejemplo 5: Búsqueda/Filtrado</h3>
+class FrutaAdapter(
+    private val frutas: List&lt;Fruta&gt;
+) : RecyclerView.Adapter&lt;FrutaAdapter.FrutaViewHolder&gt;() {
 
-      <div class="code-section">
-        <h4>📱 Adapter con filtro</h4>
-        <pre><code class="kotlin"><span class="keyword">class</span> <span class="function">FrutaAdapter</span>(
-            <span class="keyword">private var</span> frutas: ArrayList&lt;Fruta&gt;
-            ) : RecyclerView.Adapter&lt;FrutaAdapter.FrutaViewHolder&gt;() {
+    // Copia que se muestra en pantalla
+    private val frutasFiltradas = ArrayList&lt;Fruta&gt;(frutas)
 
-            <span class="keyword">private var</span> frutasFiltradas = ArrayList&lt;Fruta&gt;(frutas)
+    class FrutaViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        val tvEmoji: TextView = itemView.findViewById(R.id.tvEmoji)
+        val tvNombre: TextView = itemView.findViewById(R.id.tvNombre)
+    }
 
-            <span class="comment">// ... ViewHolder y métodos anteriores ...</span>
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): FrutaViewHolder {
+        val view = LayoutInflater.from(parent.context)
+            .inflate(R.layout.item_fruta, parent, false)
+        return FrutaViewHolder(view)
+    }
 
-            <span class="keyword">fun</span> <span class="function">filtrar</span>(texto: String) {
-            frutasFiltradas.clear()
+    override fun onBindViewHolder(holder: FrutaViewHolder, position: Int) {
+        val fruta = frutasFiltradas[position]
+        holder.tvEmoji.text = fruta.emoji
+        holder.tvNombre.text = fruta.nombre
+    }
 
-            <span class="keyword">if</span> (texto.isEmpty()) {
+    override fun getItemCount(): Int = frutasFiltradas.size
+
+    fun filtrar(texto: String) {
+        frutasFiltradas.clear()
+
+        if (texto.isEmpty()) {
             frutasFiltradas.addAll(frutas)
-            } <span class="keyword">else</span> {
-            <span class="keyword">val</span> busqueda = texto.lowercase()
-            <span class="keyword">for</span> (fruta <span class="keyword">in</span> frutas) {
-            <span class="keyword">if</span> (fruta.nombre.lowercase().contains(busqueda)) {
-            frutasFiltradas.add(fruta)
+        } else {
+            val busqueda = texto.lowercase()
+            for (fruta in frutas) {
+                if (fruta.nombre.lowercase().contains(busqueda)) {
+                    frutasFiltradas.add(fruta)
+                }
             }
-            }
-            }
+        }
 
-            notifyDataSetChanged()
-            }
+        notifyDataSetChanged()
+    }
+}</code></pre>
+    <pre data-lang="xml" data-file="res/layout/activity_recycler_view.xml"><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp"&gt;
 
-            <span class="keyword">override fun</span> <span class="function">getItemCount</span>(): Int = frutasFiltradas.size
-            }</code></pre>
-      </div>
+    &lt;EditText
+        android:id="@+id/etBuscar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Buscar fruta..."
+        android:inputType="text" /&gt;
 
-      <div class="exercise">
-        <h4>✏️ Proyecto Final Integrador</h4>
-        <p><strong>"App de Contactos Completa":</strong></p>
-        <ul>
-          <li>RecyclerView con foto, nombre, teléfono</li>
-          <li>LinearLayoutManager vertical</li>
-          <li>SearchView para filtrar</li>
-          <li>FloatingActionButton para agregar</li>
-          <li>Click: Ver detalles en nueva Activity</li>
-          <li>Long Click: Menú contextual (Editar/Eliminar)</li>
-          <li>DividerItemDecoration entre items</li>
-          <li>Mensaje cuando la lista está vacía</li>
-        </ul>
-      </div>
-    </div>
+    &lt;androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" /&gt;
 
-    <!-- RESUMEN -->
-    <div class="summary">
-      <h2>📚 Resumen Completo</h2>
-      <ul class="checklist">
-        <li><strong>RecyclerView:</strong> Componente moderno para listas eficientes</li>
-        <li><strong>ViewHolder:</strong> Patrón obligatorio para reciclar vistas</li>
-        <li><strong>Adapter:</strong> Conecta datos con ViewHolder</li>
-        <li><strong>LayoutManager:</strong> Define organización (Linear, Grid, Staggered)</li>
-        <li><strong>Eventos:</strong> Click manual mediante lambdas o interfaces</li>
-        <li><strong>CRUD:</strong> notifyItemInserted/Removed/Changed para animaciones</li>
-        <li><strong>Avanzado:</strong> Filtros, separadores, vistas vacías</li>
+&lt;/LinearLayout&gt;</code></pre>
+    <pre data-lang="kotlin" data-file="RecyclerViewActivity.kt"><code>package com.example.spinnerlistrecycler
+
+import android.os.Bundle
+import android.widget.EditText
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.widget.doAfterTextChanged
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.spinnerlistrecycler.adapter.FrutaAdapter
+import com.example.spinnerlistrecycler.model.Fruta
+
+class RecyclerViewActivity : AppCompatActivity() {
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_recycler_view)
+
+        val recyclerView = findViewById&lt;RecyclerView&gt;(R.id.recyclerView)
+        val etBuscar = findViewById&lt;EditText&gt;(R.id.etBuscar)
+
+        val nombres = resources.getStringArray(R.array.frutas_nombres)
+        val emojis = resources.getStringArray(R.array.frutas_emojis)
+        val frutas = nombres.zip(emojis) { nombre, emoji -&gt; Fruta(emoji, nombre) }
+
+        val adapter = FrutaAdapter(frutas)
+        recyclerView.adapter = adapter
+        recyclerView.layoutManager = LinearLayoutManager(this)
+
+        // Filtrar cada vez que cambia el texto
+        etBuscar.doAfterTextChanged { texto -&gt;
+            adapter.filtrar(texto.toString())
+        }
+    }
+}</code></pre>
+    <p class="caption">Resultado al escribir «ma»:</p>
+    <div class="result">🍎 Manzana<br>🥭 Mango<br>🍋 Maracuyá</div>
+
+    <div class="ok"><strong>Proyecto final integrador — App de contactos:</strong>
+      <ul>
+        <li>RecyclerView con foto, nombre y teléfono (LinearLayoutManager vertical).</li>
+        <li>Campo de búsqueda para filtrar.</li>
+        <li>FloatingActionButton para agregar.</li>
+        <li>Clic: ver detalles en una nueva actividad.</li>
+        <li>Clic largo: menú contextual (Editar / Eliminar).</li>
+        <li>DividerItemDecoration entre ítems y mensaje de lista vacía.</li>
       </ul>
-
-      <div style="background: white; padding: 20px; border-radius: 10px; margin-top: 30px;">
-        <h3 style="color: #667eea;">RecyclerView vs ListView - Comparación Final</h3>
-        <table class="comparison-table">
-          <tr>
-            <th>Característica</th>
-            <th>ListView</th>
-            <th>RecyclerView</th>
-          </tr>
-          <tr>
-            <td>Rendimiento</td>
-            <td>⭐⭐ Regular</td>
-            <td>⭐⭐⭐⭐⭐ Excelente</td>
-          </tr>
-          <tr>
-            <td>ViewHolder</td>
-            <td>Opcional</td>
-            <td>Obligatorio</td>
-          </tr>
-          <tr>
-            <td>LayoutManager</td>
-            <td>Solo vertical</td>
-            <td>Linear, Grid, Staggered</td>
-          </tr>
-          <tr>
-            <td>Animaciones</td>
-            <td>Manual</td>
-            <td>Automáticas</td>
-          </tr>
-          <tr>
-            <td>Complejidad</td>
-            <td>Baja</td>
-            <td>Media-Alta</td>
-          </tr>
-          <tr>
-            <td>Líneas de código</td>
-            <td>~20</td>
-            <td>~60-80</td>
-          </tr>
-          <tr>
-            <td>Uso recomendado</td>
-            <td>Legacy</td>
-            <td>✅ Proyectos nuevos</td>
-          </tr>
-        </table>
-      </div>
     </div>
 
-    <!-- RECURSOS -->
-    <div class="resources">
-      <h2>📦 Recursos Adicionales</h2>
+    <!-- ============ RESUMEN ============ -->
+    <h2 id="resumen">10. Resumen</h2>
+    <table>
+      <tr>
+        <th>Concepto</th>
+        <th>Clave en Kotlin / Android</th>
+        <th>Finalidad</th>
+      </tr>
+      <tr>
+        <td>RecyclerView</td>
+        <td><code>androidx.recyclerview.widget.RecyclerView</code></td>
+        <td>Listas eficientes que reciclan vistas.</td>
+      </tr>
+      <tr>
+        <td>ViewHolder</td>
+        <td><code>RecyclerView.ViewHolder</code></td>
+        <td>Guardar referencias a las vistas del ítem.</td>
+      </tr>
+      <tr>
+        <td>Adapter</td>
+        <td><code>onCreateViewHolder</code>, <code>onBindViewHolder</code>, <code>getItemCount</code></td>
+        <td>Conectar datos con ViewHolders.</td>
+      </tr>
+      <tr>
+        <td>LayoutManager</td>
+        <td><code>Linear</code>, <code>Grid</code>, <code>StaggeredGrid</code></td>
+        <td>Organizar los ítems.</td>
+      </tr>
+      <tr>
+        <td>Eventos</td>
+        <td>Lambdas o interfaces sobre <code>holder.itemView</code></td>
+        <td>Responder al clic.</td>
+      </tr>
+      <tr>
+        <td>CRUD</td>
+        <td><code>notifyItemInserted/Changed/Removed</code></td>
+        <td>Modificar la lista con animaciones.</td>
+      </tr>
+      <tr>
+        <td>Avanzado</td>
+        <td>Filtros, separadores, vista vacía, carrusel</td>
+        <td>Mejorar la experiencia.</td>
+      </tr>
+    </table>
+    <table>
+      <tr>
+        <th>Característica</th>
+        <th>ListView</th>
+        <th>RecyclerView</th>
+      </tr>
+      <tr>
+        <td>Rendimiento</td>
+        <td>Regular</td>
+        <td>Excelente</td>
+      </tr>
+      <tr>
+        <td>ViewHolder</td>
+        <td>Opcional</td>
+        <td>Obligatorio</td>
+      </tr>
+      <tr>
+        <td>Organización</td>
+        <td>Solo vertical</td>
+        <td>Lineal, cuadrícula, escalonada</td>
+      </tr>
+      <tr>
+        <td>Animaciones</td>
+        <td>Manuales</td>
+        <td>Automáticas</td>
+      </tr>
+      <tr>
+        <td>Evento de clic</td>
+        <td><code>setOnItemClickListener</code></td>
+        <td>Se programa en el Adapter</td>
+      </tr>
+      <tr>
+        <td>Complejidad</td>
+        <td>Baja (~20 líneas)</td>
+        <td>Media-alta (~60–80 líneas)</td>
+      </tr>
+      <tr>
+        <td>Uso recomendado</td>
+        <td>Legacy</td>
+        <td>Proyectos nuevos</td>
+      </tr>
+    </table>
+    <div class="box"><strong>Secuencia:</strong> dependencia → modelo → layout del ítem → ViewHolder → Adapter → RecyclerView en el layout → LayoutManager → <code>recyclerView.adapter</code>.</div>
 
-      <div style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 10px; margin-top: 30px;">
-        <h3>🔗 Enlaces Útiles:</h3>
-        <ul>
-          <li>
-            <a href="https://developer.android.com/reference/androidx/recyclerview/widget/RecyclerView" style="color: white; text-decoration: underline;">Documentación Oficial - RecyclerView</a>
-          </li>
-          <li><a href="https://developer.android.com/guide/topics/ui/layout/recyclerview" style="color: white; text-decoration: underline;">Android Developers Guide - RecyclerView</a></li>
-          <li><a href="https://kotlinlang.org/docs/home.html" style="color: white; text-decoration: underline;">Kotlin Documentation</a></li>
-        </ul>
-      </div>
+    <div class="footer">Aplicativos Móviles — Android / Kotlin · Documentación: <a href="https://developer.android.com/develop/ui/views/layout/recyclerview" target="_blank" rel="noopener">RecyclerView (Android Developers)</a></div>
+  </main>
+  <div id="copyToast" role="status" aria-live="polite"></div>
 
-      <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 2px solid rgba(255,255,255,0.3);">
-        <p style="font-size: 1.2em; margin-bottom: 10px;">¡Manual Completado! 🎉</p>
-        <p style="opacity: 0.7; margin-top: 20px;">Desarrollado con ❤️ para estudiantes</p>
-      </div>
-    </div>
-  </div>
+  <script>
+    (function () {
+      // Interruptor interno: true muestra el botón «Copiar» en cada bloque de código.
+      var CONFIG = { allowCodeCopy: true };
+
+      function escapeHtml(text) {
+        return text.replace(/[&<>]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]; });
+      }
+
+      function highlight(source, pattern, classify) {
+        var result = '', last = 0, match;
+        while ((match = pattern.exec(source)) !== null) {
+          var kind = classify(match[0]);
+          result += escapeHtml(source.slice(last, match.index));
+          result += kind ? '<span class="' + kind + '">' + escapeHtml(match[0]) + '</span>' : escapeHtml(match[0]);
+          last = pattern.lastIndex;
+        }
+        return result + escapeHtml(source.slice(last));
+      }
+
+      var KT_KEYWORDS = 'package|import|class|data|interface|object|override|fun|val|var|private|lateinit|init|when|else|if|for|in|return|as|super|this';
+      var KT_TYPES = 'Bundle|View|ViewGroup|LayoutInflater|Context|TextView|Button|EditText|Toast|AlertDialog|AppCompatActivity|RecyclerViewActivity|RecyclerView|ViewHolder|Adapter|LinearLayoutManager|GridLayoutManager|StaggeredGridLayoutManager|DividerItemDecoration|PagerSnapHelper|Usuario|UsuarioAdapter|UsuarioViewHolder|UsuarioLayoutManager|Fruta|FrutaAdapter|FrutaViewHolder|OnFrutaClickListener|Producto|String|Int|Long|Unit|List|ArrayList';
+      var KT_KEYWORD_RE = new RegExp('^(' + KT_KEYWORDS + ')$');
+      var KT_TYPE_RE = new RegExp('^(' + KT_TYPES + ')$');
+      var KT_PATTERN = new RegExp('\\/\\/[^\\n]*|"(?:\\\\.|[^"\\\\])*"|this@\\w+|@\\w+|\\b(?:' + KT_KEYWORDS + ')\\b|\\b(?:' + KT_TYPES + ')\\b|\\b(?:true|false|null)\\b|\\b\\d+\\b', 'g');
+
+      function highlightKotlin(source) {
+        KT_PATTERN.lastIndex = 0;
+        return highlight(source, KT_PATTERN, function (t) {
+          if (t.indexOf('//') === 0) return 'kt-comment';
+          if (t.charAt(0) === '"') return 'kt-string';
+          if (t.indexOf('this@') === 0) return 'kt-keyword';
+          if (t.charAt(0) === '@') return 'kt-annotation';
+          if (KT_KEYWORD_RE.test(t)) return 'kt-keyword';
+          if (KT_TYPE_RE.test(t)) return 'kt-type';
+          if (/^(true|false|null)$/.test(t)) return 'kt-literal';
+          return 'kt-number';
+        });
+      }
+
+      function highlightXml(source) {
+        var pattern = /<!--[\s\S]*?-->|"[^"]*"|<\?\w+|\?>|<\/?[\w.:-]+|\/?>|[\w:.-]+(?==)/g;
+        return highlight(source, pattern, function (t) {
+          if (t.indexOf('<!--') === 0) return 'xml-comment';
+          if (t.charAt(0) === '"') return 'xml-string';
+          if (t.charAt(0) === '<' || t.charAt(t.length - 1) === '>') return 'xml-tag';
+          return 'xml-attr';
+        });
+      }
+
+      var toast = document.getElementById('copyToast'), toastTimer;
+      function showToast(message) {
+        toast.textContent = message;
+        toast.classList.add('show');
+        clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () { toast.classList.remove('show'); }, 2200);
+      }
+
+      function copyText(text) {
+        if (navigator.clipboard && window.isSecureContext) return navigator.clipboard.writeText(text);
+        return new Promise(function (resolve, reject) {
+          var area = document.createElement('textarea');
+          area.value = text;
+          area.setAttribute('readonly', '');
+          area.style.position = 'fixed';
+          area.style.opacity = '0';
+          document.body.appendChild(area);
+          area.select();
+          try { document.execCommand('copy') ? resolve() : reject(); } catch (e) { reject(e); }
+          document.body.removeChild(area);
+        });
+      }
+
+      // Envolver cada <pre> en un bloque con cabecera: nombre de archivo + botón Copiar.
+      document.querySelectorAll('pre[data-lang]').forEach(function (pre) {
+        var code = pre.querySelector('code');
+        var raw = code.textContent;
+        var lang = pre.getAttribute('data-lang');
+        code.innerHTML = lang === 'xml' ? highlightXml(raw) : highlightKotlin(raw);
+
+        var wrap = document.createElement('div');
+        wrap.className = 'codeblock';
+        var head = document.createElement('div');
+        head.className = 'codehead';
+        var file = document.createElement('span');
+        file.className = 'file';
+        file.textContent = pre.getAttribute('data-file') || (lang === 'xml' ? 'XML' : 'Kotlin');
+        head.appendChild(file);
+
+        if (CONFIG.allowCodeCopy) {
+          var btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'copy-btn';
+          btn.textContent = 'Copiar';
+          btn.addEventListener('click', function () {
+            copyText(raw).then(function () {
+              btn.textContent = '✓ Copiado';
+              btn.classList.add('done');
+              showToast('Código copiado. Pégalo en Android Studio.');
+              setTimeout(function () { btn.textContent = 'Copiar'; btn.classList.remove('done'); }, 1800);
+            }, function () {
+              showToast('No se pudo copiar. Selecciona el código manualmente.');
+            });
+          });
+          head.appendChild(btn);
+        }
+
+        pre.parentNode.insertBefore(wrap, pre);
+        wrap.appendChild(head);
+        wrap.appendChild(pre);
+      });
+
+      var bar = document.getElementById('progress');
+      var links = document.querySelectorAll('.navlinks a');
+      var sections = Array.prototype.slice.call(document.querySelectorAll('main, h2[id]'));
+
+      function update() {
+        var root = document.documentElement;
+        var total = root.scrollHeight - root.clientHeight;
+        var pos = window.scrollY + 130;
+        var current = sections[0];
+        bar.style.width = (total > 0 ? root.scrollTop / total * 100 : 0) + '%';
+        sections.forEach(function (section) { if (section.offsetTop <= pos) current = section; });
+        links.forEach(function (link) { link.classList.toggle('active', link.getAttribute('href') === '#' + current.id); });
+      }
+
+      document.addEventListener('scroll', update, { passive: true });
+      update();
+    })();
+  </script>
 </body>
 </html>
