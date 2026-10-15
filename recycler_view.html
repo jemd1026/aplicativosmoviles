@@ -633,15 +633,15 @@
       <div class="pills"><span class="pill">Android · Kotlin</span><span class="pill">RecyclerView</span><span class="pill">Nivel intermedio-avanzado</span></div>
       <p class="kicker">Guía práctica</p>
       <h1>RecyclerView en Android con Kotlin</h1>
-      <p class="lead">Todas las prácticas se realizan en la actividad <code>RecyclerViewActivity</code> y su layout <code>activity_recycler_view.xml</code>, dentro del paquete <code>com.example.spinnerlistrecycler</code>.</p>
+      <p class="lead">Todas las prácticas se realizan en la actividad <code>RecyclerViewActivity</code> y su layout <code>activity_recycler_view.xml</code>, dentro del proyecto <code>Recycler View</code> y el paquete <code>com.example.recyclerview</code>.</p>
     </header>
 
     <!-- ============ PROYECTO ============ -->
     <h2 id="proyecto">1. Preparar el proyecto</h2>
-    <p>Trabaja en el proyecto con el paquete <code>com.example.spinnerlistrecycler</code>. Las clases de apoyo se organizan en los subpaquetes <code>model</code>, <code>adapter</code> y <code>layoutmanager</code>:</p>
-    <div class="tree">app/src/main
+    <p>Trabaja en el proyecto <code>Recycler View</code> con el paquete <code>com.example.recyclerview</code>. Las clases de apoyo se organizan en los subpaquetes <code>model</code>, <code>adapter</code> y <code>layoutmanager</code>:</p>
+    <pre class="tree">app/src/main
 │
-├── java/com/example/spinnerlistrecycler
+├── java/com/example/recyclerview
 │   ├── RecyclerViewActivity.kt        ← actividad de la práctica
 │   ├── model/
 │   │   ├── Usuario.kt                 ← Parte 4
@@ -662,10 +662,19 @@
 ├── res/values
 │   └── data_frutas.xml                ← datos de frutas
 │
-└── AndroidManifest.xml</div>
-    <div class="box"><strong>Crear un subpaquete:</strong> clic derecho en <code>com.example.spinnerlistrecycler</code> → <strong>New → Package</strong> → escribe <code>model</code> (o <code>adapter</code>, <code>layoutmanager</code>). Luego, clic derecho en el subpaquete → <strong>New → Kotlin Class/File</strong>.</div>
+└── AndroidManifest.xml</pre>
+    <div class="box"><strong>Crear subpaquetes:</strong> clic derecho en <code>com.example.recyclerview</code> → <strong>New → Package</strong> → escribe <code>model</code> (o <code>adapter</code>, <code>layoutmanager</code>). Luego, clic derecho en el subpaquete → <strong>New → Kotlin Class/File</strong>.</div>
 
-    <h3>1.1 Agregar las dependencias</h3>
+    <h3>1.1 Crear el proyecto Android</h3>
+    <ol>
+      <li>En Android Studio, selecciona <strong>New Project → Empty Views Activity</strong>.</li>
+      <li>En <strong>Name</strong>, escribe <code>Recycler View</code>.</li>
+      <li>En <strong>Package name</strong>, establece <code>com.example.recyclerview</code>.</li>
+      <li>Selecciona <strong>Kotlin</strong> como lenguaje y pulsa <strong>Finish</strong>.</li>
+    </ol>
+    <div class="note"><strong>Importante:</strong> el nombre del proyecto puede llevar un espacio; el paquete debe escribirse sin espacios y exactamente como <code>com.example.recyclerview</code>. Android Studio usará este paquete como base de las rutas y declaraciones <code>package</code> de los ejemplos.</div>
+
+    <h3>1.2 Agregar las dependencias</h3>
     <p>Abre <code>build.gradle.kts (Module :app)</code> y agrega estas líneas dentro de <code>dependencies</code>. Después pulsa <strong>Sync Now</strong>.</p>
     <pre data-lang="kotlin" data-file="build.gradle.kts (Module :app)"><code>dependencies {
     // RecyclerView y CardView
@@ -676,15 +685,15 @@
 }</code></pre>
     <div class="note"><strong>Si tu proyecto usa Groovy</strong> (<code>build.gradle</code> sin <code>.kts</code>), escribe <code>implementation 'androidx.recyclerview:recyclerview:1.3.2'</code> y <code>implementation 'androidx.cardview:cardview:1.0.0'</code>.</div>
 
-    <h3>1.2 Crear <code>RecyclerViewActivity</code></h3>
+    <h3>1.3 Crear <code>RecyclerViewActivity</code></h3>
     <ol>
-      <li>En el panel <strong>Project</strong>, haz clic derecho en el paquete <code>com.example.spinnerlistrecycler</code>.</li>
+      <li>En el panel <strong>Project</strong>, haz clic derecho en el paquete <code>com.example.recyclerview</code>.</li>
       <li>Selecciona <strong>New → Activity → Empty Views Activity</strong>.</li>
       <li>En <strong>Activity Name</strong> escribe <code>RecyclerViewActivity</code>. El campo <strong>Layout Name</strong> se completa como <code>activity_recycler_view</code>.</li>
       <li>Verifica que <strong>Language</strong> sea <strong>Kotlin</strong> y pulsa <strong>Finish</strong>.</li>
     </ol>
 
-    <h3>1.3 Abrir <code>RecyclerViewActivity</code> al iniciar la app</h3>
+    <h3>1.4 Abrir <code>RecyclerViewActivity</code> al iniciar la app</h3>
     <p>En <code>AndroidManifest.xml</code>, el <code>intent-filter</code> con <code>MAIN</code> y <code>LAUNCHER</code> indica qué actividad arranca primero. Colócalo en <code>RecyclerViewActivity</code> y quítalo de las demás actividades (por ejemplo <code>SpinnerActivity</code> o <code>ListViewActivity</code>), que quedan con <code>android:exported="false"</code>.</p>
     <pre data-lang="xml" data-file="AndroidManifest.xml (dentro de &lt;application&gt;)"><code>&lt;activity
     android:name=".RecyclerViewActivity"
@@ -701,7 +710,7 @@
     android:exported="false" /&gt;</code></pre>
     <div class="note"><strong>Importante:</strong> cada práctica <strong>reemplaza</strong> el contenido completo de <code>activity_recycler_view.xml</code>, <code>RecyclerViewActivity.kt</code> y, cuando se indique, <code>FrutaAdapter.kt</code>. Usa el botón <strong>Copiar</strong> de cada bloque y pega el código en Android Studio.</div>
 
-    <h3>1.4 Solución de errores frecuentes de Gradle</h3>
+    <h3>1.5 Solución de errores frecuentes de Gradle</h3>
     <table>
       <tr>
         <th>Problema</th>
@@ -856,7 +865,7 @@
 
     <h3>4.1 Modelo de datos</h3>
     <p>Define qué datos mostrará la lista. Una <code>data class</code> genera automáticamente <code>equals()</code>, <code>hashCode()</code> y <code>toString()</code>.</p>
-    <pre data-lang="kotlin" data-file="model/Usuario.kt"><code>package com.example.spinnerlistrecycler.model
+    <pre data-lang="kotlin" data-file="model/Usuario.kt"><code>package com.example.recyclerview.model
 
 // MODELO DE DATOS
 // Representa la información de cada usuario que se muestra en la lista
@@ -931,12 +940,12 @@ data class Usuario(
 
     <h3>4.4 ViewHolder</h3>
     <p>Guarda las referencias a las vistas del XML. Se hace una sola vez por ítem creado.</p>
-    <pre data-lang="kotlin" data-file="adapter/UsuarioViewHolder.kt"><code>package com.example.spinnerlistrecycler.adapter
+    <pre data-lang="kotlin" data-file="adapter/UsuarioViewHolder.kt"><code>package com.example.recyclerview.adapter
 
 import android.view.View
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.spinnerlistrecycler.R
+import com.example.recyclerview.R
 
 // COMPONENTE 3: VIEWHOLDER
 // Guarda las referencias a las vistas de cada ítem
@@ -946,18 +955,18 @@ class UsuarioViewHolder(view: View) : RecyclerView.ViewHolder(view) {
     val tvNombre: TextView = view.findViewById(R.id.tvNombre)
     val tvCorreo: TextView = view.findViewById(R.id.tvCorreo)
 }</code></pre>
-    <div class="note"><strong>Import de <code>R</code>:</strong> como el archivo está en un subpaquete, debe importar <code>com.example.spinnerlistrecycler.R</code> para acceder a los ids y layouts.</div>
+    <div class="note"><strong>Import de <code>R</code>:</strong> como el archivo está en un subpaquete, debe importar <code>com.example.recyclerview.R</code> para acceder a los ids y layouts.</div>
 
     <h3>4.5 Adapter</h3>
     <p>Es el puente entre los datos y la vista. Implementa <code>onCreateViewHolder</code>, <code>onBindViewHolder</code> y <code>getItemCount</code>.</p>
-    <pre data-lang="kotlin" data-file="adapter/UsuarioAdapter.kt"><code>package com.example.spinnerlistrecycler.adapter
+    <pre data-lang="kotlin" data-file="adapter/UsuarioAdapter.kt"><code>package com.example.recyclerview.adapter
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.RecyclerView
-import com.example.spinnerlistrecycler.R
-import com.example.spinnerlistrecycler.model.Usuario
+import com.example.recyclerview.R
+import com.example.recyclerview.model.Usuario
 
 // COMPONENTE 2: ADAPTER
 // Conecta la lista de usuarios con el RecyclerView
@@ -994,7 +1003,7 @@ class UsuarioAdapter(private val listaUsuarios: List&lt;Usuario&gt;) :
 
     <h3>4.6 LayoutManager personalizado</h3>
     <p>Decide <strong>cómo se organizan</strong> los ítems. Hereda de <code>LinearLayoutManager</code> para fijar la orientación y permitir personalizaciones futuras.</p>
-    <pre data-lang="kotlin" data-file="layoutmanager/UsuarioLayoutManager.kt"><code>package com.example.spinnerlistrecycler.layoutmanager
+    <pre data-lang="kotlin" data-file="layoutmanager/UsuarioLayoutManager.kt"><code>package com.example.recyclerview.layoutmanager
 
 import android.content.Context
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -1017,14 +1026,14 @@ class UsuarioLayoutManager(context: Context) : LinearLayoutManager(context) {
 
     <h3>4.7 Actividad</h3>
     <p>Aquí se une todo: se conecta el RecyclerView, se preparan los datos, se asigna el LayoutManager y finalmente el Adapter.</p>
-    <pre data-lang="kotlin" data-file="RecyclerViewActivity.kt"><code>package com.example.spinnerlistrecycler
+    <pre data-lang="kotlin" data-file="RecyclerViewActivity.kt"><code>package com.example.recyclerview
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
-import com.example.spinnerlistrecycler.adapter.UsuarioAdapter
-import com.example.spinnerlistrecycler.layoutmanager.UsuarioLayoutManager
-import com.example.spinnerlistrecycler.model.Usuario
+import com.example.recyclerview.adapter.UsuarioAdapter
+import com.example.recyclerview.layoutmanager.UsuarioLayoutManager
+import com.example.recyclerview.model.Usuario
 
 class RecyclerViewActivity : AppCompatActivity() {
 
@@ -1163,7 +1172,7 @@ class RecyclerViewActivity : AppCompatActivity() {
 &lt;/androidx.cardview.widget.CardView&gt;</code></pre>
 
     <h3>5.3 Clase de datos</h3>
-    <pre data-lang="kotlin" data-file="model/Fruta.kt"><code>package com.example.spinnerlistrecycler.model
+    <pre data-lang="kotlin" data-file="model/Fruta.kt"><code>package com.example.recyclerview.model
 
 data class Fruta(
     val emoji: String,
@@ -1172,15 +1181,15 @@ data class Fruta(
 
     <h3>5.4 Adapter con ViewHolder interno</h3>
     <p>A diferencia del proyecto 1, aquí el ViewHolder se declara <strong>dentro</strong> del Adapter.</p>
-    <pre data-lang="kotlin" data-file="adapter/FrutaAdapter.kt"><code>package com.example.spinnerlistrecycler.adapter
+    <pre data-lang="kotlin" data-file="adapter/FrutaAdapter.kt"><code>package com.example.recyclerview.adapter
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.spinnerlistrecycler.R
-import com.example.spinnerlistrecycler.model.Fruta
+import com.example.recyclerview.R
+import com.example.recyclerview.model.Fruta
 
 class FrutaAdapter(
     private val frutas: List&lt;Fruta&gt;
@@ -1274,14 +1283,14 @@ List&lt;Usuario&gt;  // Lista de usuarios</code></pre>
         android:layout_height="match_parent" /&gt;
 
 &lt;/LinearLayout&gt;</code></pre>
-    <pre data-lang="kotlin" data-file="RecyclerViewActivity.kt"><code>package com.example.spinnerlistrecycler
+    <pre data-lang="kotlin" data-file="RecyclerViewActivity.kt"><code>package com.example.recyclerview
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.spinnerlistrecycler.adapter.FrutaAdapter
-import com.example.spinnerlistrecycler.model.Fruta
+import com.example.recyclerview.adapter.FrutaAdapter
+import com.example.recyclerview.model.Fruta
 
 class RecyclerViewActivity : AppCompatActivity() {
 
@@ -1392,15 +1401,15 @@ class RecyclerViewActivity : AppCompatActivity() {
 
     <h3>7.1 Método 1: lambda en el Adapter (recomendado)</h3>
     <p>Reemplaza <code>FrutaAdapter.kt</code>. El Adapter recibe una función que se ejecuta al tocar un ítem:</p>
-    <pre data-lang="kotlin" data-file="adapter/FrutaAdapter.kt"><code>package com.example.spinnerlistrecycler.adapter
+    <pre data-lang="kotlin" data-file="adapter/FrutaAdapter.kt"><code>package com.example.recyclerview.adapter
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.spinnerlistrecycler.R
-import com.example.spinnerlistrecycler.model.Fruta
+import com.example.recyclerview.R
+import com.example.recyclerview.model.Fruta
 
 class FrutaAdapter(
     private val frutas: List&lt;Fruta&gt;,
@@ -1432,15 +1441,15 @@ class FrutaAdapter(
     override fun getItemCount(): Int = frutas.size
 }</code></pre>
     <p>El layout de la Parte 5.6 se mantiene. En la actividad se pasa la lambda al crear el Adapter:</p>
-    <pre data-lang="kotlin" data-file="RecyclerViewActivity.kt"><code>package com.example.spinnerlistrecycler
+    <pre data-lang="kotlin" data-file="RecyclerViewActivity.kt"><code>package com.example.recyclerview
 
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.spinnerlistrecycler.adapter.FrutaAdapter
-import com.example.spinnerlistrecycler.model.Fruta
+import com.example.recyclerview.adapter.FrutaAdapter
+import com.example.recyclerview.model.Fruta
 
 class RecyclerViewActivity : AppCompatActivity() {
 
@@ -1475,23 +1484,23 @@ class RecyclerViewActivity : AppCompatActivity() {
 
     <h3>7.2 Método 2: interface</h3>
     <p>Crea la interface en el subpaquete <code>adapter</code>:</p>
-    <pre data-lang="kotlin" data-file="adapter/OnFrutaClickListener.kt"><code>package com.example.spinnerlistrecycler.adapter
+    <pre data-lang="kotlin" data-file="adapter/OnFrutaClickListener.kt"><code>package com.example.recyclerview.adapter
 
-import com.example.spinnerlistrecycler.model.Fruta
+import com.example.recyclerview.model.Fruta
 
 interface OnFrutaClickListener {
     fun onItemClick(fruta: Fruta, position: Int)
 }</code></pre>
     <p>Reemplaza <code>FrutaAdapter.kt</code> para que reciba la interface:</p>
-    <pre data-lang="kotlin" data-file="adapter/FrutaAdapter.kt"><code>package com.example.spinnerlistrecycler.adapter
+    <pre data-lang="kotlin" data-file="adapter/FrutaAdapter.kt"><code>package com.example.recyclerview.adapter
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.spinnerlistrecycler.R
-import com.example.spinnerlistrecycler.model.Fruta
+import com.example.recyclerview.R
+import com.example.recyclerview.model.Fruta
 
 class FrutaAdapter(
     private val frutas: List&lt;Fruta&gt;,
@@ -1522,16 +1531,16 @@ class FrutaAdapter(
     override fun getItemCount(): Int = frutas.size
 }</code></pre>
     <p>La actividad implementa la interface y se pasa a sí misma (<code>this</code>) al Adapter:</p>
-    <pre data-lang="kotlin" data-file="RecyclerViewActivity.kt"><code>package com.example.spinnerlistrecycler
+    <pre data-lang="kotlin" data-file="RecyclerViewActivity.kt"><code>package com.example.recyclerview
 
 import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.spinnerlistrecycler.adapter.FrutaAdapter
-import com.example.spinnerlistrecycler.adapter.OnFrutaClickListener
-import com.example.spinnerlistrecycler.model.Fruta
+import com.example.recyclerview.adapter.FrutaAdapter
+import com.example.recyclerview.adapter.OnFrutaClickListener
+import com.example.recyclerview.model.Fruta
 
 class RecyclerViewActivity : AppCompatActivity(), OnFrutaClickListener {
 
@@ -1630,7 +1639,7 @@ class RecyclerViewActivity : AppCompatActivity(), OnFrutaClickListener {
     <div class="note"><strong>Buena práctica:</strong> usa <code>notifyItemInserted()</code>, <code>notifyItemRemoved()</code> y similares en lugar de <code>notifyDataSetChanged()</code>: obtienes animaciones automáticas y mejor rendimiento.</div>
 
     <h3>8.1 Adapter con ArrayList</h3>
-    <pre data-lang="kotlin" data-file="adapter/FrutaAdapter.kt"><code>package com.example.spinnerlistrecycler.adapter
+    <pre data-lang="kotlin" data-file="adapter/FrutaAdapter.kt"><code>package com.example.recyclerview.adapter
 
 import android.view.LayoutInflater
 import android.view.View
@@ -1638,8 +1647,8 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.recyclerview.widget.RecyclerView
-import com.example.spinnerlistrecycler.R
-import com.example.spinnerlistrecycler.model.Fruta
+import com.example.recyclerview.R
+import com.example.recyclerview.model.Fruta
 
 class FrutaAdapter(
     private val frutas: ArrayList&lt;Fruta&gt;,             // ArrayList mutable
@@ -1731,7 +1740,7 @@ class FrutaAdapter(
 &lt;/LinearLayout&gt;</code></pre>
 
     <h3>8.3 Actividad</h3>
-    <pre data-lang="kotlin" data-file="RecyclerViewActivity.kt"><code>package com.example.spinnerlistrecycler
+    <pre data-lang="kotlin" data-file="RecyclerViewActivity.kt"><code>package com.example.recyclerview
 
 import android.os.Bundle
 import android.widget.Button
@@ -1741,8 +1750,8 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.spinnerlistrecycler.adapter.FrutaAdapter
-import com.example.spinnerlistrecycler.model.Fruta
+import com.example.recyclerview.adapter.FrutaAdapter
+import com.example.recyclerview.model.Fruta
 
 class RecyclerViewActivity : AppCompatActivity() {
 
@@ -1957,15 +1966,15 @@ private fun actualizarVista() {
 
     <h3>9.5 Búsqueda y filtrado</h3>
     <p>El Adapter guarda la lista completa y una lista filtrada. <strong>Todos</strong> los métodos trabajan con la lista filtrada:</p>
-    <pre data-lang="kotlin" data-file="adapter/FrutaAdapter.kt"><code>package com.example.spinnerlistrecycler.adapter
+    <pre data-lang="kotlin" data-file="adapter/FrutaAdapter.kt"><code>package com.example.recyclerview.adapter
 
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import com.example.spinnerlistrecycler.R
-import com.example.spinnerlistrecycler.model.Fruta
+import com.example.recyclerview.R
+import com.example.recyclerview.model.Fruta
 
 class FrutaAdapter(
     private val frutas: List&lt;Fruta&gt;
@@ -2033,7 +2042,7 @@ class FrutaAdapter(
         android:layout_weight="1" /&gt;
 
 &lt;/LinearLayout&gt;</code></pre>
-    <pre data-lang="kotlin" data-file="RecyclerViewActivity.kt"><code>package com.example.spinnerlistrecycler
+    <pre data-lang="kotlin" data-file="RecyclerViewActivity.kt"><code>package com.example.recyclerview
 
 import android.os.Bundle
 import android.widget.EditText
@@ -2041,8 +2050,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.widget.doAfterTextChanged
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.spinnerlistrecycler.adapter.FrutaAdapter
-import com.example.spinnerlistrecycler.model.Fruta
+import com.example.recyclerview.adapter.FrutaAdapter
+import com.example.recyclerview.model.Fruta
 
 class RecyclerViewActivity : AppCompatActivity() {
 
