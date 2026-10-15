@@ -4,6 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>API REST en Android - Teoría y Práctica</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Source+Code+Pro:wght@500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
       body {
           background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -388,18 +391,356 @@
               grid-template-columns: 1fr;
           }
       }
+
+      :root {
+        --bg: #f7f7f2;
+        --soft: #e7eee9;
+        --panel: #fff;
+        --ink: #18252b;
+        --muted: #657278;
+        --line: #dfe5e1;
+        --coral: #ef714c;
+        --coral-dark: #da5e3b;
+        --coral-tint: #fff0e9;
+        --green: #16745a;
+        --green-tint: #e4f0e9;
+        --amber: #d29b35;
+        --amber-tint: #fff8df;
+        --code: #172a31;
+        --code-top: #243c42;
+        --code-ink: #d8e5df;
+        --shadow: 0 24px 60px rgba(24, 37, 43, .12);
+        --sans: 'DM Sans', sans-serif;
+        --display: 'Space Grotesk', sans-serif;
+        --mono: 'Source Code Pro', Consolas, monospace
+      }
+      * { box-sizing: border-box }
+      html { scroll-behavior: smooth }
+      body {
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font: 16px/1.6 var(--sans)
+      }
+      nav {
+        position: fixed;
+        inset: 0 auto 0 0;
+        z-index: 100;
+        width: 260px;
+        overflow-y: auto;
+        background: var(--bg);
+        border-right: 1px solid var(--line)
+      }
+      .navrow { padding: 42px 26px }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        margin-bottom: 30px;
+        padding: 18px 16px;
+        color: #fff;
+        background: var(--code);
+        border-radius: 4px 22px 22px 22px;
+        font-weight: 700
+      }
+      .dot { width: 11px; height: 11px; border-radius: 50%; background: var(--coral) }
+      .navlinks { display: flex; flex-direction: column; gap: 3px }
+      .navlinks:before {
+        content: 'CONTENIDO';
+        margin: 0 12px 10px;
+        color: #9aa6a7;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1.5px
+      }
+      .navlinks a {
+        padding: 10px 12px;
+        border-radius: 8px;
+        color: var(--muted);
+        font-size: 14px;
+        text-decoration: none
+      }
+      .navlinks a:hover, .navlinks a.active { background: var(--soft); color: var(--green); font-weight: 700 }
+      .container {
+        max-width: 1100px;
+        min-height: 100vh;
+        margin: 0 0 0 260px;
+        overflow: visible;
+        background: transparent;
+        border-radius: 0;
+        box-shadow: none
+      }
+      .header {
+        max-width: 810px;
+        padding: 80px 6vw 40px;
+        color: var(--ink);
+        background: transparent;
+        border-bottom: 1px solid var(--line);
+        text-align: left
+      }
+      .pills { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px }
+      .pill {
+        padding: 5px 11px;
+        border-radius: 20px;
+        color: var(--green);
+        background: var(--green-tint);
+        font-size: 12px;
+        font-weight: 700
+      }
+      .kicker {
+        margin: 0 0 8px !important;
+        color: var(--green);
+        font-size: 11px !important;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase
+      }
+      h1, h2, h3, h4 { font-family: var(--display); letter-spacing: -1px }
+      .header h1 {
+        max-width: 15ch;
+        margin: 0 0 16px;
+        font-size: clamp(42px, 5vw, 70px);
+        line-height: .98;
+        text-shadow: none
+      }
+      .header .lead { max-width: 62ch; margin: 0; color: var(--muted); font-size: 18px; opacity: 1 }
+      .project {
+        margin: 28px 6vw 44px;
+        scroll-margin-top: 28px
+      }
+      .project h2, .content > h2 {
+        margin: 62px 0 14px;
+        padding: 0;
+        color: var(--ink);
+        border: 0;
+        font-size: clamp(31px, 4vw, 51px);
+        line-height: 1.03;
+        scroll-margin-top: 30px
+      }
+      .project h2 { margin-top: 0 }
+      .project p, .content > p { color: var(--muted) }
+      .tree {
+        margin: 18px 0;
+        padding: 20px 24px;
+        overflow: auto;
+        color: var(--green);
+        background: var(--green-tint);
+        border: 1px solid var(--line);
+        border-radius: 4px 14px 14px 14px;
+        font: 600 13px/1.6 var(--mono);
+        white-space: pre
+      }
+      .box {
+        margin: 22px 0;
+        padding: 16px 18px;
+        background: var(--green-tint);
+        border: 1px solid #bddbcf;
+        border-left: 5px solid var(--green);
+        border-radius: 4px 14px 14px 4px
+      }
+      .box pre {
+        margin-top: 12px;
+        overflow: auto;
+        color: var(--code-ink);
+        background: var(--code);
+        border-radius: 4px 14px 14px 14px
+      }
+      .box pre code { color: inherit; background: transparent; white-space: pre; overflow-wrap: normal }
+      .content { padding: 0 6vw 62px }
+      .content > h2:first-child { margin-top: 52px }
+      h3 { color: var(--green); font-size: 22px; margin: 34px 0 8px }
+      h4 { color: var(--green); font-size: 17px; margin: 18px 0 8px }
+      p, li { line-height: 1.6 }
+      .concept-grid, .component-list { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px }
+      .concept-card, .component-item {
+        min-width: 0;
+        padding: 20px;
+        color: var(--ink);
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-top: 3px solid var(--coral);
+        border-radius: 4px 18px 18px 18px;
+        box-shadow: none
+      }
+      .concept-card:hover { transform: translateY(-2px); border-color: var(--line); border-top-color: var(--coral) }
+      .concept-card h4, .component-item h5 { margin: 0 0 8px; color: var(--green); font: 600 20px var(--display) }
+      .concept-card p, .concept-card li, .component-item p { color: var(--muted); font-size: 14px; overflow-wrap: anywhere }
+      .component-item:nth-child(even) { border-top-color: var(--green) }
+      .component-item p { opacity: 1 }
+      .http-methods { justify-content: flex-start }
+      .http-method { flex: 1 1 150px; min-width: 140px; color: #fff; border-radius: 4px 14px 14px 14px; box-shadow: none }
+      .method-get { background: var(--green) }
+      .method-post { background: #337d9a }
+      .method-put { background: var(--amber) }
+      .method-delete { background: var(--coral-dark) }
+      .flow-diagram {
+        padding: 22px;
+        background: var(--green-tint) !important;
+        color: var(--ink) !important;
+        border: 1px solid var(--line);
+        border-radius: 4px 18px 18px 18px
+      }
+      .flow-diagram h4 { color: var(--green) !important }
+      .flow-step { background: var(--panel); border: 1px solid var(--line); border-top: 3px solid var(--coral); border-radius: 4px 14px 14px 14px }
+      .flow-step::after { color: var(--coral) }
+      .flow-step-number { background: var(--green) }
+      .architecture {
+        padding: 22px;
+        color: var(--ink);
+        background: var(--green-tint);
+        border: 1px solid var(--line);
+        border-radius: 4px 18px 18px 18px
+      }
+      .architecture > h4 { color: var(--green) !important }
+      .architecture-layer {
+        color: var(--ink);
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-left: 4px solid var(--coral);
+        border-radius: 4px 12px 12px 12px;
+        backdrop-filter: none
+      }
+      .architecture-layer:hover { background: var(--panel); transform: none }
+      .architecture-layer p { color: var(--muted) }
+      .comparison-table {
+        border: 1px solid var(--line);
+        border-radius: 0;
+        box-shadow: 0 8px 24px -18px rgba(24,37,43,.3)
+      }
+      .comparison-table th { background: var(--coral); font-size: 13px }
+      .comparison-table td { color: var(--muted); border-color: var(--line) }
+      .comparison-table tr:nth-child(even) td { background: var(--soft) }
+      .code-block {
+        background: var(--code);
+        border-radius: 4px 20px 20px 20px;
+        box-shadow: var(--shadow)
+      }
+      .code-header {
+        padding: 10px 18px;
+        color: #9fb5ad;
+        background: var(--code-top);
+        border-radius: 0;
+        font: 600 12px var(--mono)
+      }
+      pre {
+        padding: 20px 24px;
+        color: var(--code-ink);
+        font: 13px/1.6 var(--mono)
+      }
+      code {
+        color: var(--coral-dark);
+        background: var(--coral-tint);
+        border-radius: 4px;
+        font: .9em var(--mono);
+        white-space: normal;
+        overflow-wrap: anywhere
+      }
+      pre code { color: inherit; background: transparent; font-size: inherit; white-space: pre; overflow-wrap: normal }
+      .alert { margin: 22px 0; padding: 16px 18px; border: 1px solid var(--line); border-left-width: 5px; border-radius: 4px 14px 14px 4px }
+      .alert-info { color: var(--green); background: var(--green-tint); border-left-color: var(--green) }
+      .alert-success { color: var(--green); background: var(--green-tint); border-left-color: var(--green) }
+      .alert-warning { color: #8b641b; background: var(--amber-tint); border-left-color: var(--amber) }
+      .alert-tip { color: var(--coral-dark); background: var(--coral-tint); border-left-color: var(--coral) }
+      .content > h2:last-of-type { scroll-margin-top: 30px }
+      @media (max-width: 760px) {
+        nav { position: sticky; inset: 0; width: 100%; border-right: 0; border-bottom: 1px solid var(--line) }
+        .navrow { display: flex; gap: 12px; align-items: center; padding: 12px 18px }
+        .brand { flex-shrink: 0; margin: 0; padding: 10px 12px }
+        .navlinks { flex-direction: row; overflow-x: auto }
+        .navlinks:before { display: none }
+        .navlinks a { white-space: nowrap }
+        .container { margin: 0 }
+        .header { padding: 46px 16px 32px }
+        .project, .content { margin-left: 0; margin-right: 0; padding-left: 16px; padding-right: 16px }
+        .project { margin-top: 24px; margin-bottom: 36px }
+        .content { padding-bottom: 40px }
+        .concept-grid, .component-list { grid-template-columns: repeat(2, minmax(0, 1fr)) }
+      }
+      @media (max-width: 480px) {
+        .concept-grid, .component-list { grid-template-columns: 1fr }
+        .tree, pre { padding: 16px }
+      }
     </style>
   </head>
   <body>
+    <nav aria-label="Navegación de la guía">
+      <div class="navrow">
+        <div class="brand"><span class="dot"></span>API REST · Android</div>
+        <div class="navlinks">
+          <a href="#inicio">Inicio</a>
+          <a href="#proyecto">Preparar el proyecto</a>
+          <a href="#fundamentos">Fundamentos</a>
+          <a href="#implementacion">Implementación</a>
+          <a href="#registro-api">Registro de productos</a>
+          <a href="#formulario">Formulario Android</a>
+          <a href="#fab">Botón flotante</a>
+        </div>
+      </div>
+    </nav>
     <div class="container">
       <div class="header">
-        <h1>🚀 API REST en Android</h1>
-        <p>Guía Completa: Teoría y Práctica con MySQL + PHP + Retrofit + RecyclerView</p>
+        <div class="pills">
+          <span class="pill">Android · Kotlin</span>
+          <span class="pill">PHP · MySQL</span>
+          <span class="pill">Retrofit · RecyclerView</span>
+        </div>
+        <p class="kicker">Guía práctica</p>
+        <h1 id="inicio">API REST en Android</h1>
+        <p class="lead">Guía Completa: Teoría y Práctica con MySQL + PHP + Retrofit + RecyclerView</p>
       </div>
+
+      <section class="project" id="proyecto">
+        <h2>1. Preparar el proyecto</h2>
+        <p>La práctica conecta una app Android con una API PHP que consulta MySQL. Prepara el servidor y la aplicación en paralelo; configura la misma URL base en Retrofit que corresponde a la ubicación de tu proyecto bajo el servidor web.</p>
+
+        <pre class="tree">Proyecto del servidor (Laragon / XAMPP)
+www/ o htdocs/
+└── ucv_aplic_mov/
+    ├── config.php                   ← conexión a MySQL mediante PDO
+    └── productos/
+        ├── listar.php                ← endpoint GET de productos
+        └── registrar.php             ← endpoint POST (Parte III)
+
+Base de datos MySQL
+└── aplic_movil
+    └── productos                    ← id, nombre, precio, categoria
+
+Proyecto Android (app/src/main)
+├── AndroidManifest.xml              ← permiso INTERNET y Activities
+├── java/com/example/apirestapp/
+│   ├── MainActivity.kt              ← carga la lista desde la API
+│   ├── RegistrarActivity.kt         ← formulario (Parte IV)
+│   ├── models/
+│   │   └── Producto.kt              ← Producto y ProductosResponse
+│   ├── api/
+│   │   ├── ApiService.kt            ← endpoints Retrofit
+│   │   └── RetrofitClient.kt        ← URL base y conversor Gson
+│   └── adapters/
+│       └── ProductoAdapter.kt       ← vincula productos al RecyclerView
+└── res/
+    ├── layout/
+    │   ├── activity_main.xml        ← RecyclerView y botón de registro
+    │   ├── item_producto.xml       ← fila de producto
+    │   └── activity_registrar.xml   ← formulario de alta
+    └── values/
+        └── strings.xml              ← nombre y textos de la app</pre>
+
+        <div class="box"><strong>Dependencias Android:</strong> agrega Retrofit y el conversor Gson a <code>app/build.gradle(.kts)</code>. La pantalla usa RecyclerView y ConstraintLayout; el ejemplo de botón flotante también requiere Material Components.
+          <pre><code>implementation("com.squareup.retrofit2:retrofit:2.9.0")
+implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+implementation("androidx.recyclerview:recyclerview:1.3.2")
+implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+implementation("com.google.android.material:material:1.11.0")</code></pre>
+        </div>
+        <div class="alert alert-warning"><strong>Paquete Kotlin:</strong> algunos bloques de esta guía usan <code>com.example.apirestapp</code> y otros <code>com.example.api_php</code>. En tu proyecto, elige un único paquete y actualiza de forma coherente las declaraciones <code>package</code> y los <code>import</code> de <code>MainActivity</code>, modelos, API, adapter y activity de registro.</div>
+        <div class="alert alert-info"><strong>Conexión local:</strong> desde el emulador Android, <code>10.0.2.2</code> apunta al localhost de tu computadora. En un dispositivo físico, usa la IP local de la computadora y asegúrate de que ambos estén en la misma red. Inicia Apache y MySQL, importa/crea la base de datos y prueba <code>http://localhost/ucv_aplic_mov/productos/listar.php</code> antes de abrir la app.</div>
+      </section>
 
       <div class="content">
         <!-- SECCIÓN TEÓRICA -->
-        <h2>📚 PARTE I: FUNDAMENTOS TEÓRICOS</h2>
+        <h2 id="fundamentos">📚 PARTE I: FUNDAMENTOS TEÓRICOS</h2>
 
         <h3>¿Qué vamos a construir?</h3>
         <p>
@@ -410,6 +751,7 @@
         <div class="architecture">
           <h4 style="color: white; text-align: center; margin-bottom: 20px;">🏗️ Arquitectura del Sistema</h4>
           <div class="architecture-layer">
+            <p>
               • RecyclerView para mostrar lista de productos<br />
               • Activities y Layouts XML<br />
               • Adaptadores para vincular datos
@@ -422,8 +764,6 @@
               • Conversión automática JSON ↔ Objetos Kotlin<br />
               • Manejo de peticiones asíncronas
             </p>
-            <div class="code-header">Kotlin - models/Producto.kt</div>
-            <pre><code>package com.example.api_php
           </div>
           <div class="architecture-layer">
             <strong>Capa de Servicio (API REST PHP)</strong>
@@ -701,7 +1041,7 @@
         </div>
 
         <!-- SECCIÓN PRÁCTICA -->
-        <h2>💻 PARTE II: IMPLEMENTACIÓN PRÁCTICA</h2>
+        <h2 id="implementacion">💻 PARTE II: IMPLEMENTACIÓN PRÁCTICA</h2>
 
         <h3>1️⃣ Base de Datos MySQL</h3>
 
@@ -801,13 +1141,12 @@ try {
 
         <h3>3️⃣ Aplicación Android</h3>
 
-        <h4>Configuración de Retrofit</h4>
+        <h4>Dependencia de Retrofit y Gson</h4>
 
-                <div class="code-block">
-                  <div class="code-header">Kotlin - api/ApiService.kt</div>
-                  <pre><code>import com.example.api_php.ProductosResponse
-    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
-}</code></pre>
+        <div class="code-block">
+          <div class="code-header">Gradle - app/build.gradle.kts</div>
+          <pre><code>implementation("com.squareup.retrofit2:retrofit:2.9.0")
+implementation("com.squareup.retrofit2:converter-gson:2.9.0")</code></pre>
         </div>
 
         <div class="code-block">
@@ -816,7 +1155,6 @@ try {
     xmlns:tools="http://schemas.android.com/tools"&gt;
 
     &lt;uses-permission android:name="android.permission.INTERNET" /&gt;
-                </div>
 
     &lt;application
         android:allowBackup="true"
@@ -969,22 +1307,16 @@ data class ProductosResponse(
 
         <div class="code-block">
           <div class="code-header">Kotlin - api/ApiService.kt</div>
-        <pre><code>package com.example.api_php
+          <pre><code>package com.example.apirestapp.api
 
-<pre><code>
-  import com.example.api_php.ProductosResponse
+import com.example.apirestapp.models.ProductosResponse
 import retrofit2.Call
 import retrofit2.http.GET
 
 interface ApiService {
     @GET("productos/listar.php")
     fun listarProductos(): Call&lt;ProductosResponse>
-    // BASE_URL = http://10.0.2.2/ucv_aplic_mov/
-    // URL final   = http://10.0.2.2/ucv_aplic_mov/productos/listar.php
-  }
-  </code></pre>
-        
-</code></pre>
+}</code></pre>
         </div>
 
         <div class="code-block">
@@ -1007,8 +1339,6 @@ object RetrofitClient {
     }
 }</code></pre>
         </div>
-            <div class="code-header">Kotlin - adapters/ProductoAdapter.kt</div>
-            <pre><code>package com.example.api_php
 
         <h4>Adapter para RecyclerView</h4>
 
@@ -1028,7 +1358,7 @@ class ProductoAdapter(
     private var items: List&lt;Producto>
 ) : RecyclerView.Adapter&lt;ProductoAdapter.ProductoViewHolder>() {
 
-    inner class ProductoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+    class ProductoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tvNombre: TextView = itemView.findViewById(R.id.tvNombre)
         val tvCategoria: TextView = itemView.findViewById(R.id.tvCategoria)
         val tvPrecio: TextView = itemView.findViewById(R.id.tvPrecio)
@@ -1046,7 +1376,6 @@ class ProductoAdapter(
         holder.tvCategoria.text = "Categoría: ${producto.categoria}"
         holder.tvPrecio.text = "S/ ${producto.precio}"
     }
-      </code></pre>
 
     override fun getItemCount(): Int = items.size
 
@@ -1171,7 +1500,7 @@ class MainActivity : AppCompatActivity() {
         </div>
 
         <!-- SECCIÓN EXTRA: REGISTRO DE PRODUCTOS -->
-        <h2>📝 PARTE III: REGISTRO DE PRODUCTOS (INSERTAR)</h2>
+        <h2 id="registro-api">📝 PARTE III: REGISTRO DE PRODUCTOS (INSERTAR)</h2>
 
         <h3>1️⃣ Crear el endpoint registrar.php</h3>
         <div class="alert alert-warning">
@@ -1268,7 +1597,7 @@ call.enqueue(object : Callback&lt;Map&lt;String, Any&gt;&gt; {
         </div>
 
         <!-- SECCIÓN EXTRA: BOTÓN Y FORMULARIO DE REGISTRO EN ANDROID -->
-        <h2>🟢 PARTE IV: BOTÓN Y FORMULARIO DE REGISTRO</h2>
+        <h2 id="formulario">🟢 PARTE IV: BOTÓN Y FORMULARIO DE REGISTRO</h2>
 
         <h3>1️⃣ Agregar botón en activity_main.xml</h3>
         <div class="alert alert-warning">
@@ -1400,7 +1729,7 @@ class RegistrarActivity : AppCompatActivity() {
         </div>
 
         <!-- SECCIÓN EXTRA: BOTÓN FLOTANTE (FAB) PARA REGISTRAR -->
-        <h2>➕ BOTÓN FLOTANTE PARA REGISTRO</h2>
+        <h2 id="fab">➕ BOTÓN FLOTANTE PARA REGISTRO</h2>
         <div class="alert alert-warning">
           <strong>Reemplaza el botón normal por un FloatingActionButton (FAB) en activity_main.xml:</strong>
         </div>
