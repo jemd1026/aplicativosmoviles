@@ -4,6 +4,9 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Fragments en Android - Guía Completa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Source+Code+Pro:wght@500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
       * {
           margin: 0;
@@ -422,19 +425,324 @@
               transform: rotate(90deg);
           }
       }
+
+      :root {
+        --bg: #f7f7f2;
+        --soft: #e7eee9;
+        --panel: #fff;
+        --ink: #18252b;
+        --muted: #657278;
+        --line: #dfe5e1;
+        --coral: #ef714c;
+        --coral-dark: #da5e3b;
+        --coral-tint: #fff0e9;
+        --green: #16745a;
+        --green-tint: #e4f0e9;
+        --amber: #d29b35;
+        --amber-tint: #fff8df;
+        --code: #172a31;
+        --code-top: #243c42;
+        --code-ink: #d8e5df;
+        --shadow: 0 24px 60px rgba(24, 37, 43, .12);
+        --sans: 'DM Sans', sans-serif;
+        --display: 'Space Grotesk', sans-serif;
+        --mono: 'Source Code Pro', Consolas, monospace
+      }
+      * { box-sizing: border-box }
+      html { scroll-behavior: smooth }
+      body {
+        margin: 0;
+        padding: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font: 16px/1.6 var(--sans)
+      }
+      nav {
+        position: fixed;
+        inset: 0 auto 0 0;
+        z-index: 100;
+        width: 260px;
+        overflow-y: auto;
+        background: var(--bg);
+        border-right: 1px solid var(--line)
+      }
+      .navrow { padding: 42px 26px }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        margin-bottom: 30px;
+        padding: 18px 16px;
+        color: #fff;
+        background: var(--code);
+        border-radius: 4px 22px 22px 22px;
+        font-weight: 700
+      }
+      .dot { width: 11px; height: 11px; border-radius: 50%; background: var(--coral) }
+      .navlinks { display: flex; flex-direction: column; gap: 3px }
+      .navlinks:before {
+        content: 'CONTENIDO';
+        margin: 0 12px 10px;
+        color: #9aa6a7;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1.5px
+      }
+      .navlinks a {
+        padding: 10px 12px;
+        border-radius: 8px;
+        color: var(--muted);
+        font-size: 14px;
+        text-decoration: none
+      }
+      .navlinks a:hover, .navlinks a.active { background: var(--soft); color: var(--green); font-weight: 700 }
+      .container {
+        max-width: 1100px;
+        min-height: 100vh;
+        margin: 0 0 0 260px;
+        padding: 80px 6vw 62px;
+        overflow: visible;
+        background: transparent;
+        border-radius: 0;
+        box-shadow: none
+      }
+      .header {
+        max-width: 810px;
+        padding: 0 0 48px;
+        color: var(--ink);
+        background: transparent;
+        border-bottom: 1px solid var(--line);
+        text-align: left
+      }
+      .pills { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px }
+      .pill {
+        padding: 5px 11px;
+        border-radius: 20px;
+        color: var(--green);
+        background: var(--green-tint);
+        font-size: 12px;
+        font-weight: 700
+      }
+      .kicker {
+        margin: 0 0 8px;
+        color: var(--green);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase
+      }
+      h1, h2, h3 { font-family: var(--display); letter-spacing: -1.2px }
+      .header h1 {
+        max-width: 15ch;
+        margin: 0 0 16px;
+        font-size: clamp(42px, 5vw, 70px);
+        line-height: .98;
+        text-shadow: none
+      }
+      .header p { margin: 0 0 8px; font-size: 16px }
+      .header .lead { max-width: 62ch; margin: 0; color: var(--muted); font-size: 18px }
+      .schedule {
+        margin: 28px 0 44px;
+        padding: 24px;
+        background: var(--soft);
+        border: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+        border-radius: 4px 18px 18px 18px
+      }
+      .schedule h2 { margin: 0 0 16px; color: var(--green); font-size: 24px }
+      .schedule-grid { grid-template-columns: repeat(3, 1fr); gap: 14px }
+      .schedule-item {
+        padding: 16px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-top: 3px solid var(--coral);
+        border-radius: 4px 14px 14px 14px;
+        box-shadow: none
+      }
+      .schedule-item:hover { transform: translateY(-2px) }
+      .schedule-item h3 { margin: 0 0 7px; color: var(--green); font-size: 18px }
+      .schedule-item p { margin: 3px 0; color: var(--muted); font-size: 14px }
+      .section { margin: 0; padding: 0 0 18px; background: transparent !important }
+      .section > h2, .summary > h2, .resources > h2 {
+        margin: 62px 0 14px;
+        padding: 0;
+        border: 0;
+        color: var(--ink);
+        font-size: clamp(31px, 4vw, 51px);
+        line-height: 1.03;
+        scroll-margin-top: 30px
+      }
+      .section h3 { margin: 34px 0 8px; font-size: 22px }
+      .section h4 { font-family: var(--display); letter-spacing: -.4px }
+      .theory, .visual-example, .exercise, .tips, .warning, .note, .architecture-box {
+        margin: 22px 0;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 4px 14px 14px 14px;
+        box-shadow: none
+      }
+      .theory, .architecture-box { background: var(--panel) }
+      .box {
+        margin: 22px 0;
+        padding: 16px 18px;
+        background: var(--green-tint);
+        border: 1px solid #bddbcf;
+        border-left: 5px solid var(--green);
+        border-radius: 4px 14px 14px 4px
+      }
+      .tree {
+        margin: 18px 0;
+        padding: 20px 24px;
+        overflow: auto;
+        color: var(--green);
+        background: var(--green-tint);
+        border: 1px solid var(--line);
+        border-radius: 4px 14px 14px 14px;
+        font: 600 13px/1.6 var(--mono);
+        white-space: pre
+      }
+      .theory h3 { margin: 0 0 10px; font-size: 22px }
+      .theory h4, .architecture-box h4 { margin: 18px 0 8px; color: var(--green); font-size: 17px }
+      .theory p, .theory li, .exercise p, .exercise li, .tips p, .tips li, .warning li, .note p, .note li { color: var(--muted) }
+      .visual-example { background: var(--green-tint); text-align: center }
+      .visual-example h4 { margin: 0 0 15px; color: var(--green); font-size: 18px }
+      .code-section {
+        margin: 20px 0;
+        padding: 0;
+        overflow: hidden;
+        color: var(--code-ink);
+        background: var(--code);
+        border-radius: 4px 20px 20px 20px;
+        box-shadow: var(--shadow)
+      }
+      .code-section h4 {
+        margin: 0;
+        padding: 10px 18px;
+        color: #9fb5ad;
+        background: var(--code-top);
+        font: 600 12px var(--mono);
+        letter-spacing: 0
+      }
+      pre { margin: 0; padding: 20px 24px; overflow: auto; font: 13px/1.6 var(--mono) }
+      .kotlin, .string { color: #f5cd62 }
+      .xml { color: #78c5d4 }
+      .comment { color: #8fb6a8; font-style: italic }
+      .keyword { color: #ef9470 }
+      .function { color: #c9a7ed }
+      .exercise { background: var(--amber-tint); border-left: 5px solid var(--amber) }
+      .exercise h4 { margin: 0 0 8px; color: #9a6a13; font-size: 18px }
+      .tips { background: var(--green-tint); border-left: 5px solid var(--green) }
+      .tips strong { color: var(--green) }
+      .warning { background: var(--amber-tint); border-left: 5px solid var(--amber) }
+      .warning strong { color: #9a6a13 }
+      .note { background: var(--coral-tint); border-left: 5px solid var(--coral) }
+      .note strong { color: var(--coral-dark) }
+      code {
+        padding: .08em .28em;
+        border-radius: 4px;
+        color: var(--coral-dark);
+        background: var(--coral-tint);
+        font: .9em var(--mono)
+      }
+      pre code { padding: 0; color: inherit; background: transparent; font-size: inherit }
+      .highlight { padding: 2px 6px; color: var(--coral-dark); background: var(--coral-tint); border-radius: 4px; font-weight: 700 }
+      .comparison-table {
+        width: 100%;
+        margin: 20px 0;
+        border-collapse: collapse;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 0;
+        box-shadow: none
+      }
+      .comparison-table th, .comparison-table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--line) }
+      .comparison-table th { color: #fff; background: var(--coral); font-size: 13px }
+      .comparison-table td { color: var(--muted) }
+      .comparison-table tr:nth-child(even) td { background: var(--soft) }
+      .flow-box {
+        min-width: 130px;
+        padding: 16px;
+        color: var(--green);
+        background: var(--green-tint);
+        border: 1px solid #bddbcf;
+        border-radius: 4px 14px 14px 14px;
+        box-shadow: none
+      }
+      .flow-arrow { color: var(--coral); font-size: 1.5em }
+      .summary { margin-top: 56px; padding: 1px 0 0; background: transparent; border-top: 1px solid var(--line) }
+      .summary h2 { color: var(--ink) }
+      .checklist { padding: 0; list-style: none }
+      .checklist li {
+        margin: 10px 0;
+        padding: 14px 16px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-left: 4px solid var(--green);
+        border-radius: 4px 12px 12px 12px;
+        box-shadow: none
+      }
+      .resources {
+        margin-top: 52px;
+        padding: 28px;
+        color: var(--ink);
+        background: var(--green-tint);
+        border: 1px solid #bddbcf;
+        border-radius: 4px 18px 18px 18px
+      }
+      .resources h2 { margin-top: 0 }
+      .resources a { color: var(--green) !important; overflow-wrap: anywhere }
+      .resources > div { background: rgba(22,116,90,.08) !important }
+      @media (max-width: 760px) {
+        nav { position: sticky; inset: 0; width: 100%; border-right: 0; border-bottom: 1px solid var(--line) }
+        .navrow { display: flex; gap: 12px; align-items: center; padding: 12px 18px }
+        .brand { flex-shrink: 0; margin: 0; padding: 10px 12px }
+        .navlinks { flex-direction: row; overflow-x: auto }
+        .navlinks:before { display: none }
+        .navlinks a { white-space: nowrap }
+        .container { margin: 0; padding: 46px 16px 40px }
+        .schedule-grid { grid-template-columns: repeat(2, 1fr) }
+        .flow-diagram { flex-direction: column }
+        .flow-arrow { transform: rotate(90deg) }
+      }
+      @media (max-width: 480px) {
+        .schedule-grid { grid-template-columns: 1fr }
+        .schedule { padding: 18px }
+        .resources { padding: 20px }
+        .comparison-table th, .comparison-table td { padding: 8px; font-size: 13px }
+      }
     </style>
   </head>
   <body>
-    <div class="container">
+    <nav aria-label="Navegación de la guía">
+      <div class="navrow">
+        <div class="brand"><span class="dot"></span>Fragments.kt</div>
+        <div class="navlinks">
+          <a href="#inicio">Inicio</a>
+          <a href="#contenido">Contenido</a>
+          <a href="#proyecto">Preparar el proyecto</a>
+          <a href="#fundamentos">Fundamentos</a>
+          <a href="#primer-fragment">Primer Fragment</a>
+          <a href="#master-detail">Master-Detail</a>
+          <a href="#resumen">Resumen</a>
+          <a href="#recursos">Recursos</a>
+        </div>
+      </div>
+    </nav>
+    <main class="container" id="inicio">
       <!-- HEADER -->
       <div class="header">
-        <h1>🧩 Fragments en Android con Kotlin</h1>
-        <p>Guía Completa de Desarrollo Android Moderno</p>
-        <p>🎯 Nivel: Intermedio</p>
+        <div class="pills">
+          <span class="pill">Android · Kotlin</span>
+          <span class="pill">Fragments</span>
+          <span class="pill">Nivel intermedio</span>
+        </div>
+        <p class="kicker">Guía práctica</p>
+        <h1>Fragments en Android con Kotlin</h1>
+        <p class="lead">Todas las prácticas se realizan en el proyecto <code>Fragments</code> con el paquete <code>com.example.fragments</code>.</p>
       </div>
 
       <!-- SCHEDULE -->
-      <div class="schedule">
+      <div class="schedule" id="contenido">
         <h2>📋 Contenido del Manual</h2>
         <div class="schedule-grid">
           <div class="schedule-item">
@@ -470,8 +778,49 @@
         </div>
       </div>
 
+      <!-- PREPARAR EL PROYECTO -->
+      <section class="section" id="proyecto">
+        <h2>1. Preparar el proyecto</h2>
+        <p>Trabaja en el proyecto <code>Fragments</code> con el paquete <code>com.example.fragments</code>. La primera práctica agrega un Fragment de lista a <code>MainActivity</code>; el ejercicio Master-Detail reutiliza la actividad y agrega los Fragments de lista y detalle, además de los datos de flores.</p>
+
+        <pre class="tree">app/src/main
+│
+├── java/com/example/fragments
+│   ├── MainActivity.kt                 ← Activity y mediador
+│   ├── ListaFloresFragment.kt          ← lista de flores
+│   ├── DetalleFloresFragment.kt        ← detalle (Parte 3)
+│   └── Flor.kt                         ← modelo de datos
+│
+├── res/layout
+│   ├── activity_main.xml               ← contenedor de Fragments
+│   ├── fragment_lista.xml              ← lista simple (Parte 2)
+│   ├── fragment_lista_flores.xml       ← lista Master (Parte 3)
+│   ├── item_flor.xml                   ← fila de flor
+│   └── fragment_detalle_flor.xml       ← vista de detalle
+│
+├── res/values
+│   └── arrays.xml                      ← datos de flores
+│
+├── res/drawable
+│   └── badge_background.xml            ← fondo del badge de familia
+│
+└── AndroidManifest.xml</pre>
+
+        <div class="box"><strong>Organización de las prácticas:</strong> crea los archivos en el paquete <code>com.example.fragments</code>. <code>ListaFloresFragment</code> se usa primero con datos de ejemplo y luego se amplía para cargar los objetos <code>Flor</code> desde <code>arrays.xml</code>. El ejemplo Master-Detail agrega <code>DetalleFloresFragment</code> y coordina la selección desde <code>MainActivity</code>.</div>
+        <h3>1.1 Crear el proyecto Android</h3>
+        <ol>
+          <li>En Android Studio, selecciona <strong>New Project → Empty Views Activity</strong>.</li>
+          <li>En <strong>Name</strong>, escribe <code>Fragments</code>.</li>
+          <li>En <strong>Package name</strong>, establece <code>com.example.fragments</code>.</li>
+          <li>Selecciona <strong>Kotlin</strong> como lenguaje y pulsa <strong>Finish</strong>.</li>
+        </ol>
+        <div class="note"><strong>Importante:</strong> el paquete debe escribirse exactamente como <code>com.example.fragments</code>. Android Studio lo usará como base de las rutas y declaraciones <code>package</code> de los ejemplos.</div>
+        <div class="note"><strong>Dependencias:</strong> verifica que el módulo <code>app</code> incluya AndroidX Fragment y AppCompat, necesarias para <code>androidx.fragment.app.Fragment</code> y <code>AppCompatActivity</code>. Si no están incluidas por la plantilla de Android Studio, agrega las dependencias compatibles con las versiones de AndroidX de tu proyecto y sincroniza Gradle.</div>
+        <div class="warning"><strong>Importante:</strong> <code>activity_main.xml</code> cambia según la práctica: en la Parte 2 contiene un único contenedor; en el ejemplo Master-Detail para tablet contiene dos contenedores, uno para la lista y otro para el detalle. Usa el layout correspondiente al ejemplo que estés implementando.</div>
+      </section>
+
       <!-- PARTE 1 -->
-      <div class="section">
+      <div class="section" id="fundamentos">
         <h2>📚 PARTE 1: ¿Qué son los Fragments?</h2>
 
         <div class="theory">
@@ -616,7 +965,7 @@
       </div>
 
       <!-- PARTE 2 -->
-      <div class="section">
+      <div class="section" id="primer-fragment">
         <h2>🏗️ PARTE 2: Tu Primer Fragment</h2>
 
         <h3>💻 Paso 1: Crear el Layout del Fragment</h3>
@@ -653,7 +1002,7 @@
 
         <div class="code-section">
           <h4>📱 ListaFloresFragment.kt (Nueva clase)</h4>
-          <pre><code class="kotlin"><span class="keyword">package</span> com.example.ucv_b
+          <pre><code class="kotlin"><span class="keyword">package</span> com.example.fragments
 
 <span class="keyword">import</span> android.os.Bundle
 <span class="keyword">import</span> android.view.LayoutInflater
@@ -778,7 +1127,7 @@
     <span class="comment">&lt;!-- Agregar Fragment estáticamente --&gt;</span>
     &lt;fragment
         android:id="@+id/fragmentLista"
-        android:name="com.example.ucv_b.ListaFloresFragment"
+        android:name="com.example.fragments.ListaFloresFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/&gt;
 
@@ -812,7 +1161,7 @@
 
         <div class="code-section">
           <h4>📱 MainActivity.kt</h4>
-          <pre><code class="kotlin"><span class="keyword">package</span> com.example.ucv_b
+          <pre><code class="kotlin"><span class="keyword">package</span> com.example.fragments
 
 <span class="keyword">import</span> android.os.Bundle
 <span class="keyword">import</span> androidx.appcompat.app.AppCompatActivity
@@ -866,7 +1215,7 @@
       </div>
 
       <!-- PARTE 3 -->
-      <div class="section">
+      <div class="section" id="master-detail">
         <h2>🎨 PARTE 3: Master-Detail Pattern (Tablet)</h2>
 
         <div class="theory">
@@ -966,7 +1315,7 @@
 
         <div class="code-section">
           <h4>📱 Flor.kt (Nueva clase - Simple)</h4>
-          <pre><code class="kotlin"><span class="keyword">package</span> com.example.ucv_b
+          <pre><code class="kotlin"><span class="keyword">package</span> com.example.fragments
 
 <span class="keyword">data class</span> <span class="function">Flor</span>(
     <span class="keyword">val</span> id: Int,
@@ -1073,8 +1422,9 @@
 
         <div class="code-section">
           <h4>📱 ListaFloresFragment.kt (Con arrays.xml)</h4>
-          <pre><code class="kotlin"><span class="keyword">package</span> com.example.ucv_b
+          <pre><code class="kotlin"><span class="keyword">package</span> com.example.fragments
 
+<span class="keyword">import</span> android.content.Context
 <span class="keyword">import</span> android.os.Bundle
 <span class="keyword">import</span> android.view.LayoutInflater
 <span class="keyword">import</span> android.view.View
@@ -1086,7 +1436,7 @@
 
 <span class="keyword">class</span> <span class="function">ListaFloresFragment</span> : Fragment() {
 
-    <span class="comment">// Interface para comunicación con la Activity</span>
+    <span class="comment">// La Activity implementa este contrato para recibir la flor seleccionada.</span>
     <span class="keyword">interface</span> <span class="function">OnFlorSeleccionadaListener</span> {
         <span class="keyword">fun</span> <span class="function">onFlorSeleccionada</span>(flor: Flor)
     }
@@ -1094,53 +1444,69 @@
     <span class="keyword">private var</span> listener: OnFlorSeleccionadaListener? = <span class="keyword">null</span>
     <span class="keyword">private lateinit var</span> flores: List&lt;Flor&gt;
 
+    <span class="comment">// Vincula el listener cuando el Fragment se conecta a su Activity.</span>
+    <span class="keyword">override fun</span> <span class="function">onAttach</span>(context: Context) {
+        <span class="keyword">super</span>.onAttach(context)
+        <span class="keyword">if</span> (context <span class="keyword">is</span> OnFlorSeleccionadaListener) {
+            listener = context
+        } <span class="keyword">else</span> {
+            <span class="keyword">throw</span> RuntimeException(<span class="string">"$context debe implementar OnFlorSeleccionadaListener"</span>)
+        }
+    }
+
+    <span class="comment">// Libera la referencia a la Activity cuando el Fragment se separa.</span>
+    <span class="keyword">override fun</span> <span class="function">onDetach</span>() {
+        <span class="keyword">super</span>.onDetach()
+        listener = <span class="keyword">null</span>
+    }
+
     <span class="keyword">override fun</span> <span class="function">onCreateView</span>(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        <span class="comment">// Infla la interfaz de la lista definida en el recurso XML.</span>
         <span class="keyword">return</span> inflater.inflate(R.layout.fragment_lista_flores, container, <span class="keyword">false</span>)
     }
 
     <span class="keyword">override fun</span> <span class="function">onViewCreated</span>(view: View, savedInstanceState: Bundle?) {
         <span class="keyword">super</span>.onViewCreated(view, savedInstanceState)
 
-        <span class="comment">// ⭐ Cargar datos desde arrays.xml</span>
+        <span class="comment">// Carga los objetos Flor desde los arrays de recursos.</span>
         flores = cargarFloresDesdeResources()
-
-        <span class="comment">// Configurar ListView</span>
         <span class="keyword">val</span> listView = view.findViewById&lt;ListView&gt;(R.id.listViewFlores)
 
-        <span class="comment">// Adapter personalizado</span>
+        <span class="comment">// Convierte cada flor en una fila usando item_flor.xml.</span>
         <span class="keyword">val</span> adapter = <span class="keyword">object</span> : ArrayAdapter&lt;Flor&gt;(
             requireContext(),
             R.layout.item_flor,
             flores
         ) {
             <span class="keyword">override fun</span> <span class="function">getView</span>(position: Int, convertView: View?, parent: ViewGroup): View {
-                <span class="keyword">val</span> view = convertView ?: LayoutInflater.from(context)
+                <span class="comment">// Reutiliza una fila existente o crea una nueva.</span>
+                <span class="keyword">val</span> itemView = convertView ?: LayoutInflater.from(context)
                     .inflate(R.layout.item_flor, parent, <span class="keyword">false</span>)
-
                 <span class="keyword">val</span> flor = getItem(position)
 
-                view.findViewById&lt;TextView&gt;(R.id.tvEmoji).text = flor?.emoji
-                view.findViewById&lt;TextView&gt;(R.id.tvNombre).text = flor?.nombre
-                view.findViewById&lt;TextView&gt;(R.id.tvCientifico).text = flor?.nombreCientifico
+                <span class="comment">// Muestra los datos visibles de la flor en la fila.</span>
+                itemView.findViewById&lt;TextView&gt;(R.id.tvEmoji).text = flor?.emoji
+                itemView.findViewById&lt;TextView&gt;(R.id.tvNombre).text = flor?.nombre
+                itemView.findViewById&lt;TextView&gt;(R.id.tvCientifico).text = flor?.nombreCientifico
 
-                <span class="keyword">return</span> view
+                <span class="keyword">return</span> itemView
             }
         }
 
         listView.adapter = adapter
 
-        <span class="comment">// ⭐ Click en item: Notificar a la Activity</span>
-        listView.setOnItemClickListener { parent, view, position, id ->
+        <span class="comment">// Notifica a la Activity cuál flor seleccionó el usuario.</span>
+        listView.setOnItemClickListener { _, _, position, _ ->
             <span class="keyword">val</span> florSeleccionada = flores[position]
             listener?.onFlorSeleccionada(florSeleccionada)
         }
     }
 
-    <span class="comment">// ⭐ Método para cargar flores desde arrays.xml</span>
+    <span class="comment">// Combina los arrays paralelos de arrays.xml en objetos Flor.</span>
     <span class="keyword">private fun</span> <span class="function">cargarFloresDesdeResources</span>(): List&lt;Flor&gt; {
         <span class="keyword">val</span> emojis = resources.getStringArray(R.array.flores_emojis)
         <span class="keyword">val</span> nombres = resources.getStringArray(R.array.flores_nombres)
@@ -1149,7 +1515,7 @@
         <span class="keyword">val</span> descripciones = resources.getStringArray(R.array.flores_descripciones)
 
         <span class="keyword">val</span> listaFlores = mutableListOf&lt;Flor&gt;()
-
+        <span class="comment">// Usa el mismo índice para mantener relacionados los datos de cada flor.</span>
         <span class="keyword">for</span> (i <span class="keyword">in</span> nombres.indices) {
             listaFlores.add(
                 Flor(
@@ -1162,13 +1528,7 @@
                 )
             )
         }
-
         <span class="keyword">return</span> listaFlores
-    }
-
-    <span class="comment">// ⭐ Método para vincular el listener (la Activity)</span>
-    <span class="keyword">fun</span> <span class="function">setOnFlorSeleccionadaListener</span>(listener: OnFlorSeleccionadaListener) {
-        <span class="keyword">this</span>.listener = listener
     }
 }</code></pre>
         </div>
@@ -1353,7 +1713,7 @@
 
         <div class="code-section">
           <h4>📱 DetalleFloresFragment.kt</h4>
-          <pre><code class="kotlin"><span class="keyword">package</span> com.example.ucv_b
+          <pre><code class="kotlin"><span class="keyword">package</span> com.example.fragments
 
 <span class="keyword">import</span> android.os.Bundle
 <span class="keyword">import</span> android.view.LayoutInflater
@@ -1373,11 +1733,15 @@
     <span class="keyword">private lateinit var</span> tvFamilia: TextView
     <span class="keyword">private lateinit var</span> tvDescripcion: TextView
 
+    <span class="comment">// Conserva la selección para volver a mostrarla al recrear las vistas.</span>
+    <span class="keyword">private var</span> florSeleccionada: Flor? = <span class="keyword">null</span>
+
     <span class="keyword">override fun</span> <span class="function">onCreateView</span>(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        <span class="comment">// Infla el layout que contiene el placeholder y los detalles.</span>
         <span class="keyword">return</span> inflater.inflate(R.layout.fragment_detalle_flor, container, <span class="keyword">false</span>)
     }
 
@@ -1392,15 +1756,24 @@
         tvCientificoDetalle = view.findViewById(R.id.tvCientificoDetalle)
         tvFamilia = view.findViewById(R.id.tvFamilia)
         tvDescripcion = view.findViewById(R.id.tvDescripcion)
+
+        <span class="comment">// Restaura la selección cuando se vuelven a crear las vistas.</span>
+        florSeleccionada?.let { actualizarUI(it) }
     }
 
-    <span class="comment">// ⭐ Método público para actualizar los detalles</span>
+    <span class="comment">// Guarda la flor y actualiza la interfaz si las vistas ya están creadas.</span>
     <span class="keyword">fun</span> <span class="function">mostrarDetalles</span>(flor: Flor) {
-        <span class="comment">// Ocultar placeholder y mostrar detalles</span>
+        florSeleccionada = flor
+        <span class="keyword">if</span> (::layoutPlaceholder.isInitialized) {
+            actualizarUI(flor)
+        }
+    }
+
+    <span class="comment">// Muestra los datos seleccionados y oculta el placeholder inicial.</span>
+    <span class="keyword">private fun</span> <span class="function">actualizarUI</span>(flor: Flor) {
         layoutPlaceholder.visibility = View.GONE
         layoutDetalles.visibility = View.VISIBLE
 
-        <span class="comment">// Actualizar vistas con los datos de la flor</span>
         tvEmojiGrande.text = flor.emoji
         tvNombreDetalle.text = flor.nombre
         tvCientificoDetalle.text = flor.nombreCientifico
@@ -1446,7 +1819,7 @@
 
         <div class="code-section">
           <h4>📱 MainActivity.kt (Completa)</h4>
-          <pre><code class="kotlin"><span class="keyword">package</span> com.example.ucv_b
+          <pre><code class="kotlin"><span class="keyword">package</span> com.example.fragments
 
 <span class="keyword">import</span> android.os.Bundle
 <span class="keyword">import</span> androidx.appcompat.app.AppCompatActivity
@@ -1460,25 +1833,25 @@
         <span class="keyword">super</span>.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        <span class="comment">// Agrega los Fragments solo al inicio para evitar duplicarlos al recrear la Activity.</span>
         <span class="keyword">if</span> (savedInstanceState == <span class="keyword">null</span>) {
-            <span class="comment">// ⭐ Crear Fragment Master (Lista)</span>
             <span class="keyword">val</span> listaFragment = ListaFloresFragment()
-            listaFragment.setOnFlorSeleccionadaListener(<span class="keyword">this</span>)
-
-            <span class="comment">// ⭐ Crear Fragment Detail (Detalles)</span>
             detalleFragment = DetalleFloresFragment()
 
-            <span class="comment">// ⭐ Agregar ambos fragments</span>
+            <span class="comment">// Coloca la lista y el detalle en sus contenedores de la pantalla.</span>
             supportFragmentManager.beginTransaction()
                 .add(R.id.fragmentListaContainer, listaFragment)
                 .add(R.id.fragmentDetalleContainer, detalleFragment)
                 .commit()
+        } <span class="keyword">else</span> {
+            <span class="comment">// Recupera el Fragment de detalle que Android restauró automáticamente.</span>
+            detalleFragment = supportFragmentManager
+                .findFragmentById(R.id.fragmentDetalleContainer) <span class="keyword">as</span> DetalleFloresFragment
         }
     }
 
-    <span class="comment">// ⭐ Implementar el método de la interface</span>
+    <span class="comment">// Recibe la flor seleccionada y delega la actualización al Fragment de detalle.</span>
     <span class="keyword">override fun</span> <span class="function">onFlorSeleccionada</span>(flor: Flor) {
-        <span class="comment">// Actualizar el fragment de detalles</span>
         detalleFragment.mostrarDetalles(flor)
     }
 }</code></pre>
@@ -1555,7 +1928,7 @@
       </div>
 
       <!-- RESUMEN -->
-      <div class="summary">
+      <div class="summary" id="resumen">
         <h2>📚 Resumen Completo</h2>
         <ul class="checklist">
           <li><strong>Fragment:</strong> Porción modular y reutilizable de UI</li>
@@ -1568,7 +1941,7 @@
       </div>
 
       <!-- RECURSOS -->
-      <div class="resources">
+      <div class="resources" id="recursos">
         <h2>📦 Recursos Adicionales</h2>
 
         <div style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 10px; margin-top: 30px;">
@@ -1591,7 +1964,6 @@
           </p>
           <p style="opacity: 0.7; margin-top: 20px;">Desarrollado con ❤️ para estudiantes</p>
         </div>
-      </div>
-    </div>
+    </main>
   </body>
 </html>
