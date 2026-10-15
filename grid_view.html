@@ -4,407 +4,321 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>GridView en Android - Guía Completa</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Source+Code+Pro:wght@500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <style>
-      * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
+      :root {
+        --bg: #f7f7f2;
+        --soft: #e7eee9;
+        --panel: #fff;
+        --ink: #18252b;
+        --muted: #657278;
+        --line: #dfe5e1;
+        --coral: #ef714c;
+        --coral-dark: #da5e3b;
+        --coral-tint: #fff0e9;
+        --green: #16745a;
+        --green-tint: #e4f0e9;
+        --amber: #d29b35;
+        --amber-tint: #fff8df;
+        --code: #172a31;
+        --code-top: #243c42;
+        --code-ink: #d8e5df;
+        --shadow: 0 24px 60px rgba(24, 37, 43, .12);
+        --sans: 'DM Sans', sans-serif;
+        --display: 'Space Grotesk', sans-serif;
+        --mono: 'Source Code Pro', Consolas, monospace
       }
 
+      * { box-sizing: border-box }
+      html { scroll-behavior: smooth }
       body {
-          font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-          background: linear-gradient(135deg, #d299c2 0%, #fef9d7 100%);
-          padding: 20px;
-          line-height: 1.6;
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font: 16px/1.6 var(--sans)
       }
-
+      nav {
+        position: fixed;
+        inset: 0 auto 0 0;
+        z-index: 100;
+        width: 260px;
+        overflow-y: auto;
+        background: var(--bg);
+        border-right: 1px solid var(--line)
+      }
+      .navrow { padding: 42px 26px }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        margin-bottom: 30px;
+        padding: 18px 16px;
+        color: #fff;
+        background: var(--code);
+        border-radius: 4px 22px 22px 22px;
+        font-weight: 700
+      }
+      .dot {
+        width: 11px;
+        height: 11px;
+        border-radius: 50%;
+        background: var(--coral)
+      }
+      .navlinks { display: flex; flex-direction: column; gap: 3px }
+      .navlinks:before {
+        content: 'CONTENIDO';
+        margin: 0 12px 10px;
+        color: #9aa6a7;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1.5px
+      }
+      .navlinks a {
+        padding: 10px 12px;
+        border-radius: 8px;
+        color: var(--muted);
+        font-size: 14px;
+        text-decoration: none
+      }
+      .navlinks a:hover { background: var(--soft); color: var(--green); font-weight: 700 }
       .container {
-          max-width: 1200px;
-          margin: 0 auto;
-          background: white;
-          border-radius: 20px;
-          box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-          overflow: hidden;
+        max-width: 1100px;
+        min-height: 100vh;
+        margin-left: 260px;
+        padding: 80px 6vw 62px
       }
-
       .header {
-          background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-          color: white;
-          padding: 40px;
-          text-align: center;
+        max-width: 810px;
+        padding: 0 0 48px;
+        border-bottom: 1px solid var(--line)
       }
-
+      .pills { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px }
+      .pill {
+        padding: 5px 11px;
+        border-radius: 20px;
+        color: var(--green);
+        background: var(--green-tint);
+        font-size: 12px;
+        font-weight: 700
+      }
+      .kicker {
+        margin: 0 0 8px;
+        color: var(--green);
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase
+      }
+      h1, h2, h3 { font-family: var(--display); letter-spacing: -1.2px }
       .header h1 {
-          font-size: 2.5em;
-          margin-bottom: 10px;
-          text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        max-width: 15ch;
+        margin: 0 0 16px;
+        font-size: clamp(42px, 5vw, 70px);
+        line-height: .98
       }
-
-      .header p {
-          font-size: 1.2em;
-      }
-
+      .header p { margin: 0 0 8px }
+      .header .lead { max-width: 62ch; margin: 0; color: var(--muted); font-size: 18px }
       .schedule {
-          background: #f8f9fa;
-          padding: 30px;
-          border-bottom: 3px solid #fa709a;
+        margin: 28px 0 44px;
+        padding: 24px;
+        background: var(--soft);
+        border: 1px solid var(--line);
+        border-radius: 4px 18px 18px 18px
       }
-
-      .schedule h2 {
-          color: #fa709a;
-          margin-bottom: 20px;
-          font-size: 1.8em;
-      }
-
-      .schedule-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-          gap: 15px;
-      }
-
+      .schedule h2 { margin: 0 0 16px; color: var(--green); font-size: 24px }
+      .schedule-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px }
       .schedule-item {
-          background: white;
-          padding: 20px;
-          border-radius: 10px;
-          border-left: 5px solid #fa709a;
-          box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-          transition: transform 0.3s;
+        padding: 16px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-top: 3px solid var(--coral);
+        border-radius: 4px 14px 14px 14px
       }
-
-      .schedule-item:hover {
-          transform: translateX(5px);
+      .schedule-item h3 { margin: 0 0 7px; color: var(--green); font-size: 18px }
+      .schedule-item p { margin: 3px 0; color: var(--muted); font-size: 14px }
+      .section { margin: 0; padding: 0 0 18px }
+      .section > h2, .summary > h2, .resources > h2 {
+        margin: 62px 0 14px;
+        font-size: clamp(31px, 4vw, 51px);
+        line-height: 1.03;
+        scroll-margin-top: 30px
       }
-
-      .schedule-item h3 {
-          color: #fa709a;
-          margin-bottom: 10px;
+      .section h3 { margin: 34px 0 8px; font-size: 22px }
+      .section h4 { font-family: var(--display); letter-spacing: -.4px }
+      .theory, .visual-example, .exercise, .tips, .warning, .note {
+        margin: 22px 0;
+        padding: 18px;
+        border: 1px solid var(--line);
+        border-radius: 4px 14px 14px 14px
       }
-
-      .section {
-          padding: 40px;
-          margin: 0;
+      .box {
+        margin: 22px 0;
+        padding: 16px 18px;
+        background: var(--green-tint);
+        border: 1px solid #bddbcf;
+        border-left: 5px solid var(--green);
+        border-radius: 4px 14px 14px 4px
       }
-
-      .section:nth-child(odd) {
-          background: linear-gradient(135deg, #fff5f7 0%, #ffe4e9 100%);
+      .tree {
+        margin: 18px 0;
+        padding: 20px 24px;
+        overflow: auto;
+        color: var(--green);
+        background: var(--green-tint);
+        border: 1px solid var(--line);
+        border-radius: 4px 14px 14px 14px;
+        font: 600 13px/1.6 var(--mono);
+        white-space: pre
       }
-
-      .section:nth-child(even) {
-          background: linear-gradient(135deg, #fffbea 0%, #fff4cc 100%);
+      .theory { background: var(--panel); box-shadow: 0 12px 24px -20px rgba(24,37,43,.35) }
+      .theory h3 { margin: 0 0 10px; font-size: 22px }
+      .theory h4 { margin: 18px 0 8px; color: var(--green); font-size: 17px }
+      .theory p, .theory li, .exercise p, .exercise li, .tips p, .tips li, .warning li, .note p, .note li {
+        color: var(--muted)
       }
-
-      .section:nth-child(3) {
-          background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
-      }
-
-      .section:nth-child(4) {
-          background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
-      }
-
-      .section:nth-child(5) {
-          background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%);
-      }
-
-      .section:nth-child(6) {
-          background: linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%);
-      }
-
-      .section h2 {
-          font-size: 2em;
-          margin-bottom: 20px;
-          border-bottom: 3px solid rgba(250,112,154,0.5);
-          padding-bottom: 10px;
-          color: #333;
-      }
-
-      .section h3 {
-          color: #444;
-          margin-top: 20px;
-          margin-bottom: 15px;
-      }
-
-      .theory {
-          background: rgba(255,255,255,0.7);
-          padding: 20px;
-          border-radius: 10px;
-          margin: 20px 0;
-          backdrop-filter: blur(10px);
-          border: 1px solid rgba(0,0,0,0.1);
-          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      }
-
-      .theory h3 {
-          margin-bottom: 10px;
-          font-size: 1.3em;
-          color: #333;
-      }
-
-      .theory h4 {
-          color: #555;
-          font-size: 1.2em;
-          margin: 15px 0 10px 0;
-      }
-
-      .theory p, .theory li {
-          color: #444;
-          font-size: 1.05em;
-      }
-
-      .visual-example {
-          background: rgba(0,0,0,0.05);
-          padding: 20px;
-          border-radius: 10px;
-          margin: 15px 0;
-          text-align: center;
-          border: 2px dashed rgba(0,0,0,0.2);
-      }
-
-      .visual-example h4 {
-          margin-bottom: 15px;
-          color: #555;
-      }
-
-      .grid-visual {
-          display: grid;
-          grid-template-columns: repeat(3, 1fr);
-          gap: 10px;
-          max-width: 400px;
-          margin: 20px auto;
-      }
-
+      .visual-example { background: var(--green-tint); text-align: center }
+      .visual-example h4 { margin: 0 0 15px; color: var(--green); font-size: 18px }
+      .grid-visual { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; max-width: 400px; margin: 20px auto }
       .grid-item {
-          background: white;
-          padding: 20px;
-          border-radius: 8px;
-          box-shadow: 0 2px 5px rgba(0,0,0,0.2);
-          text-align: center;
-          font-size: 1.5em;
+        padding: 20px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 4px 14px 14px 14px;
+        box-shadow: 0 8px 18px -14px rgba(24,37,43,.5);
+        font-size: 1.5em
       }
-
       .code-section {
-          background: #1e1e1e;
-          color: #d4d4d4;
-          padding: 20px;
-          border-radius: 10px;
-          margin: 20px 0;
-          overflow-x: auto;
+        margin: 20px 0;
+        overflow: hidden;
+        color: var(--code-ink);
+        background: var(--code);
+        border-radius: 4px 20px 20px 20px;
+        box-shadow: var(--shadow)
       }
-
       .code-section h4 {
-          color: #4ec9b0;
-          margin-bottom: 15px;
-          font-size: 1.1em;
+        margin: 0;
+        padding: 10px 18px;
+        color: #9fb5ad;
+        background: var(--code-top);
+        font: 600 12px var(--mono);
+        letter-spacing: 0
       }
-
-      pre {
-          margin: 0;
-          font-family: 'Courier New', monospace;
-          font-size: 0.9em;
+      pre { margin: 0; padding: 20px 24px; overflow: auto; font: 13px/1.6 var(--mono) }
+      .kotlin, .string { color: #f5cd62 }
+      .xml { color: #78c5d4 }
+      .comment { color: #8fb6a8; font-style: italic }
+      .keyword { color: #ef9470 }
+      .function { color: #c9a7ed }
+      .exercise { background: var(--amber-tint); border-left: 5px solid var(--amber) }
+      .exercise h4 { margin: 0 0 8px; color: #9a6a13; font-size: 18px }
+      .tips { background: var(--green-tint); border-left: 5px solid var(--green) }
+      .tips strong { color: var(--green) }
+      .warning { background: var(--amber-tint); border-left: 5px solid var(--amber) }
+      .warning strong { color: #9a6a13 }
+      .note { background: var(--coral-tint); border-left: 5px solid var(--coral) }
+      .note strong { color: var(--coral-dark) }
+      code {
+        padding: .08em .28em;
+        border-radius: 4px;
+        color: var(--coral-dark);
+        background: var(--coral-tint);
+        font: .9em var(--mono)
       }
-
-      .kotlin {
-          color: #ce9178;
-      }
-
-      .xml {
-          color: #9cdcfe;
-      }
-
-      .comment {
-          color: #6a9955;
-      }
-
-      .keyword {
-          color: #569cd6;
-      }
-
-      .string {
-          color: #ce9178;
-      }
-
-      .function {
-          color: #dcdcaa;
-      }
-
-      .exercise {
-          background: rgba(255,255,255,0.8);
-          padding: 20px;
-          border-radius: 10px;
-          margin: 20px 0;
-          border-left: 5px solid #ffa726;
-          border: 1px solid rgba(255,167,38,0.3);
-          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      }
-
-      .exercise h4 {
-          color: #f57c00;
-          margin-bottom: 10px;
-          font-size: 1.2em;
-      }
-
-      .exercise p, .exercise ul, .exercise li {
-          color: #444;
-          font-size: 1.05em;
-      }
-
-      .tips {
-          background: rgba(255,255,255,0.8);
-          padding: 15px;
-          border-radius: 10px;
-          margin: 15px 0;
-          border-left: 5px solid #66bb6a;
-          border: 1px solid rgba(102,187,106,0.3);
-          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      }
-
-      .tips strong {
-          color: #388e3c;
-      }
-
-      .tips p, .tips li, .tips td {
-          color: #444;
-          font-size: 1.05em;
-      }
-
-      .warning {
-          background: rgba(255,235,59,0.3);
-          padding: 15px;
-          border-radius: 10px;
-          margin: 15px 0;
-          border-left: 5px solid #fbc02d;
-          border: 1px solid rgba(251,192,45,0.3);
-          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      }
-
-      .warning strong {
-          color: #f57f17;
-      }
-
-      .note {
-          background: rgba(255, 255, 255, 0.8);
-          padding: 15px;
-          border-radius: 8px;
-          margin: 15px 0;
-          border-left: 5px solid #42a5f5;
-          border: 1px solid rgba(66,165,245,0.3);
-          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-      }
-
-      .note strong {
-          color: #1976d2;
-      }
-
-      .note p, .note code {
-          color: #444;
-          font-size: 1.05em;
-      }
-
-      .highlight {
-          background: rgba(66,165,245,0.2);
-          padding: 2px 6px;
-          border-radius: 3px;
-          font-weight: bold;
-          color: #1565c0;
-      }
-
+      pre code { padding: 0; color: inherit; background: transparent; font-size: inherit }
+      .highlight { padding: 2px 6px; color: var(--coral-dark); background: var(--coral-tint); border-radius: 4px; font-weight: 700 }
       .comparison-table {
-          width: 100%;
-          margin: 20px 0;
-          border-collapse: collapse;
-          background: white;
-          border-radius: 10px;
-          overflow: hidden;
-          box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        width: 100%;
+        margin: 20px 0;
+        border-collapse: collapse;
+        background: var(--panel);
+        border: 1px solid var(--line)
       }
-
-      .comparison-table th {
-          background: #fa709a;
-          color: white;
-          padding: 12px;
-          text-align: left;
-      }
-
-      .comparison-table td {
-          padding: 12px;
-          border-bottom: 1px solid #eee;
-          color: #444;
-      }
-
-      .comparison-table tr:hover {
-          background: #f5f5f5;
-      }
-
-      .summary {
-          background: #f8f9fa;
-          padding: 40px;
-      }
-
-      .summary h2 {
-          color: #fa709a;
-          font-size: 2em;
-          margin-bottom: 20px;
-      }
-
-      .checklist {
-          list-style: none;
-          padding: 0;
-      }
-
+      .comparison-table th, .comparison-table td { padding: 12px 14px; text-align: left; border-bottom: 1px solid var(--line) }
+      .comparison-table th { color: #fff; background: var(--coral); font-size: 13px }
+      .comparison-table td { color: var(--muted) }
+      .comparison-table tr:nth-child(even) td { background: var(--soft) }
+      .summary { margin-top: 56px; padding-top: 1px; border-top: 1px solid var(--line) }
+      .summary h2, .resources h2 { color: var(--ink) }
+      .checklist { padding: 0; list-style: none }
       .checklist li {
-          padding: 15px;
-          margin: 10px 0;
-          background: white;
-          border-radius: 10px;
-          border-left: 5px solid #4ade80;
-          box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        margin: 10px 0;
+        padding: 14px 16px;
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-left: 4px solid var(--green);
+        border-radius: 4px 12px 12px 12px
       }
-
-      .checklist li:before {
-          content: "✅ ";
-          font-size: 1.2em;
-      }
-
       .resources {
-          background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
-          color: white;
-          padding: 40px;
+        margin-top: 52px;
+        padding: 28px;
+        color: var(--ink);
+        background: var(--green-tint);
+        border: 1px solid #bddbcf;
+        border-radius: 4px 18px 18px 18px
       }
-
-      .resources h2 {
-          font-size: 2em;
-          margin-bottom: 20px;
+      .resources h2 { margin-top: 0 }
+      .resources a { color: var(--green) !important }
+      @media (max-width: 760px) {
+        nav {
+          position: sticky;
+          inset: 0;
+          width: 100%;
+          border-right: 0;
+          border-bottom: 1px solid var(--line)
+        }
+        .navrow { display: flex; gap: 12px; align-items: center; padding: 12px 18px }
+        .brand { flex-shrink: 0; margin: 0; padding: 10px 12px }
+        .navlinks { flex-direction: row; overflow-x: auto }
+        .navlinks:before { display: none }
+        .navlinks a { white-space: nowrap }
+        .container { margin-left: 0; padding: 46px 16px 40px }
+        .schedule-grid { grid-template-columns: repeat(2, 1fr) }
+        .grid-visual { grid-template-columns: repeat(2, 1fr) }
       }
-
-      @media (max-width: 768px) {
-          .header h1 {
-              font-size: 1.8em;
-          }
-
-          .schedule-grid {
-              grid-template-columns: 1fr;
-          }
-
-          .section {
-              padding: 20px;
-          }
-
-          .grid-visual {
-              grid-template-columns: repeat(2, 1fr);
-          }
+      @media (max-width: 480px) {
+        .schedule-grid { grid-template-columns: 1fr }
+        .schedule { padding: 18px }
+        .resources { padding: 20px }
+        .comparison-table th, .comparison-table td { padding: 8px; font-size: 13px }
       }
     </style>
   </head>
   <body>
-    <div class="container">
+    <nav aria-label="Navegación de la guía">
+      <div class="navrow">
+        <div class="brand"><span class="dot"></span>GridView.kt</div>
+        <div class="navlinks">
+          <a href="#inicio">Inicio</a>
+          <a href="#contenido">Contenido</a>
+          <a href="#proyecto">Preparar el proyecto</a>
+          <a href="#fundamentos">Fundamentos</a>
+          <a href="#primer-grid">Primer GridView</a>
+          <a href="#personalizacion">Personalización</a>
+          <a href="#recursos-xml">Datos XML</a>
+          <a href="#eventos">Eventos de clic</a>
+          <a href="#casos-practicos">Casos prácticos</a>
+          <a href="#resumen">Resumen</a>
+          <a href="#recursos">Recursos</a>
+        </div>
+      </div>
+    </nav>
+    <main class="container" id="inicio">
       <!-- HEADER -->
       <div class="header">
-        <h1>📊 GridView en Android con Kotlin</h1>
-        <p>Guía Completa de Desarrollo Android</p>
-        <p>🎯 Nivel: Básico-Intermedio</p>
+        <div class="pills">
+          <span class="pill">Android · Kotlin</span>
+          <span class="pill">GridView</span>
+          <span class="pill">Nivel básico-intermedio</span>
+        </div>
+        <p class="kicker">Guía práctica</p>
+        <h1>GridView en Android con Kotlin</h1>
+        <p class="lead">Todas las prácticas se realizan en el proyecto <code>Grid View</code> con el paquete <code>com.example.gridview</code>.</p>
       </div>
 
       <!-- SCHEDULE -->
-      <div class="schedule">
+      <div class="schedule" id="contenido">
         <h2>📋 Contenido del Manual</h2>
         <div class="schedule-grid">
           <div class="schedule-item">
@@ -440,17 +354,56 @@
         </div>
       </div>
 
+      <!-- PREPARAR EL PROYECTO -->
+      <section class="section" id="proyecto">
+        <h2>1. Preparar el proyecto</h2>
+        <p>Trabaja en el proyecto <code>Grid View</code> con el paquete <code>com.example.gridview</code>. Las prácticas principales reutilizan <code>MainActivity</code> y <code>activity_main.xml</code>; los layouts de cada celda y los datos se agregan según el ejercicio.</p>
+
+        <pre class="tree">app/src/main
+│
+├── java/com/example/gridview
+│   ├── MainActivity.kt             ← actividad principal de las prácticas
+│   ├── DetalleActivity.kt          ← destino del ejemplo de navegación (opcional)
+│   └── adapter/
+│       └── ColorAdapter.kt         ← adapter personalizado de colores (Parte 6)
+│
+├── res/layout
+│   ├── activity_main.xml           ← pantalla principal con el GridView
+│   ├── item_galeria.xml            ← celda para la galería personalizada
+│   └── item_app.xml                ← celda para el menú de aplicaciones
+│
+├── res/values
+│   └── arrays.xml                  ← animales, frutas, deportes y productos
+│
+├── res/drawable
+│   └── placeholder.png            ← imagen usada por item_galeria.xml
+│
+└── AndroidManifest.xml</pre>
+
+        <div class="box"><strong>Organización de las prácticas:</strong> crea el paquete <code>adapter</code> para separar <code>ColorAdapter</code> cuando llegues a la Parte 6. Las demás prácticas usan <code>ArrayAdapter</code> y pueden resolverse directamente en <code>MainActivity.kt</code>.</div>
+        <div class="note"><strong>Antes de ejecutar:</strong> establece <code>MainActivity</code> como actividad de inicio en <code>AndroidManifest.xml</code>. Si implementas la navegación con <code>Intent</code>, crea y registra también <code>DetalleActivity</code>. El layout de galería usa <code>CardView</code>; si tu proyecto aún no incluye la librería, agrega <code>implementation("androidx.cardview:cardview:1.0.0")</code> en las dependencias del módulo <code>app</code>.</div>
+
+        <h3>1.1 Crear el proyecto Android</h3>
+        <ol>
+          <li>En Android Studio, selecciona <strong>New Project → Empty Views Activity</strong>.</li>
+          <li>En <strong>Name</strong>, escribe <code>Grid View</code>.</li>
+          <li>En <strong>Package name</strong>, establece <code>com.example.gridview</code>.</li>
+          <li>Selecciona <strong>Kotlin</strong> como lenguaje y pulsa <strong>Finish</strong>.</li>
+        </ol>
+        <div class="note"><strong>Importante:</strong> el nombre del proyecto puede llevar un espacio; el paquete debe escribirse sin espacios y exactamente como <code>com.example.gridview</code>. Android Studio usará este paquete como base de las rutas y declaraciones <code>package</code> de los ejemplos.</div>
+      </section>
+
       <!-- PARTE 1 -->
-      <div class="section">
+      <div class="section" id="fundamentos">
         <h2>📚 PARTE 1: ¿Qué es GridView?</h2>
 
         <div class="theory">
           <h3>Definición</h3>
-          
+
           <div style="margin-bottom: 20px;">
             <p style="font-size: 1.1em; line-height: 1.8;">
-              <strong>GridView</strong> es un componente de Android que muestra elementos en una cuadrícula bidimensional desplazable (filas y columnas).
-              Es ideal para presentar colecciones de datos de forma visual, como galerías de fotos, catálogos de productos, iconos de aplicaciones, etc.
+              <strong>GridView</strong> es un componente de Android que muestra elementos en una cuadrícula bidimensional desplazable (filas y columnas). Es ideal para presentar colecciones de datos
+              de forma visual, como galerías de fotos, catálogos de productos, iconos de aplicaciones, etc.
             </p>
           </div>
 
@@ -526,7 +479,7 @@
       </div>
 
       <!-- PARTE 2 -->
-      <div class="section">
+      <div class="section" id="primer-grid">
         <h2>🛠️ PARTE 2: Primer GridView</h2>
 
         <div class="theory">
@@ -587,7 +540,7 @@
 
         <div class="code-section">
           <h4>📱 MainActivity.kt (Con ArrayAdapter simple)</h4>
-          <pre><code class="kotlin"><span class="keyword">package</span> com.example.ucv_b
+          <pre><code class="kotlin"><span class="keyword">package</span> com.example.gridview
 
 <span class="keyword">import</span> android.os.Bundle
 <span class="keyword">import</span> android.widget.ArrayAdapter
@@ -650,7 +603,7 @@
       </div>
 
       <!-- PARTE 3 -->
-      <div class="section">
+      <div class="section" id="personalizacion">
         <h2>🎨 PARTE 3: Personalización del GridView</h2>
 
         <div class="theory">
@@ -694,7 +647,9 @@
 
         <div class="note">
           <strong>📝 auto_fit:</strong>
-          <p style="margin-top: 10px;">Con <code>numColumns="auto_fit"</code> y <code>columnWidth="100dp"</code>, el GridView calcula automáticamente cuántas columnas caben según el ancho de la pantalla.</p>
+          <p style="margin-top: 10px;">
+            Con <code>numColumns="auto_fit"</code> y <code>columnWidth="100dp"</code>, el GridView calcula automáticamente cuántas columnas caben según el ancho de la pantalla.
+          </p>
           <p style="margin-top: 10px;"><strong>Ventaja:</strong> Se adapta a diferentes tamaños de pantalla (teléfonos, tablets)</p>
         </div>
 
@@ -723,7 +678,8 @@
 │ 1 │ 2 │ 3 │
 ├───┼───┼───┤
 │ 4 │ 5 │ 6 │
-└───┴───┴───┘</pre>
+└───┴───┴───┘</pre
+            >
 
             <p><strong>Con espaciado (8dp):</strong></p>
             <pre style="background: white; padding: 10px; border-radius: 5px; margin: 10px 0;">
@@ -733,7 +689,8 @@
 
 ┌───┐ ┌───┐ ┌───┐
 │ 4 │ │ 5 │ │ 6 │
-└───┘ └───┘ └───┘</pre>
+└───┘ └───┘ └───┘</pre
+            >
 
             <p><strong>Con padding (16dp):</strong></p>
             <pre style="background: white; padding: 10px; border-radius: 5px; margin: 10px 0;">
@@ -743,7 +700,8 @@
     
     ┌───┐ ┌───┐ ┌───┐
     │ 4 │ │ 5 │ │ 6 │
-    └───┘ └───┘ └───┘</pre>
+    └───┘ └───┘ └───┘</pre
+            >
           </div>
         </div>
 
@@ -782,7 +740,7 @@ android:stretchMode="none"</code></pre>
       </div>
 
       <!-- PARTE 4 -->
-      <div class="section">
+      <div class="section" id="recursos-xml">
         <h2>💾 PARTE 4: Datos desde Resources XML</h2>
 
         <div class="theory">
@@ -1035,7 +993,7 @@ android:stretchMode="none"</code></pre>
       </div>
 
       <!-- PARTE 5 -->
-      <div class="section">
+      <div class="section" id="eventos">
         <h2>⚡ PARTE 5: Eventos y Clicks</h2>
 
         <div class="theory">
@@ -1199,7 +1157,7 @@ gridView.setOnItemClickListener { parent, view, position, id ->
       </div>
 
       <!-- PARTE 6 -->
-      <div class="section">
+      <div class="section" id="casos-practicos">
         <h2>🚀 PARTE 6: Casos Prácticos Avanzados</h2>
 
         <h3>💻 Ejemplo 1: Galería de Fotos con Custom Adapter</h3>
@@ -1404,7 +1362,7 @@ gridView.setOnItemClickListener { parent, view, position, id ->
       </div>
 
       <!-- RESUMEN -->
-      <div class="summary">
+      <div class="summary" id="resumen">
         <h2>📚 Resumen Completo</h2>
         <ul class="checklist">
           <li><strong>GridView:</strong> Componente para mostrar elementos en cuadrícula</li>
@@ -1466,7 +1424,7 @@ gridView.setOnItemClickListener { parent, view, position, id ->
       </div>
 
       <!-- RECURSOS -->
-      <div class="resources">
+      <div class="resources" id="recursos">
         <h2>📦 Recursos Adicionales</h2>
 
         <div style="background: rgba(255,255,255,0.2); padding: 20px; border-radius: 10px; margin-top: 30px;">
@@ -1480,9 +1438,10 @@ gridView.setOnItemClickListener { parent, view, position, id ->
 
         <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 2px solid rgba(255,255,255,0.3);">
           <p style="font-size: 1.2em; margin-bottom: 10px;">¡Manual Completado! 🎉</p>
+          <p style="opacity: 0.9;">Universidad César Vallejo</p>
           <p style="opacity: 0.7; margin-top: 20px;">Desarrollado con ❤️ para estudiantes</p>
         </div>
       </div>
-    </div>
+    </main>
   </body>
 </html>
