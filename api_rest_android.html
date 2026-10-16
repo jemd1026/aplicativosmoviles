@@ -708,7 +708,7 @@ Base de datos MySQL
     └── productos                    ← id, nombre, precio, categoria
 
 Proyecto Android (app/src/main)
-├── AndroidManifest.xml              ← permiso INTERNET y Activities
+├── AndroidManifest.xml              ← permisos INTERNET, tráfico HTTP y Activities
 ├── java/com/example/apirestapp/
 │   ├── MainActivity.kt              ← carga la lista desde la API
 │   ├── RegistrarActivity.kt         ← formulario (Parte IV)
@@ -724,18 +724,22 @@ Proyecto Android (app/src/main)
     │   ├── activity_main.xml        ← RecyclerView y botón de registro
     │   ├── item_producto.xml       ← fila de producto
     │   └── activity_registrar.xml   ← formulario de alta
+    ├── xml/
+    │   └── network_security_config.xml ← permite HTTP (cleartext) hacia el servidor local
     └── values/
         └── strings.xml              ← nombre y textos de la app</pre>
 
         <div class="box"><strong>Dependencias Android:</strong> agrega Retrofit y el conversor Gson a <code>app/build.gradle(.kts)</code>. La pantalla usa RecyclerView y ConstraintLayout; el ejemplo de botón flotante también requiere Material Components.
           <pre><code>implementation("com.squareup.retrofit2:retrofit:2.9.0")
 implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 implementation("androidx.recyclerview:recyclerview:1.3.2")
 implementation("androidx.constraintlayout:constraintlayout:2.1.4")
 implementation("com.google.android.material:material:1.11.0")</code></pre>
         </div>
+        <div class="alert alert-warning"><strong>HTTP local:</strong> Android bloquea el tráfico HTTP sin cifrar. Crea <code>res/xml/network_security_config.xml</code> (código en la Parte II, junto al Manifest) y referéncialo en <code>AndroidManifest.xml</code> con <code>android:networkSecurityConfig</code>. Si cambias la IP de <code>RetrofitClient</code>, agrégala también en ese archivo.</div>
         <div class="alert alert-success"><strong>Paquete Kotlin:</strong> todos los bloques de esta guía usan <code>com.example.apirestapp</code>. Si tu proyecto tiene otro paquete, reemplázalo de forma coherente en todas las declaraciones <code>package</code> y en los <code>import</code>.</div>
-        <div class="alert alert-info"><strong>Conexión local:</strong> desde el emulador Android, <code>10.0.2.2</code> apunta al localhost de tu computadora. En un dispositivo físico, usa la IP local de la computadora y asegúrate de que ambos estén en la misma red. Inicia Apache y MySQL, importa/crea la base de datos y prueba <code>http://localhost/ucv_aplic_mov/productos/listar.php</code> antes de abrir la app.</div>
+        <div class="alert alert-info"><strong>Conexión local:</strong> en <code>RetrofitClient.kt</code> la <code>BASE_URL</code> debe apuntar a tu servidor. Con el emulador Android puedes usar <code>10.0.2.2</code> (localhost de tu PC). En un dispositivo físico, o si el emulador no conecta (por ejemplo por el firewall de Hyper-V/WSL), usa la IP Wi-Fi de tu PC (<code>ipconfig</code> → Adaptador Wi-Fi → IPv4, ej. <code>10.50.100.36</code>) y asegúrate de que ambos estén en la misma red. Esa misma IP debe aparecer en <code>network_security_config.xml</code>. Inicia Apache y MySQL, importa/crea la base de datos y prueba <code>http://localhost/ucv_aplic_mov/productos/listar.php</code> antes de abrir la app.</div>
       </section>
 
       <div class="content">
@@ -905,7 +909,7 @@ implementation("com.google.android.material:material:1.11.0")</code></pre>
           <div class="flow-step">
             <span class="flow-step-number">3</span>
             <strong>Retrofit envía petición HTTP</strong>
-            <p>GET request a http://10.0.2.2/ucv_aplic_mov/productos/listar.php</p>
+            <p>GET request a http://&lt;IP-de-tu-PC&gt;/ucv_aplic_mov/productos/listar.php</p>
           </div>
 
           <div class="flow-step">
@@ -1147,6 +1151,7 @@ try {
           <div class="code-header">Gradle - app/build.gradle.kts</div>
           <pre><code>implementation("com.squareup.retrofit2:retrofit:2.9.0")
 implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+implementation("com.squareup.okhttp3:logging-interceptor:4.12.0")
 implementation("androidx.recyclerview:recyclerview:1.3.2")
 implementation("androidx.constraintlayout:constraintlayout:2.1.4")
 implementation("com.google.android.material:material:1.11.0")
@@ -1158,11 +1163,14 @@ implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")</code></pre
           <pre><code>&lt;manifest xmlns:android="http://schemas.android.com/apk/res/android"&gt;
 
     &lt;uses-permission android:name="android.permission.INTERNET" /&gt;
+    &lt;uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /&gt;
 
     &lt;application
         android:allowBackup="true"
         android:usesCleartextTraffic="true"
-        android:label="API REST App"&gt;
+        android:networkSecurityConfig="@xml/network_security_config"
+        android:label="API REST App"
+        android:theme="@style/Theme.Apirestapp"&gt;
 
         &lt;activity
             android:name=".RegistrarActivity"
@@ -1179,6 +1187,20 @@ implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")</code></pre
 
     &lt;/application&gt;
 &lt;/manifest&gt;</code></pre>
+        </div>
+
+        <div class="code-block">
+          <div class="code-header">XML - res/xml/network_security_config.xml</div>
+          <pre><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;network-security-config&gt;
+    &lt;domain-config cleartextTrafficPermitted="true"&gt;
+        &lt;domain includeSubdomains="true"&gt;10.0.2.2&lt;/domain&gt;
+        &lt;domain includeSubdomains="true"&gt;10.50.100.36&lt;/domain&gt;
+        &lt;domain includeSubdomains="true"&gt;localhost&lt;/domain&gt;
+        &lt;domain includeSubdomains="true"&gt;127.0.0.1&lt;/domain&gt;
+    &lt;/domain-config&gt;
+    &lt;base-config cleartextTrafficPermitted="true" /&gt;
+&lt;/network-security-config&gt;</code></pre>
         </div>
 
         <h4>Layouts XML</h4>
@@ -1302,15 +1324,17 @@ implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")</code></pre
           <pre><code>package com.example.apirestapp.models
 
 data class Producto(
-    val id: Int,
-    val nombre: String,
-    val precio: String,
-    val categoria: String
+    val id: Int = 0,
+    val nombre: String? = null,
+    val precio: String? = null,
+    val categoria: String? = null
 )
 
 data class ProductosResponse(
-    val success: Boolean,
-    val data: List&lt;Producto>
+    val success: Boolean = false,
+    val message: String? = null,
+    val data: List&lt;Producto&gt;? = emptyList(),
+    val total: Int? = null
 )</code></pre>
         </div>
 
@@ -1329,7 +1353,7 @@ import retrofit2.http.POST
 
 interface ApiService {
     @GET("productos/listar.php")
-    fun listarProductos(): Call&lt;ProductosResponse>
+    fun listarProductos(): Call&lt;ProductosResponse&gt;
 
     @FormUrlEncoded
     @POST("productos/registrar.php")
@@ -1345,18 +1369,31 @@ interface ApiService {
           <div class="code-header">Kotlin - api/RetrofitClient.kt</div>
           <pre><code>package com.example.apirestapp.api
 
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
 object RetrofitClient {
-    // Para emulador: 10.0.2.2 apunta al localhost de tu PC
-    private const val BASE_URL = "http://10.0.2.2/ucv_aplic_mov/"
+    // Dirección IP local real de la PC en tu red Wi-Fi (obtenida mediante ipconfig):
+    // Usamos la IP de la placa Wi-Fi (10.50.100.36) para evitar bloqueos del Firewall de Hyper-V/WSL en 10.0.2.2
+    private const val BASE_URL = "http://10.50.100.36/ucv_aplic_mov/"
 
     val instance: ApiService by lazy {
+        val logging = HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        }
+
+        val client = OkHttpClient.Builder()
+            .addInterceptor(logging)
+            .build()
+
         val retrofit = Retrofit.Builder()
             .baseUrl(BASE_URL)
+            .client(client)
             .addConverterFactory(GsonConverterFactory.create())
             .build()
+
         retrofit.create(ApiService::class.java)
     }
 }</code></pre>
@@ -1377,8 +1414,8 @@ import com.example.apirestapp.R
 import com.example.apirestapp.models.Producto
 
 class ProductoAdapter(
-    private var items: List&lt;Producto>
-) : RecyclerView.Adapter&lt;ProductoAdapter.ProductoViewHolder>() {
+    private var items: List&lt;Producto&gt;
+) : RecyclerView.Adapter&lt;ProductoAdapter.ProductoViewHolder&gt;() {
 
     class ProductoViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         val tvNombre: TextView = itemView.findViewById(R.id.tvNombre)
@@ -1394,15 +1431,15 @@ class ProductoAdapter(
 
     override fun onBindViewHolder(holder: ProductoViewHolder, position: Int) {
         val producto = items[position]
-        holder.tvNombre.text = producto.nombre
-        holder.tvCategoria.text = "Categoría: ${producto.categoria}"
-        holder.tvPrecio.text = "S/ ${producto.precio}"
+        holder.tvNombre.text = producto.nombre ?: ""
+        holder.tvCategoria.text = "Categoría: ${producto.categoria ?: ""}"
+        holder.tvPrecio.text = "S/ ${producto.precio ?: "0.00"}"
     }
 
     override fun getItemCount(): Int = items.size
 
-    fun actualizarDatos(nuevos: List&lt;Producto>) {
-        items = nuevos
+    fun actualizarDatos(nuevos: List&lt;Producto&gt;?) {
+        items = nuevos ?: emptyList()
         notifyDataSetChanged()
     }
 }</code></pre>
@@ -1416,6 +1453,7 @@ class ProductoAdapter(
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
@@ -1461,30 +1499,43 @@ class MainActivity : AppCompatActivity() {
     private fun cargarProductos() {
         val call = RetrofitClient.instance.listarProductos()
 
-        call.enqueue(object : Callback&lt;ProductosResponse> {
+        call.enqueue(object : Callback&lt;ProductosResponse&gt; {
             override fun onResponse(
-                call: Call&lt;ProductosResponse>,
-                response: Response&lt;ProductosResponse>
+                call: Call&lt;ProductosResponse&gt;,
+                response: Response&lt;ProductosResponse&gt;
             ) {
-                val body = response.body()
-                if (response.isSuccessful && body != null && body.success) {
-                    // Actualizar el adapter con los datos recibidos
-                    adapter.actualizarDatos(body.data)
+                if (response.isSuccessful) {
+                    val body = response.body()
+                    Log.d("API_SUCCESS", "Respuesta recibida: $body")
+                    if (body != null &amp;&amp; body.success) {
+                        adapter.actualizarDatos(body.data ?: emptyList())
+                        if (body.data.isNullOrEmpty()) {
+                            Toast.makeText(
+                                this@MainActivity,
+                                "No hay productos registrados",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                    } else {
+                        val msg = if (body != null) "Respuesta sin éxito (success=false)" else "Cuerpo de respuesta nulo"
+                        Log.e("API_ERROR", msg)
+                        Toast.makeText(this@MainActivity, msg, Toast.LENGTH_LONG).show()
+                    }
                 } else {
-                    Toast.makeText(
-                        this@MainActivity,
-                        "Error al cargar productos",
-                        Toast.LENGTH_SHORT
-                    ).show()
+                    val errorMsg = "Error servidor HTTP ${response.code()}: ${response.message()}"
+                    Log.e("API_ERROR", errorMsg)
+                    Toast.makeText(this@MainActivity, errorMsg, Toast.LENGTH_LONG).show()
                 }
             }
 
-            override fun onFailure(call: Call&lt;ProductosResponse>, t: Throwable) {
-                Toast.makeText(
-                    this@MainActivity,
-                    "Error de conexión: ${t.message}",
-                    Toast.LENGTH_SHORT
-                ).show()
+            override fun onFailure(call: Call&lt;ProductosResponse&gt;, t: Throwable) {
+                Log.e("API_FAILURE", "Error al conectar con la API", t)
+                val msg = when (t) {
+                    is java.net.ConnectException -&gt; "No se pudo conectar a la API (Connection Refused). ¿Está iniciado Apache/XAMPP o la IP es correcta?"
+                    is com.google.gson.JsonSyntaxException -&gt; "Error en formato JSON recibido de la API: ${t.message}"
+                    else -&gt; "Error de conexión (${t.javaClass.simpleName}): ${t.localizedMessage}"
+                }
+                Toast.makeText(this@MainActivity, msg, Toast.LENGTH_LONG).show()
             }
         })
     }
@@ -1493,8 +1544,9 @@ class MainActivity : AppCompatActivity() {
 
         <div class="alert alert-tip">
           <strong>💡 Tips importantes:</strong><br />
-          • Usa <code>10.0.2.2</code> como IP para acceder a tu servidor local desde el emulador Android<br />
-          • Para dispositivo físico, usa la IP de tu PC en la red local (ej: 192.168.1.100)<br />
+          • Cambia la IP de <code>BASE_URL</code> en <code>RetrofitClient.kt</code> por la IP de tu PC en la red local (ej: 10.50.100.36; obtenla con <code>ipconfig</code>)<br />
+          • Agrega esa misma IP en <code>network_security_config.xml</code>, o la app no podrá usar HTTP<br />
+          • En el emulador también funciona <code>10.0.2.2</code>, pero puede fallar si el firewall de Hyper-V/WSL lo bloquea<br />
           • Verifica que Apache/XAMPP esté ejecutándose antes de probar<br />
           • Revisa los logs en Logcat de Android Studio para debug
         </div>
@@ -1586,7 +1638,7 @@ import retrofit2.http.POST
 
 interface ApiService {
     @GET("productos/listar.php")
-    fun listarProductos(): Call&lt;ProductosResponse>
+    fun listarProductos(): Call&lt;ProductosResponse&gt;
 
     @FormUrlEncoded
     @POST("productos/registrar.php")
@@ -1641,6 +1693,7 @@ interface ApiService {
           <pre><code>package com.example.apirestapp
 
 import android.os.Bundle
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -1651,60 +1704,75 @@ import retrofit2.Callback
 import retrofit2.Response
 
 class RegistrarActivity : AppCompatActivity() {
+
+    private lateinit var etNombre: EditText
+    private lateinit var etPrecio: EditText
+    private lateinit var etCategoria: EditText
+    private lateinit var btnGuardar: Button
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_registrar)
 
-        val etNombre = findViewById&lt;EditText&gt;(R.id.etNombre)
-        val etPrecio = findViewById&lt;EditText&gt;(R.id.etPrecio)
-        val etCategoria = findViewById&lt;EditText&gt;(R.id.etCategoria)
-        val btnGuardar = findViewById&lt;Button&gt;(R.id.btnGuardar)
+        etNombre = findViewById(R.id.etNombre)
+        etPrecio = findViewById(R.id.etPrecio)
+        etCategoria = findViewById(R.id.etCategoria)
+        btnGuardar = findViewById(R.id.btnGuardar)
 
         btnGuardar.setOnClickListener {
-            val nombre = etNombre.text.toString().trim()
-            val precio = etPrecio.text.toString().trim()
-            val categoria = etCategoria.text.toString().trim()
-
-            if (nombre.isEmpty() || precio.isEmpty() || categoria.isEmpty()) {
-                Toast.makeText(this, "Completa todos los campos", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            val call = RetrofitClient.instance.registrarProducto(nombre, precio, categoria)
-            call.enqueue(object : Callback&lt;Map&lt;String, Any&gt;&gt; {
-                override fun onResponse(
-                    call: Call&lt;Map&lt;String, Any&gt;&gt;,
-                    response: Response&lt;Map&lt;String, Any&gt;&gt;
-                ) {
-                    val body = response.body()
-                    if (response.isSuccessful && body?.get("success") == true) {
-                        Toast.makeText(
-                            this@RegistrarActivity,
-                            "Producto registrado correctamente",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                        finish()
-                    } else {
-                        Toast.makeText(
-                            this@RegistrarActivity,
-                            "No se pudo registrar el producto",
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-                }
-
-                override fun onFailure(call: Call&lt;Map&lt;String, Any&gt;&gt;, t: Throwable) {
-                    Toast.makeText(
-                        this@RegistrarActivity,
-                        "Error de conexión: ${t.message}",
-                        Toast.LENGTH_SHORT
-                    ).show()
-                }
-            })
+            registrarProducto()
         }
     }
-}
-</code></pre>
+
+    private fun registrarProducto() {
+        val nombre = etNombre.text.toString().trim()
+        val precio = etPrecio.text.toString().trim()
+        val categoria = etCategoria.text.toString().trim()
+
+        if (nombre.isEmpty() || precio.isEmpty() || categoria.isEmpty()) {
+            Toast.makeText(this, "Por favor completa todos los campos", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        btnGuardar.isEnabled = false
+
+        val call = RetrofitClient.instance.registrarProducto(nombre, precio, categoria)
+        call.enqueue(object : Callback&lt;Map&lt;String, Any&gt;&gt; {
+            override fun onResponse(
+                call: Call&lt;Map&lt;String, Any&gt;&gt;,
+                response: Response&lt;Map&lt;String, Any&gt;&gt;
+            ) {
+                btnGuardar.isEnabled = true
+                if (response.isSuccessful) {
+                    Log.d("API_REGISTRAR", "Respuesta: ${response.body()}")
+                    Toast.makeText(
+                        this@RegistrarActivity,
+                        "Producto registrado con éxito",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                    finish()
+                } else {
+                    Log.e("API_REGISTRAR_ERROR", "HTTP ${response.code()}: ${response.message()}")
+                    Toast.makeText(
+                        this@RegistrarActivity,
+                        "Error servidor HTTP ${response.code()}",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            }
+
+            override fun onFailure(call: Call&lt;Map&lt;String, Any&gt;&gt;, t: Throwable) {
+                btnGuardar.isEnabled = true
+                Log.e("API_REGISTRAR_FAILURE", "Error al registrar", t)
+                Toast.makeText(
+                    this@RegistrarActivity,
+                    "Error de conexión: ${t.localizedMessage}",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+        })
+    }
+}</code></pre>
         </div>
         <div class="code-block">
           <div class="code-header">XML - res/layout/activity_registrar.xml</div>
