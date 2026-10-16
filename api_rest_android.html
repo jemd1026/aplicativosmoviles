@@ -734,7 +734,7 @@ implementation("androidx.recyclerview:recyclerview:1.3.2")
 implementation("androidx.constraintlayout:constraintlayout:2.1.4")
 implementation("com.google.android.material:material:1.11.0")</code></pre>
         </div>
-        <div class="alert alert-warning"><strong>Paquete Kotlin:</strong> algunos bloques de esta guía usan <code>com.example.apirestapp</code> y otros <code>com.example.api_php</code>. En tu proyecto, elige un único paquete y actualiza de forma coherente las declaraciones <code>package</code> y los <code>import</code> de <code>MainActivity</code>, modelos, API, adapter y activity de registro.</div>
+        <div class="alert alert-success"><strong>Paquete Kotlin:</strong> todos los bloques de esta guía usan <code>com.example.apirestapp</code>. Si tu proyecto tiene otro paquete, reemplázalo de forma coherente en todas las declaraciones <code>package</code> y en los <code>import</code>.</div>
         <div class="alert alert-info"><strong>Conexión local:</strong> desde el emulador Android, <code>10.0.2.2</code> apunta al localhost de tu computadora. En un dispositivo físico, usa la IP local de la computadora y asegúrate de que ambos estén en la misma red. Inicia Apache y MySQL, importa/crea la base de datos y prueba <code>http://localhost/ucv_aplic_mov/productos/listar.php</code> antes de abrir la app.</div>
       </section>
 
@@ -1146,26 +1146,27 @@ try {
         <div class="code-block">
           <div class="code-header">Gradle - app/build.gradle.kts</div>
           <pre><code>implementation("com.squareup.retrofit2:retrofit:2.9.0")
-implementation("com.squareup.retrofit2:converter-gson:2.9.0")</code></pre>
+implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+implementation("androidx.recyclerview:recyclerview:1.3.2")
+implementation("androidx.constraintlayout:constraintlayout:2.1.4")
+implementation("com.google.android.material:material:1.11.0")
+implementation("androidx.coordinatorlayout:coordinatorlayout:1.2.0")</code></pre>
         </div>
 
         <div class="code-block">
           <div class="code-header">XML - AndroidManifest.xml</div>
-          <pre><code>&lt;manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"&gt;
+          <pre><code>&lt;manifest xmlns:android="http://schemas.android.com/apk/res/android"&gt;
 
     &lt;uses-permission android:name="android.permission.INTERNET" /&gt;
 
     &lt;application
         android:allowBackup="true"
         android:usesCleartextTraffic="true"
-        android:dataExtractionRules="@xml/data_extraction_rules"
-        android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:roundIcon="@mipmap/ic_launcher_round"
-        android:supportsRtl="true"
-        android:theme="@style/Theme.Apiphp"&gt;
+        android:label="API REST App"&gt;
+
+        &lt;activity
+            android:name=".RegistrarActivity"
+            android:exported="false" /&gt;
 
         &lt;activity
             android:name=".MainActivity"
@@ -1193,11 +1194,20 @@ implementation("com.squareup.retrofit2:converter-gson:2.9.0")</code></pre>
     android:layout_height="match_parent"
     tools:context=".MainActivity"&gt;
 
+    &lt;Button
+        android:id="@+id/btnRegistrar"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="Registrar producto"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" /&gt;
+
     &lt;androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerProductos"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/btnRegistrar"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -1268,6 +1278,7 @@ implementation("com.squareup.retrofit2:converter-gson:2.9.0")</code></pre>
         android:id="@+id/etPrecio"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:inputType="numberDecimal"
         android:hint="Precio" /&gt;
 
     &lt;EditText
@@ -1311,11 +1322,22 @@ data class ProductosResponse(
 
 import com.example.apirestapp.models.ProductosResponse
 import retrofit2.Call
+import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
 import retrofit2.http.GET
+import retrofit2.http.POST
 
 interface ApiService {
     @GET("productos/listar.php")
     fun listarProductos(): Call&lt;ProductosResponse>
+
+    @FormUrlEncoded
+    @POST("productos/registrar.php")
+    fun registrarProducto(
+        @Field("nombre") nombre: String,
+        @Field("precio") precio: String,
+        @Field("categoria") categoria: String
+    ): Call&lt;Map&lt;String, Any&gt;&gt;
 }</code></pre>
         </div>
 
@@ -1392,10 +1414,11 @@ class ProductoAdapter(
           <div class="code-header">Kotlin - MainActivity.kt</div>
           <pre><code>package com.example.apirestapp
 
-import androidx.appcompat.app.AppCompatActivity
+import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.apirestapp.adapters.ProductoAdapter
@@ -1422,14 +1445,17 @@ class MainActivity : AppCompatActivity() {
         adapter = ProductoAdapter(emptyList())
         recyclerView.adapter = adapter
 
-        // Cargar productos desde la API
-        cargarProductos()
-        ////////
+        // Botón Registrar
         val btnRegistrar = findViewById&lt;Button&gt;(R.id.btnRegistrar)
         btnRegistrar.setOnClickListener {
             val intent = Intent(this, RegistrarActivity::class.java)
             startActivity(intent)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        cargarProductos()
     }
 
     private fun cargarProductos() {
@@ -1543,15 +1569,25 @@ if ($nombre && $precio && $categoria) {
 ?></code></pre>
         </div>
 
-        <h3>2️⃣ Agregar función en ApiService.kt</h3>
+        <h3>2️⃣ Verificar ApiService.kt</h3>
+        <div class="alert alert-info">
+          La función de registro ya está incluida en el archivo completo de la Parte II. Si la estás agregando a un proyecto existente, el archivo debe quedar así:
+        </div>
         <div class="code-block">
-          <div class="code-header">Kotlin - ApiService.kt (agregar POST)</div>
-          <pre><code>import retrofit2.http.FormUrlEncoded
+          <div class="code-header">Kotlin - api/ApiService.kt (versión final)</div>
+          <pre><code>package com.example.apirestapp.api
+
+import com.example.apirestapp.models.ProductosResponse
+import retrofit2.Call
 import retrofit2.http.Field
+import retrofit2.http.FormUrlEncoded
+import retrofit2.http.GET
 import retrofit2.http.POST
 
 interface ApiService {
-    // ...
+    @GET("productos/listar.php")
+    fun listarProductos(): Call&lt;ProductosResponse>
+
     @FormUrlEncoded
     @POST("productos/registrar.php")
     fun registrarProducto(
@@ -1559,37 +1595,12 @@ interface ApiService {
         @Field("precio") precio: String,
         @Field("categoria") categoria: String
     ): Call&lt;Map&lt;String, Any&gt;&gt;
-}
-</code></pre>
+}</code></pre>
         </div>
 
         <h3>3️⃣ Lógica en Android para registrar</h3>
         <div class="alert alert-info">
-          <strong>Paso 3:</strong> Puedes crear un método en tu <code>MainActivity</code> o en una nueva <code>Activity</code> para enviar los datos del producto usando <code>registrarProducto</code> de <code>ApiService</code>.<br>
-          Ejemplo básico:
-        </div>
-        <div class="code-block">
-          <div class="code-header">Kotlin - Registrar producto desde Android</div>
-          <pre><code>// ...
-val call = RetrofitClient.instance.registrarProducto("Paracetamol 500mg", "2.50", "Medicamento")
-call.enqueue(object : Callback&lt;Map&lt;String, Any&gt;&gt; {
-    override fun onResponse(
-        call: Call&lt;Map&lt;String, Any&gt;&gt;,
-        response: Response&lt;Map&lt;String, Any&gt;&gt;
-    ) {
-        val body = response.body()
-        if (body != null && body["success"] == true) {
-            Toast.makeText(this@MainActivity, "Registro exitoso", Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(this@MainActivity, "Error: ${body?.get("message")}", Toast.LENGTH_SHORT).show()
-        }
-    }
-    override fun onFailure(call: Call&lt;Map&lt;String, Any&gt;&gt;, t: Throwable) {
-        Toast.makeText(this@MainActivity, "Error de red: ${t.message}", Toast.LENGTH_SHORT).show()
-    }
-})
-// ...
-</code></pre>
+          <strong>Paso 3:</strong> La lógica completa de registro se implementa en <code>RegistrarActivity.kt</code> en la Parte IV. Copia esa versión completa para capturar los campos del formulario, llamar a <code>registrarProducto</code> y cerrar la pantalla cuando el registro sea exitoso.
         </div>
 
         <div class="alert alert-success">
@@ -1599,9 +1610,9 @@ call.enqueue(object : Callback&lt;Map&lt;String, Any&gt;&gt; {
         <!-- SECCIÓN EXTRA: BOTÓN Y FORMULARIO DE REGISTRO EN ANDROID -->
         <h2 id="formulario">🟢 PARTE IV: BOTÓN Y FORMULARIO DE REGISTRO</h2>
 
-        <h3>1️⃣ Agregar botón en activity_main.xml</h3>
+        <h3>1️⃣ Verificar botón en activity_main.xml</h3>
         <div class="alert alert-warning">
-          <strong>Paso 1:</strong> Agrega un botón encima del RecyclerView en <code>activity_main.xml</code>:
+          <strong>Paso 1:</strong> El layout completo de la Parte II ya incluye el botón <code>btnRegistrar</code> encima del RecyclerView. Si trabajas sobre un proyecto existente, agrega este fragmento:
         </div>
         <div class="code-block">
           <div class="code-header">XML - res/layout/activity_main.xml (fragmento)</div>
@@ -1627,13 +1638,14 @@ call.enqueue(object : Callback&lt;Map&lt;String, Any&gt;&gt; {
         </div>
         <div class="code-block">
           <div class="code-header">Kotlin - RegistrarActivity.kt</div>
-          <pre><code>package com.example.api_php
+          <pre><code>package com.example.apirestapp
 
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import com.example.apirestapp.api.RetrofitClient
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -1649,28 +1661,46 @@ class RegistrarActivity : AppCompatActivity() {
         val btnGuardar = findViewById&lt;Button&gt;(R.id.btnGuardar)
 
         btnGuardar.setOnClickListener {
-            val nombre = etNombre.text.toString()
-            val precio = etPrecio.text.toString()
-            val categoria = etCategoria.text.toString()
-            if (nombre.isNotBlank() && precio.isNotBlank() && categoria.isNotBlank()) {
-                val call = RetrofitClient.instance.registrarProducto(nombre, precio, categoria)
-                call.enqueue(object : Callback<Map<String, Any>> {
-                    override fun onResponse(call: Call<Map<String, Any>>, response: Response<Map<String, Any>>) {
-                        val body = response.body()
-                        if (body != null && body["success"] == true) {
-                            Toast.makeText(this@RegistrarActivity, "Registro exitoso", Toast.LENGTH_SHORT).show()
-                            finish()
-                        } else {
-                            Toast.makeText(this@RegistrarActivity, "Error: ${body?.get("message")}", Toast.LENGTH_SHORT).show()
-                        }
-                    }
-                    override fun onFailure(call: Call<Map<String, Any>>, t: Throwable) {
-                        Toast.makeText(this@RegistrarActivity, "Error de red: ${t.message}", Toast.LENGTH_SHORT).show()
-                    }
-                })
-            } else {
+            val nombre = etNombre.text.toString().trim()
+            val precio = etPrecio.text.toString().trim()
+            val categoria = etCategoria.text.toString().trim()
+
+            if (nombre.isEmpty() || precio.isEmpty() || categoria.isEmpty()) {
                 Toast.makeText(this, "Completa todos los campos", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
             }
+
+            val call = RetrofitClient.instance.registrarProducto(nombre, precio, categoria)
+            call.enqueue(object : Callback&lt;Map&lt;String, Any&gt;&gt; {
+                override fun onResponse(
+                    call: Call&lt;Map&lt;String, Any&gt;&gt;,
+                    response: Response&lt;Map&lt;String, Any&gt;&gt;
+                ) {
+                    val body = response.body()
+                    if (response.isSuccessful && body?.get("success") == true) {
+                        Toast.makeText(
+                            this@RegistrarActivity,
+                            "Producto registrado correctamente",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                        finish()
+                    } else {
+                        Toast.makeText(
+                            this@RegistrarActivity,
+                            "No se pudo registrar el producto",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+
+                override fun onFailure(call: Call&lt;Map&lt;String, Any&gt;&gt;, t: Throwable) {
+                    Toast.makeText(
+                        this@RegistrarActivity,
+                        "Error de conexión: ${t.message}",
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            })
         }
     }
 }
@@ -1694,6 +1724,7 @@ class RegistrarActivity : AppCompatActivity() {
         android:id="@+id/etPrecio"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:inputType="numberDecimal"
         android:hint="Precio" /&gt;
 
     &lt;EditText
@@ -1731,7 +1762,7 @@ class RegistrarActivity : AppCompatActivity() {
         <!-- SECCIÓN EXTRA: BOTÓN FLOTANTE (FAB) PARA REGISTRAR -->
         <h2 id="fab">➕ BOTÓN FLOTANTE PARA REGISTRO</h2>
         <div class="alert alert-warning">
-          <strong>Reemplaza el botón normal por un FloatingActionButton (FAB) en activity_main.xml:</strong>
+          <strong>Opcional:</strong> reemplaza el botón normal y su listener por un FloatingActionButton (FAB) en <code>activity_main.xml</code>:
         </div>
         <div class="code-block">
           <div class="code-header">XML - res/layout/activity_main.xml (fragmento)</div>
@@ -1762,14 +1793,16 @@ class RegistrarActivity : AppCompatActivity() {
           <strong>Recuerda:</strong> Debes tener la dependencia de Material Design en tu build.gradle:
         </div>
         <div class="code-block">
-          <div class="code-header">Gradle - app/build.gradle</div>
-          <pre><code>implementation 'com.google.android.material:material:1.11.0'
+          <div class="code-header">Gradle - app/build.gradle.kts</div>
+          <pre><code>implementation("com.google.android.material:material:1.11.0")
 </code></pre>
         </div>
         <h3>Acción en MainActivity</h3>
         <div class="code-block">
           <div class="code-header">Kotlin - MainActivity.kt (fragmento)</div>
-          <pre><code>val fabRegistrar = findViewById<FloatingActionButton>(R.id.fabRegistrar)
+          <pre><code>import com.google.android.material.floatingactionbutton.FloatingActionButton
+
+val fabRegistrar = findViewById&lt;FloatingActionButton&gt;(R.id.fabRegistrar)
 fabRegistrar.setOnClickListener {
     val intent = Intent(this, RegistrarActivity::class.java)
     startActivity(intent)
