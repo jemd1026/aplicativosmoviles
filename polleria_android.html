@@ -1,0 +1,1377 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Pollería en Android — Código del proyecto</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Source+Code+Pro:wght@500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --bg: #f7f7f2;
+        --soft: #e7eee9;
+        --panel: #fff;
+        --ink: #18252b;
+        --muted: #657278;
+        --line: #dfe5e1;
+        --coral: #ef714c;
+        --coral-dark: #da5e3b;
+        --coral-tint: #fff0e9;
+        --green: #16745a;
+        --green-tint: #e4f0e9;
+        --amber: #d29b35;
+        --amber-tint: #fff8df;
+        --code: #172a31;
+        --code-top: #243c42;
+        --code-ink: #d8e5df;
+        --shadow: 0 24px 60px rgba(24, 37, 43, .12);
+        --sans: 'DM Sans', sans-serif;
+        --display: 'Space Grotesk', sans-serif;
+        --mono: 'Source Code Pro', Consolas, monospace
+      }
+      * { box-sizing: border-box }
+      html { scroll-behavior: smooth }
+      body {
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font: 16px/1.6 var(--sans)
+      }
+      nav {
+        position: fixed;
+        inset: 0 auto 0 0;
+        z-index: 100;
+        width: 260px;
+        overflow-y: auto;
+        background: var(--bg);
+        border-right: 1px solid var(--line)
+      }
+      .navrow { padding: 42px 26px }
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 9px;
+        margin-bottom: 30px;
+        padding: 18px 16px;
+        color: #fff;
+        background: var(--code);
+        border-radius: 4px 22px 22px 22px;
+        font-weight: 700
+      }
+      .dot { width: 11px; height: 11px; border-radius: 50%; background: var(--coral) }
+      .navlinks { display: flex; flex-direction: column; gap: 3px }
+      .navlinks:before {
+        content: 'CONTENIDO';
+        margin: 0 12px 10px;
+        color: #9aa6a7;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1.5px
+      }
+      .navlinks a {
+        padding: 10px 12px;
+        border-radius: 8px;
+        color: var(--muted);
+        font-size: 14px;
+        text-decoration: none
+      }
+      .navlinks a:hover, .navlinks a.active { background: var(--soft); color: var(--green); font-weight: 700 }
+      .container {
+        max-width: 1100px;
+        min-height: 100vh;
+        margin: 0 0 0 260px;
+        overflow: visible;
+        background: transparent;
+        border-radius: 0;
+        box-shadow: none
+      }
+      .header {
+        max-width: 810px;
+        padding: 80px 6vw 40px;
+        color: var(--ink);
+        background: transparent;
+        border-bottom: 1px solid var(--line);
+        text-align: left
+      }
+      .pills { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px }
+      .pill {
+        padding: 5px 11px;
+        border-radius: 20px;
+        color: var(--green);
+        background: var(--green-tint);
+        font-size: 12px;
+        font-weight: 700
+      }
+      .kicker {
+        margin: 0 0 8px !important;
+        color: var(--green);
+        font-size: 11px !important;
+        font-weight: 700;
+        letter-spacing: 1.5px;
+        text-transform: uppercase
+      }
+      h1, h2, h3, h4 { font-family: var(--display); letter-spacing: -1px }
+      .header h1 {
+        max-width: 15ch;
+        margin: 0 0 16px;
+        font-size: clamp(42px, 5vw, 70px);
+        line-height: .98;
+        text-shadow: none
+      }
+      .header .lead { max-width: 62ch; margin: 0; color: var(--muted); font-size: 18px; opacity: 1 }
+      .project {
+        margin: 28px 6vw 44px;
+        scroll-margin-top: 28px
+      }
+      .project h2, .content > h2 {
+        margin: 62px 0 14px;
+        padding: 0;
+        color: var(--ink);
+        border: 0;
+        font-size: clamp(31px, 4vw, 51px);
+        line-height: 1.03;
+        scroll-margin-top: 30px
+      }
+      .project h2 { margin-top: 0 }
+      .project p, .content > p { color: var(--muted) }
+      .tree {
+        margin: 18px 0;
+        padding: 20px 24px;
+        overflow: auto;
+        color: var(--green);
+        background: var(--green-tint);
+        border: 1px solid var(--line);
+        border-radius: 4px 14px 14px 14px;
+        font: 600 13px/1.6 var(--mono);
+        white-space: pre
+      }
+      .box {
+        margin: 22px 0;
+        padding: 16px 18px;
+        background: var(--green-tint);
+        border: 1px solid #bddbcf;
+        border-left: 5px solid var(--green);
+        border-radius: 4px 14px 14px 4px
+      }
+      .box pre {
+        margin-top: 12px;
+        overflow: auto;
+        color: var(--code-ink);
+        background: var(--code);
+        border-radius: 4px 14px 14px 14px
+      }
+      .box pre code { color: inherit; background: transparent; white-space: pre; overflow-wrap: normal }
+      .content { padding: 0 6vw 62px }
+      .content > h2:first-child { margin-top: 52px }
+      h3 { color: var(--green); font-size: 22px; margin: 34px 0 8px }
+      h4 { color: var(--green); font-size: 17px; margin: 18px 0 8px }
+      p, li { line-height: 1.6 }
+      .concept-grid, .component-list { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px }
+      .concept-card, .component-item {
+        min-width: 0;
+        padding: 20px;
+        color: var(--ink);
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-top: 3px solid var(--coral);
+        border-radius: 4px 18px 18px 18px;
+        box-shadow: none
+      }
+      .concept-card:hover { transform: translateY(-2px); border-color: var(--line); border-top-color: var(--coral) }
+      .concept-card h4, .component-item h5 { margin: 0 0 8px; color: var(--green); font: 600 20px var(--display) }
+      .concept-card p, .concept-card li, .component-item p { color: var(--muted); font-size: 14px; overflow-wrap: anywhere }
+      .component-item:nth-child(even) { border-top-color: var(--green) }
+      .component-item p { opacity: 1 }
+      .http-methods { justify-content: flex-start }
+      .http-method { flex: 1 1 150px; min-width: 140px; color: #fff; border-radius: 4px 14px 14px 14px; box-shadow: none }
+      .method-get { background: var(--green) }
+      .method-post { background: #337d9a }
+      .method-put { background: var(--amber) }
+      .method-delete { background: var(--coral-dark) }
+      .flow-diagram {
+        padding: 22px;
+        background: var(--green-tint) !important;
+        color: var(--ink) !important;
+        border: 1px solid var(--line);
+        border-radius: 4px 18px 18px 18px
+      }
+      .flow-diagram h4 { color: var(--green) !important }
+      .flow-step { background: var(--panel); border: 1px solid var(--line); border-top: 3px solid var(--coral); border-radius: 4px 14px 14px 14px }
+      .flow-step::after { color: var(--coral) }
+      .flow-step-number { background: var(--green) }
+      .architecture {
+        padding: 22px;
+        color: var(--ink);
+        background: var(--green-tint);
+        border: 1px solid var(--line);
+        border-radius: 4px 18px 18px 18px
+      }
+      .architecture > h4 { color: var(--green) !important }
+      .architecture-layer {
+        color: var(--ink);
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-left: 4px solid var(--coral);
+        border-radius: 4px 12px 12px 12px;
+        backdrop-filter: none
+      }
+      .architecture-layer:hover { background: var(--panel); transform: none }
+      .architecture-layer p { color: var(--muted) }
+      .comparison-table {
+        border: 1px solid var(--line);
+        border-radius: 0;
+        box-shadow: 0 8px 24px -18px rgba(24,37,43,.3)
+      }
+      .comparison-table th { background: var(--coral); font-size: 13px }
+      .comparison-table td { color: var(--muted); border-color: var(--line) }
+      .comparison-table tr:nth-child(even) td { background: var(--soft) }
+      .code-block {
+        background: var(--code);
+        border-radius: 4px 20px 20px 20px;
+        box-shadow: var(--shadow)
+      }
+      .code-header {
+        padding: 10px 18px;
+        color: #9fb5ad;
+        background: var(--code-top);
+        border-radius: 0;
+        font: 600 12px var(--mono)
+      }
+      pre {
+        padding: 20px 24px;
+        color: var(--code-ink);
+        font: 13px/1.6 var(--mono)
+      }
+      code {
+        color: var(--coral-dark);
+        background: var(--coral-tint);
+        border-radius: 4px;
+        font: .9em var(--mono);
+        white-space: normal;
+        overflow-wrap: anywhere
+      }
+      pre code { color: inherit; background: transparent; font-size: inherit; white-space: pre; overflow-wrap: normal }
+      .alert { margin: 22px 0; padding: 16px 18px; border: 1px solid var(--line); border-left-width: 5px; border-radius: 4px 14px 14px 4px }
+      .alert-info { color: var(--green); background: var(--green-tint); border-left-color: var(--green) }
+      .alert-success { color: var(--green); background: var(--green-tint); border-left-color: var(--green) }
+      .alert-warning { color: #8b641b; background: var(--amber-tint); border-left-color: var(--amber) }
+      .alert-tip { color: var(--coral-dark); background: var(--coral-tint); border-left-color: var(--coral) }
+      .content > h2:last-of-type { scroll-margin-top: 30px }
+      @media (max-width: 760px) {
+        nav { position: sticky; inset: 0; width: 100%; border-right: 0; border-bottom: 1px solid var(--line) }
+        .navrow { display: flex; gap: 12px; align-items: center; padding: 12px 18px }
+        .brand { flex-shrink: 0; margin: 0; padding: 10px 12px }
+        .navlinks { flex-direction: row; overflow-x: auto }
+        .navlinks:before { display: none }
+        .navlinks a { white-space: nowrap }
+        .container { margin: 0 }
+        .header { padding: 46px 16px 32px }
+        .project, .content { margin-left: 0; margin-right: 0; padding-left: 16px; padding-right: 16px }
+        .project { margin-top: 24px; margin-bottom: 36px }
+        .content { padding-bottom: 40px }
+        .concept-grid, .component-list { grid-template-columns: repeat(2, minmax(0, 1fr)) }
+      }
+      @media (max-width: 480px) {
+        .concept-grid, .component-list { grid-template-columns: 1fr }
+        .tree, pre { padding: 16px }
+      }
+
+      .code-header { display: flex; align-items: center; justify-content: space-between; gap: 12px }
+      .code-header .file { word-break: break-all }
+      .code-block pre { overflow-x: auto; max-width: 100% }
+      .copy-btn {
+        flex-shrink: 0;
+        padding: 5px 14px;
+        color: var(--code-ink);
+        background: transparent;
+        border: 1px solid #5d7379;
+        border-radius: 999px;
+        font: 600 12px var(--sans);
+        cursor: pointer
+      }
+      .copy-btn:hover { color: #fff; background: var(--coral); border-color: var(--coral) }
+      .copy-btn.ok { color: #fff; background: var(--green); border-color: var(--green) }
+      .copy-btn:focus-visible { outline: 2px solid var(--amber); outline-offset: 2px }
+      .alert ul { margin: 8px 0 0; padding-left: 20px }
+      .alert li { margin: 4px 0 }
+    </style>
+  </head>
+  <body>
+    <nav aria-label="Navegación de la guía">
+      <div class="navrow">
+        <div class="brand"><span class="dot"></span>Pollería · Android</div>
+        <div class="navlinks">
+          <a href="#inicio">Inicio</a>
+          <a href="#proyecto">Estructura</a>
+          <a href="#configuracion">Configuración</a>
+          <a href="#modelos">Modelos y carrito</a>
+          <a href="#firebase">Firebase y repositorios</a>
+          <a href="#adaptadores">Adaptadores</a>
+          <a href="#activities">Activities</a>
+          <a href="#fragments">Fragments</a>
+          <a href="#recorrido">Recorrido y datos</a>
+          <a href="#limites">Límites</a>
+        </div>
+      </div>
+    </nav>
+    <div class="container">
+      <div class="header">
+        <div class="pills">
+          <span class="pill">Android · Kotlin</span>
+          <span class="pill">XML · RecyclerView</span>
+          <span class="pill">Firebase Auth · Firestore</span>
+        </div>
+        <p class="kicker">Guía práctica</p>
+        <h1 id="inicio">Pollería en Android</h1>
+        <p class="lead">Código completo de cada archivo del proyecto Polleria, con el botón Copiar en la esquina superior derecha de cada bloque.</p>
+      </div>
+
+      <section class="project" id="proyecto">
+        <h2>1. Estructura del proyecto</h2>
+        <p>Todo el código fuente está en <code>Polleria/app/src/main/</code>. Copia esa carpeta sobre el <code>app/src/main/</code> de tu proyecto de Android Studio. El paquete de todas las clases es <code>com.example.polleria</code>.</p>
+
+        <pre class="tree">Polleria/
+├── LEEME_PRIMERO.md                     ← pasos de configuración y de prueba
+├── firestore.rules.EJEMPLO              ← reglas de Firestore para la práctica
+└── app/src/main/
+    ├── AndroidManifest.xml              ← permisos y Activities
+    ├── java/com/example/polleria/
+    │   ├── activities/                  ← pantallas (Activity)
+    │   │   ├── LoginActivity.kt
+    │   │   ├── RegistroActivity.kt
+    │   │   ├── MainActivity.kt          ← contenedor con barra inferior
+    │   │   ├── DetalleProductoActivity.kt
+    │   │   └── ConfirmarPedidoActivity.kt
+    │   ├── fragments/                   ← secciones dentro de MainActivity
+    │   │   ├── CatalogoFragment.kt
+    │   │   ├── CategoriasFragment.kt
+    │   │   ├── CarritoFragment.kt
+    │   │   └── PerfilFragment.kt
+    │   ├── adapters/                    ← RecyclerView (ViewHolder + Adapter)
+    │   │   ├── ProductoAdapter.kt
+    │   │   ├── CategoriaAdapter.kt
+    │   │   └── CarritoAdapter.kt
+    │   ├── models/                      ← clases de datos
+    │   │   ├── Producto.kt
+    │   │   ├── Categoria.kt
+    │   │   └── ItemCarrito.kt
+    │   ├── data/                        ← acceso a Firebase
+    │   │   ├── FirebaseManager.kt
+    │   │   ├── ProductoRepository.kt
+    │   │   └── PedidoRepository.kt
+    │   └── utils/
+    │       └── CarritoManager.kt        ← carrito en memoria
+    └── res/
+        ├── layout/                      ← activity_*.xml, fragment_*.xml, item_*.xml
+        ├── menu/menu_navegacion.xml     ← las 4 opciones de la barra inferior
+        └── values/styles_polleria.xml   ← estilos del tema</pre>
+
+        <div class="alert alert-warning"><strong>Importante:</strong> elimina el <code>MainActivity.kt</code> antiguo de la raíz del paquete. La versión vigente está en <code>com.example.polleria.activities</code>. En el AndroidManifest solo <code>LoginActivity</code> debe tener el filtro LAUNCHER.</div>
+
+        <div class="box"><strong>Flujo de navegación entre pantallas:</strong>
+          <pre><code>LoginActivity ──► RegistroActivity ──► MainActivity
+      │                                  ▲
+      └──────────── éxito ───────────────┘
+
+MainActivity (BottomNavigationView)
+  ├── CatalogoFragment ──► DetalleProductoActivity
+  ├── CategoriasFragment
+  ├── CarritoFragment ──► ConfirmarPedidoActivity
+  └── PerfilFragment ──► cerrar sesión ──► LoginActivity</code></pre>
+        </div>
+      </section>
+
+      <div class="content">
+        <!-- CONFIGURACIÓN -->
+        <h2 id="configuracion">PARTE I: CONFIGURACIÓN</h2>
+
+        <p>Estos archivos definen los permisos, las pantallas declaradas, los estilos y las opciones de la barra inferior.</p>
+
+        <h4>Dependencias Gradle (Kotlin DSL)</h4>
+        <div class="alert alert-warning"><strong>Paso previo:</strong> estas líneas van en los archivos <code>build.gradle.kts</code>, no en el código Kotlin. Las versiones son de referencia: verifícalas con tu versión de Android Studio.</div>
+
+        <div class="code-block">
+          <div class="code-header"><span class="file">Gradle Kotlin DSL · build.gradle.kts</span><button type="button" class="copy-btn" aria-label="Copiar código">Copiar</button></div>
+          <pre><code>// build.gradle.kts (proyecto raíz)
+plugins {
+    id("com.google.gms.google-services") version "4.4.2" apply false
+}
+
+// app/build.gradle.kts (módulo app)
+plugins {
+    id("com.google.gms.google-services")
+}
+
+dependencies {
+    implementation(platform("com.google.firebase:firebase-bom:34.4.0"))
+    implementation("com.google.firebase:firebase-auth")
+    implementation("com.google.firebase:firebase-firestore")
+    implementation("androidx.recyclerview:recyclerview:1.4.0")
+    implementation("com.google.android.material:material:1.12.0")
+    implementation("androidx.appcompat:appcompat:1.7.1")
+    implementation("androidx.fragment:fragment-ktx:1.8.9")
+}</code></pre>
+        </div>
+
+        <h4>Manifest y recursos de configuración</h4>
+
+        <div class="code-block">
+          <div class="code-header"><span class="file">XML · app/src/main/AndroidManifest.xml</span><button type="button" class="copy-btn" aria-label="Copiar código">Copiar</button></div>
+          <pre><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;manifest xmlns:android="http://schemas.android.com/apk/res/android"&gt;&lt;uses-permission android:name="android.permission.INTERNET"/&gt;&lt;application android:allowBackup="true" android:label="Pollería" android:theme="@style/Theme.Polleria"&gt;
+&lt;activity android:name=".activities.ConfirmarPedidoActivity" android:exported="false"/&gt;
+&lt;activity android:name=".activities.DetalleProductoActivity" android:exported="false"/&gt;
+&lt;activity android:name=".activities.MainActivity" android:exported="false"/&gt;
+&lt;activity android:name=".activities.RegistroActivity" android:exported="false"/&gt;
+&lt;activity android:name=".activities.LoginActivity" android:exported="true"&gt;&lt;intent-filter&gt;&lt;action android:name="android.intent.action.MAIN"/&gt;&lt;category android:name="android.intent.category.LAUNCHER"/&gt;&lt;/intent-filter&gt;&lt;/activity&gt;
+&lt;/application&gt;&lt;/manifest&gt;</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header"><span class="file">XML · app/src/main/res/values/styles_polleria.xml</span><button type="button" class="copy-btn" aria-label="Copiar código">Copiar</button></div>
+          <pre><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;resources&gt;&lt;style name="Theme.Polleria" parent="Theme.MaterialComponents.DayNight.NoActionBar"&gt;&lt;item name="colorPrimary"&gt;#C25A22&lt;/item&gt;&lt;item name="colorPrimaryVariant"&gt;#873909&lt;/item&gt;&lt;item name="colorOnPrimary"&gt;#FFFFFF&lt;/item&gt;&lt;item name="colorSecondary"&gt;#DBA33A&lt;/item&gt;&lt;item name="android:statusBarColor"&gt;#873909&lt;/item&gt;&lt;item name="android:navigationBarColor"&gt;#FFFFFF&lt;/item&gt;&lt;item name="android:windowLightNavigationBar"&gt;true&lt;/item&gt;&lt;/style&gt;&lt;/resources&gt;</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header"><span class="file">XML · app/src/main/res/menu/menu_navegacion.xml</span><button type="button" class="copy-btn" aria-label="Copiar código">Copiar</button></div>
+          <pre><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;menu xmlns:android="http://schemas.android.com/apk/res/android"&gt;
+&lt;item android:id="@+id/nav_catalogo" android:icon="@android:drawable/ic_menu_view" android:title="Catálogo"/&gt;
+&lt;item android:id="@+id/nav_categorias" android:icon="@android:drawable/ic_menu_sort_by_size" android:title="Categorías"/&gt;
+&lt;item android:id="@+id/nav_carrito" android:icon="@android:drawable/ic_menu_agenda" android:title="Carrito"/&gt;
+&lt;item android:id="@+id/nav_perfil" android:icon="@android:drawable/ic_menu_myplaces" android:title="Cuenta"/&gt;
+&lt;/menu&gt;</code></pre>
+        </div>
+
+        <div class="alert alert-info"><strong>Nota:</strong> el <code>MainActivity</code> del Manifest no es el launcher; la app arranca en <code>LoginActivity</code> y, tras iniciar sesión, pasa a <code>MainActivity</code>.</div>
+
+        <!-- MODELOS -->
+        <h2 id="modelos">PARTE II: MODELOS Y CARRITO</h2>
+
+        <p>Los modelos son <b>data class</b>: Kotlin genera automáticamente <code>equals</code>, <code>copy</code> y <code>toString</code>. El carrito es un <b>object</b> (singleton) que guarda los productos en memoria.</p>
+
+        <div class="code-block">
+          <div class="code-header"><span class="file">Kotlin · app/src/main/java/com/example/polleria/models/Producto.kt</span><button type="button" class="copy-btn" aria-label="Copiar código">Copiar</button></div>
+          <pre><code>package com.example.polleria.models
+
+data class Producto(
+    var id: String = "",
+    var idCategoria: String = "",
+    var nombre: String = "",
+    var descripcion: String = "",
+    var precio: Double = 0.0,
+    var imagenUrl: String = "",
+    var stock: Long = 0,
+    var activo: Boolean = true
+)</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header"><span class="file">Kotlin · app/src/main/java/com/example/polleria/models/Categoria.kt</span><button type="button" class="copy-btn" aria-label="Copiar código">Copiar</button></div>
+          <pre><code>package com.example.polleria.models
+
+data class Categoria(var id: String = "", var nombre: String = "", var descripcion: String = "", var activo: Boolean = true)</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header"><span class="file">Kotlin · app/src/main/java/com/example/polleria/models/ItemCarrito.kt</span><button type="button" class="copy-btn" aria-label="Copiar código">Copiar</button></div>
+          <pre><code>package com.example.polleria.models
+
+data class ItemCarrito(val producto: Producto, var cantidad: Int = 1) {
+    fun subtotal() = producto.precio * cantidad
+}</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header"><span class="file">Kotlin · app/src/main/java/com/example/polleria/utils/CarritoManager.kt</span><button type="button" class="copy-btn" aria-label="Copiar código">Copiar</button></div>
+          <pre><code>package com.example.polleria.utils
+
+import com.example.polleria.models.ItemCarrito
+import com.example.polleria.models.Producto
+
+object CarritoManager {
+    val items = mutableListOf&lt;ItemCarrito&gt;()
+    fun agregar(p: Producto): Boolean {
+        val existente = items.find { it.producto.id == p.id }
+        val cantidadNueva = (existente?.cantidad ?: 0) + 1
+        if (p.stock &lt; cantidadNueva) return false
+        if (existente != null) existente.cantidad++ else items.add(ItemCarrito(p))
+        return true
+    }
+    fun quitar(id: String) { items.removeAll { it.producto.id == id } }
+    fun cambiar(id: String, incremento: Int) {
+        val item = items.find { it.producto.id == id } ?: return
+        val nuevo = item.cantidad + incremento
+        if (nuevo &lt;= 0) quitar(id) else if (nuevo &lt;= item.producto.stock) item.cantidad = nuevo
+    }
+    fun total() = items.sumOf { it.subtotal() }
+    fun limpiar() = items.clear()
+}</code></pre>
+        </div>
+
+        <div class="alert alert-tip"><strong>Dato importante:</strong> el carrito solo vive mientras el proceso de la app esté activo. Si Android cierra la app, el carrito se pierde.</div>
+
+        <!-- FIREBASE -->
+        <h2 id="firebase">PARTE III: FIREBASE Y REPOSITORIOS</h2>
+
+        <p><code>FirebaseManager</code> centraliza Authentication y Firestore. Los repositorios son los únicos que leen y escriben en Firestore; las Activities y Fragments no acceden directamente a la base de datos.</p>
+
+        <div class="code-block">
+          <div class="code-header"><span class="file">Kotlin · app/src/main/java/com/example/polleria/data/FirebaseManager.kt</span><button type="button" class="copy-btn" aria-label="Copiar código">Copiar</button></div>
+          <pre><code>package com.example.polleria.data
+
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+
+object FirebaseManager {
+    val auth: FirebaseAuth by lazy { FirebaseAuth.getInstance() }
+    val db: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
+}</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header"><span class="file">Kotlin · app/src/main/java/com/example/polleria/data/ProductoRepository.kt</span><button type="button" class="copy-btn" aria-label="Copiar código">Copiar</button></div>
+          <pre><code>package com.example.polleria.data
+
+import com.example.polleria.models.Categoria
+import com.example.polleria.models.Producto
+
+object ProductoRepository {
+    fun listarCategorias(onDone: (List&lt;Categoria&gt;, String?) -&gt; Unit) {
+        FirebaseManager.db.collection("categorias").whereEqualTo("activo", true).get()
+            .addOnSuccessListener { docs -&gt;
+                onDone(docs.documents.mapNotNull { d -&gt; d.toObject(Categoria::class.java)?.apply { id = d.id } }, null)
+            }.addOnFailureListener { onDone(emptyList(), it.localizedMessage) }
+    }
+    fun listarProductos(categoria: String? = null, onDone: (List&lt;Producto&gt;, String?) -&gt; Unit) {
+        val q = FirebaseManager.db.collection("productos").whereEqualTo("activo", true)
+        q.get().addOnSuccessListener { docs -&gt;
+            val productos = docs.documents.mapNotNull { d -&gt; d.toObject(Producto::class.java)?.apply { id = d.id } }
+            onDone(if (categoria == null) productos else productos.filter { it.idCategoria == categoria }, null)
+        }.addOnFailureListener { onDone(emptyList(), it.localizedMessage) }
+    }
+}</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header"><span class="file">Kotlin · app/src/main/java/com/example/polleria/data/PedidoRepository.kt</span><button type="button" class="copy-btn" aria-label="Copiar código">Copiar</button></div>
+          <pre><code>package com.example.polleria.data
+
+import com.example.polleria.models.ItemCarrito
+import com.google.firebase.Timestamp
+
+object PedidoRepository {
+    fun registrar(items: List&lt;ItemCarrito&gt;, onDone: (String?, String?) -&gt; Unit) {
+        val uid = FirebaseManager.auth.currentUser?.uid ?: run { onDone(null, "Sesión no iniciada"); return }
+        if (items.isEmpty()) { onDone(null, "El carrito está vacío"); return }
+        val db = FirebaseManager.db
+        val pedido = db.collection("pedidos").document()
+        val batch = db.batch()
+        val total = items.sumOf { it.subtotal() }
+        batch.set(pedido, mapOf(
+            "uidCliente" to uid, "fechaPedido" to Timestamp.now(),
+            "total" to total, "estado" to "Pendiente"
+        ))
+        items.forEach { item -&gt;
+            val doc = db.collection("detallePedidos").document()
+            batch.set(doc, mapOf(
+                "idPedido" to pedido.id, "idProducto" to item.producto.id,
+                "nombreProducto" to item.producto.nombre, "cantidad" to item.cantidad,
+                "precioUnitario" to item.producto.precio, "subtotal" to item.subtotal()
+            ))
+        }
+        batch.commit().addOnSuccessListener { onDone(pedido.id, null) }
+            .addOnFailureListener { onDone(null, it.localizedMessage) }
+    }
+}</code></pre>
+        </div>
+
+        <div class="box"><strong>Escritura por lotes:</strong> <code>PedidoRepository</code> usa <code>db.batch()</code> para guardar el pedido y sus detalles juntos. Si falla un documento, ninguno se guarda.
+        </div>
+
+        <h4>Reglas de seguridad de Firestore (práctica)</h4>
+        <div class="code-block">
+          <div class="code-header"><span class="file">Reglas Firestore · firestore.rules.EJEMPLO</span><button type="button" class="copy-btn" aria-label="Copiar código">Copiar</button></div>
+          <pre><code>rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function autenticado() { return request.auth != null; }
+    match /categorias/{id} { allow read: if autenticado(); allow write: if false; }
+    match /productos/{id} { allow read: if autenticado(); allow write: if false; }
+    match /clientes/{uid} {
+      allow read: if autenticado() &amp;&amp; request.auth.uid == uid;
+      allow create: if autenticado() &amp;&amp; request.auth.uid == uid &amp;&amp; request.resource.data.uid == uid;
+      allow update, delete: if false;
+    }
+    // Solo ejemplo de clase, NO suficiente para una tienda real:
+    // El cliente podría adulterar precios, total y contenido.
+    match /pedidos/{id} {
+      allow create: if autenticado() &amp;&amp; request.resource.data.uidCliente == request.auth.uid
+                    &amp;&amp; request.resource.data.estado == 'Pendiente';
+      allow read: if autenticado() &amp;&amp; resource.data.uidCliente == request.auth.uid;
+      allow update, delete: if false;
+    }
+    match /detallePedidos/{id} {
+      // Esquema académico: la verificación cruzada entre detalles y pedido
+      // requiere reglas más complejas o lógica en un backend de confianza.
+      allow create: if autenticado()
+        &amp;&amp; request.resource.data.idPedido is string
+        &amp;&amp; getAfter(/databases/$(database)/documents/pedidos/$(request.resource.data.idPedido)).data.uidCliente == request.auth.uid;
+      allow read: if false;
+      allow update, delete: if false;
+    }
+  }
+}</code></pre>
+        </div>
+
+        <div class="alert alert-warning"><strong>Advertencia:</strong> estas reglas son solo para clase. No las uses en producción sin revisarlas.</div>
+
+        <!-- ADAPTADORES -->
+        <h2 id="adaptadores">PARTE IV: ADAPTADORES Y FILAS</h2>
+
+        <p>Cada RecyclerView tiene un <b>Adapter</b> y un <b>ViewHolder</b>. El Adapter infla el layout de la fila (<code>item_*.xml</code>) y asigna los datos a cada vista.</p>
+
+        <h4>Producto</h4>
+        <div class="code-block">
+          <div class="code-header"><span class="file">Kotlin · app/src/main/java/com/example/polleria/adapters/ProductoAdapter.kt</span><button type="button" class="copy-btn" aria-label="Copiar código">Copiar</button></div>
+          <pre><code>package com.example.polleria.adapters
+
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import com.example.polleria.R
+import com.example.polleria.models.Producto
+
+class ProductoAdapter(private val onClick: (Producto) -&gt; Unit) : RecyclerView.Adapter&lt;ProductoAdapter.Holder&gt;() {
+    private val datos = mutableListOf&lt;Producto&gt;()
+    fun actualizar(lista: List&lt;Producto&gt;) { datos.clear(); datos.addAll(lista); notifyDataSetChanged() }
+    class Holder(v: View) : RecyclerView.ViewHolder(v) {
+        val nombre: TextView = v.findViewById(R.id.tvNombreProducto)
+        val descripcion: TextView = v.findViewById(R.id.tvDescripcionProducto)
+        val precio: TextView = v.findViewById(R.id.tvPrecioProducto)
+    }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = Holder(
+        LayoutInflater.from(parent.context).inflate(R.layout.item_producto,parent,false))
+    override fun getItemCount() = datos.size
+    override fun onBindViewHolder(holder: Holder, position: Int) {
+        val p = datos[position]
+        holder.nombre.text = p.nombre
+        holder.descripcion.text = p.descripcion
+        holder.precio.text = "S/ %.2f".format(p.precio)
+        holder.itemView.setOnClickListener { onClick(p) }
+    }
+}</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header"><span class="file">XML · app/src/main/res/layout/item_producto.xml</span><button type="button" class="copy-btn" aria-label="Copiar código">Copiar</button></div>
+          <pre><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:padding="14dp" android:layout_marginBottom="8dp" android:background="#FFFFFF"&gt;
+&lt;TextView android:id="@+id/tvNombreProducto" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="#3F2414" android:textSize="18sp" android:textStyle="bold"/&gt;
+&lt;TextView android:id="@+id/tvDescripcionProducto" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="#6B584C" android:maxLines="2"/&gt;
+&lt;TextView android:id="@+id/tvPrecioProducto" android:layout_width="match_parent" android:layout_height="wrap_content" android:textColor="#B64A10" android:textSize="18sp" android:textStyle="bold"/&gt;
+&lt;/LinearLayout&gt;</code></pre>
+        </div>
+
+        <h4>Categoría</h4>
+        <div class="code-block">
+          <div class="code-header"><span class="file">Kotlin · app/src/main/java/com/example/polleria/adapters/CategoriaAdapter.kt</span><button type="button" class="copy-btn" aria-label="Copiar código">Copiar</button></div>
+          <pre><code>package com.example.polleria.adapters
+
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import com.example.polleria.R
+import com.example.polleria.models.Categoria
+
+class CategoriaAdapter(private val onClick: (Categoria) -&gt; Unit) : RecyclerView.Adapter&lt;CategoriaAdapter.Holder&gt;() {
+    private val datos = mutableListOf&lt;Categoria&gt;()
+    fun actualizar(lista: List&lt;Categoria&gt;) { datos.clear(); datos.addAll(lista); notifyDataSetChanged() }
+    class Holder(v: View): RecyclerView.ViewHolder(v) { val texto: TextView = v.findViewById(R.id.tvCategoria) }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = Holder(LayoutInflater.from(parent.context).inflate(R.layout.item_categoria,parent,false))
+    override fun getItemCount() = datos.size
+    override fun onBindViewHolder(holder: Holder, position: Int) {
+        val c = datos[position]; holder.texto.text = c.nombre
+        holder.itemView.setOnClickListener { onClick(c) }
+    }
+}</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header"><span class="file">XML · app/src/main/res/layout/item_categoria.xml</span><button type="button" class="copy-btn" aria-label="Copiar código">Copiar</button></div>
+          <pre><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;TextView xmlns:android="http://schemas.android.com/apk/res/android" android:id="@+id/tvCategoria" android:layout_width="match_parent" android:layout_height="wrap_content" android:padding="22dp" android:layout_marginBottom="8dp" android:background="#FFE9D2" android:textColor="#633218" android:textSize="18sp"/&gt;</code></pre>
+        </div>
+
+        <h4>Carrito</h4>
+        <div class="code-block">
+          <div class="code-header"><span class="file">Kotlin · app/src/main/java/com/example/polleria/adapters/CarritoAdapter.kt</span><button type="button" class="copy-btn" aria-label="Copiar código">Copiar</button></div>
+          <pre><code>package com.example.polleria.adapters
+
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.TextView
+import androidx.recyclerview.widget.RecyclerView
+import com.example.polleria.R
+import com.example.polleria.models.ItemCarrito
+import com.example.polleria.utils.CarritoManager
+
+class CarritoAdapter(private val onChange: () -&gt; Unit): RecyclerView.Adapter&lt;CarritoAdapter.Holder&gt;() {
+    private var datos: List&lt;ItemCarrito&gt; = emptyList()
+    fun actualizar() { datos = CarritoManager.items.toList(); notifyDataSetChanged() }
+    class Holder(v: View): RecyclerView.ViewHolder(v) {
+        val texto: TextView = v.findViewById(R.id.tvItemCarrito)
+        val menos: Button = v.findViewById(R.id.btnMenos)
+        val mas: Button = v.findViewById(R.id.btnMas)
+        val quitar: Button = v.findViewById(R.id.btnQuitar)
+    }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = Holder(LayoutInflater.from(parent.context).inflate(R.layout.item_carrito,parent,false))
+    override fun getItemCount() = datos.size
+    override fun onBindViewHolder(holder: Holder, position: Int) {
+        val i = datos[position]
+        holder.texto.text = "${i.producto.nombre} · ${i.cantidad} und.\nS/ %.2f".format(i.subtotal())
+        holder.menos.setOnClickListener { CarritoManager.cambiar(i.producto.id,-1); onChange() }
+        holder.mas.setOnClickListener { CarritoManager.cambiar(i.producto.id,1); onChange() }
+        holder.quitar.setOnClickListener { CarritoManager.quitar(i.producto.id); onChange() }
+    }
+}</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header"><span class="file">XML · app/src/main/res/layout/item_carrito.xml</span><button type="button" class="copy-btn" aria-label="Copiar código">Copiar</button></div>
+          <pre><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical" android:layout_marginBottom="8dp" android:padding="12dp" android:background="#FFFFFF"&gt;
+&lt;TextView android:id="@+id/tvItemCarrito" android:layout_width="match_parent" android:layout_height="wrap_content" android:textSize="17sp" android:textColor="#493122"/&gt;
+&lt;LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="horizontal"&gt;
+&lt;Button android:id="@+id/btnMenos" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="-"/&gt;
+&lt;Button android:id="@+id/btnMas" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="1" android:text="+"/&gt;
+&lt;Button android:id="@+id/btnQuitar" android:layout_width="0dp" android:layout_height="wrap_content" android:layout_weight="2" android:text="Eliminar"/&gt;
+&lt;/LinearLayout&gt;&lt;/LinearLayout&gt;</code></pre>
+        </div>
+
+        <!-- ACTIVITIES -->
+        <h2 id="activities">PARTE V: ACTIVITIES</h2>
+
+        <p>Cada Activity carga su layout con <code>setContentView</code> y conecta las vistas con <code>findViewById</code> o con listeners.</p>
+
+        <h4>MainActivity (contenedor principal)</h4>
+        <div class="code-block">
+          <div class="code-header"><span class="file">Kotlin · app/src/main/java/com/example/polleria/activities/MainActivity.kt</span><button type="button" class="copy-btn" aria-label="Copiar código">Copiar</button></div>
+          <pre><code>package com.example.polleria.activities
+
+import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
+import androidx.fragment.app.Fragment
+import com.example.polleria.R
+import com.example.polleria.fragments.CarritoFragment
+import com.example.polleria.fragments.CatalogoFragment
+import com.example.polleria.fragments.CategoriasFragment
+import com.example.polleria.fragments.PerfilFragment
+import com.google.android.material.bottomnavigation.BottomNavigationView
+
+class MainActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+        val barra = findViewById&lt;BottomNavigationView&gt;(R.id.bottomNav)
+        barra.setOnItemSelectedListener { item -&gt;
+            val f: Fragment = when (item.itemId) {
+                R.id.nav_categorias -&gt; CategoriasFragment()
+                R.id.nav_carrito -&gt; CarritoFragment()
+                R.id.nav_perfil -&gt; PerfilFragment()
+                else -&gt; CatalogoFragment()
+            }
+            supportFragmentManager.beginTransaction().replace(R.id.fragmentContainer, f).commit()
+            true
+        }
+        if (savedInstanceState == null) barra.selectedItemId = R.id.nav_catalogo
+    }
+}</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header"><span class="file">XML · app/src/main/res/layout/activity_main.xml</span><button type="button" class="copy-btn" aria-label="Copiar código">Copiar</button></div>
+          <pre><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" xmlns:app="http://schemas.android.com/apk/res-auto" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:background="#FFF9F3"&gt;
+&lt;FrameLayout android:id="@+id/fragmentContainer" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"/&gt;
+&lt;com.google.android.material.bottomnavigation.BottomNavigationView android:id="@+id/bottomNav" android:layout_width="match_parent" android:layout_height="wrap_content" android:background="#FFFFFF" app:menu="@menu/menu_navegacion" app:labelVisibilityMode="labeled"/&gt;
+&lt;/LinearLayout&gt;</code></pre>
+        </div>
+
+        <h4>LoginActivity (inicio de sesión)</h4>
+        <div class="code-block">
+          <div class="code-header"><span class="file">Kotlin · app/src/main/java/com/example/polleria/activities/LoginActivity.kt</span><button type="button" class="copy-btn" aria-label="Copiar código">Copiar</button></div>
+          <pre><code>package com.example.polleria.activities
+
+import android.content.Intent
+import android.os.Bundle
+import android.widget.Button
+import android.widget.EditText
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import com.example.polleria.R
+import com.example.polleria.data.FirebaseManager
+
+class LoginActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        if (FirebaseManager.auth.currentUser != null) { abrirPrincipal(); return }
+        setContentView(R.layout.activity_login)
+        val correo = findViewById&lt;EditText&gt;(R.id.etCorreo)
+        val clave = findViewById&lt;EditText&gt;(R.id.etClave)
+        val entrar = findViewById&lt;Button&gt;(R.id.btnIngresar)
+        entrar.setOnClickListener {
+            val email = correo.text.toString().trim()
+            val pass = clave.text.toString()
+            if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() || pass.isBlank()) {
+                Toast.makeText(this, "Ingrese correo válido y contraseña", Toast.LENGTH_SHORT).show(); return@setOnClickListener
+            }
+            entrar.isEnabled = false
+            FirebaseManager.auth.signInWithEmailAndPassword(email, pass)
+                .addOnSuccessListener { abrirPrincipal() }
+                .addOnFailureListener { Toast.makeText(this, "No se pudo iniciar sesión: ${it.localizedMessage}", Toast.LENGTH_LONG).show(); entrar.isEnabled = true }
+        }
+        findViewById&lt;Button&gt;(R.id.btnIrRegistro).setOnClickListener { startActivity(Intent(this, RegistroActivity::class.java)) }
+    }
+    private fun abrirPrincipal() {
+        startActivity(Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK))
+        finish()
+    }
+}</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header"><span class="file">XML · app/src/main/res/layout/activity_login.xml</span><button type="button" class="copy-btn" aria-label="Copiar código">Copiar</button></div>
+          <pre><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;ScrollView xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true"&gt;&lt;LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:padding="20dp" android:background="#FFF9F3"&gt;&lt;TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Pollería · Iniciar sesión" android:textColor="#66371D" android:textSize="22sp" android:textStyle="bold" android:layout_marginBottom="20dp"/&gt;&lt;EditText android:id="@+id/etCorreo" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="12dp" android:hint="Correo electrónico" android:inputType="textEmailAddress" android:padding="12dp" android:backgroundTint="#B65728"/&gt;&lt;EditText android:id="@+id/etClave" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="12dp" android:hint="Contraseña" android:inputType="textPassword" android:padding="12dp" android:backgroundTint="#B65728"/&gt;&lt;Button android:id="@+id/btnIngresar" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="INGRESAR" android:backgroundTint="#C25A22" android:textColor="#FFFFFF"/&gt;&lt;Button android:id="@+id/btnIrRegistro" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="CREAR CUENTA" android:backgroundTint="#C25A22" android:textColor="#FFFFFF"/&gt;&lt;/LinearLayout&gt;&lt;/ScrollView&gt;</code></pre>
+        </div>
+
+        <h4>RegistroActivity (crear cuenta)</h4>
+        <div class="code-block">
+          <div class="code-header"><span class="file">Kotlin · app/src/main/java/com/example/polleria/activities/RegistroActivity.kt</span><button type="button" class="copy-btn" aria-label="Copiar código">Copiar</button></div>
+          <pre><code>package com.example.polleria.activities
+
+import android.content.Intent
+import android.os.Bundle
+import android.widget.Button
+import android.widget.EditText
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import com.example.polleria.R
+import com.example.polleria.data.FirebaseManager
+import com.google.firebase.Timestamp
+
+class RegistroActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_registro)
+        val nombres = findViewById&lt;EditText&gt;(R.id.etNombres)
+        val apellidos = findViewById&lt;EditText&gt;(R.id.etApellidos)
+        val dni = findViewById&lt;EditText&gt;(R.id.etDni)
+        val celular = findViewById&lt;EditText&gt;(R.id.etCelular)
+        val direccion = findViewById&lt;EditText&gt;(R.id.etDireccion)
+        val correo = findViewById&lt;EditText&gt;(R.id.etCorreoRegistro)
+        val clave = findViewById&lt;EditText&gt;(R.id.etClaveRegistro)
+        val guardar = findViewById&lt;Button&gt;(R.id.btnRegistrar)
+        guardar.setOnClickListener {
+            val email = correo.text.toString().trim()
+            val password = clave.text.toString()
+            if (listOf(nombres,apellidos,celular,direccion).any { it.text.toString().isBlank() } ||
+                !dni.text.toString().matches(Regex("[0-9]{8}")) ||
+                !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches() || password.length &lt; 6) {
+                Toast.makeText(this, "Complete los datos. DNI: 8 dígitos y contraseña: mínimo 6 caracteres", Toast.LENGTH_LONG).show()
+                return@setOnClickListener
+            }
+            guardar.isEnabled = false
+            FirebaseManager.auth.createUserWithEmailAndPassword(email,password)
+                .addOnSuccessListener { result -&gt;
+                    val uid = result.user?.uid ?: return@addOnSuccessListener
+                    val cliente = mapOf(
+                        "uid" to uid, "nombres" to nombres.text.toString().trim(),
+                        "apellidos" to apellidos.text.toString().trim(), "dni" to dni.text.toString(),
+                        "celular" to celular.text.toString(), "direccion" to direccion.text.toString().trim(),
+                        "correo" to email, "fechaRegistro" to Timestamp.now(), "activo" to true
+                    )
+                    FirebaseManager.db.collection("clientes").document(uid).set(cliente)
+                        .addOnSuccessListener {
+                            startActivity(Intent(this, MainActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK))
+                            finish()
+                        }
+                        .addOnFailureListener { e -&gt;
+                            Toast.makeText(this, "Cuenta creada, pero no se guardó el perfil: ${e.localizedMessage}. Reintente el registro del perfil con ayuda del docente.", Toast.LENGTH_LONG).show()
+                            guardar.isEnabled = true
+                        }
+                }.addOnFailureListener {
+                    Toast.makeText(this, it.localizedMessage ?: "Error de registro", Toast.LENGTH_LONG).show()
+                    guardar.isEnabled = true
+                }
+        }
+    }
+}</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header"><span class="file">XML · app/src/main/res/layout/activity_registro.xml</span><button type="button" class="copy-btn" aria-label="Copiar código">Copiar</button></div>
+          <pre><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;ScrollView xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:fillViewport="true"&gt;&lt;LinearLayout android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:padding="20dp" android:background="#FFF9F3"&gt;&lt;TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Crear cuenta" android:textColor="#66371D" android:textSize="22sp" android:textStyle="bold" android:layout_marginBottom="20dp"/&gt;&lt;EditText android:id="@+id/etNombres" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="12dp" android:hint="Nombres" android:inputType="text" android:padding="12dp" android:backgroundTint="#B65728"/&gt;&lt;EditText android:id="@+id/etApellidos" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="12dp" android:hint="Apellidos" android:inputType="text" android:padding="12dp" android:backgroundTint="#B65728"/&gt;&lt;EditText android:id="@+id/etDni" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="12dp" android:hint="DNI" android:inputType="number" android:padding="12dp" android:backgroundTint="#B65728"/&gt;&lt;EditText android:id="@+id/etCelular" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="12dp" android:hint="Celular" android:inputType="phone" android:padding="12dp" android:backgroundTint="#B65728"/&gt;&lt;EditText android:id="@+id/etDireccion" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="12dp" android:hint="Dirección" android:inputType="text" android:padding="12dp" android:backgroundTint="#B65728"/&gt;&lt;EditText android:id="@+id/etCorreoRegistro" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="12dp" android:hint="Correo" android:inputType="textEmailAddress" android:padding="12dp" android:backgroundTint="#B65728"/&gt;&lt;EditText android:id="@+id/etClaveRegistro" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginBottom="12dp" android:hint="Contraseña (mínimo 6)" android:inputType="textPassword" android:padding="12dp" android:backgroundTint="#B65728"/&gt;&lt;Button android:id="@+id/btnRegistrar" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="REGISTRARME" android:backgroundTint="#C25A22" android:textColor="#FFFFFF"/&gt;&lt;/LinearLayout&gt;&lt;/ScrollView&gt;</code></pre>
+        </div>
+
+        <h4>DetalleProductoActivity</h4>
+        <div class="code-block">
+          <div class="code-header"><span class="file">Kotlin · app/src/main/java/com/example/polleria/activities/DetalleProductoActivity.kt</span><button type="button" class="copy-btn" aria-label="Copiar código">Copiar</button></div>
+          <pre><code>package com.example.polleria.activities
+
+import android.os.Bundle
+import android.widget.Button
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import com.example.polleria.R
+import com.example.polleria.models.Producto
+import com.example.polleria.utils.CarritoManager
+
+class DetalleProductoActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_detalle_producto)
+        val p = Producto(
+            id = intent.getStringExtra("id") ?: "",
+            nombre = intent.getStringExtra("nombre") ?: "",
+            descripcion = intent.getStringExtra("descripcion") ?: "",
+            precio = intent.getDoubleExtra("precio",0.0),
+            stock = intent.getLongExtra("stock",0L)
+        )
+        findViewById&lt;TextView&gt;(R.id.tvDetalleNombre).text = p.nombre
+        findViewById&lt;TextView&gt;(R.id.tvDetalleDescripcion).text = p.descripcion
+        findViewById&lt;TextView&gt;(R.id.tvDetallePrecio).text = "S/ %.2f · Stock: %d".format(p.precio, p.stock)
+        findViewById&lt;Button&gt;(R.id.btnAgregar).setOnClickListener {
+            val ok = CarritoManager.agregar(p)
+            Toast.makeText(this, if (ok) "Agregado al carrito" else "Stock insuficiente", Toast.LENGTH_SHORT).show()
+            if (ok) finish()
+        }
+    }
+}</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header"><span class="file">XML · app/src/main/res/layout/activity_detalle_producto.xml</span><button type="button" class="copy-btn" aria-label="Copiar código">Copiar</button></div>
+          <pre><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:padding="20dp" android:background="#FFF9F3"&gt;&lt;TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Detalle del producto" android:textColor="#66371D" android:textSize="22sp" android:textStyle="bold" android:layout_marginBottom="20dp"/&gt;&lt;TextView android:id="@+id/tvDetalleNombre" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Producto" android:textSize="24sp" android:textColor="#4B3225" android:padding="8dp"/&gt;&lt;TextView android:id="@+id/tvDetalleDescripcion" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Descripción" android:textSize="16sp" android:textColor="#4B3225" android:padding="8dp"/&gt;&lt;TextView android:id="@+id/tvDetallePrecio" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Precio" android:textSize="19sp" android:textColor="#4B3225" android:padding="8dp"/&gt;&lt;Button android:id="@+id/btnAgregar" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="AGREGAR AL CARRITO" android:backgroundTint="#C25A22" android:textColor="#FFFFFF"/&gt;&lt;/LinearLayout&gt;</code></pre>
+        </div>
+
+        <h4>ConfirmarPedidoActivity</h4>
+        <div class="code-block">
+          <div class="code-header"><span class="file">Kotlin · app/src/main/java/com/example/polleria/activities/ConfirmarPedidoActivity.kt</span><button type="button" class="copy-btn" aria-label="Copiar código">Copiar</button></div>
+          <pre><code>package com.example.polleria.activities
+
+import android.os.Bundle
+import android.widget.Button
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
+import com.example.polleria.R
+import com.example.polleria.data.PedidoRepository
+import com.example.polleria.utils.CarritoManager
+
+class ConfirmarPedidoActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_confirmar_pedido)
+        findViewById&lt;TextView&gt;(R.id.tvResumen).text =
+            CarritoManager.items.joinToString("\n") { "${it.producto.nombre} × ${it.cantidad} = S/ %.2f".format(it.subtotal()) } +
+            "\n\nTOTAL: S/ %.2f".format(CarritoManager.total())
+        val boton = findViewById&lt;Button&gt;(R.id.btnConfirmar)
+        boton.setOnClickListener {
+            boton.isEnabled = false
+            PedidoRepository.registrar(CarritoManager.items.toList()) { id, error -&gt;
+                if (id != null) {
+                    CarritoManager.limpiar()
+                    Toast.makeText(this, "Pedido registrado: $id", Toast.LENGTH_LONG).show()
+                    finish()
+                } else {
+                    Toast.makeText(this, "Error: $error", Toast.LENGTH_LONG).show()
+                    boton.isEnabled = true
+                }
+            }
+        }
+    }
+}</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header"><span class="file">XML · app/src/main/res/layout/activity_confirmar_pedido.xml</span><button type="button" class="copy-btn" aria-label="Copiar código">Copiar</button></div>
+          <pre><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:padding="20dp" android:background="#FFF9F3"&gt;&lt;TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Confirmar pedido" android:textColor="#66371D" android:textSize="22sp" android:textStyle="bold" android:layout_marginBottom="20dp"/&gt;&lt;TextView android:id="@+id/tvResumen" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Resumen" android:textSize="16sp" android:textColor="#4B3225" android:padding="8dp"/&gt;&lt;Button android:id="@+id/btnConfirmar" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="CONFIRMAR PEDIDO" android:backgroundTint="#C25A22" android:textColor="#FFFFFF"/&gt;&lt;/LinearLayout&gt;</code></pre>
+        </div>
+
+        <!-- FRAGMENTS -->
+        <h2 id="fragments">PARTE VI: FRAGMENTS</h2>
+
+        <p>Los Fragments son las secciones de la barra inferior. <code>MainActivity</code> los reemplaza en <code>fragmentContainer</code> según la opción elegida.</p>
+
+        <h4>CatalogoFragment</h4>
+        <div class="code-block">
+          <div class="code-header"><span class="file">Kotlin · app/src/main/java/com/example/polleria/fragments/CatalogoFragment.kt</span><button type="button" class="copy-btn" aria-label="Copiar código">Copiar</button></div>
+          <pre><code>package com.example.polleria.fragments
+
+import android.content.Intent
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.polleria.R
+import com.example.polleria.activities.DetalleProductoActivity
+import com.example.polleria.adapters.ProductoAdapter
+import com.example.polleria.data.ProductoRepository
+import com.example.polleria.models.Producto
+
+class CatalogoFragment : Fragment() {
+    private var adapter: ProductoAdapter? = null
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+        inflater.inflate(R.layout.fragment_catalogo,container,false)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        val titulo = view.findViewById&lt;TextView&gt;(R.id.tvTituloCatalogo)
+        val categoria = arguments?.getString("categoria")
+        titulo.text = if (categoria == null) "Catálogo de la pollería" else "Productos de la categoría"
+        adapter = ProductoAdapter { abrirDetalle(it) }
+        view.findViewById&lt;RecyclerView&gt;(R.id.rvProductos).apply {
+            layoutManager = LinearLayoutManager(requireContext()); adapter = this@CatalogoFragment.adapter
+        }
+        ProductoRepository.listarProductos(categoria) { productos, error -&gt;
+            if (this@CatalogoFragment.view == null) return@listarProductos
+            adapter?.actualizar(productos)
+            view.findViewById&lt;TextView&gt;(R.id.tvEstadoCatalogo).text =
+                error ?: if (productos.isEmpty()) "No hay productos. Agrega documentos en Firebase." else "${productos.size} productos"
+        }
+    }
+    private fun abrirDetalle(p: Producto) {
+        startActivity(Intent(requireContext(),DetalleProductoActivity::class.java).apply {
+            putExtra("id",p.id);putExtra("nombre",p.nombre);putExtra("descripcion",p.descripcion)
+            putExtra("precio",p.precio);putExtra("stock",p.stock)
+        })
+    }
+    override fun onDestroyView() { adapter = null; super.onDestroyView() }
+}</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header"><span class="file">XML · app/src/main/res/layout/fragment_catalogo.xml</span><button type="button" class="copy-btn" aria-label="Copiar código">Copiar</button></div>
+          <pre><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:padding="20dp" android:background="#FFF9F3"&gt;&lt;TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Productos disponibles" android:textColor="#66371D" android:textSize="22sp" android:textStyle="bold" android:layout_marginBottom="20dp"/&gt;&lt;TextView android:id="@+id/tvTituloCatalogo" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Catálogo" android:textSize="16sp" android:textColor="#4B3225" android:padding="8dp"/&gt;&lt;TextView android:id="@+id/tvEstadoCatalogo" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Cargando..." android:textSize="16sp" android:textColor="#4B3225" android:padding="8dp"/&gt;&lt;androidx.recyclerview.widget.RecyclerView android:id="@+id/rvProductos" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"/&gt;&lt;/LinearLayout&gt;</code></pre>
+        </div>
+
+        <h4>CategoriasFragment</h4>
+        <div class="code-block">
+          <div class="code-header"><span class="file">Kotlin · app/src/main/java/com/example/polleria/fragments/CategoriasFragment.kt</span><button type="button" class="copy-btn" aria-label="Copiar código">Copiar</button></div>
+          <pre><code>package com.example.polleria.fragments
+
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.polleria.R
+import com.example.polleria.adapters.CategoriaAdapter
+import com.example.polleria.data.ProductoRepository
+
+class CategoriasFragment : Fragment() {
+    private var adaptador: CategoriaAdapter? = null
+    override fun onCreateView(inflater: LayoutInflater,container: ViewGroup?,savedInstanceState: Bundle?): View =
+        inflater.inflate(R.layout.fragment_categorias,container,false)
+    override fun onViewCreated(view: View,savedInstanceState: Bundle?) {
+        adaptador = CategoriaAdapter { c -&gt;
+            val fragment = CatalogoFragment().apply { arguments = Bundle().apply { putString("categoria",c.id) } }
+            parentFragmentManager.beginTransaction().replace(R.id.fragmentContainer,fragment).addToBackStack(null).commit()
+        }
+        view.findViewById&lt;RecyclerView&gt;(R.id.rvCategorias).apply {
+            layoutManager = LinearLayoutManager(requireContext());adapter = adaptador
+        }
+        ProductoRepository.listarCategorias { lista, error -&gt;
+            if (this@CategoriasFragment.view == null) return@listarCategorias
+            adaptador?.actualizar(lista)
+            view.findViewById&lt;TextView&gt;(R.id.tvEstadoCategorias).text = error ?: "${lista.size} categorías"
+        }
+    }
+    override fun onDestroyView() { adaptador = null;super.onDestroyView() }
+}</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header"><span class="file">XML · app/src/main/res/layout/fragment_categorias.xml</span><button type="button" class="copy-btn" aria-label="Copiar código">Copiar</button></div>
+          <pre><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:padding="20dp" android:background="#FFF9F3"&gt;&lt;TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Categorías" android:textColor="#66371D" android:textSize="22sp" android:textStyle="bold" android:layout_marginBottom="20dp"/&gt;&lt;TextView android:id="@+id/tvEstadoCategorias" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Cargando..." android:textSize="16sp" android:textColor="#4B3225" android:padding="8dp"/&gt;&lt;androidx.recyclerview.widget.RecyclerView android:id="@+id/rvCategorias" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"/&gt;&lt;/LinearLayout&gt;</code></pre>
+        </div>
+
+        <h4>CarritoFragment</h4>
+        <div class="code-block">
+          <div class="code-header"><span class="file">Kotlin · app/src/main/java/com/example/polleria/fragments/CarritoFragment.kt</span><button type="button" class="copy-btn" aria-label="Copiar código">Copiar</button></div>
+          <pre><code>package com.example.polleria.fragments
+
+import android.content.Intent
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.TextView
+import androidx.fragment.app.Fragment
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.polleria.R
+import com.example.polleria.activities.ConfirmarPedidoActivity
+import com.example.polleria.adapters.CarritoAdapter
+import com.example.polleria.utils.CarritoManager
+
+class CarritoFragment : Fragment() {
+    private var lista: CarritoAdapter? = null
+    override fun onCreateView(inflater: LayoutInflater,container: ViewGroup?,savedInstanceState: Bundle?): View =
+        inflater.inflate(R.layout.fragment_carrito,container,false)
+    override fun onViewCreated(view: View,savedInstanceState: Bundle?) {
+        lista = CarritoAdapter { refrescar(view) }
+        view.findViewById&lt;RecyclerView&gt;(R.id.rvCarrito).apply { layoutManager = LinearLayoutManager(requireContext());adapter = lista }
+        view.findViewById&lt;Button&gt;(R.id.btnIrConfirmar).setOnClickListener {
+            if (CarritoManager.items.isNotEmpty()) startActivity(Intent(requireContext(),ConfirmarPedidoActivity::class.java))
+        }
+        refrescar(view)
+    }
+    override fun onResume() { super.onResume();view?.let { refrescar(it) } }
+    private fun refrescar(v: View) {
+        lista?.actualizar()
+        v.findViewById&lt;TextView&gt;(R.id.tvTotal).text = "Total: S/ %.2f".format(CarritoManager.total())
+        v.findViewById&lt;Button&gt;(R.id.btnIrConfirmar).isEnabled = CarritoManager.items.isNotEmpty()
+    }
+    override fun onDestroyView() { lista = null;super.onDestroyView() }
+}</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header"><span class="file">XML · app/src/main/res/layout/fragment_carrito.xml</span><button type="button" class="copy-btn" aria-label="Copiar código">Copiar</button></div>
+          <pre><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:padding="20dp" android:background="#FFF9F3"&gt;&lt;TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Mi carrito" android:textColor="#66371D" android:textSize="22sp" android:textStyle="bold" android:layout_marginBottom="20dp"/&gt;&lt;androidx.recyclerview.widget.RecyclerView android:id="@+id/rvCarrito" android:layout_width="match_parent" android:layout_height="0dp" android:layout_weight="1"/&gt;&lt;TextView android:id="@+id/tvTotal" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Total: S/ 0.00" android:textSize="20sp" android:textColor="#4B3225" android:padding="8dp"/&gt;&lt;Button android:id="@+id/btnIrConfirmar" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="CONTINUAR PEDIDO" android:backgroundTint="#C25A22" android:textColor="#FFFFFF"/&gt;&lt;/LinearLayout&gt;</code></pre>
+        </div>
+
+        <h4>PerfilFragment</h4>
+        <div class="code-block">
+          <div class="code-header"><span class="file">Kotlin · app/src/main/java/com/example/polleria/fragments/PerfilFragment.kt</span><button type="button" class="copy-btn" aria-label="Copiar código">Copiar</button></div>
+          <pre><code>package com.example.polleria.fragments
+
+import android.content.Intent
+import android.os.Bundle
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.Button
+import android.widget.TextView
+import androidx.fragment.app.Fragment
+import com.example.polleria.R
+import com.example.polleria.activities.LoginActivity
+import com.example.polleria.data.FirebaseManager
+import com.example.polleria.utils.CarritoManager
+
+class PerfilFragment: Fragment() {
+    override fun onCreateView(inflater: LayoutInflater,container: ViewGroup?,savedInstanceState: Bundle?): View =
+        inflater.inflate(R.layout.fragment_perfil,container,false)
+    override fun onViewCreated(view: View,savedInstanceState: Bundle?) {
+        view.findViewById&lt;TextView&gt;(R.id.tvCorreoPerfil).text = FirebaseManager.auth.currentUser?.email ?: "Sin sesión"
+        view.findViewById&lt;Button&gt;(R.id.btnSalir).setOnClickListener {
+            CarritoManager.limpiar()
+            FirebaseManager.auth.signOut()
+            startActivity(Intent(requireContext(),LoginActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK))
+            requireActivity().finish()
+        }
+    }
+}</code></pre>
+        </div>
+        <div class="code-block">
+          <div class="code-header"><span class="file">XML · app/src/main/res/layout/fragment_perfil.xml</span><button type="button" class="copy-btn" aria-label="Copiar código">Copiar</button></div>
+          <pre><code>&lt;?xml version="1.0" encoding="utf-8"?&gt;
+&lt;LinearLayout xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent" android:layout_height="match_parent" android:orientation="vertical" android:padding="20dp" android:background="#FFF9F3"&gt;&lt;TextView android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Mi cuenta" android:textColor="#66371D" android:textSize="22sp" android:textStyle="bold" android:layout_marginBottom="20dp"/&gt;&lt;TextView android:id="@+id/tvCorreoPerfil" android:layout_width="match_parent" android:layout_height="wrap_content" android:text="Correo" android:textSize="16sp" android:textColor="#4B3225" android:padding="8dp"/&gt;&lt;Button android:id="@+id/btnSalir" android:layout_width="match_parent" android:layout_height="wrap_content" android:layout_marginTop="8dp" android:text="CERRAR SESIÓN" android:backgroundTint="#C25A22" android:textColor="#FFFFFF"/&gt;&lt;/LinearLayout&gt;</code></pre>
+        </div>
+
+        <!-- RECORRIDO -->
+        <h2 id="recorrido">PARTE VII: RECORRIDO Y DATOS DE PRUEBA</h2>
+
+        <div class="flow-diagram">
+          <h4>Recorrido de prueba</h4>
+
+          <div class="flow-step"><span class="flow-step-number">1</span><strong>Registro</strong><p>Crea una cuenta con correo y contraseña, y completa los datos del cliente.</p></div>
+          <div class="flow-step"><span class="flow-step-number">2</span><strong>Catálogo</strong><p>Abre un producto y pulsa Agregar al carrito.</p></div>
+          <div class="flow-step"><span class="flow-step-number">3</span><strong>Carrito</strong><p>Cambia la cantidad y pulsa continuar.</p></div>
+          <div class="flow-step"><span class="flow-step-number">4</span><strong>Confirmar</strong><p>Revisa en Firestore los documentos <code>pedidos</code> y <code>detallePedidos</code>.</p></div>
+          <div class="flow-step"><span class="flow-step-number">5</span><strong>Cuenta</strong><p>Cierra sesión y vuelve a ingresar.</p></div>
+        </div>
+
+        <h3>Datos de prueba en Firestore</h3>
+        <p>Estos datos se crean a mano en Firebase Console. Los campos distinguen mayúsculas y minúsculas; <code>precio</code> y <code>stock</code> deben ser números, y <code>activo</code> debe ser booleano.</p>
+
+        <table class="comparison-table">
+          <thead>
+            <tr><th>Colección</th><th>ID del documento</th><th>Campos</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><strong>categorias</strong></td><td>pollos</td><td>nombre = Pollos a la brasa, descripcion = Clásicos, activo = true</td></tr>
+            <tr><td><strong>categorias</strong></td><td>combos</td><td>nombre = Combos, descripcion = Combos familiares, activo = true</td></tr>
+            <tr><td><strong>categorias</strong></td><td>bebidas</td><td>nombre = Bebidas, descripcion = Refrescos, activo = true</td></tr>
+            <tr><td><strong>productos</strong></td><td>pollo_entero</td><td>idCategoria = pollos, nombre = Pollo entero, descripcion = Con papas y ensalada, precio = 65.0, imagenUrl = "", stock = 20, activo = true</td></tr>
+            <tr><td><strong>productos</strong></td><td>medio_pollo</td><td>idCategoria = pollos, nombre = Medio pollo, descripcion = Con papas, precio = 36.0, imagenUrl = "", stock = 20, activo = true</td></tr>
+            <tr><td><strong>productos</strong></td><td>combo_familiar</td><td>idCategoria = combos, nombre = Combo familiar, descripcion = Pollo, papas y gaseosa, precio = 79.0, imagenUrl = "", stock = 10, activo = true</td></tr>
+            <tr><td><strong>productos</strong></td><td>chicha</td><td>idCategoria = bebidas, nombre = Chicha morada, descripcion = 1 litro, precio = 10.0, imagenUrl = "", stock = 30, activo = true</td></tr>
+          </tbody>
+        </table>
+
+        <div class="alert alert-info"><strong>La app escribe</strong> en <code>clientes</code> (al registrarse), y en <code>pedidos</code> y <code>detallePedidos</code> (al confirmar un pedido).</div>
+
+        <h4>Instrucciones del proyecto (LEEME_PRIMERO.md)</h4>
+        <div class="code-block">
+          <div class="code-header"><span class="file">Markdown · LEEME_PRIMERO.md</span><button type="button" class="copy-btn" aria-label="Copiar código">Copiar</button></div>
+          <pre><code># Pollería — Android (Kotlin + XML) + Firebase
+
+Paquete: `com.example.polleria`.
+
+## 1. Copiar archivos
+
+Conserva el proyecto **Polleria** que acabas de crear en Android Studio. Copia el contenido de esta carpeta `app/src/main/` sobre el `app/src/main/` del proyecto existente. El archivo `MainActivity.kt` antiguo de la raíz `com.example.polleria` debe eliminarse porque ahora está en `com.example.polleria.activities`. No debes conservar dos actividades launcher en el AndroidManifest. Los otros recursos que Android Studio creó (íconos, `themes.xml`, etc.) pueden permanecer.
+
+**Importante:** es un paquete de código fuente, no un proyecto Android Studio autónomo, porque tus versiones exactas de Gradle, AGP y Kotlin no aparecen en la captura.
+
+## 2. Firebase (paso obligatorio)
+
+1. En https://console.firebase.google.com, crea un proyecto.
+2. Agrega una app Android con el ID exacto `com.example.polleria`.
+3. Descarga `google-services.json` y colócalo en `&lt;tu-proyecto&gt;/app/google-services.json` (archivo real de TU Firebase; no se puede generar genéricamente).
+4. Activa **Authentication &gt; Sign-in method &gt; Email/Password**.
+5. Activa **Cloud Firestore** y configura las reglas. Para clase, ver el archivo `firestore.rules.EJEMPLO`; **no uses reglas abiertas en producción**.
+
+## 3. Gradle Kotlin DSL (build.gradle.kts)
+
+Añade al bloque `plugins` del **proyecto raíz** el plugin de Google Services con una versión compatible con tu proyecto (ejemplo: `id("com.google.gms.google-services") version "4.4.2" apply false`).
+
+En `app/build.gradle.kts`, añade al bloque `plugins`:
+
+```kotlin
+id("com.google.gms.google-services")
+```
+
+En el bloque `dependencies` del módulo `app` (conserva las dependencias existentes):
+
+```kotlin
+implementation(platform("com.google.firebase:firebase-bom:34.4.0"))
+implementation("com.google.firebase:firebase-auth")
+implementation("com.google.firebase:firebase-firestore")
+implementation("androidx.recyclerview:recyclerview:1.4.0")
+implementation("com.google.android.material:material:1.12.0")
+implementation("androidx.appcompat:appcompat:1.7.1")
+implementation("androidx.fragment:fragment-ktx:1.8.9")
+```
+
+**Versiones de referencia:** comprueba la compatibilidad con la versión instalada de Android Studio/AGP y actualiza versiones según el IDE. RecyclerView 1.4.0 requiere compilar con API 35 o superior. Si tienes un `build.gradle` Groovy, convierte la sintaxis.
+
+Sincroniza Gradle (`Sync Now`) y ejecuta en el emulador con Internet.
+
+## 4. Datos de prueba en Firestore
+
+Se crean **manualmente** desde Firebase Console estas colecciones:
+
+`categorias`:
+- documento ID: `pollos`: `nombre` (string) = `Pollos a la brasa`, `descripcion` = `Clásicos`, `activo` (boolean) = `true`
+- documento ID: `combos`: `nombre` = `Combos`, `descripcion` = `Combos familiares`, `activo` = `true`
+- documento ID: `bebidas`: `nombre` = `Bebidas`, `descripcion` = `Refrescos`, `activo` = `true`
+
+`productos`:
+- documento ID: `pollo_entero`: `idCategoria` = `pollos`, `nombre` = `Pollo entero`, `descripcion` = `Con papas y ensalada`, `precio` (number) = `65.0`, `imagenUrl` = ``, `stock` (number) = `20`, `activo` = `true`
+- documento ID: `medio_pollo`: `idCategoria` = `pollos`, `nombre` = `Medio pollo`, `descripcion` = `Con papas`, `precio` = `36.0`, `imagenUrl` = ``, `stock` = `20`, `activo` = `true`
+- documento ID: `combo_familiar`: `idCategoria` = `combos`, `nombre` = `Combo familiar`, `descripcion` = `Pollo, papas y gaseosa`, `precio` = `79.0`, `imagenUrl` = ``, `stock` = `10`, `activo` = `true`
+- documento ID: `chicha`: `idCategoria` = `bebidas`, `nombre` = `Chicha morada`, `descripcion` = `1 litro`, `precio` = `10.0`, `imagenUrl` = ``, `stock` = `30`, `activo` = `true`
+
+Todos los nombres de campo distinguen mayúsculas y minúsculas; `precio` y `stock` deben tener **tipo número**, `activo` debe ser **booleano**.
+
+La app escribe en `clientes`, `pedidos` y `detallePedidos` cuando se registra y confirma un pedido.
+
+## 5. Recorrido para probar
+
+1. Crear cuenta con correo/contraseña y datos del cliente.
+2. Ver catálogo; tocar un producto; pulsar Agregar al carrito.
+3. Abrir menú Carrito; cambiar cantidad; continuar pedido.
+4. Confirmar; verificar en Firestore el documento `pedidos` y documentos relacionados en `detallePedidos`.
+5. Abrir Cuenta y cerrar sesión; ingresar otra vez.
+
+## 6. Temas de aprendizaje
+
+- Activity: `LoginActivity`, `RegistroActivity`, `DetalleProductoActivity`, `ConfirmarPedidoActivity`.
+- Fragment y ciclo de vida: `CatalogoFragment`, `CategoriasFragment`, `CarritoFragment`, `PerfilFragment`.
+- RecyclerView + ViewHolder + Adapter: `ProductoAdapter`, `CategoriaAdapter`, `CarritoAdapter`.
+- POO/Data class: `Producto`, `Categoria`, `ItemCarrito`.
+- Firebase Auth: `FirebaseManager`, `LoginActivity`, `RegistroActivity`.
+- Firestore y escrituras por lotes: `ProductoRepository`, `PedidoRepository`.
+- Datos locales temporales: `CarritoManager` (se pierde si Android cierra el proceso).
+
+## 7. Límites importantes de esta versión académica
+
+- **No es una tienda lista para producción**: la validación del total, precios, stock, límites y autorización para escribir pedidos debería hacerse en un servidor o Cloud Functions con Firebase Admin SDK, no confiando en campos enviados desde el cliente.
+- El stock se verifica en la pantalla para práctica, pero NO se descuenta de Firestore ni es transaccional.
+- Las imágenes se omiten deliberadamente del RecyclerView, aunque `imagenUrl` está incluido en el modelo. Se pueden agregar con Coil/Glide en una segunda etapa.
+- El carrito está en memoria: no persiste entre reinicios del proceso.
+- La creación de la cuenta en Authentication y escritura del perfil no es una transacción atómica; si falla la escritura del perfil, el docente debe revisar y corregir el estado en Firebase.
+- Los listeners `get()` leen una vez; no es catálogo realtime. No se incluye consulta de historial ni verificación de correo.
+- Este entregable no ha sido compilado contra tu instalación específica de Android Studio; la configuración Gradle y las reglas de tu Firebase deben verificarse localmente.</code></pre>
+        </div>
+
+        <!-- LÍMITES -->
+        <h2 id="limites">PARTE VIII: LÍMITES DE ESTA VERSIÓN</h2>
+
+        <div class="alert alert-warning">
+          <strong>No es una tienda lista para producción.</strong> Esta versión es académica y tiene estas limitaciones:
+          <ul>
+            <li>El total, los precios y el stock se calculan en la app. En un sistema real esto debe validarse en un servidor o en Cloud Functions.</li>
+            <li>El stock se verifica en pantalla, pero no se descuenta de Firestore ni es transaccional.</li>
+            <li>El carrito está en memoria: no persiste entre reinicios del proceso.</li>
+            <li>Las imágenes (<code>imagenUrl</code>) están en el modelo, pero no se muestran en el RecyclerView. Se pueden agregar con Coil o Glide.</li>
+            <li>La cuenta en Authentication y el perfil en Firestore no son atómicos: si falla el perfil, hay que corregirlo a mano.</li>
+            <li>Las consultas usan <code>get()</code>, que lee una sola vez; no es un catálogo en tiempo real.</li>
+          </ul>
+        </div>
+
+        <div class="alert alert-success">
+          <strong>¡Listo!</strong> Ya tienes el código completo del proyecto. Pégalo archivo por archivo, sincroniza Gradle y prueba la app en el emulador con Internet.
+        </div>
+      </div>
+    </div>
+  <script>
+    (function () {
+      document.querySelectorAll('.copy-btn').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var codigo = btn.closest('.code-block').querySelector('pre').textContent;
+
+          function confirmar() {
+            btn.textContent = '¡Copiado!';
+            btn.classList.add('ok');
+            setTimeout(function () {
+              btn.textContent = 'Copiar';
+              btn.classList.remove('ok');
+            }, 1600);
+          }
+
+          function respaldo() {
+            var area = document.createElement('textarea');
+            area.value = codigo;
+            area.setAttribute('readonly', '');
+            area.style.position = 'fixed';
+            area.style.opacity = '0';
+            document.body.appendChild(area);
+            area.select();
+            var copiado = false;
+            try { copiado = document.execCommand('copy'); } catch (e) { copiado = false; }
+            area.remove();
+            if (copiado) { confirmar(); } else { btn.textContent = 'No se pudo copiar'; }
+          }
+
+          if (navigator.clipboard && window.isSecureContext) {
+            navigator.clipboard.writeText(codigo).then(confirmar, respaldo);
+          } else {
+            respaldo();
+          }
+        });
+      });
+    })();
+  </script>
+  </body>
+</html>
