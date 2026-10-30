@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Trabajo Práctico</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Source+Code+Pro:wght@500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+      :root {
+        --bg: #f7f7f2;
+        --soft: #e7eee9;
+        --panel: #fff;
+        --ink: #18252b;
+        --muted: #657278;
+        --line: #dfe5e1;
+        --coral: #ef714c;
+        --coral-dark: #da5e3b;
+        --coral-tint: #fff0e9;
+        --green: #16745a;
+        --green-tint: #e4f0e9;
+        --amber: #d29b35;
+        --amber-tint: #fff8df;
+        --code: #172a31;
+        --code-top: #243c42;
+        --code-ink: #d8e5df;
+        --shadow: 0 24px 60px rgba(24, 37, 43, .12);
+        --sans: 'DM Sans', sans-serif;
+        --display: 'Space Grotesk', sans-serif;
+        --mono: 'Source Code Pro', Consolas, monospace
+      }
+      * { box-sizing: border-box }
+      html { scroll-behavior: smooth }
+      body { min-height: 100vh; margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 var(--sans) }
+      .progress { position: fixed; top: 0; left: 0; z-index: 200; height: 3px; width: 0; background: var(--coral) }
+
+      /* Navegación lateral */
+      nav { position: fixed; inset: 0 auto 0 0; z-index: 100; width: 260px; overflow-y: auto; background: var(--bg); border-right: 1px solid var(--line) }
+      .navrow { padding: 42px 26px }
+      .brand { display: flex; align-items: center; gap: 9px; margin-bottom: 30px; padding: 18px 16px; color: #fff; background: var(--code); border-radius: 4px 22px 22px 22px; font-weight: 700 }
+      .dot { width: 11px; height: 11px; border-radius: 50%; background: var(--coral) }
+      .navlinks { display: flex; flex-direction: column; gap: 3px }
+      .navlinks:before { content: 'CONTENIDO'; margin: 0 12px 10px; color: #9aa6a7; font-size: 11px; font-weight: 700; letter-spacing: 1.5px }
+      .navlinks a { padding: 10px 12px; border-radius: 8px; color: var(--muted); font-size: 14px; text-decoration: none }
+      .navlinks a:hover, .navlinks a.active { background: var(--soft); color: var(--green); font-weight: 700 }
+
+      .container { max-width: 1100px; min-height: 100vh; margin: 0 0 0 260px }
+      .header { max-width: 860px; padding: 80px 6vw 40px; border-bottom: 1px solid var(--line) }
+      .pills { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 18px }
+      .pill { padding: 5px 11px; border-radius: 20px; color: var(--green); background: var(--green-tint); font-size: 12px; font-weight: 700 }
+      .kicker { margin: 0 0 8px; color: var(--green); font-size: 11px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase }
+      h1, h2, h3, h4 { font-family: var(--display); letter-spacing: -1px }
+      .header h1 { margin: 0 0 16px; font-size: clamp(42px, 5vw, 70px); line-height: .98 }
+      .lead { max-width: 62ch; margin: 0; color: var(--muted); font-size: 18px }
+      .facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-top: 30px }
+      .fact { padding: 14px 16px; background: var(--panel); border: 1px solid var(--line); border-radius: 4px 14px 14px 14px }
+      .fact b { display: block; font: 700 22px var(--display); color: var(--ink) }
+      .fact span { color: var(--muted); font-size: 13px }
+
+      .content { padding: 0 6vw 70px }
+      section { scroll-margin-top: 24px }
+      h2 { margin: 62px 0 14px; color: var(--ink); font-size: clamp(31px, 4vw, 48px); line-height: 1.03 }
+      h3 { color: var(--green); font-size: 22px; margin: 34px 0 8px }
+      h4 { color: var(--green); font-size: 17px; margin: 18px 0 8px; letter-spacing: -.3px }
+      .content p { color: var(--muted) }
+      .content li { color: var(--muted) }
+      .content li strong, .content p strong { color: var(--ink) }
+
+      code { padding: 1px 5px; color: var(--coral-dark); background: var(--coral-tint); border-radius: 4px; font: .9em var(--mono); overflow-wrap: anywhere }
+      .tree { margin: 18px 0; padding: 20px 24px; overflow: auto; color: var(--green); background: var(--green-tint); border: 1px solid var(--line); border-radius: 4px 14px 14px 14px; font: 600 13px/1.6 var(--mono); white-space: pre }
+
+      /* Bloques de código con botón Copiar */
+      .code-wrap { margin: 20px 0; overflow: hidden; background: var(--code); border-radius: 4px 20px 20px 20px; box-shadow: var(--shadow) }
+      .code-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 8px 10px 8px 18px; color: #9fb5ad; background: var(--code-top); font: 600 12px var(--mono) }
+      .copy { padding: 5px 12px; color: #fff; background: transparent; border: 1px solid #4b666b; border-radius: 6px; cursor: pointer; font: 600 12px var(--sans) }
+      .copy:hover { background: var(--coral); border-color: var(--coral) }
+      .code-wrap pre { margin: 0; padding: 20px 24px; overflow-x: auto; color: var(--code-ink); font: 13px/1.6 var(--mono) }
+      .code-wrap pre code { padding: 0; color: inherit; background: transparent; font-size: inherit; white-space: pre; overflow-wrap: normal }
+      .k { color: #f39a7c } .s { color: #a8d8a0 } .c { color: #7d9690; font-style: italic } .n { color: #e8c473 } .t { color: #8cc7e0 }
+
+      /* Callouts */
+      .box, .note, .ok { margin: 22px 0; padding: 16px 18px; border: 1px solid var(--line); border-left-width: 5px; border-radius: 4px 14px 14px 4px }
+      .box { background: var(--green-tint); border-left-color: var(--green) }
+      .note { color: #8b641b; background: var(--amber-tint); border-left-color: var(--amber) }
+      .note strong { color: #6e4e12 }
+      .ok { background: var(--coral-tint); border-left-color: var(--coral) }
+
+      /* Tarjetas generales */
+      .grid3 { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 20px 0 }
+      .card { min-width: 0; padding: 20px; background: var(--panel); border: 1px solid var(--line); border-top: 3px solid var(--coral); border-radius: 4px 18px 18px 18px }
+      .card:nth-child(even) { border-top-color: var(--green) }
+      .card h4 { margin: 0 0 8px; font-size: 19px }
+      .card ul { margin: 6px 0 0; padding-left: 18px; font-size: 14px }
+      .card p { font-size: 14px; margin: 0 }
+
+      /* Proyectos */
+      .filters { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 6px }
+      .chip { padding: 7px 14px; color: var(--muted); background: var(--panel); border: 1px solid var(--line); border-radius: 20px; cursor: pointer; font: 600 13px var(--sans) }
+      .chip:hover { color: var(--green); border-color: var(--green) }
+      .chip.on { color: #fff; background: var(--green); border-color: var(--green) }
+      .projects { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; margin-top: 16px }
+      .proj { display: flex; flex-direction: column; min-width: 0; padding: 22px; background: var(--panel); border: 1px solid var(--line); border-radius: 4px 18px 18px 18px }
+      .proj.hide { display: none }
+      .proj-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px }
+      .num { flex-shrink: 0; display: grid; place-items: center; width: 34px; height: 34px; color: #fff; background: var(--code); border-radius: 50%; font: 700 14px var(--display) }
+      .proj h3 { margin: 0 0 2px; color: var(--ink); font-size: 21px; letter-spacing: -.5px }
+      .region { color: var(--green); font-size: 12px; font-weight: 700; letter-spacing: .5px; text-transform: uppercase }
+      .proj p { margin: 10px 0; font-size: 14.5px }
+      .proj .label { margin: 10px 0 4px; color: var(--ink); font-size: 12px; font-weight: 700; letter-spacing: 1px; text-transform: uppercase }
+      .fields { display: flex; flex-wrap: wrap; gap: 5px }
+      .fields code { font-size: 12px }
+      .proj ul { margin: 4px 0 0; padding-left: 18px; font-size: 14px }
+      .extra { margin-top: auto; padding-top: 12px; color: var(--coral-dark); font-size: 13.5px }
+      .extra::before { content: '★ Reto opcional: '; font-weight: 700 }
+
+      /* Tablas */
+      .table-wrap { overflow-x: auto; margin: 20px 0; border: 1px solid var(--line); box-shadow: 0 8px 24px -18px rgba(24,37,43,.3) }
+      table { width: 100%; border-collapse: collapse; font-size: 14px }
+      th { padding: 12px 14px; color: #fff; background: var(--coral); text-align: left; font-size: 13px; white-space: nowrap }
+      td { padding: 11px 14px; color: var(--muted); background: var(--panel); border-bottom: 1px solid var(--line); vertical-align: top }
+      tr:nth-child(even) td { background: var(--soft) }
+      td strong { color: var(--ink) }
+      .pts { color: var(--green); font: 700 15px var(--display); white-space: nowrap; text-align: center }
+      tfoot td { color: var(--ink); background: var(--green-tint) !important; font-weight: 700 }
+
+      /* Cronograma */
+      .timeline { position: relative; margin: 22px 0; padding-left: 28px; border-left: 2px solid var(--line) }
+      .hito { position: relative; margin-bottom: 18px; padding: 16px 18px; background: var(--panel); border: 1px solid var(--line); border-radius: 4px 14px 14px 14px }
+      .hito::before { content: ''; position: absolute; top: 20px; left: -37px; width: 14px; height: 14px; background: var(--coral); border: 3px solid var(--bg); border-radius: 50% }
+      .hito h4 { margin: 0 0 4px }
+      .hito ul { margin: 6px 0 0; padding-left: 18px; font-size: 14.5px }
+      .tag { display: inline-block; margin-left: 6px; padding: 2px 8px; color: var(--coral-dark); background: var(--coral-tint); border-radius: 10px; font: 700 11px var(--sans); letter-spacing: .5px; vertical-align: middle }
+
+      /* Checklist */
+      .check { margin: 18px 0; padding: 6px 0; background: var(--panel); border: 1px solid var(--line); border-radius: 4px 18px 18px 18px }
+      .check label { display: flex; gap: 12px; align-items: flex-start; padding: 10px 18px; color: var(--muted); cursor: pointer; font-size: 15px }
+      .check label:hover { background: var(--soft) }
+      .check input { flex-shrink: 0; width: 18px; height: 18px; margin-top: 3px; accent-color: var(--green) }
+      .check input:checked + span { color: var(--green); text-decoration: line-through }
+      .check-bar { display: flex; align-items: center; gap: 12px; margin-top: 10px; color: var(--muted); font-size: 14px }
+      .meter { flex: 1; height: 8px; overflow: hidden; background: var(--soft); border-radius: 8px }
+      .meter i { display: block; height: 100%; width: 0; background: var(--green); transition: width .25s }
+      .reset { padding: 6px 12px; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: 6px; cursor: pointer; font: 600 12px var(--sans) }
+
+      footer { padding: 30px 6vw 50px; color: var(--muted); border-top: 1px solid var(--line); font-size: 14px }
+
+      @media (max-width: 960px) {
+        .grid3 { grid-template-columns: repeat(2, minmax(0, 1fr)) }
+        .projects { grid-template-columns: 1fr }
+        .facts { grid-template-columns: repeat(2, minmax(0, 1fr)) }
+      }
+      @media (max-width: 760px) {
+        nav { position: sticky; inset: 0; width: 100%; border-right: 0; border-bottom: 1px solid var(--line) }
+        .navrow { display: flex; gap: 12px; align-items: center; padding: 12px 16px }
+        .brand { flex-shrink: 0; margin: 0; padding: 10px 12px }
+        .navlinks { flex-direction: row; overflow-x: auto }
+        .navlinks:before { display: none }
+        .navlinks a { white-space: nowrap }
+        .container { margin: 0 }
+        .header { padding: 46px 16px 32px }
+        .content, footer { padding-left: 16px; padding-right: 16px }
+      }
+      @media (max-width: 480px) {
+        .grid3, .facts { grid-template-columns: 1fr }
+        .tree, .code-wrap pre { padding: 16px }
+        .proj { padding: 18px }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="progress" id="progress"></div>
+    <nav aria-label="Navegación del trabajo práctico">
+      <div class="navrow">
+        <div class="brand"><span class="dot"></span>Trabajo Práctico</div>
+        <div class="navlinks">
+          <a href="#inicio">Inicio</a>
+          <a href="#contexto">Contexto y propósito</a>
+          <a href="#proyectos">Proyectos propuestos</a>
+          <a href="#requisitos">Requisitos técnicos</a>
+          <a href="#ejemplo">Ejemplo de adaptación</a>
+          <a href="#cronograma">Cronograma</a>
+          <a href="#entregables">Entregables</a>
+          <a href="#rubrica">Rúbrica</a>
+          <a href="#sustentacion">Sustentación</a>
+          <a href="#checklist">Checklist final</a>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container">
+      <header class="header" id="inicio">
+        <div class="pills">
+          <span class="pill">Aplicativos Móviles · 2026-2</span>
+          <span class="pill">Android · Kotlin</span>
+          <span class="pill">PHP · MySQL · Retrofit</span>
+        </div>
+        <p class="kicker">Evaluación · Trabajo grupal</p>
+        <h1>Trabajo Práctico</h1>
+        <p class="lead">Apps móviles con API REST para la Amazonía peruana. Cada grupo elige un problema real de la región selva y construye una app Android que lista y registra información a través de su propia API PHP + MySQL, aplicando lo trabajado en la guía <em>API REST en Android</em>.</p>
+        <div class="facts">
+          <div class="fact"><b>3 – 4</b><span>integrantes por grupo</span></div>
+          <div class="fact"><b>3 semanas</b><span>de desarrollo</span></div>
+          <div class="fact"><b>16</b><span>proyectos para elegir</span></div>
+          <div class="fact"><b>20 pts</b><span>nota vigesimal + 2 de bonificación</span></div>
+        </div>
+      </header>
+
+      <main class="content">
+        <!-- 1. CONTEXTO -->
+        <section id="contexto">
+          <h2>1. Contexto y propósito</h2>
+          <p>Loreto, Ucayali, San Martín, Madre de Dios, Amazonas y la selva central concentran más del 60 % del territorio nacional, pero gran parte de su información productiva, turística y de servicios sigue registrándose en cuadernos, hojas sueltas o grupos de WhatsApp. Una app sencilla que <strong>consulte y registre datos en un servidor</strong> ya resuelve problemas concretos: saber a qué hora sale la lancha, cuánto se pagó por kilo de cacao o dónde se reportó un incendio.</p>
+
+          <div class="grid3">
+            <div class="card">
+              <h4>🎯 Competencia</h4>
+              <p>Desarrolla una aplicación móvil nativa que consume una API REST propia para listar y registrar información, con interfaz usable y validaciones.</p>
+            </div>
+            <div class="card">
+              <h4>🌳 Pertinencia</h4>
+              <p>El proyecto debe responder a una necesidad real de la región, con datos verosímiles de la zona (lugares, especies, productos, rutas).</p>
+            </div>
+            <div class="card">
+              <h4>🧩 Base técnica</h4>
+              <p>Se reutiliza la arquitectura de la guía: <code>config.php</code>, <code>listar.php</code>, <code>registrar.php</code>, Retrofit, RecyclerView, formulario y FAB.</p>
+            </div>
+          </div>
+
+          <div class="box"><strong>Regla de oro:</strong> la guía usa la tabla <code>productos</code>. En el trabajo práctico esa tabla se <strong>reemplaza</strong> por la entidad de tu proyecto (viajes, acopios, reportes, etc.). Cambia nombres de tabla, carpetas, clases Kotlin, layouts y textos; no se aceptan apps que sigan mostrando “Productos” o “Paracetamol”.</div>
+        </section>
+
+        <!-- 2. PROYECTOS -->
+        <section id="proyectos">
+          <h2>2. Proyectos propuestos</h2>
+          <p>Cada grupo elige <strong>un proyecto distinto</strong> (no se repiten). La elección se registra en el foro del aula virtual en orden de llegada. Si el grupo desea proponer un tema propio de la selva, debe ser aprobado por el docente en la semana 1 y cumplir los mismos requisitos.</p>
+
+          <div class="filters" role="group" aria-label="Filtrar por región">
+            <button class="chip on" data-f="todas">Todas</button>
+            <button class="chip" data-f="loreto">Loreto</button>
+            <button class="chip" data-f="ucayali">Ucayali</button>
+            <button class="chip" data-f="sanmartin">San Martín</button>
+            <button class="chip" data-f="madrededios">Madre de Dios</button>
+            <button class="chip" data-f="amazonas">Amazonas</button>
+            <button class="chip" data-f="central">Selva central</button>
+          </div>
+
+          <div class="projects">
+            <article class="proj" data-r="loreto ucayali">
+              <div class="proj-top">
+                <div><span class="region">Loreto · Ucayali</span><h3>RíoViaje — Lanchas y deslizadores</h3></div><span class="num">01</span>
+              </div>
+              <p>Horarios, rutas y precios de embarcaciones fluviales (Iquitos – Yurimaguas – Pucallpa – Nauta). Hoy se consultan en pizarras del puerto.</p>
+              <div class="label">Tabla sugerida: viajes</div>
+              <div class="fields"><code>id</code><code>embarcacion</code><code>origen</code><code>destino</code><code>fecha_salida</code><code>hora_salida</code><code>precio</code><code>cupos</code></div>
+              <div class="label">Funciones mínimas</div>
+              <ul><li>Listar próximas salidas ordenadas por fecha</li><li>Registrar un nuevo viaje desde el formulario</li></ul>
+              <div class="extra">filtrar por destino o marcar “sin cupos”.</div>
+            </article>
+
+            <article class="proj" data-r="sanmartin amazonas">
+              <div class="proj-top">
+                <div><span class="region">San Martín · Amazonas</span><h3>CacaoTrack — Acopio en cooperativas</h3></div><span class="num">02</span>
+              </div>
+              <p>Registro de entregas de cacao en grano de cada productor a la cooperativa, con calidad y precio pagado por kilo.</p>
+              <div class="label">Tabla sugerida: acopios</div>
+              <div class="fields"><code>id</code><code>productor</code><code>comunidad</code><code>kilos</code><code>calidad</code><code>precio_kg</code><code>fecha</code></div>
+              <div class="label">Funciones mínimas</div>
+              <ul><li>Listar acopios con total a pagar (kilos × precio)</li><li>Registrar una entrega con calidad A/B/C (Spinner)</li></ul>
+              <div class="extra">total de kilos acopiados en la cabecera de la lista.</div>
+            </article>
+
+            <article class="proj" data-r="ucayali loreto sanmartin">
+              <div class="proj-top">
+                <div><span class="region">Ucayali · Loreto · San Martín</span><h3>PezAmazónico — Piscigranjas</h3></div><span class="num">03</span>
+              </div>
+              <p>Oferta de lotes de paiche, gamitana, paco y boquichico de piscigranjas locales para restaurantes y mercados.</p>
+              <div class="label">Tabla sugerida: lotes</div>
+              <div class="fields"><code>id</code><code>especie</code><code>piscigranja</code><code>kilos</code><code>precio_kg</code><code>fecha_cosecha</code><code>telefono</code></div>
+              <div class="label">Funciones mínimas</div>
+              <ul><li>Listar lotes disponibles con especie y precio</li><li>Registrar un lote nuevo</li></ul>
+              <div class="extra">botón “Llamar” que abra el marcador con el teléfono del productor.</div>
+            </article>
+
+            <article class="proj" data-r="madrededios loreto sanmartin">
+              <div class="proj-top">
+                <div><span class="region">Madre de Dios · Loreto · San Martín</span><h3>EcoRuta Selva — Turismo</h3></div><span class="num">04</span>
+              </div>
+              <p>Catálogo de albergues, cataratas, lagos y miradores (Tambopata, Pacaya Samiria, Ahuashiyacu) con precio de ingreso y contacto.</p>
+              <div class="label">Tabla sugerida: atractivos</div>
+              <div class="fields"><code>id</code><code>nombre</code><code>tipo</code><code>distrito</code><code>precio_entrada</code><code>telefono</code><code>descripcion</code></div>
+              <div class="label">Funciones mínimas</div>
+              <ul><li>Listar atractivos con tipo y distrito</li><li>Registrar un nuevo atractivo</li></ul>
+              <div class="extra">mostrar una imagen por URL con Glide o Coil.</div>
+            </article>
+
+            <article class="proj" data-r="madrededios ucayali">
+              <div class="proj-top">
+                <div><span class="region">Madre de Dios · Ucayali</span><h3>Alerta Forestal — Reporte ciudadano</h3></div><span class="num">05</span>
+              </div>
+              <p>Reporte de incendios, quemas, tala o minería ilegal para que la autoridad local priorice la atención.</p>
+              <div class="label">Tabla sugerida: reportes</div>
+              <div class="fields"><code>id</code><code>tipo</code><code>descripcion</code><code>lugar</code><code>latitud</code><code>longitud</code><code>estado</code><code>fecha</code></div>
+              <div class="label">Funciones mínimas</div>
+              <ul><li>Listar reportes con estado (pendiente / atendido)</li><li>Registrar un reporte desde el formulario</li></ul>
+              <div class="extra">color de la fila según el tipo y abrir la ubicación en Google Maps.</div>
+            </article>
+
+            <article class="proj" data-r="sanmartin loreto ucayali">
+              <div class="proj-top">
+                <div><span class="region">San Martín · Loreto · Ucayali</span><h3>Dengue Cero — Vigilancia vectorial</h3></div><span class="num">06</span>
+              </div>
+              <p>Registro de inspecciones casa por casa: recipientes revisados y recipientes con larvas, para identificar sectores de riesgo.</p>
+              <div class="label">Tabla sugerida: inspecciones</div>
+              <div class="fields"><code>id</code><code>direccion</code><code>sector</code><code>revisados</code><code>positivos</code><code>inspector</code><code>fecha</code></div>
+              <div class="label">Funciones mínimas</div>
+              <ul><li>Listar inspecciones con % de positividad</li><li>Registrar una inspección (validar positivos ≤ revisados)</li></ul>
+              <div class="extra">resaltar en rojo las viviendas con positividad mayor a 0 %.</div>
+            </article>
+
+            <article class="proj" data-r="loreto ucayali">
+              <div class="proj-top">
+                <div><span class="region">Loreto · Ucayali</span><h3>Frutos de la Selva — Precios de mercado</h3></div><span class="num">07</span>
+              </div>
+              <p>Precios diarios de camu camu, aguaje, cocona, ungurahui y copoazú en mercados como Belén (Iquitos) o Bellavista (Pucallpa).</p>
+              <div class="label">Tabla sugerida: precios</div>
+              <div class="fields"><code>id</code><code>fruto</code><code>mercado</code><code>unidad</code><code>precio</code><code>fecha</code></div>
+              <div class="label">Funciones mínimas</div>
+              <ul><li>Listar precios del más reciente al más antiguo</li><li>Registrar un precio con unidad (kg, saco, racimo)</li></ul>
+              <div class="extra">buscar por nombre del fruto con un SearchView.</div>
+            </article>
+
+            <article class="proj" data-r="ucayali amazonas">
+              <div class="proj-top">
+                <div><span class="region">Ucayali · Amazonas</span><h3>Arte Nativo — Artesanía de comunidades</h3></div><span class="num">08</span>
+              </div>
+              <p>Catálogo de artesanía shipibo-konibo, awajún o asháninka (textiles kené, cerámica, collares de semillas) para venta directa.</p>
+              <div class="label">Tabla sugerida: artesanias</div>
+              <div class="fields"><code>id</code><code>nombre</code><code>artesano</code><code>comunidad</code><code>material</code><code>precio</code><code>stock</code></div>
+              <div class="label">Funciones mínimas</div>
+              <ul><li>Listar piezas con artesano, comunidad y precio</li><li>Registrar una pieza nueva</li></ul>
+              <div class="extra">mostrar “Agotado” cuando el stock sea 0.</div>
+            </article>
+
+            <article class="proj" data-r="sanmartin ucayali loreto">
+              <div class="proj-top">
+                <div><span class="region">Tarapoto · Pucallpa · Iquitos</span><h3>Mototaxi Seguro — Padrón de unidades</h3></div><span class="num">09</span>
+              </div>
+              <p>Padrón de mototaxis por asociación para que el pasajero verifique la placa y el conductor antes de subir.</p>
+              <div class="label">Tabla sugerida: unidades</div>
+              <div class="fields"><code>id</code><code>placa</code><code>conductor</code><code>asociacion</code><code>telefono</code><code>soat_vence</code></div>
+              <div class="label">Funciones mínimas</div>
+              <ul><li>Listar unidades con placa y asociación</li><li>Registrar una unidad (validar formato de placa)</li></ul>
+              <div class="extra">buscar por placa y avisar si el SOAT está vencido.</div>
+            </article>
+
+            <article class="proj" data-r="loreto ucayali">
+              <div class="proj-top">
+                <div><span class="region">Loreto · Ucayali</span><h3>Río Vigía — Nivel de ríos</h3></div><span class="num">10</span>
+              </div>
+              <p>Lecturas del nivel del Amazonas, Ucayali, Marañón o Huallaga para alertar a comunidades ribereñas en temporada de creciente.</p>
+              <div class="label">Tabla sugerida: lecturas</div>
+              <div class="fields"><code>id</code><code>rio</code><code>estacion</code><code>nivel_m</code><code>alerta</code><code>observacion</code><code>fecha</code></div>
+              <div class="label">Funciones mínimas</div>
+              <ul><li>Listar lecturas con el nivel de alerta (verde / amarilla / roja)</li><li>Registrar una lectura</li></ul>
+              <div class="extra">calcular la alerta automáticamente en PHP según el nivel.</div>
+            </article>
+
+            <article class="proj" data-r="central sanmartin amazonas">
+              <div class="proj-top">
+                <div><span class="region">Selva central · San Martín · Amazonas</span><h3>Café de Origen — Trazabilidad</h3></div><span class="num">11</span>
+              </div>
+              <p>Registro de lotes de café de Villa Rica, Chanchamayo, Moyobamba o Rodríguez de Mendoza con variedad, altitud y puntaje de taza.</p>
+              <div class="label">Tabla sugerida: lotes_cafe</div>
+              <div class="fields"><code>id</code><code>finca</code><code>productor</code><code>variedad</code><code>altitud</code><code>puntaje</code><code>kilos</code><code>fecha</code></div>
+              <div class="label">Funciones mínimas</div>
+              <ul><li>Listar lotes ordenados por puntaje</li><li>Registrar un lote (puntaje entre 0 y 100)</li></ul>
+              <div class="extra">etiqueta “Especial” para lotes con puntaje ≥ 84.</div>
+            </article>
+
+            <article class="proj" data-r="madrededios loreto central">
+              <div class="proj-top">
+                <div><span class="region">Madre de Dios · Loreto · Selva central</span><h3>Fauna Viva — Ciencia ciudadana</h3></div><span class="num">12</span>
+              </div>
+              <p>Registro de avistamientos de aves, primates y otras especies por guías, estudiantes y comuneros, como apoyo a áreas naturales protegidas.</p>
+              <div class="label">Tabla sugerida: avistamientos</div>
+              <div class="fields"><code>id</code><code>nombre_comun</code><code>especie</code><code>cantidad</code><code>lugar</code><code>observador</code><code>fecha</code></div>
+              <div class="label">Funciones mínimas</div>
+              <ul><li>Listar avistamientos recientes</li><li>Registrar un avistamiento</li></ul>
+              <div class="extra">endpoint que devuelva el conteo por especie.</div>
+            </article>
+
+            <article class="proj" data-r="loreto amazonas sanmartin">
+              <div class="proj-top">
+                <div><span class="region">Loreto · Amazonas · San Martín</span><h3>Agua Segura — Calidad del agua</h3></div><span class="num">13</span>
+              </div>
+              <p>Control de cloro residual y turbidez del agua en comunidades atendidas por las JASS (juntas de agua), donde muchas familias consumen agua de río o pozo.</p>
+              <div class="label">Tabla sugerida: muestras</div>
+              <div class="fields"><code>id</code><code>comunidad</code><code>fuente</code><code>cloro_residual</code><code>turbidez</code><code>responsable</code><code>fecha</code></div>
+              <div class="label">Funciones mínimas</div>
+              <ul><li>Listar muestras indicando si el agua es apta o no apta</li><li>Registrar una muestra (cloro entre 0 y 5 mg/L)</li></ul>
+              <div class="extra">marcar “No apta” cuando el cloro residual sea menor a 0.5 mg/L.</div>
+            </article>
+
+            <article class="proj" data-r="ucayali central">
+              <div class="proj-top">
+                <div><span class="region">Ucayali · Selva central</span><h3>Chacra Digital — Cosechas</h3></div><span class="num">14</span>
+              </div>
+              <p>Registro de cosechas de plátano, yuca, piña y papaya por agricultor y parcela (Aguaytía, Chanchamayo, Satipo) para planificar la venta a los mercados.</p>
+              <div class="label">Tabla sugerida: cosechas</div>
+              <div class="fields"><code>id</code><code>agricultor</code><code>cultivo</code><code>parcela</code><code>hectareas</code><code>toneladas</code><code>fecha</code></div>
+              <div class="label">Funciones mínimas</div>
+              <ul><li>Listar cosechas con rendimiento (toneladas / hectárea)</li><li>Registrar una cosecha con el cultivo en un Spinner</li></ul>
+              <div class="extra">filtrar la lista por cultivo.</div>
+            </article>
+
+            <article class="proj" data-r="amazonas loreto">
+              <div class="proj-top">
+                <div><span class="region">Amazonas · Loreto</span><h3>Posta Rural — Atenciones de salud</h3></div><span class="num">15</span>
+              </div>
+              <p>Registro de atenciones en puestos de salud de comunidades alejadas (Condorcanqui, Datem del Marañón), donde el reporte aún se hace en papel. Usar solo datos ficticios de pacientes.</p>
+              <div class="label">Tabla sugerida: atenciones</div>
+              <div class="fields"><code>id</code><code>paciente</code><code>edad</code><code>comunidad</code><code>motivo</code><code>establecimiento</code><code>fecha</code></div>
+              <div class="label">Funciones mínimas</div>
+              <ul><li>Listar atenciones del día con motivo y comunidad</li><li>Registrar una atención (edad entre 0 y 120)</li></ul>
+              <div class="extra">mostrar un resumen de atenciones por motivo.</div>
+            </article>
+
+            <article class="proj" data-r="ucayali madrededios sanmartin">
+              <div class="proj-top">
+                <div><span class="region">Ucayali · Madre de Dios · San Martín</span><h3>Reforesta Selva — Siembra de plantones</h3></div><span class="num">16</span>
+              </div>
+              <p>Seguimiento de campañas de reforestación con bolaina, shihuahuaco, caoba o capirona: dónde se sembró, cuántos plantones y cuántos sobreviven.</p>
+              <div class="label">Tabla sugerida: plantones</div>
+              <div class="fields"><code>id</code><code>especie</code><code>cantidad</code><code>sobrevivientes</code><code>lugar</code><code>responsable</code><code>fecha_siembra</code></div>
+              <div class="label">Funciones mínimas</div>
+              <ul><li>Listar siembras con el % de sobrevivencia</li><li>Registrar una siembra (validar sobrevivientes ≤ cantidad)</li></ul>
+              <div class="extra">mostrar el total de plantones sembrados en la cabecera de la lista.</div>
+            </article>
+          </div>
+        </section>
+
+        <!-- 3. REQUISITOS -->
+        <section id="requisitos">
+          <h2>3. Requisitos técnicos mínimos</h2>
+          <p>Todos los proyectos, sin excepción, deben cumplir lo siguiente. Es la misma arquitectura de la guía, aplicada a otra entidad.</p>
+
+          <div class="grid3">
+            <div class="card">
+              <h4>🗄️ Base de datos</h4>
+              <ul>
+                <li>Base propia: <code>tp_g01_rioviaje</code> (grupo + proyecto)</li>
+                <li>Tabla principal con <strong>mínimo 6 campos</strong> y <code>id</code> AUTO_INCREMENT</li>
+                <li>Tipos adecuados: <code>DECIMAL</code>, <code>DATE</code>, <code>INT</code>, <code>VARCHAR</code></li>
+                <li><strong>10 registros o más</strong> con datos verosímiles de la región</li>
+                <li>Script <code>.sql</code> exportado que crea e inserta todo</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h4>🐘 API PHP</h4>
+              <ul>
+                <li><code>config.php</code> con PDO y <code>charset=utf8</code></li>
+                <li><code>listar.php</code> (GET) y <code>registrar.php</code> (POST)</li>
+                <li>Consultas con <strong>prepared statements</strong></li>
+                <li>Validación de campos en el servidor</li>
+                <li>Respuesta JSON uniforme: <code>success</code>, <code>message</code>, <code>data</code></li>
+                <li>Pruebas en navegador o Postman (capturas)</li>
+              </ul>
+            </div>
+            <div class="card">
+              <h4>🤖 App Android</h4>
+              <ul>
+                <li>Paquete propio, p. ej. <code>com.example.rioviaje</code></li>
+                <li>Retrofit + Gson: modelo, <code>ApiService</code>, <code>RetrofitClient</code></li>
+                <li>RecyclerView con layout de ítem propio (≥ 3 datos visibles)</li>
+                <li>Formulario de registro con validaciones</li>
+                <li>FAB que abre el formulario; la lista se recarga en <code>onResume()</code></li>
+                <li>Mensajes de error si no hay conexión o el servidor falla</li>
+              </ul>
+            </div>
+          </div>
+
+          <h3>Identidad de la app</h3>
+          <ul>
+            <li><strong>Nombre</strong> en <code>strings.xml</code> y <strong>ícono</strong> propio (Image Asset de Android Studio).</li>
+            <li><strong>Colores</strong> del tema relacionados con la temática (verde selva, tonos tierra, azul río…).</li>
+            <li>Textos, hints y mensajes en español, sin restos del ejemplo de productos.</li>
+            <li>Formulario con el tipo de teclado correcto (<code>inputType</code> numérico, decimal, fecha o teléfono según el campo).</li>
+          </ul>
+
+          <div class="note"><strong>Conexión:</strong> igual que en la guía, el emulador usa <code>http://10.0.2.2/…</code> y un celular físico usa la IPv4 de la PC en la misma red. No olvides <code>network_security_config.xml</code> y el permiso <code>INTERNET</code> en el Manifest: es el error más frecuente en la sustentación.</div>
+        </section>
+
+        <!-- 4. EJEMPLO -->
+        <section id="ejemplo">
+          <h2>4. Ejemplo de adaptación</h2>
+          <p>Así se transforma la guía para el proyecto <strong>01 · RíoViaje</strong>. Úsalo como referencia para tu propio proyecto: cambian la tabla, las carpetas y los modelos; la lógica de Retrofit y del RecyclerView es la misma.</p>
+
+          <pre class="tree">Guía (productos)                       →  Proyecto RíoViaje (viajes)
+ucv_aplic_mov/productos/listar.php     →  tp_g01_rioviaje/viajes/listar.php
+ucv_aplic_mov/productos/registrar.php  →  tp_g01_rioviaje/viajes/registrar.php
+models/Producto.kt                     →  models/Viaje.kt
+adapters/ProductoAdapter.kt            →  adapters/ViajeAdapter.kt
+layout/item_producto.xml               →  layout/item_viaje.xml
+RegistrarActivity.kt                   →  RegistrarViajeActivity.kt</pre>
+
+          <pre data-lang="sql" data-file="tp_g01_rioviaje.sql">CREATE DATABASE IF NOT EXISTS tp_g01_rioviaje;
+USE tp_g01_rioviaje;
+
+CREATE TABLE viajes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    embarcacion VARCHAR(80) NOT NULL,
+    origen VARCHAR(60) NOT NULL,
+    destino VARCHAR(60) NOT NULL,
+    fecha_salida DATE NOT NULL,
+    hora_salida TIME NOT NULL,
+    precio DECIMAL(8,2) NOT NULL,
+    cupos INT NOT NULL DEFAULT 0
+);
+
+INSERT INTO viajes (embarcacion, origen, destino, fecha_salida, hora_salida, precio, cupos) VALUES
+('Eduardo IX', 'Iquitos', 'Yurimaguas', '2026-11-10', '18:00:00', 120.00, 45),
+('Henry VII', 'Iquitos', 'Pucallpa', '2026-11-11', '17:00:00', 180.00, 60),
+('Deslizador Amazon Express', 'Iquitos', 'Nauta', '2026-11-10', '07:30:00', 25.00, 20);
+-- Completar hasta 10 registros como mínimo</pre>
+
+          <pre data-lang="kotlin" data-file="models/Viaje.kt">package com.example.rioviaje.models
+
+import com.google.gson.annotations.SerializedName
+
+data class Viaje(
+    val id: Int,
+    val embarcacion: String,
+    val origen: String,
+    val destino: String,
+    @SerializedName("fecha_salida") val fechaSalida: String,
+    @SerializedName("hora_salida") val horaSalida: String,
+    val precio: Double,
+    val cupos: Int
+)
+
+data class ViajesResponse(
+    val success: Boolean,
+    val message: String,
+    val data: List&lt;Viaje&gt;?,
+    val total: Int?
+)</pre>
+
+          <div class="ok"><strong>Atención con los tipos:</strong> PDO devuelve los <code>DECIMAL</code> e <code>INT</code> como texto (<code>"120.00"</code>). Gson suele convertirlos sin problema, pero si ves errores de conversión, castea en PHP (<code>(float)$fila['precio']</code>) o declara el campo como <code>String</code> en Kotlin y conviértelo al mostrarlo.</div>
+        </section>
+
+        <!-- 5. CRONOGRAMA -->
+        <section id="cronograma">
+          <h2>5. Cronograma y avances</h2>
+          <p>El trabajo se desarrolla en tres semanas con dos avances revisados en clase. Las fechas exactas se publican en el aula virtual.</p>
+
+          <div class="timeline">
+            <div class="hito">
+              <h4>Semana 1 · Elección y backend <span class="tag">AVANCE 1</span></h4>
+              <ul>
+                <li>Formar el grupo y registrar el proyecto elegido en el foro del aula virtual.</li>
+                <li>Diseñar la tabla, crear la base de datos e insertar 10 registros reales o verosímiles.</li>
+                <li><code>config.php</code>, <code>listar.php</code> y <code>registrar.php</code> funcionando.</li>
+                <li><strong>Evidencia:</strong> captura del JSON en el navegador y prueba POST en Postman.</li>
+              </ul>
+            </div>
+            <div class="hito">
+              <h4>Semana 2 · App Android <span class="tag">AVANCE 2</span></h4>
+              <ul>
+                <li>Proyecto Android con modelo, <code>ApiService</code> y <code>RetrofitClient</code>.</li>
+                <li>Lista en RecyclerView con layout de ítem diseñado para el tema.</li>
+                <li>Formulario de registro con validaciones y FAB.</li>
+                <li><strong>Evidencia:</strong> demo en clase listando y registrando desde el emulador.</li>
+              </ul>
+            </div>
+            <div class="hito">
+              <h4>Semana 3 · Cierre y entrega final <span class="tag">ENTREGA</span></h4>
+              <ul>
+                <li>Identidad visual (ícono, colores, nombre) y manejo de errores.</li>
+                <li>Retos opcionales para la bonificación.</li>
+                <li>Informe, video y subida de archivos a la plataforma.</li>
+                <li>Sustentación grupal con preguntas individuales.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- 6. ENTREGABLES -->
+        <section id="entregables">
+          <h2>6. Entregables en la plataforma</h2>
+          <p>Un solo integrante (el coordinador) sube los archivos en la tarea <strong>“Trabajo Práctico – Entrega final”</strong> del aula virtual. Todos los archivos usan el formato de nombre <code>TP_G##_Proyecto_Tipo</code>.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>#</th><th>Entregable</th><th>Formato</th><th>Nombre del archivo</th><th>Contenido</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>1</td><td><strong>Informe técnico</strong></td><td>PDF</td><td><code>TP_G01_RioViaje_Informe.pdf</code></td><td>Estructura indicada abajo, 8 a 15 páginas.</td></tr>
+                <tr><td>2</td><td><strong>Proyecto Android</strong></td><td>ZIP</td><td><code>TP_G01_RioViaje_Android.zip</code></td><td>Proyecto completo de Android Studio, sin carpetas <code>build/</code> ni <code>.gradle/</code>.</td></tr>
+                <tr><td>3</td><td><strong>API y base de datos</strong></td><td>ZIP</td><td><code>TP_G01_RioViaje_API.zip</code></td><td>Carpeta PHP completa + script <code>.sql</code> exportado desde phpMyAdmin / HeidiSQL.</td></tr>
+                <tr><td>4</td><td><strong>APK de prueba</strong></td><td>APK</td><td><code>TP_G01_RioViaje.apk</code></td><td>Build &gt; Build APK(s), versión debug.</td></tr>
+                <tr><td>5</td><td><strong>Video demostrativo</strong></td><td>Enlace</td><td>En el comentario de la entrega</td><td>3 a 5 min en YouTube (no listado) o Drive con acceso público. Todos los integrantes aparecen o narran.</td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <h3>Estructura de los archivos comprimidos</h3>
+          <pre class="tree">TP_G01_RioViaje_API.zip
+├── tp_g01_rioviaje.sql          ← crea la BD, la tabla e inserta los registros
+└── tp_g01_rioviaje/
+    ├── config.php
+    └── viajes/
+        ├── listar.php
+        └── registrar.php
+
+TP_G01_RioViaje_Android.zip
+└── RioViaje/                    ← carpeta raíz del proyecto Android Studio
+    ├── app/src/main/...
+    ├── build.gradle.kts
+    └── settings.gradle.kts</pre>
+
+          <div class="note"><strong>Antes de comprimir Android:</strong> ejecuta <em>Build &gt; Clean Project</em> y cierra Android Studio. Excluye <code>app/build/</code>, <code>build/</code> y <code>.gradle/</code>: un ZIP limpio pesa menos de 5 MB. Si el archivo supera el límite de la plataforma, súbelo a Drive y deja el enlace.</div>
+
+          <h3>Estructura del informe</h3>
+          <ol>
+            <li><strong>Carátula:</strong> universidad, curso, docente, número de grupo, integrantes y rol de cada uno.</li>
+            <li><strong>Problema y región:</strong> qué necesidad atiende la app, para quién y dónde (máx. 1 página).</li>
+            <li><strong>Objetivo general</strong> y 2 o 3 objetivos específicos.</li>
+            <li><strong>Modelo de datos:</strong> diagrama o descripción de la tabla con tipos de datos.</li>
+            <li><strong>Endpoints:</strong> tabla con método, URL, parámetros y ejemplo de respuesta JSON.</li>
+            <li><strong>Arquitectura de la app:</strong> estructura de paquetes y responsabilidad de cada clase.</li>
+            <li><strong>Capturas:</strong> lista, formulario, validaciones, error de conexión y registro reflejado en la BD.</li>
+            <li><strong>Dificultades y soluciones</strong> encontradas durante el desarrollo.</li>
+            <li><strong>Conclusiones</strong> y mejoras futuras.</li>
+            <li><strong>Enlace al video</strong> y declaración de participación de cada integrante.</li>
+          </ol>
+
+          <h3>Guion sugerido para el video</h3>
+          <div class="grid3">
+            <div class="card"><h4>0:00 – 1:00</h4><p>Presentación del grupo, el problema de la región y la idea de la app.</p></div>
+            <div class="card"><h4>1:00 – 2:30</h4><p>Base de datos y API: mostrar la tabla y probar <code>listar.php</code> y <code>registrar.php</code>.</p></div>
+            <div class="card"><h4>2:30 – 5:00</h4><p>App en el emulador: listar, registrar, validar campos vacíos y ver el nuevo registro en MySQL.</p></div>
+          </div>
+        </section>
+
+        <!-- 7. RÚBRICA -->
+        <section id="rubrica">
+          <h2>7. Rúbrica de evaluación</h2>
+          <p>La nota final es sobre 20. Los criterios técnicos se evalúan sobre el código entregado y lo demostrado en la sustentación; la sustentación es individual.</p>
+
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr><th>Criterio</th><th>Pts</th><th>Excelente (100 %)</th><th>Bueno (75 %)</th><th>En proceso (50 %)</th><th>Insuficiente (0 %)</th></tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><strong>1. Base de datos</strong></td><td class="pts">2</td>
+                  <td>Tabla con ≥ 6 campos y tipos correctos, ≥ 10 registros de la región, script SQL ejecuta sin errores.</td>
+                  <td>Tabla correcta con menos registros o algún tipo de dato inadecuado.</td>
+                  <td>Tabla incompleta o datos de ejemplo genéricos.</td>
+                  <td>No entrega script o no funciona.</td>
+                </tr>
+                <tr>
+                  <td><strong>2. API REST PHP</strong></td><td class="pts">4</td>
+                  <td>GET y POST funcionan, prepared statements, validación en servidor, JSON uniforme y códigos de error manejados.</td>
+                  <td>GET y POST funcionan; falta validación o el JSON no es uniforme.</td>
+                  <td>Solo funciona uno de los dos endpoints.</td>
+                  <td>La API no responde o concatena SQL sin preparar.</td>
+                </tr>
+                <tr>
+                  <td><strong>3. Retrofit y modelos</strong></td><td class="pts">3</td>
+                  <td>Modelo, ApiService y RetrofitClient correctos, <code>@SerializedName</code> donde corresponde, llamadas asíncronas con manejo de <code>onFailure</code>.</td>
+                  <td>Funciona, pero sin manejo de errores de red.</td>
+                  <td>Funciona parcialmente o con la URL fija del ejemplo.</td>
+                  <td>No consume la API.</td>
+                </tr>
+                <tr>
+                  <td><strong>4. Listado (RecyclerView)</strong></td><td class="pts">3</td>
+                  <td>Ítem propio con ≥ 3 datos y formato (moneda, fecha), adapter limpio, recarga tras registrar.</td>
+                  <td>Lista correcta con diseño básico.</td>
+                  <td>Lista con datos incompletos o sin recargar.</td>
+                  <td>No muestra datos.</td>
+                </tr>
+                <tr>
+                  <td><strong>5. Registro (formulario + FAB)</strong></td><td class="pts">3</td>
+                  <td>FAB abre el formulario, validaciones (vacíos, números, rangos), <code>inputType</code> adecuados, mensaje de éxito y regreso a la lista.</td>
+                  <td>Registra correctamente con validaciones mínimas.</td>
+                  <td>Registra sin validar o con errores frecuentes.</td>
+                  <td>No registra.</td>
+                </tr>
+                <tr>
+                  <td><strong>6. Pertinencia regional y UX</strong></td><td class="pts">2</td>
+                  <td>Problema real bien sustentado, datos de la zona, ícono, colores y textos coherentes con el tema.</td>
+                  <td>Tema adecuado con identidad visual básica.</td>
+                  <td>Restos del ejemplo de la guía (productos).</td>
+                  <td>Sin relación con la región.</td>
+                </tr>
+                <tr>
+                  <td><strong>7. Informe y video</strong></td><td class="pts">1</td>
+                  <td>Informe completo según estructura y video claro dentro del tiempo.</td>
+                  <td>Falta una sección o el video excede el tiempo.</td>
+                  <td>Informe o video incompletos.</td>
+                  <td>No entrega.</td>
+                </tr>
+                <tr>
+                  <td><strong>8. Sustentación individual</strong></td><td class="pts">2</td>
+                  <td>Explica y modifica su parte del código con seguridad.</td>
+                  <td>Explica con apoyo del grupo.</td>
+                  <td>Explica de forma superficial.</td>
+                  <td>No puede explicar el código.</td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr><td>Total</td><td class="pts">20</td><td colspan="4">Los puntos de bonificación se suman sin superar 20.</td></tr>
+              </tfoot>
+            </table>
+          </div>
+
+          <h3>Bonificación (hasta +2 puntos)</h3>
+          <div class="grid3">
+            <div class="card"><h4>+0.5 · Editar</h4><p>Endpoint <code>actualizar.php</code> y opción de editar un registro desde la lista.</p></div>
+            <div class="card"><h4>+0.5 · Eliminar</h4><p>Endpoint <code>eliminar.php</code> con diálogo de confirmación en la app.</p></div>
+            <div class="card"><h4>+0.5 · Buscar o filtrar</h4><p>SearchView o Spinner que filtre la lista (en la app o con parámetro GET).</p></div>
+            <div class="card"><h4>+0.5 · Imágenes</h4><p>Campo URL de imagen mostrado en el ítem con Glide o Coil.</p></div>
+            <div class="card"><h4>+0.5 · Mapa o intención</h4><p>Abrir Google Maps, el marcador telefónico o WhatsApp desde un registro.</p></div>
+            <div class="card"><h4>+0.5 · El reto del proyecto</h4><p>Implementar el “reto opcional” indicado en la tarjeta del proyecto elegido.</p></div>
+          </div>
+
+          <h3>Penalidades</h3>
+          <ul>
+            <li><strong>Entrega tardía:</strong> −2 puntos por día, hasta un máximo de 2 días; después no se recibe.</li>
+            <li><strong>Archivos incompletos o que no abren:</strong> se califica solo lo que se puede ejecutar.</li>
+            <li><strong>Copia entre grupos o código ajeno sin citar:</strong> nota 0 para todos los grupos involucrados.</li>
+            <li><strong>Integrante que no sustenta:</strong> obtiene 0 en el criterio 8 y su nota técnica puede reducirse según su participación declarada.</li>
+          </ul>
+        </section>
+
+        <!-- 8. SUSTENTACIÓN -->
+        <section id="sustentacion">
+          <h2>8. Sustentación</h2>
+          <p>Cada grupo dispone de <strong>10 minutos</strong>: 4 minutos de demostración en vivo y 6 minutos de preguntas. El docente elige a quién pregunta, por lo que todos deben conocer el proyecto completo.</p>
+          <h3>Ejemplos de preguntas</h3>
+          <div class="grid3">
+            <div class="card"><h4>API</h4><ul><li>¿Por qué usar prepared statements?</li><li>¿Qué devuelve <code>registrar.php</code> si falta un campo?</li></ul></div>
+            <div class="card"><h4>Retrofit</h4><ul><li>¿Qué hace la anotación <code>@SerializedName</code>?</li><li>¿Por qué la emulación usa <code>10.0.2.2</code>?</li></ul></div>
+            <div class="card"><h4>Android</h4><ul><li>¿Qué hace el ViewHolder?</li><li>¿Por qué se recarga la lista en <code>onResume()</code>?</li></ul></div>
+          </div>
+          <div class="box"><strong>Cambio en vivo:</strong> durante la sustentación se puede pedir un cambio pequeño (agregar un campo al ítem, cambiar una validación o un texto). Tenlo en cuenta al repartir el trabajo: cada integrante debe saber dónde está cada archivo.</div>
+        </section>
+
+        <!-- 9. CHECKLIST -->
+        <section id="checklist">
+          <h2>9. Checklist antes de entregar</h2>
+          <p>Marca cada punto antes de subir los archivos. Las marcas se guardan solo en tu navegador.</p>
+          <div class="check" id="check">
+            <label><input type="checkbox"><span>El script <code>.sql</code> crea la base, la tabla e inserta 10 o más registros sin errores.</span></label>
+            <label><input type="checkbox"><span><code>listar.php</code> devuelve JSON con <code>success</code>, <code>message</code> y <code>data</code> en el navegador.</span></label>
+            <label><input type="checkbox"><span><code>registrar.php</code> fue probado con Postman y rechaza campos vacíos.</span></label>
+            <label><input type="checkbox"><span>La app tiene permiso <code>INTERNET</code> y <code>network_security_config.xml</code>.</span></label>
+            <label><input type="checkbox"><span>La lista muestra los datos de mi proyecto (no hay restos de “productos”).</span></label>
+            <label><input type="checkbox"><span>El FAB abre el formulario, valida y registra; al volver, la lista se actualiza.</span></label>
+            <label><input type="checkbox"><span>La app muestra un mensaje cuando el servidor está apagado.</span></label>
+            <label><input type="checkbox"><span>Cambié nombre, ícono y colores de la app.</span></label>
+            <label><input type="checkbox"><span>Hice <em>Clean Project</em> y el ZIP de Android no incluye <code>build/</code> ni <code>.gradle/</code>.</span></label>
+            <label><input type="checkbox"><span>El informe PDF tiene todas las secciones y el enlace al video funciona en modo incógnito.</span></label>
+            <label><input type="checkbox"><span>Los archivos siguen el formato <code>TP_G##_Proyecto_Tipo</code>.</span></label>
+          </div>
+          <div class="check-bar">
+            <div class="meter"><i id="meter"></i></div>
+            <span id="count">0 / 11</span>
+            <button class="reset" id="reset">Reiniciar</button>
+          </div>
+        </section>
+      </main>
+
+      <footer>Aplicativos Móviles · Universidad César Vallejo · Semestre 2026-2 · Trabajo Práctico basado en la guía <em>API REST en Android</em>.</footer>
+    </div>
+
+    <script>
+      // Barra de progreso y enlace activo del menú
+      const bar = document.getElementById('progress');
+      const links = [...document.querySelectorAll('.navlinks a')];
+      const targets = links.map(a => document.querySelector(a.getAttribute('href')));
+      function onScroll() {
+        const h = document.documentElement;
+        bar.style.width = (h.scrollTop / (h.scrollHeight - h.clientHeight) * 100) + '%';
+        let current = 0;
+        targets.forEach((t, i) => { if (t && t.getBoundingClientRect().top < 140) current = i; });
+        links.forEach((a, i) => a.classList.toggle('active', i === current));
+      }
+      window.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+
+      // Filtro de proyectos por región
+      const chips = document.querySelectorAll('.chip');
+      chips.forEach(chip => chip.addEventListener('click', () => {
+        chips.forEach(c => c.classList.remove('on'));
+        chip.classList.add('on');
+        const f = chip.dataset.f;
+        document.querySelectorAll('.proj').forEach(p => {
+          p.classList.toggle('hide', f !== 'todas' && !p.dataset.r.split(' ').includes(f));
+        });
+      }));
+
+      // Resaltado simple de SQL y Kotlin
+      const KW = {
+        sql: /\b(CREATE|DATABASE|IF|NOT|EXISTS|USE|TABLE|INT|AUTO_INCREMENT|PRIMARY|KEY|VARCHAR|DECIMAL|DATE|TIME|NULL|DEFAULT|INSERT|INTO|VALUES)\b/g,
+        kotlin: /\b(package|import|data|class|val|var|fun|return|null)\b/g
+      };
+      function highlight(text, lang) {
+        const tokens = [];
+        const keep = (cls) => (m) => { tokens.push(`<span class="${cls}">${m}</span>`); return `\u0000${String.fromCharCode(0xE000 + tokens.length - 1)}\u0000`; };
+        let out = text
+          .replace(lang === 'sql' ? /--.*$/gm : /\/\/.*$/gm, keep('c'))
+          .replace(/'[^'\n]*'|"[^"\n]*"/g, keep('s'))
+          .replace(/@\w+/g, keep('n'))
+          .replace(KW[lang] || /$^/g, keep('k'))
+          .replace(/\b(String|Int|Double|Boolean|List)\b/g, keep('t'))
+          .replace(/\b\d+(\.\d+)?\b/g, keep('n'));
+        return out.replace(/\u0000([-])\u0000/g, (_, c) => tokens[c.charCodeAt(0) - 0xE000]);
+      }
+
+      // Cabecera con nombre de archivo y botón Copiar
+      document.querySelectorAll('pre[data-lang]').forEach(pre => {
+        const raw = pre.textContent;
+        const wrap = document.createElement('div');
+        wrap.className = 'code-wrap';
+        const top = document.createElement('div');
+        top.className = 'code-top';
+        top.innerHTML = `<span>${pre.dataset.file || pre.dataset.lang}</span>`;
+        const btn = document.createElement('button');
+        btn.className = 'copy';
+        btn.textContent = 'Copiar';
+        btn.addEventListener('click', () => {
+          navigator.clipboard.writeText(raw).then(() => {
+            btn.textContent = '¡Copiado!';
+            setTimeout(() => btn.textContent = 'Copiar', 1500);
+          });
+        });
+        top.appendChild(btn);
+        pre.parentNode.insertBefore(wrap, pre);
+        wrap.append(top, pre);
+        const esc = raw.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+        pre.innerHTML = `<code>${highlight(esc, pre.dataset.lang)}</code>`;
+      });
+
+      // Checklist con estado guardado en el navegador
+      const KEY = 'tp-apirest-checklist';
+      const boxes = [...document.querySelectorAll('#check input')];
+      const meter = document.getElementById('meter');
+      const count = document.getElementById('count');
+      function save() {
+        const done = boxes.filter(b => b.checked).length;
+        meter.style.width = (done / boxes.length * 100) + '%';
+        count.textContent = `${done} / ${boxes.length}`;
+        try { localStorage.setItem(KEY, JSON.stringify(boxes.map(b => b.checked))); } catch (e) {}
+      }
+      try {
+        const saved = JSON.parse(localStorage.getItem(KEY) || '[]');
+        boxes.forEach((b, i) => b.checked = !!saved[i]);
+      } catch (e) {}
+      boxes.forEach(b => b.addEventListener('change', save));
+      document.getElementById('reset').addEventListener('click', () => { boxes.forEach(b => b.checked = false); save(); });
+      save();
+    </script>
+  </body>
+</html>
