@@ -132,17 +132,6 @@
       .hito ul { margin: 6px 0 0; padding-left: 18px; font-size: 14.5px }
       .tag { display: inline-block; margin-left: 6px; padding: 2px 8px; color: var(--coral-dark); background: var(--coral-tint); border-radius: 10px; font: 700 11px var(--sans); letter-spacing: .5px; vertical-align: middle }
 
-      /* Checklist */
-      .check { margin: 18px 0; padding: 6px 0; background: var(--panel); border: 1px solid var(--line); border-radius: 4px 18px 18px 18px }
-      .check label { display: flex; gap: 12px; align-items: flex-start; padding: 10px 18px; color: var(--muted); cursor: pointer; font-size: 15px }
-      .check label:hover { background: var(--soft) }
-      .check input { flex-shrink: 0; width: 18px; height: 18px; margin-top: 3px; accent-color: var(--green) }
-      .check input:checked + span { color: var(--green); text-decoration: line-through }
-      .check-bar { display: flex; align-items: center; gap: 12px; margin-top: 10px; color: var(--muted); font-size: 14px }
-      .meter { flex: 1; height: 8px; overflow: hidden; background: var(--soft); border-radius: 8px }
-      .meter i { display: block; height: 100%; width: 0; background: var(--green); transition: width .25s }
-      .reset { padding: 6px 12px; color: var(--muted); background: transparent; border: 1px solid var(--line); border-radius: 6px; cursor: pointer; font: 600 12px var(--sans) }
-
       footer { padding: 30px 6vw 50px; color: var(--muted); border-top: 1px solid var(--line); font-size: 14px }
 
       @media (max-width: 960px) {
@@ -178,12 +167,11 @@
           <a href="#contexto">Contexto y propósito</a>
           <a href="#proyectos">Proyectos propuestos</a>
           <a href="#requisitos">Requisitos técnicos</a>
+          <a href="#hosting">Publicación en hosting</a>
           <a href="#ejemplo">Ejemplo de adaptación</a>
           <a href="#cronograma">Cronograma</a>
           <a href="#entregables">Entregables</a>
           <a href="#rubrica">Rúbrica</a>
-          <a href="#sustentacion">Sustentación</a>
-          <a href="#checklist">Checklist final</a>
         </div>
       </div>
     </nav>
@@ -194,16 +182,18 @@
           <span class="pill">Aplicativos Móviles · 2026-2</span>
           <span class="pill">Android · Kotlin</span>
           <span class="pill">PHP · MySQL · Retrofit</span>
+          <span class="pill">API en hosting</span>
         </div>
         <p class="kicker">Evaluación · Trabajo grupal</p>
         <h1>Trabajo Práctico</h1>
-        <p class="lead">Apps móviles con API REST para la Amazonía peruana. Cada grupo elige un problema real de la región selva y construye una app Android que lista y registra información a través de su propia API PHP + MySQL, aplicando lo trabajado en la guía <em>API REST en Android</em>.</p>
+        <p class="lead">Apps móviles con API REST para la Amazonía peruana. Cada grupo elige un problema real de la región selva y construye una app Android que lista y registra información a través de su propia API PHP + MySQL <strong>publicada en un hosting</strong>, aplicando lo trabajado en la guía <em>API REST en Android</em>.</p>
         <div class="facts">
           <div class="fact"><b>3 – 4</b><span>integrantes por grupo</span></div>
-          <div class="fact"><b>3 semanas</b><span>de desarrollo</span></div>
+          <div class="fact"><b>6 días</b><span>para entregar todo</span></div>
           <div class="fact"><b>16</b><span>proyectos para elegir</span></div>
           <div class="fact"><b>20 pts</b><span>nota vigesimal + 2 de bonificación</span></div>
         </div>
+        <div class="note"><strong>Requisito obligatorio:</strong> la API (PHP + MySQL) <strong>debe estar publicada en un hosting</strong> y la app debe conectarse a ella mediante su URL pública. Un trabajo cuya API funcione solo en localhost, con <code>10.0.2.2</code> o con la IP de una PC <strong>no pasa a calificación</strong>.</div>
       </header>
 
       <main class="content">
@@ -223,7 +213,7 @@
             </div>
             <div class="card">
               <h4>🧩 Base técnica</h4>
-              <p>Se reutiliza la arquitectura de la guía: <code>config.php</code>, <code>listar.php</code>, <code>registrar.php</code>, Retrofit, RecyclerView, formulario y FAB.</p>
+              <p>Se reutiliza la arquitectura de la guía: <code>config.php</code>, <code>listar.php</code>, <code>registrar.php</code>, Retrofit, RecyclerView, formulario y FAB. La diferencia: la API ya no corre en localhost, sino en un <strong>hosting con URL pública</strong>.</p>
             </div>
           </div>
 
@@ -233,7 +223,7 @@
         <!-- 2. PROYECTOS -->
         <section id="proyectos">
           <h2>2. Proyectos propuestos</h2>
-          <p>Cada grupo elige <strong>un proyecto distinto</strong> (no se repiten). La elección se registra en el foro del aula virtual en orden de llegada. Si el grupo desea proponer un tema propio de la selva, debe ser aprobado por el docente en la semana 1 y cumplir los mismos requisitos.</p>
+          <p>Cada grupo elige <strong>un proyecto distinto</strong> (no se repiten). La elección se registra en el foro del aula virtual en orden de llegada. Si el grupo desea proponer un tema propio de la selva, debe ser aprobado por el docente el día 1 y cumplir los mismos requisitos.</p>
 
           <div class="filters" role="group" aria-label="Filtrar por región">
             <button class="chip on" data-f="todas">Todas</button>
@@ -449,7 +439,7 @@
             <div class="card">
               <h4>🗄️ Base de datos</h4>
               <ul>
-                <li>Base propia: <code>tp_g01_rioviaje</code> (grupo + proyecto)</li>
+                <li>Base MySQL <strong>creada en el hosting</strong> (el panel puede añadir un prefijo al nombre)</li>
                 <li>Tabla principal con <strong>mínimo 6 campos</strong> y <code>id</code> AUTO_INCREMENT</li>
                 <li>Tipos adecuados: <code>DECIMAL</code>, <code>DATE</code>, <code>INT</code>, <code>VARCHAR</code></li>
                 <li><strong>10 registros o más</strong> con datos verosímiles de la región</li>
@@ -459,7 +449,8 @@
             <div class="card">
               <h4>🐘 API PHP</h4>
               <ul>
-                <li><code>config.php</code> con PDO y <code>charset=utf8</code></li>
+                <li><strong>Publicada en un hosting</strong> con URL pública (HTTPS de preferencia)</li>
+                <li><code>config.php</code> con PDO, <code>charset=utf8</code> y los datos de conexión del hosting</li>
                 <li><code>listar.php</code> (GET) y <code>registrar.php</code> (POST)</li>
                 <li>Consultas con <strong>prepared statements</strong></li>
                 <li>Validación de campos en el servidor</li>
@@ -472,6 +463,7 @@
               <ul>
                 <li>Paquete propio, p. ej. <code>com.example.rioviaje</code></li>
                 <li>Retrofit + Gson: modelo, <code>ApiService</code>, <code>RetrofitClient</code></li>
+                <li><code>BASE_URL</code> apunta al dominio del hosting (no a <code>10.0.2.2</code> ni a una IP local)</li>
                 <li>RecyclerView con layout de ítem propio (≥ 3 datos visibles)</li>
                 <li>Formulario de registro con validaciones</li>
                 <li>FAB que abre el formulario; la lista se recarga en <code>onResume()</code></li>
@@ -488,23 +480,82 @@
             <li>Formulario con el tipo de teclado correcto (<code>inputType</code> numérico, decimal, fecha o teléfono según el campo).</li>
           </ul>
 
-          <div class="note"><strong>Conexión:</strong> igual que en la guía, el emulador usa <code>http://10.0.2.2/…</code> y un celular físico usa la IPv4 de la PC en la misma red. No olvides <code>network_security_config.xml</code> y el permiso <code>INTERNET</code> en el Manifest: es el error más frecuente en la sustentación.</div>
+          <div class="note"><strong>Hosting obligatorio:</strong> Laragon/XAMPP sirve solo como borrador mientras programan. El control del día 2, el APK, el video y la sustentación <strong>se hacen siempre contra la API en el hosting</strong>. El docente instalará el APK en un celular con datos móviles: si la app depende de la PC del grupo, el trabajo no se califica.</div>
         </section>
 
-        <!-- 4. EJEMPLO -->
+        <!-- 4. HOSTING -->
+        <section id="hosting">
+          <h2>4. Publicación de la API en un hosting</h2>
+          <p>Este paso es <strong>obligatorio</strong>: sin API en hosting no hay trabajo que calificar. El hosting debe ofrecer <strong>PHP 8 y MySQL/MariaDB</strong> con phpMyAdmin. Puede ser un plan gratuito o de pago; el grupo es responsable de que la API esté en línea desde el día 2 hasta la publicación de notas.</p>
+
+          <div class="note"><strong>Cuidado con algunos hostings gratuitos:</strong> varios planes gratuitos (por ejemplo InfinityFree o ByetHost) responden a cada petición con una página de verificación en JavaScript antes de mostrar el contenido. En el navegador se ve bien, pero Retrofit recibe HTML en lugar de JSON y la app falla con <code>Expected BEGIN_OBJECT but was STRING</code>. Antes de elegir, prueba la URL en Postman: debe devolver JSON puro.</div>
+
+          <h3>Pasos para publicar</h3>
+          <ol>
+            <li><strong>Crear la cuenta</strong> y un subdominio o dominio, por ejemplo <code>tp-g01-rioviaje.tuhosting.com</code>.</li>
+            <li><strong>Crear la base de datos MySQL</strong> desde el panel y anotar: servidor (host), nombre de la base, usuario y contraseña.</li>
+            <li><strong>Importar el script</strong> <code>.sql</code> en phpMyAdmin del hosting. Quita la línea <code>CREATE DATABASE</code> y <code>USE</code> si el hosting no permite crear bases desde SQL.</li>
+            <li><strong>Editar <code>config.php</code></strong> con los datos del panel (ver ejemplo).</li>
+            <li><strong>Subir la carpeta</strong> de la API a <code>public_html/</code> (o <code>htdocs/</code>) con el Administrador de archivos o por FTP con FileZilla.</li>
+            <li><strong>Probar</strong> <code>https://tu-dominio/api/viajes/listar.php</code> en el navegador del celular con datos móviles y <code>registrar.php</code> con Postman.</li>
+            <li><strong>Cambiar la <code>BASE_URL</code></strong> en <code>RetrofitClient.kt</code> por la URL del hosting y generar el APK.</li>
+          </ol>
+
+          <pre class="tree">public_html/                     ← raíz del hosting
+└── api/
+    ├── config.php               ← datos de conexión del hosting
+    └── viajes/
+        ├── listar.php           → https://tp-g01-rioviaje.tuhosting.com/api/viajes/listar.php
+        └── registrar.php        → https://tp-g01-rioviaje.tuhosting.com/api/viajes/registrar.php</pre>
+
+          <pre data-lang="php" data-file="api/config.php">&lt;?php
+// Datos que entrega el panel del hosting (sección "Bases de datos MySQL")
+$host = "sql123.tuhosting.com";       // en muchos hostings es "localhost"
+$db   = "cuenta_tp_g01_rioviaje";      // nombre con el prefijo de la cuenta
+$user = "cuenta_tpg01";
+$pass = "********";
+
+header('Content-Type: application/json; charset=utf-8');
+
+try {
+    $conexion = new PDO("mysql:host=$host;dbname=$db;charset=utf8", $user, $pass);
+    $conexion-&gt;setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch (PDOException $e) {
+    http_response_code(500);
+    echo json_encode([
+        "success" =&gt; false,
+        "message" =&gt; "No se pudo conectar a la base de datos"
+    ]);
+    exit;
+}</pre>
+
+          <div class="ok"><strong>En un servidor público</strong> no muestres <code>$e-&gt;getMessage()</code> al cliente: puede revelar el usuario o el host de la base de datos. Devuelve un mensaje genérico, como en el ejemplo.</div>
+
+          <h3>HTTP o HTTPS</h3>
+          <div class="grid3">
+            <div class="card"><h4>Con HTTPS (recomendado)</h4><p>La mayoría de hostings ofrece SSL gratuito (Let's Encrypt). Usa <code>https://</code> en la <code>BASE_URL</code> y ya no necesitas permitir tráfico HTTP en la app.</p></div>
+            <div class="card"><h4>Solo HTTP</h4><p>Mantén <code>network_security_config.xml</code>, pero autoriza el <strong>dominio del hosting</strong> en lugar de <code>10.0.2.2</code>.</p></div>
+            <div class="card"><h4>Siempre</h4><p>Permiso <code>INTERNET</code> en el Manifest y la <code>BASE_URL</code> terminada en <code>/</code>; si no, Retrofit lanza una excepción al iniciar.</p></div>
+          </div>
+        </section>
+
+        <!-- 5. EJEMPLO -->
         <section id="ejemplo">
-          <h2>4. Ejemplo de adaptación</h2>
+          <h2>5. Ejemplo de adaptación</h2>
           <p>Así se transforma la guía para el proyecto <strong>01 · RíoViaje</strong>. Úsalo como referencia para tu propio proyecto: cambian la tabla, las carpetas y los modelos; la lógica de Retrofit y del RecyclerView es la misma.</p>
 
           <pre class="tree">Guía (productos)                       →  Proyecto RíoViaje (viajes)
-ucv_aplic_mov/productos/listar.php     →  tp_g01_rioviaje/viajes/listar.php
-ucv_aplic_mov/productos/registrar.php  →  tp_g01_rioviaje/viajes/registrar.php
+localhost/ucv_aplic_mov/               →  hosting: public_html/api/
+ucv_aplic_mov/productos/listar.php     →  api/viajes/listar.php
+ucv_aplic_mov/productos/registrar.php  →  api/viajes/registrar.php
+BASE_URL http://10.0.2.2/...           →  BASE_URL https://tp-g01-rioviaje.tuhosting.com/api/
 models/Producto.kt                     →  models/Viaje.kt
 adapters/ProductoAdapter.kt            →  adapters/ViajeAdapter.kt
 layout/item_producto.xml               →  layout/item_viaje.xml
 RegistrarActivity.kt                   →  RegistrarViajeActivity.kt</pre>
 
-          <pre data-lang="sql" data-file="tp_g01_rioviaje.sql">CREATE DATABASE IF NOT EXISTS tp_g01_rioviaje;
+          <pre data-lang="sql" data-file="tp_g01_rioviaje.sql">-- En el hosting: omite las dos líneas siguientes y selecciona la base en phpMyAdmin
+CREATE DATABASE IF NOT EXISTS tp_g01_rioviaje;
 USE tp_g01_rioviaje;
 
 CREATE TABLE viajes (
@@ -546,48 +597,93 @@ data class ViajesResponse(
     val total: Int?
 )</pre>
 
+          <pre data-lang="kotlin" data-file="api/RetrofitClient.kt">package com.example.rioviaje.api
+
+import okhttp3.OkHttpClient
+import okhttp3.logging.HttpLoggingInterceptor
+import retrofit2.Retrofit
+import retrofit2.converter.gson.GsonConverterFactory
+import java.util.concurrent.TimeUnit
+
+object RetrofitClient {
+    // URL pública del hosting. Debe terminar en "/".
+    private const val BASE_URL = "https://tp-g01-rioviaje.tuhosting.com/api/"
+
+    val instance: ApiService by lazy {
+        val logging = HttpLoggingInterceptor().apply {
+            level = HttpLoggingInterceptor.Level.BODY
+        }
+
+        // Un hosting compartido puede tardar más que localhost en responder
+        val client = OkHttpClient.Builder()
+            .addInterceptor(logging)
+            .connectTimeout(20, TimeUnit.SECONDS)
+            .readTimeout(20, TimeUnit.SECONDS)
+            .build()
+
+        val retrofit = Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .client(client)
+            .addConverterFactory(GsonConverterFactory.create())
+            .build()
+
+        retrofit.create(ApiService::class.java)
+    }
+}</pre>
+
+          <div class="box"><strong>Los endpoints de <code>ApiService</code> son relativos a la <code>BASE_URL</code>:</strong> con la URL anterior, <code>@GET("viajes/listar.php")</code> llama a <code>https://tp-g01-rioviaje.tuhosting.com/api/viajes/listar.php</code>.</div>
+
           <div class="ok"><strong>Atención con los tipos:</strong> PDO devuelve los <code>DECIMAL</code> e <code>INT</code> como texto (<code>"120.00"</code>). Gson suele convertirlos sin problema, pero si ves errores de conversión, castea en PHP (<code>(float)$fila['precio']</code>) o declara el campo como <code>String</code> en Kotlin y conviértelo al mostrarlo.</div>
         </section>
 
-        <!-- 5. CRONOGRAMA -->
+        <!-- 6. CRONOGRAMA -->
         <section id="cronograma">
-          <h2>5. Cronograma y avances</h2>
-          <p>El trabajo se desarrolla en tres semanas con dos avances revisados en clase. Las fechas exactas se publican en el aula virtual.</p>
+          <h2>6. Cronograma: 6 días</h2>
+          <p>Todo se entrega en <strong>6 días</strong> desde la publicación del trabajo. Partan de los archivos de la guía y adáptenlos: no hace falta programar desde cero. La fecha y hora límite se publican en el aula virtual.</p>
 
           <div class="timeline">
             <div class="hito">
-              <h4>Semana 1 · Elección y backend <span class="tag">AVANCE 1</span></h4>
+              <h4>Día 1 · Elegir proyecto y base de datos</h4>
               <ul>
-                <li>Formar el grupo y registrar el proyecto elegido en el foro del aula virtual.</li>
-                <li>Diseñar la tabla, crear la base de datos e insertar 10 registros reales o verosímiles.</li>
-                <li><code>config.php</code>, <code>listar.php</code> y <code>registrar.php</code> funcionando.</li>
-                <li><strong>Evidencia:</strong> captura del JSON en el navegador y prueba POST en Postman.</li>
+                <li>Formar el grupo y registrar el proyecto en el foro del aula virtual.</li>
+                <li>Crear la tabla e insertar 10 registros de la región.</li>
               </ul>
             </div>
             <div class="hito">
-              <h4>Semana 2 · App Android <span class="tag">AVANCE 2</span></h4>
+              <h4>Día 2 · API en el hosting <span class="tag">CONTROL</span></h4>
               <ul>
-                <li>Proyecto Android con modelo, <code>ApiService</code> y <code>RetrofitClient</code>.</li>
-                <li>Lista en RecyclerView con layout de ítem diseñado para el tema.</li>
-                <li>Formulario de registro con validaciones y FAB.</li>
-                <li><strong>Evidencia:</strong> demo en clase listando y registrando desde el emulador.</li>
+                <li>Adaptar <code>config.php</code>, <code>listar.php</code> y <code>registrar.php</code> de la guía.</li>
+                <li>Crear la cuenta de hosting, importar la base y subir la API.</li>
+                <li><strong>Control:</strong> publicar en el foro la URL pública de <code>listar.php</code> devolviendo JSON.</li>
               </ul>
             </div>
             <div class="hito">
-              <h4>Semana 3 · Cierre y entrega final <span class="tag">ENTREGA</span></h4>
+              <h4>Días 3 y 4 · App Android</h4>
               <ul>
-                <li>Identidad visual (ícono, colores, nombre) y manejo de errores.</li>
-                <li>Retos opcionales para la bonificación.</li>
-                <li>Informe, video y subida de archivos a la plataforma.</li>
+                <li>Modelo, <code>ApiService</code> y <code>RetrofitClient</code> con la URL del hosting.</li>
+                <li>RecyclerView con layout de ítem propio, formulario con validaciones y FAB.</li>
+              </ul>
+            </div>
+            <div class="hito">
+              <h4>Día 5 · Prueba y evidencias</h4>
+              <ul>
+                <li>Probar el APK en un celular con datos móviles.</li>
+                <li>Nombre y colores de la app; grabar el video y armar el informe.</li>
+              </ul>
+            </div>
+            <div class="hito">
+              <h4>Día 6 · Entrega y sustentación <span class="tag">ENTREGA</span></h4>
+              <ul>
+                <li>Subir los archivos a la plataforma antes de la hora límite.</li>
                 <li>Sustentación grupal con preguntas individuales.</li>
               </ul>
             </div>
           </div>
         </section>
 
-        <!-- 6. ENTREGABLES -->
+        <!-- 7. ENTREGABLES -->
         <section id="entregables">
-          <h2>6. Entregables en la plataforma</h2>
+          <h2>7. Entregables en la plataforma</h2>
           <p>Un solo integrante (el coordinador) sube los archivos en la tarea <strong>“Trabajo Práctico – Entrega final”</strong> del aula virtual. Todos los archivos usan el formato de nombre <code>TP_G##_Proyecto_Tipo</code>.</p>
 
           <div class="table-wrap">
@@ -596,20 +692,21 @@ data class ViajesResponse(
                 <tr><th>#</th><th>Entregable</th><th>Formato</th><th>Nombre del archivo</th><th>Contenido</th></tr>
               </thead>
               <tbody>
-                <tr><td>1</td><td><strong>Informe técnico</strong></td><td>PDF</td><td><code>TP_G01_RioViaje_Informe.pdf</code></td><td>Estructura indicada abajo, 8 a 15 páginas.</td></tr>
+                <tr><td>0</td><td><strong>URL pública de la API</strong></td><td>Enlace</td><td>En el comentario de la entrega y en el informe</td><td>URL de <code>listar.php</code> en el hosting. Debe seguir activa hasta la publicación de notas.</td></tr>
+                <tr><td>1</td><td><strong>Informe técnico</strong></td><td>PDF</td><td><code>TP_G01_RioViaje_Informe.pdf</code></td><td>Estructura indicada abajo, 4 a 6 páginas.</td></tr>
                 <tr><td>2</td><td><strong>Proyecto Android</strong></td><td>ZIP</td><td><code>TP_G01_RioViaje_Android.zip</code></td><td>Proyecto completo de Android Studio, sin carpetas <code>build/</code> ni <code>.gradle/</code>.</td></tr>
-                <tr><td>3</td><td><strong>API y base de datos</strong></td><td>ZIP</td><td><code>TP_G01_RioViaje_API.zip</code></td><td>Carpeta PHP completa + script <code>.sql</code> exportado desde phpMyAdmin / HeidiSQL.</td></tr>
-                <tr><td>4</td><td><strong>APK de prueba</strong></td><td>APK</td><td><code>TP_G01_RioViaje.apk</code></td><td>Build &gt; Build APK(s), versión debug.</td></tr>
-                <tr><td>5</td><td><strong>Video demostrativo</strong></td><td>Enlace</td><td>En el comentario de la entrega</td><td>3 a 5 min en YouTube (no listado) o Drive con acceso público. Todos los integrantes aparecen o narran.</td></tr>
+                <tr><td>3</td><td><strong>API y base de datos</strong></td><td>ZIP</td><td><code>TP_G01_RioViaje_API.zip</code></td><td>Carpeta PHP tal como está en el hosting + script <code>.sql</code> exportado desde el phpMyAdmin del hosting. En <code>config.php</code> reemplaza la contraseña por <code>********</code>.</td></tr>
+                <tr><td>4</td><td><strong>APK de prueba</strong></td><td>APK</td><td><code>TP_G01_RioViaje.apk</code></td><td>Build &gt; Build APK(s), versión debug, conectada al hosting. Se instalará en un celular con datos móviles.</td></tr>
+                <tr><td>5</td><td><strong>Video demostrativo</strong></td><td>Enlace</td><td>En el comentario de la entrega</td><td>2 a 3 min en YouTube (no listado) o Drive con acceso público. Puede grabarse con la pantalla del celular.</td></tr>
               </tbody>
             </table>
           </div>
 
           <h3>Estructura de los archivos comprimidos</h3>
           <pre class="tree">TP_G01_RioViaje_API.zip
-├── tp_g01_rioviaje.sql          ← crea la BD, la tabla e inserta los registros
-└── tp_g01_rioviaje/
-    ├── config.php
+├── tp_g01_rioviaje.sql          ← crea la tabla e inserta los registros
+└── api/                         ← misma carpeta subida a public_html/
+    ├── config.php               ← contraseña reemplazada por ********
     └── viajes/
         ├── listar.php
         └── registrar.php
@@ -622,32 +719,28 @@ TP_G01_RioViaje_Android.zip
 
           <div class="note"><strong>Antes de comprimir Android:</strong> ejecuta <em>Build &gt; Clean Project</em> y cierra Android Studio. Excluye <code>app/build/</code>, <code>build/</code> y <code>.gradle/</code>: un ZIP limpio pesa menos de 5 MB. Si el archivo supera el límite de la plataforma, súbelo a Drive y deja el enlace.</div>
 
-          <h3>Estructura del informe</h3>
+          <h3>Estructura del informe (4 a 6 páginas)</h3>
           <ol>
-            <li><strong>Carátula:</strong> universidad, curso, docente, número de grupo, integrantes y rol de cada uno.</li>
-            <li><strong>Problema y región:</strong> qué necesidad atiende la app, para quién y dónde (máx. 1 página).</li>
-            <li><strong>Objetivo general</strong> y 2 o 3 objetivos específicos.</li>
-            <li><strong>Modelo de datos:</strong> diagrama o descripción de la tabla con tipos de datos.</li>
-            <li><strong>Endpoints:</strong> tabla con método, URL, parámetros y ejemplo de respuesta JSON.</li>
-            <li><strong>Arquitectura de la app:</strong> estructura de paquetes y responsabilidad de cada clase.</li>
-            <li><strong>Capturas:</strong> lista, formulario, validaciones, error de conexión y registro reflejado en la BD.</li>
-            <li><strong>Dificultades y soluciones</strong> encontradas durante el desarrollo.</li>
-            <li><strong>Conclusiones</strong> y mejoras futuras.</li>
-            <li><strong>Enlace al video</strong> y declaración de participación de cada integrante.</li>
+            <li><strong>Carátula:</strong> curso, docente, número de grupo e integrantes con su rol.</li>
+            <li><strong>Problema y región:</strong> qué necesidad atiende la app y para quién (un párrafo).</li>
+            <li><strong>Tabla y endpoints:</strong> campos de la tabla y las URL públicas de <code>listar.php</code> y <code>registrar.php</code>.</li>
+            <li><strong>Hosting:</strong> nombre del hosting y captura de la base en su phpMyAdmin (sin contraseñas).</li>
+            <li><strong>Capturas de la app:</strong> lista, formulario, validación y el nuevo registro en la base.</li>
+            <li><strong>Conclusión</strong> breve y enlace al video.</li>
           </ol>
 
-          <h3>Guion sugerido para el video</h3>
+          <h3>Guion del video (2 a 3 min)</h3>
           <div class="grid3">
-            <div class="card"><h4>0:00 – 1:00</h4><p>Presentación del grupo, el problema de la región y la idea de la app.</p></div>
-            <div class="card"><h4>1:00 – 2:30</h4><p>Base de datos y API: mostrar la tabla y probar <code>listar.php</code> y <code>registrar.php</code>.</p></div>
-            <div class="card"><h4>2:30 – 5:00</h4><p>App en el emulador: listar, registrar, validar campos vacíos y ver el nuevo registro en MySQL.</p></div>
+            <div class="card"><h4>0:00 – 0:30</h4><p>Grupo, problema de la región e idea de la app.</p></div>
+            <div class="card"><h4>0:30 – 1:00</h4><p>URL pública de <code>listar.php</code> abierta en el navegador.</p></div>
+            <div class="card"><h4>1:00 – 3:00</h4><p>App en el celular: listar, registrar, validar un campo vacío y ver el registro nuevo en la lista.</p></div>
           </div>
         </section>
 
-        <!-- 7. RÚBRICA -->
+        <!-- 8. RÚBRICA -->
         <section id="rubrica">
-          <h2>7. Rúbrica de evaluación</h2>
-          <p>La nota final es sobre 20. Los criterios técnicos se evalúan sobre el código entregado y lo demostrado en la sustentación; la sustentación es individual.</p>
+          <h2>8. Rúbrica de evaluación</h2>
+          <p>La nota final es sobre 20. Los criterios técnicos se evalúan sobre el código entregado y lo demostrado en la sustentación; la sustentación es individual. <strong>La rúbrica se aplica solo si la API está publicada en un hosting</strong> y la app se conecta a ella.</p>
 
           <div class="table-wrap">
             <table>
@@ -663,17 +756,17 @@ TP_G01_RioViaje_Android.zip
                   <td>No entrega script o no funciona.</td>
                 </tr>
                 <tr>
-                  <td><strong>2. API REST PHP</strong></td><td class="pts">4</td>
-                  <td>GET y POST funcionan, prepared statements, validación en servidor, JSON uniforme y códigos de error manejados.</td>
-                  <td>GET y POST funcionan; falta validación o el JSON no es uniforme.</td>
-                  <td>Solo funciona uno de los dos endpoints.</td>
-                  <td>La API no responde o concatena SQL sin preparar.</td>
+                  <td><strong>2. API REST PHP en hosting</strong></td><td class="pts">4</td>
+                  <td>Publicada en hosting con URL pública; GET y POST funcionan, prepared statements, validación en servidor, JSON uniforme y errores manejados.</td>
+                  <td>En hosting, GET y POST funcionan; falta validación o el JSON no es uniforme.</td>
+                  <td>En hosting funciona solo uno de los dos endpoints.</td>
+                  <td>La URL pública no responde o concatena SQL sin preparar.</td>
                 </tr>
                 <tr>
                   <td><strong>3. Retrofit y modelos</strong></td><td class="pts">3</td>
                   <td>Modelo, ApiService y RetrofitClient correctos, <code>@SerializedName</code> donde corresponde, llamadas asíncronas con manejo de <code>onFailure</code>.</td>
-                  <td>Funciona, pero sin manejo de errores de red.</td>
-                  <td>Funciona parcialmente o con la URL fija del ejemplo.</td>
+                  <td>Funciona contra el hosting, pero sin manejo de errores de red.</td>
+                  <td>Funciona parcialmente contra el hosting (solo lista o solo registra).</td>
                   <td>No consume la API.</td>
                 </tr>
                 <tr>
@@ -732,46 +825,11 @@ TP_G01_RioViaje_Android.zip
           <ul>
             <li><strong>Entrega tardía:</strong> −2 puntos por día, hasta un máximo de 2 días; después no se recibe.</li>
             <li><strong>Archivos incompletos o que no abren:</strong> se califica solo lo que se puede ejecutar.</li>
+            <li><strong>API solo en localhost, con <code>10.0.2.2</code> o con IP local:</strong> el trabajo no pasa a calificación (no se aplica la rúbrica).</li>
+            <li><strong>Hosting caído o suspendido al momento de la revisión:</strong> se califican los criterios 2 a 5 solo con lo demostrado en la sustentación. Mantengan la cuenta activa hasta la publicación de notas.</li>
             <li><strong>Copia entre grupos o código ajeno sin citar:</strong> nota 0 para todos los grupos involucrados.</li>
             <li><strong>Integrante que no sustenta:</strong> obtiene 0 en el criterio 8 y su nota técnica puede reducirse según su participación declarada.</li>
           </ul>
-        </section>
-
-        <!-- 8. SUSTENTACIÓN -->
-        <section id="sustentacion">
-          <h2>8. Sustentación</h2>
-          <p>Cada grupo dispone de <strong>10 minutos</strong>: 4 minutos de demostración en vivo y 6 minutos de preguntas. El docente elige a quién pregunta, por lo que todos deben conocer el proyecto completo.</p>
-          <h3>Ejemplos de preguntas</h3>
-          <div class="grid3">
-            <div class="card"><h4>API</h4><ul><li>¿Por qué usar prepared statements?</li><li>¿Qué devuelve <code>registrar.php</code> si falta un campo?</li></ul></div>
-            <div class="card"><h4>Retrofit</h4><ul><li>¿Qué hace la anotación <code>@SerializedName</code>?</li><li>¿Por qué la emulación usa <code>10.0.2.2</code>?</li></ul></div>
-            <div class="card"><h4>Android</h4><ul><li>¿Qué hace el ViewHolder?</li><li>¿Por qué se recarga la lista en <code>onResume()</code>?</li></ul></div>
-          </div>
-          <div class="box"><strong>Cambio en vivo:</strong> durante la sustentación se puede pedir un cambio pequeño (agregar un campo al ítem, cambiar una validación o un texto). Tenlo en cuenta al repartir el trabajo: cada integrante debe saber dónde está cada archivo.</div>
-        </section>
-
-        <!-- 9. CHECKLIST -->
-        <section id="checklist">
-          <h2>9. Checklist antes de entregar</h2>
-          <p>Marca cada punto antes de subir los archivos. Las marcas se guardan solo en tu navegador.</p>
-          <div class="check" id="check">
-            <label><input type="checkbox"><span>El script <code>.sql</code> crea la base, la tabla e inserta 10 o más registros sin errores.</span></label>
-            <label><input type="checkbox"><span><code>listar.php</code> devuelve JSON con <code>success</code>, <code>message</code> y <code>data</code> en el navegador.</span></label>
-            <label><input type="checkbox"><span><code>registrar.php</code> fue probado con Postman y rechaza campos vacíos.</span></label>
-            <label><input type="checkbox"><span>La app tiene permiso <code>INTERNET</code> y <code>network_security_config.xml</code>.</span></label>
-            <label><input type="checkbox"><span>La lista muestra los datos de mi proyecto (no hay restos de “productos”).</span></label>
-            <label><input type="checkbox"><span>El FAB abre el formulario, valida y registra; al volver, la lista se actualiza.</span></label>
-            <label><input type="checkbox"><span>La app muestra un mensaje cuando el servidor está apagado.</span></label>
-            <label><input type="checkbox"><span>Cambié nombre, ícono y colores de la app.</span></label>
-            <label><input type="checkbox"><span>Hice <em>Clean Project</em> y el ZIP de Android no incluye <code>build/</code> ni <code>.gradle/</code>.</span></label>
-            <label><input type="checkbox"><span>El informe PDF tiene todas las secciones y el enlace al video funciona en modo incógnito.</span></label>
-            <label><input type="checkbox"><span>Los archivos siguen el formato <code>TP_G##_Proyecto_Tipo</code>.</span></label>
-          </div>
-          <div class="check-bar">
-            <div class="meter"><i id="meter"></i></div>
-            <span id="count">0 / 11</span>
-            <button class="reset" id="reset">Reiniciar</button>
-          </div>
         </section>
       </main>
 
@@ -813,8 +871,9 @@ TP_G01_RioViaje_Android.zip
         const tokens = [];
         const keep = (cls) => (m) => { tokens.push(`<span class="${cls}">${m}</span>`); return `\u0000${String.fromCharCode(0xE000 + tokens.length - 1)}\u0000`; };
         let out = text
-          .replace(lang === 'sql' ? /--.*$/gm : /\/\/.*$/gm, keep('c'))
-          .replace(/'[^'\n]*'|"[^"\n]*"/g, keep('s'))
+          // Comentarios y cadenas en una sola pasada: gana el que aparece primero ("https://..." sigue siendo cadena)
+          .replace(lang === 'sql' ? /--.*$|'[^'\n]*'|"[^"\n]*"/gm : /\/\/.*$|'[^'\n]*'|"[^"\n]*"/gm,
+            (m) => keep(/^(--|\/\/)/.test(m) ? 'c' : 's')(m))
           .replace(/@\w+/g, keep('n'))
           .replace(KW[lang] || /$^/g, keep('k'))
           .replace(/\b(String|Int|Double|Boolean|List)\b/g, keep('t'))
@@ -845,25 +904,6 @@ TP_G01_RioViaje_Android.zip
         const esc = raw.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
         pre.innerHTML = `<code>${highlight(esc, pre.dataset.lang)}</code>`;
       });
-
-      // Checklist con estado guardado en el navegador
-      const KEY = 'tp-apirest-checklist';
-      const boxes = [...document.querySelectorAll('#check input')];
-      const meter = document.getElementById('meter');
-      const count = document.getElementById('count');
-      function save() {
-        const done = boxes.filter(b => b.checked).length;
-        meter.style.width = (done / boxes.length * 100) + '%';
-        count.textContent = `${done} / ${boxes.length}`;
-        try { localStorage.setItem(KEY, JSON.stringify(boxes.map(b => b.checked))); } catch (e) {}
-      }
-      try {
-        const saved = JSON.parse(localStorage.getItem(KEY) || '[]');
-        boxes.forEach((b, i) => b.checked = !!saved[i]);
-      } catch (e) {}
-      boxes.forEach(b => b.addEventListener('change', save));
-      document.getElementById('reset').addEventListener('click', () => { boxes.forEach(b => b.checked = false); save(); });
-      save();
     </script>
   </body>
 </html>
