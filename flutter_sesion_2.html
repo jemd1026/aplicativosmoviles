@@ -1,0 +1,2184 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sesion 2 - Login, navegacion y orden del proyecto | Flutter &amp; Dart</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0E1218;
+      --bg-soft: #11161D;
+      --card: #171D26;
+      --card-soft: #141A22;
+      --line: #262E3A;
+      --text: #E7ECF3;
+      --text-dim: #9AA7B8;
+      --text-faint: #5E6B7D;
+      --dart: #1389FD;
+      --dart-soft: #0E2A45;
+      --flutter: #FFC93C;
+      --flutter-soft: #3A2F12;
+      --green: #3DDC97;
+      --green-soft: #10301F;
+      --red: #FF7A7A;
+      --violet: #B79CFF;
+      --violet-soft: #241B3D;
+      --bodega: #086288;
+      --bodega-2: #4D8DBA;
+      --radius: 14px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.65;
+    }
+
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      background-image:
+        radial-gradient(circle at 8% 0%, rgba(19, 137, 253, .08), transparent 38%),
+        radial-gradient(circle at 90% 72%, rgba(255, 201, 60, .08), transparent 38%);
+    }
+
+    .wrap {
+      position: relative;
+      z-index: 1;
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 48px 26px 120px;
+    }
+
+    .eyebrow {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12.5px;
+      color: var(--flutter);
+      letter-spacing: .08em;
+      margin-bottom: 12px;
+    }
+
+    h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: clamp(30px, 5vw, 46px);
+      line-height: 1.08;
+      letter-spacing: -0.01em;
+      margin-bottom: 16px;
+    }
+
+    .hero-sub {
+      color: var(--text-dim);
+      font-size: 17px;
+      max-width: 720px;
+      margin-bottom: 34px;
+    }
+
+    code.ic {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--flutter);
+      font-size: .92em;
+    }
+
+    .timeline {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 56px;
+    }
+
+    .timeline-item {
+      flex: 1;
+      min-width: 150px;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 14px 16px;
+      text-decoration: none;
+      transition: border-color .15s, transform .15s;
+    }
+
+    .timeline-item:hover { border-color: var(--flutter); transform: translateY(-2px); }
+
+    .timeline-item .t {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--flutter);
+      margin-bottom: 4px;
+    }
+
+    .timeline-item .d { font-size: 13.5px; color: var(--text-dim); }
+
+    .block { margin-bottom: 72px; scroll-margin-top: 20px; }
+
+    h2.block-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 25px;
+      margin-bottom: 6px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    h3.sub {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 19px;
+      margin: 34px 0 12px;
+      color: var(--text);
+    }
+
+    .block-num {
+      font-family: 'Space Grotesk', sans-serif;
+      font-weight: 700;
+      font-size: 15px;
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--flutter-soft);
+      color: var(--flutter);
+      flex-shrink: 0;
+    }
+
+    .block-time {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--text-faint);
+      margin-bottom: 24px;
+      display: block;
+    }
+
+    p.txt { color: var(--text-dim); margin-bottom: 16px; font-size: 15.5px; }
+    p.txt b, li b { color: var(--text); }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: var(--radius);
+      padding: 24px 26px;
+      margin-bottom: 20px;
+    }
+
+    /* ---------- Bloques de codigo ---------- */
+    .codeblock {
+      background: #0A0D12;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+      margin: 18px 0;
+    }
+
+    .codeblock .bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 16px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .codeblock .bar .fname {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--text-dim);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .codeblock .bar .dots { display: flex; gap: 6px; }
+    .codeblock .bar .dots span { width: 9px; height: 9px; border-radius: 50%; }
+    .codeblock .bar .bar-right { display: flex; align-items: center; gap: 12px; }
+
+    .codeblock pre {
+      padding: 18px 20px;
+      overflow-x: auto;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13.5px;
+      line-height: 1.7;
+      tab-size: 2;
+    }
+
+    .codeblock code { color: #D6E2F0; font-family: inherit; }
+
+    .tag {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 10.5px;
+      font-weight: 600;
+      letter-spacing: .05em;
+      padding: 2px 8px;
+      border-radius: 5px;
+    }
+    .tag-new  { background: var(--green-soft); color: var(--green); border: 1px solid rgba(61,220,151,.35); }
+    .tag-edit { background: var(--flutter-soft); color: var(--flutter); border: 1px solid rgba(255,201,60,.35); }
+    .tag-cfg  { background: var(--dart-soft); color: #7CC0FF; border: 1px solid rgba(19,137,253,.35); }
+
+    .copy-btn {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      color: var(--text-dim);
+      background: transparent;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 3px 10px;
+      cursor: pointer;
+      transition: color .15s, border-color .15s, background .15s;
+    }
+    .copy-btn:hover { color: var(--flutter); border-color: var(--flutter); }
+    .copy-btn.copied { color: #0B141F; background: var(--flutter); border-color: var(--flutter); }
+
+    .tk-key  { color: #FF7AB2; }
+    .tk-type { color: #5FD3FF; }
+    .tk-str  { color: #9EE6A8; }
+    .tk-com  { color: #8C9DB3; font-style: italic; }
+    .tk-fn   { color: #FFD479; }
+    .tk-num  { color: #FFB86C; }
+
+    /* ---------- Avisos ---------- */
+    .tip, .warn, .info {
+      display: flex;
+      gap: 14px;
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin: 18px 0;
+    }
+    .tip  { background: var(--dart-soft); border: 1px solid rgba(19, 137, 253, .3); }
+    .warn { background: #2A1A10; border: 1px solid rgba(255, 201, 60, .3); }
+    .info { background: var(--violet-soft); border: 1px solid rgba(183, 156, 255, .3); }
+    .tip .ic, .warn .ic, .info .ic { font-size: 18px; flex-shrink: 0; }
+    .tip p, .warn p, .info p { color: var(--text-dim); font-size: 14.5px; margin: 0; }
+    .tip p b, .warn p b, .info p b { color: var(--text); }
+
+    /* ---------- Ejercicios ---------- */
+    .exercise {
+      background: linear-gradient(150deg, var(--green-soft), var(--card-soft));
+      border: 1px solid rgba(61, 220, 151, .35);
+      border-radius: var(--radius);
+      padding: 22px 24px;
+      margin: 24px 0;
+    }
+    .exercise .ex-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--green);
+      letter-spacing: .06em;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .exercise .ex-label::before { content: '⏱'; }
+    .exercise h4 { font-family: 'Space Grotesk', sans-serif; font-size: 17px; margin-bottom: 8px; }
+    .exercise p { color: var(--text-dim); font-size: 14.5px; margin-bottom: 10px; }
+
+    .check-list { list-style: none; margin-top: 12px; }
+    .check-list li {
+      display: flex;
+      gap: 10px;
+      align-items: flex-start;
+      margin-bottom: 8px;
+      font-size: 14.5px;
+      color: var(--text-dim);
+    }
+    .check-list input {
+      accent-color: var(--green);
+      width: 16px;
+      height: 16px;
+      margin-top: 3px;
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+    .check-list label { cursor: pointer; }
+
+    /* ---------- Tablas ---------- */
+    .compare-wrap { overflow-x: auto; margin: 18px 0 24px; }
+    .compare-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: var(--card);
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .compare-table th, .compare-table td {
+      text-align: left;
+      padding: 13px 16px;
+      border-bottom: 1px solid var(--line);
+      vertical-align: top;
+      font-size: 14px;
+    }
+    .compare-table th {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 12px;
+      color: var(--flutter);
+      letter-spacing: .04em;
+      background: #111722;
+    }
+    .compare-table td { color: var(--text-dim); }
+    .compare-table td b { color: var(--text); }
+    .compare-table tr:last-child td { border-bottom: none; }
+
+    /* ---------- Capas del patron ---------- */
+    .layers {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+      margin: 20px 0;
+    }
+    .layer {
+      border-radius: 12px;
+      padding: 18px;
+      border: 1px solid var(--line);
+      background: var(--card);
+    }
+    .layer .ln {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+    .layer .la { font-size: 12.5px; color: var(--text-faint); margin-bottom: 10px; }
+    .layer p { font-size: 14px; color: var(--text-dim); }
+    .layer.l1 { border-color: rgba(255,201,60,.4); background: linear-gradient(160deg, var(--flutter-soft), var(--card)); }
+    .layer.l1 .ln { color: var(--flutter); }
+    .layer.l2 { border-color: rgba(19,137,253,.4); background: linear-gradient(160deg, var(--dart-soft), var(--card)); }
+    .layer.l2 .ln { color: #7CC0FF; }
+    .layer.l3 { border-color: rgba(61,220,151,.4); background: linear-gradient(160deg, var(--green-soft), var(--card)); }
+    .layer.l3 .ln { color: var(--green); }
+
+    .rule-line {
+      text-align: center;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13px;
+      color: var(--text-dim);
+      background: var(--card-soft);
+      border: 1px dashed var(--line);
+      border-radius: 10px;
+      padding: 12px;
+      margin-bottom: 20px;
+    }
+    .rule-line b { color: var(--flutter); }
+
+    /* ---------- Arbol de carpetas ---------- */
+    .tree {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 13.5px;
+      line-height: 1.85;
+      color: var(--text-dim);
+      padding: 18px 20px;
+      white-space: pre;
+      overflow-x: auto;
+    }
+    .tree .d { color: var(--text); font-weight: 600; }
+    .tree .c1 { color: var(--flutter); }
+    .tree .c2 { color: #7CC0FF; }
+    .tree .c3 { color: var(--green); }
+    .tree .n { color: var(--text-faint); font-style: italic; }
+
+    /* ---------- Mockup de celular ---------- */
+    .anatomy {
+      display: grid;
+      grid-template-columns: 230px 1fr;
+      gap: 28px;
+      align-items: center;
+      margin: 22px 0;
+    }
+    .phone {
+      width: 230px;
+      height: 440px;
+      border-radius: 32px;
+      border: 8px solid #222A35;
+      background: #000;
+      overflow: hidden;
+      position: relative;
+      box-shadow: 0 18px 50px rgba(0,0,0,.45);
+      margin: 0 auto;
+    }
+    .screen { position: absolute; inset: 0; display: flex; flex-direction: column; font-family: 'Inter', sans-serif; }
+    .screen.login { background: var(--bodega); }
+    .ph-zone { position: relative; border: 2px dashed transparent; border-radius: 10px; }
+    .ph-zone .pin {
+      position: absolute;
+      top: -10px; left: -10px;
+      width: 22px; height: 22px;
+      border-radius: 50%;
+      font: 700 12px 'Space Grotesk', sans-serif;
+      display: flex; align-items: center; justify-content: center;
+      color: #0B141F;
+    }
+    .z1 { border-color: var(--flutter); margin: 26px 12px 0; padding: 8px 0; text-align: center; }
+    .z1 .pin { background: var(--flutter); }
+    .z2 { border-color: var(--green); margin: auto 4px 4px; }
+    .z2 .pin { background: var(--green); }
+    .ph-logo {
+      width: 74px; height: 74px; margin: 0 auto 8px;
+      background: #fff; border-radius: 12px;
+      display: flex; align-items: center; justify-content: center; font-size: 34px;
+    }
+    .ph-title { color: #fff; font-weight: 700; font-size: 15px; }
+    .ph-card { background: #fff; border-radius: 22px 22px 0 0; padding: 14px 12px 16px; text-align: center; }
+    .ph-h { color: rgba(0,0,0,.55); font-weight: 700; font-size: 15px; margin-bottom: 10px; }
+    .ph-input {
+      display: flex; justify-content: space-between; align-items: center;
+      border: 1px solid #8a8f98; border-radius: 4px;
+      padding: 6px 8px; margin-bottom: 8px;
+      font-size: 10.5px; color: #555; text-align: left;
+    }
+    .ph-btn {
+      display: inline-block; background: var(--bodega); color: #fff;
+      font-size: 11px; font-weight: 600; padding: 6px 26px; border-radius: 6px; margin: 4px 0 8px;
+    }
+    .ph-link { font-size: 10px; color: var(--bodega); border-top: 1px solid #ddd; padding-top: 8px; margin: 0 16px; }
+
+    .screen.home { background: #F4F7FB; }
+    .ph-appbar { background: var(--bodega); color: #fff; font-size: 12px; font-weight: 600; padding: 26px 12px 10px; }
+    .ph-list { flex: 1; padding: 8px; display: flex; flex-direction: column; gap: 6px; }
+    .ph-item {
+      background: #fff; border-radius: 8px; padding: 7px 8px;
+      display: flex; align-items: center; gap: 8px;
+      box-shadow: 0 1px 2px rgba(0,0,0,.08);
+    }
+    .ph-av { width: 22px; height: 22px; border-radius: 50%; background: var(--bodega-2); color: #fff; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .ph-it { flex: 1; font-size: 9.5px; color: #222; line-height: 1.3; }
+    .ph-it small { display: block; color: #777; font-size: 8.5px; }
+    .ph-chip { font-size: 8.5px; padding: 2px 6px; border-radius: 8px; background: #D9F5E3; color: #1F6B3C; }
+    .ph-chip.low { background: #FBDADA; color: #9B2C2C; }
+    .ph-fab { position: absolute; right: 12px; bottom: 62px; width: 36px; height: 36px; border-radius: 10px; background: #CFE6F3; color: var(--bodega); font-size: 20px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,.2); }
+    .ph-nav { background: #E8EEF4; display: flex; justify-content: space-around; padding: 8px 0 10px; font-size: 8.5px; color: #444; text-align: center; }
+    .ph-nav .on b { display: block; background: #CFE6F3; border-radius: 10px; padding: 1px 10px; margin-bottom: 2px; }
+    .ph-nav span { font-size: 13px; display: block; }
+
+    .anat-list { list-style: none; }
+    .anat-list li { display: flex; gap: 12px; margin-bottom: 14px; color: var(--text-dim); font-size: 14.5px; }
+    .anat-list .pin {
+      width: 24px; height: 24px; border-radius: 50%;
+      font: 700 12px 'Space Grotesk', sans-serif;
+      display: flex; align-items: center; justify-content: center;
+      color: #0B141F; flex-shrink: 0; margin-top: 1px;
+    }
+
+    /* ---------- Pila de navegacion ---------- */
+    .nav-stacks {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+      margin: 20px 0;
+    }
+    .nav-col { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+    .nav-col .nc-t { font-family: 'JetBrains Mono', monospace; font-size: 12.5px; color: var(--flutter); margin-bottom: 4px; }
+    .nav-col .nc-d { font-size: 12.5px; color: var(--text-faint); margin-bottom: 14px; min-height: 38px; }
+    .pila { display: flex; flex-direction: column-reverse; gap: 6px; min-height: 104px; justify-content: flex-start; }
+    .scr {
+      font-family: 'JetBrains Mono', monospace; font-size: 12px;
+      padding: 8px 10px; border-radius: 7px; text-align: center;
+      background: #1E2632; color: var(--text-dim); border: 1px solid var(--line);
+    }
+    .scr.top { background: var(--dart-soft); color: #A9D4FF; border-color: rgba(19,137,253,.5); }
+    .scr.gone { opacity: .45; text-decoration: line-through; border-style: dashed; }
+
+    /* ---------- Flujo de validate() ---------- */
+    .flow { display: flex; align-items: stretch; gap: 10px; flex-wrap: wrap; margin: 18px 0; }
+    .flow .st {
+      flex: 1; min-width: 150px;
+      background: var(--card); border: 1px solid var(--line); border-radius: 10px;
+      padding: 12px 14px; font-size: 13.5px; color: var(--text-dim);
+    }
+    .flow .st b { display: block; color: var(--text); font-family: 'JetBrains Mono', monospace; font-size: 12.5px; margin-bottom: 4px; }
+    .flow .ar { align-self: center; color: var(--flutter); font-size: 18px; }
+
+    /* ---------- Pasos ---------- */
+    .steps { list-style: none; counter-reset: paso; margin: 14px 0 20px; }
+    .steps li {
+      counter-increment: paso;
+      position: relative;
+      padding: 10px 14px 10px 50px;
+      margin-bottom: 8px;
+      background: var(--card-soft);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      font-size: 14.5px;
+      color: var(--text-dim);
+    }
+    .steps li::before {
+      content: counter(paso);
+      position: absolute; left: 14px; top: 10px;
+      width: 24px; height: 24px; border-radius: 7px;
+      background: var(--flutter-soft); color: var(--flutter);
+      font: 700 13px 'Space Grotesk', sans-serif;
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    /* ---------- Checkpoint ---------- */
+    .checkpoint {
+      background: linear-gradient(150deg, var(--flutter-soft), var(--card));
+      border: 1px solid rgba(255, 201, 60, .4);
+      border-radius: var(--radius);
+      padding: 30px 28px;
+      margin-top: 20px;
+    }
+    .checkpoint .ck-label { font-family: 'JetBrains Mono', monospace; font-size: 12px; color: var(--flutter); letter-spacing: .08em; margin-bottom: 10px; }
+    .checkpoint h3 { font-family: 'Space Grotesk', sans-serif; font-size: 21px; margin-bottom: 10px; }
+    .checkpoint p { color: var(--text-dim); font-size: 15px; }
+
+    @media (max-width: 720px) {
+      .layers, .nav-stacks { grid-template-columns: 1fr; }
+      .anatomy { grid-template-columns: 1fr; }
+      .flow .ar { transform: rotate(90deg); margin: 0 auto; }
+      .flow .st { flex-basis: 100%; }
+    }
+
+    @media (max-width: 640px) {
+      .wrap { padding: 36px 16px 100px; }
+      .timeline { flex-direction: column; }
+      .card { padding: 20px 18px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-grid"></div>
+  <div class="wrap">
+
+    <div class="eyebrow">SESION 2 · PROYECTO INVENTARIO MIBODEGA</div>
+    <h1>Login, navegacion<br>y orden del proyecto</h1>
+    <p class="hero-sub">
+      En esta sesion construimos, paso a paso, las primeras pantallas reales de la app
+      <b>Inventario MiBodega</b>: un login con validaciones, un registro, un menu inferior
+      y una lista de productos. Y lo mas importante: aprenderemos a <b>ordenar el codigo en carpetas</b>
+      para que no todo termine dentro de <code class="ic">main.dart</code>.
+    </p>
+
+    <div class="timeline">
+      <a class="timeline-item" href="#mapa">
+        <div class="t">ANTES</div>
+        <div class="d">El mapa del proyecto (patron por capas)</div>
+      </a>
+      <a class="timeline-item" href="#b1">
+        <div class="t">BLOQUE 1</div>
+        <div class="d">Login con Form y validaciones</div>
+      </a>
+      <a class="timeline-item" href="#b2">
+        <div class="t">BLOQUE 2</div>
+        <div class="d">Registro y navegacion entre pantallas</div>
+      </a>
+      <a class="timeline-item" href="#b3">
+        <div class="t">BLOQUE 3</div>
+        <div class="d">Home con menu inferior y lista</div>
+      </a>
+      <a class="timeline-item" href="#b4">
+        <div class="t">BLOQUE 4</div>
+        <div class="d">Tema central y cierre</div>
+      </a>
+    </div>
+
+    <!-- =========================================================
+         MAPA DEL PROYECTO
+         ========================================================= -->
+    <div class="block" id="mapa">
+      <h2 class="block-title"><span class="block-num">0</span> El mapa del proyecto</h2>
+      <span class="block-time">15 minutos · entender donde va cada archivo</span>
+
+      <p class="txt">Imaginen una bodega de verdad. Hay un <b>mostrador</b> donde atienden al cliente, unas <b>herramientas</b> que todos usan (la balanza, la calculadora) y un <b>almacen</b> donde estan los productos. Nuestra app se organiza igual, en <b>3 carpetas</b>. A esto le llamamos <b>patron por capas simple</b>.</p>
+
+      <div class="layers">
+        <div class="layer l1">
+          <div class="ln">presentation/</div>
+          <div class="la">🧑‍💼 el mostrador</div>
+          <p>Todo lo que el usuario <b>ve y toca</b>: pantallas, formularios y botones.</p>
+        </div>
+        <div class="layer l2">
+          <div class="ln">core/</div>
+          <div class="la">🧰 las herramientas</div>
+          <p>Cosas que <b>todos usan</b>: colores, tema y validaciones.</p>
+        </div>
+        <div class="layer l3">
+          <div class="ln">data/</div>
+          <div class="la">📦 el almacen</div>
+          <p>Los <b>datos</b>: como es un producto y la lista de productos.</p>
+        </div>
+      </div>
+
+      <div class="rule-line">Regla de oro: <b>presentation</b> usa a <b>core</b> y a <b>data</b>. &nbsp;Nunca al reves.</div>
+
+      <p class="txt">Al terminar la sesion, la carpeta <code class="ic">lib/</code> quedara asi. El numero entre corchetes indica en que bloque crearemos cada archivo:</p>
+
+      <div class="codeblock">
+        <div class="bar"><span class="fname">Estructura final de lib/</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+<div class="tree"><span class="d">lib/</span>
+├── main.dart                         <span class="n">[1] arranca la app</span>
+│
+├── <span class="d c2">core/</span>                             <span class="n">🧰 herramientas compartidas</span>
+│   ├── <span class="c2">theme.dart</span>                    <span class="n">[1][4] colores y tema</span>
+│   └── <span class="c2">validators.dart</span>               <span class="n">[1] reglas de los formularios</span>
+│
+├── <span class="d c3">data/</span>                             <span class="n">📦 los datos</span>
+│   └── <span class="d c3">models/</span>
+│       └── <span class="c3">producto.dart</span>             <span class="n">[3] modelo + lista de prueba</span>
+│
+└── <span class="d c1">presentation/</span>                     <span class="n">🧑‍💼 lo que se ve</span>
+    ├── <span class="d c1">auth/</span>                         <span class="n">pantallas de acceso</span>
+    │   ├── <span class="c1">header_auth.dart</span>          <span class="n">[1] logo + titulo</span>
+    │   ├── <span class="c1">form_login.dart</span>           <span class="n">[1][2] formulario de ingreso</span>
+    │   ├── <span class="c1">login_screen.dart</span>         <span class="n">[1] pantalla de login</span>
+    │   ├── <span class="c1">form_register.dart</span>        <span class="n">[2] formulario de registro</span>
+    │   └── <span class="c1">register_screen.dart</span>      <span class="n">[2] pantalla de registro</span>
+    ├── <span class="d c1">home/</span>                         <span class="n">pantalla principal</span>
+    │   ├── <span class="c1">home_screen.dart</span>          <span class="n">[2][3] menu inferior</span>
+    │   ├── <span class="c1">productos_view.dart</span>       <span class="n">[3] lista de productos</span>
+    │   └── <span class="c1">perfil_view.dart</span>          <span class="n">[3] datos del usuario</span>
+    └── <span class="d c1">widgets/</span>                      <span class="n">piezas reutilizables</span>
+        └── <span class="c1">app_button.dart</span>           <span class="n">[1] boton de la app</span></div>
+      </div>
+
+      <div class="compare-wrap">
+        <table class="compare-table">
+          <thead>
+            <tr><th>Sufijo del archivo</th><th>Que significa</th><th>Ejemplo</th></tr>
+          </thead>
+          <tbody>
+            <tr><td><b>_screen</b></td><td>Una pantalla completa (tiene su propio <code class="ic">Scaffold</code>).</td><td>login_screen.dart</td></tr>
+            <tr><td><b>form_ / _view</b></td><td>Un pedazo grande de una pantalla.</td><td>form_login.dart, productos_view.dart</td></tr>
+            <tr><td><b>widgets/</b></td><td>Pieza pequena que se repite en varias pantallas.</td><td>app_button.dart</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="warn">
+        <div class="ic">⚠</div>
+        <p><b>Sobre los imports:</b> todos empiezan con <code class="ic">package:app_flutter/...</code> porque <code class="ic">app_flutter</code> es el <b>name</b> que aparece en <code class="ic">pubspec.yaml</code>. Si su proyecto se llama distinto (por ejemplo <code class="ic">mi_bodega</code>), cambien esa palabra en todos los imports.</p>
+      </div>
+    </div>
+
+    <!-- =========================================================
+         BLOQUE 1
+         ========================================================= -->
+    <div class="block" id="b1">
+      <h2 class="block-title"><span class="block-num">1</span> Login con Form y validaciones</h2>
+      <span class="block-time">60 minutos · capturar datos y revisar que esten bien</span>
+
+      <p class="txt">Vamos a construir esta pantalla. Fijense que <b>no es un solo archivo</b>: la armamos uniendo piezas pequenas, como si fuera Lego.</p>
+
+      <div class="anatomy">
+        <div class="phone">
+          <div class="screen login">
+            <div class="ph-zone z1"><span class="pin">1</span>
+              <div class="ph-logo">📦</div>
+              <div class="ph-title">Inventario MiBodega</div>
+            </div>
+            <div class="ph-zone z2"><span class="pin">2</span>
+              <div class="ph-card">
+                <div class="ph-h">Ingreso</div>
+                <div class="ph-input"><span>✉ Correo electronico</span></div>
+                <div class="ph-input"><span>🔒 Contraseña</span><span>👁</span></div>
+                <div class="ph-btn">Ingresar</div>
+                <div class="ph-link">No tienes una cuenta, creala aqui.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <ul class="anat-list">
+          <li><span class="pin" style="background:var(--flutter);">1</span><div><b>HeaderAuth</b> — el logo y el titulo. Lo separamos porque tambien lo usara la pantalla de Registro.</div></li>
+          <li><span class="pin" style="background:var(--green);">2</span><div><b>FormLogin</b> — la tarjeta blanca con las cajas de texto y el boton <b>AppButton</b>.</div></li>
+          <li><span class="pin" style="background:#7CC0FF;">▢</span><div><b>LoginScreen</b> — el fondo azul que <b>junta</b> las piezas 1 y 2. Un <code class="ic">Spacer()</code> empuja el formulario hacia abajo.</div></li>
+        </ul>
+      </div>
+
+      <h3 class="sub">Conceptos nuevos (lean esto antes del codigo)</h3>
+      <div class="compare-wrap">
+        <table class="compare-table">
+          <thead><tr><th>Concepto</th><th>Para que sirve</th><th>Comparacion de la vida real</th></tr></thead>
+          <tbody>
+            <tr><td><b>Form</b></td><td>Agrupa varias cajas de texto para revisarlas todas juntas.</td><td>Una ficha de inscripcion en papel.</td></tr>
+            <tr><td><b>TextFormField</b></td><td>Caja de texto que <b>sabe validarse</b> y mostrar su error en rojo.</td><td>Cada casillero de la ficha.</td></tr>
+            <tr><td><b>GlobalKey&lt;FormState&gt;</b></td><td>"Llave" que nos deja preguntarle al Form: <i>¿todo esta bien?</i></td><td>El sello del revisor.</td></tr>
+            <tr><td><b>validator</b></td><td>Funcion que revisa un campo. Devuelve <code class="ic">null</code> si esta bien o un texto con el error.</td><td>El revisor que dice "falta tu DNI".</td></tr>
+            <tr><td><b>TextEditingController</b></td><td>Guarda lo que el usuario escribio para poder leerlo despues con <code class="ic">.text</code>.</td><td>Una fotocopia de lo escrito.</td></tr>
+            <tr><td><b>setState()</b></td><td>Avisa a Flutter: "cambie una variable, vuelve a dibujar la pantalla".</td><td>Borrar la pizarra y escribir de nuevo.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <p class="txt"><b>¿Como funciona la validacion?</b> Al presionar "Ingresar" ocurre esto:</p>
+      <div class="flow">
+        <div class="st"><b>1. Boton</b>Se llama a <code class="ic">formKey.currentState!.validate()</code></div>
+        <div class="ar">➜</div>
+        <div class="st"><b>2. Cada campo</b>Flutter ejecuta el <code class="ic">validator</code> de cada TextFormField</div>
+        <div class="ar">➜</div>
+        <div class="st"><b>3. Resultado</b><code class="ic">null</code> = correcto ✅<br>texto = error en rojo ❌</div>
+        <div class="ar">➜</div>
+        <div class="st"><b>4. validate()</b>Devuelve <code class="ic">true</code> solo si <b>todos</b> estan correctos</div>
+      </div>
+
+      <h3 class="sub">Paso a paso: creen los archivos en este orden</h3>
+      <ol class="steps">
+        <li>Coloquen la imagen en <code class="ic">assets/logo/logo.png</code> , declarenla en <code class="ic">pubspec.yaml</code> y ejecuten <code class="ic">flutter pub get</code>.</li>
+        <li><code class="ic">core/theme.dart</code> → los colores.</li>
+        <li><code class="ic">core/validators.dart</code> → las reglas de los formularios.</li>
+        <li><code class="ic">presentation/widgets/app_button.dart</code> → el boton.</li>
+        <li><code class="ic">presentation/auth/header_auth.dart</code> → logo + titulo.</li>
+        <li><code class="ic">presentation/auth/form_login.dart</code> → el formulario.</li>
+        <li><code class="ic">presentation/auth/login_screen.dart</code> → la pantalla que une todo.</li>
+        <li><code class="ic">main.dart</code> → arrancar la app en el Login.</li>
+      </ol>
+
+      <div class="tip">
+        <div class="ic">💡</div>
+        <p><b>¿Por que en ese orden?</b> Porque cada archivo <b>importa</b> a los anteriores. Si crean <code class="ic">form_login.dart</code> antes que <code class="ic">app_button.dart</code>, VS Code marcara error en rojo hasta que exista el boton.</p>
+      </div>
+
+      <!-- Paso 1 -->
+      <div class="codeblock">
+        <div class="bar"><span class="fname"><span class="tag tag-cfg">CONFIG</span> pubspec.yaml — declarar la imagen del logo</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+<pre><code class="plain">flutter:
+  uses-material-design: true
+
+  # Lista de imagenes que la app puede usar.
+  # OJO: la sangria (espacios) importa en YAML.
+  assets:
+    - assets/logo/logo.png</code></pre>
+      </div>
+
+      <div class="warn">
+        <div class="ic">⚠</div>
+        <p><b>Despues de tocar pubspec.yaml</b> detengan la app y vuelvan a ejecutarla (no basta con Hot Reload). Si la imagen no aparece, revisen que la ruta y el nombre del archivo sean exactamente iguales.</p>
+      </div>
+
+      <div class="codeblock">
+        <div class="bar"><span class="fname"><span class="tag tag-cfg">TERMINAL</span> Comandos de esta sesion (en la carpeta del proyecto)</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+<pre><code class="plain"><span class="tk-com"># 1) Lee pubspec.yaml y prepara las imagenes y paquetes</span>
+flutter pub get
+
+<span class="tk-com"># 2) Ejecuta la app en Chrome (o en el emulador abierto)</span>
+flutter run -d chrome
+flutter run</code></pre>
+      </div>
+
+      <div class="compare-wrap">
+        <table class="compare-table">
+          <thead><tr><th>Comando</th><th>¿Cuando usarlo?</th></tr></thead>
+          <tbody>
+            <tr><td><code class="ic">flutter pub get</code></td><td>Cada vez que <b>guarden cambios en pubspec.yaml</b> (imagenes o paquetes nuevos). VS Code suele ejecutarlo solo al guardar; si sale <i>Unable to load asset</i>, ejecutenlo a mano.</td></tr>
+            <tr><td><code class="ic">flutter run</code></td><td>Para <b>ejecutar y probar</b> la app mientras programan. Con <code class="ic">-d chrome</code> se abre en el navegador.</td></tr>
+            <tr><td><code class="ic">r</code> / <code class="ic">R</code></td><td>Con la app corriendo en la terminal: <code class="ic">r</code> = Hot Reload (cambios rapidos), <code class="ic">R</code> = Hot Restart (reinicia la app), <code class="ic">q</code> = salir.</td></tr>
+            <tr><td><code class="ic">flutter build web</code></td><td><b>No se usa en esta sesion.</b> Sirve solo para generar la version final y <b>publicarla</b> en un hosting. Crea la carpeta <code class="ic">build/web</code>.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Paso 2 -->
+      <div class="codeblock">
+        <div class="bar"><span class="fname"><span class="tag tag-new">NUEVO</span> lib/core/theme.dart</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+<pre><code>import 'package:flutter/material.dart';
+
+// ======================================================
+// core/theme.dart
+// Aqui guardamos los COLORES de la app en un solo lugar.
+// Si mañana queremos otro azul, lo cambiamos aqui
+// y toda la app se actualiza sola.
+// ======================================================
+
+class AppColors {
+  // "static const" = valor fijo que se usa SIN crear un objeto.
+  // Se escribe asi: AppColors.primario
+  static const Color primario = Color(0xFF086288);   // azul oscuro (Login)
+  static const Color secundario = Color(0xFF4D8DBA); // azul claro (Registro)
+  static const Color texto = Colors.black54;         // gris para titulos
+
+  // 0xFF086288 se lee asi:
+  //   0x  -> "esto es un numero hexadecimal"
+  //   FF  -> opacidad al 100%
+  //   086288 -> el color (como en HTML: #086288)
+}</code></pre>
+      </div>
+
+      <!-- Paso 3 -->
+      <div class="codeblock">
+        <div class="bar"><span class="fname"><span class="tag tag-new">NUEVO</span> lib/core/validators.dart</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+<pre><code>// ======================================================
+// core/validators.dart
+// Funciones que revisan si lo que escribio el usuario
+// es correcto. Las usaremos en el Login Y en el Registro,
+// por eso viven aqui y no dentro de un formulario.
+//
+// Regla de TODO validator:
+//   - devuelve null      -> el campo esta bien
+//   - devuelve un String -> ese texto aparece en rojo
+// ======================================================
+
+class Validators {
+  // 1) Campo obligatorio: no puede quedar vacio
+  static String? obligatorio(String? valor) {
+    // trim() quita los espacios: "   " tambien cuenta como vacio
+    if (valor == null || valor.trim().isEmpty) {
+      return 'Este campo es obligatorio';
+    }
+    return null; // null = sin error
+  }
+
+  // 2) Correo electronico
+  static String? email(String? valor) {
+    // Primero revisamos que no este vacio (reutilizamos la funcion 1)
+    final error = obligatorio(valor);
+    if (error != null) return error;
+
+    // RegExp = un "molde" que el texto debe cumplir:
+    //   letras/numeros  @  dominio  .  com / pe / edu ...
+    final molde = RegExp(r'^[\w\.\-]+@([\w\-]+\.)+[a-zA-Z]{2,4}$');
+
+    // valor! -> el "!" le dice a Dart: "tranquilo, aqui no es null"
+    if (!molde.hasMatch(valor!.trim())) {
+      return 'Correo electronico invalido';
+    }
+    return null;
+  }
+
+  // 3) Contraseña segura: 8 caracteres, una MAYUSCULA y un numero
+  static String? password(String? valor) {
+    final error = obligatorio(valor);
+    if (error != null) return error;
+
+    if (valor!.length &lt; 8) {
+      return 'Debe tener 8 caracteres como minimo';
+    }
+    // contains(RegExp(...)) pregunta: "¿hay al menos uno de estos?"
+    if (!valor.contains(RegExp(r'[A-Z]'))) {
+      return 'Debe tener al menos una letra MAYUSCULA';
+    }
+    if (!valor.contains(RegExp(r'[0-9]'))) {
+      return 'Debe tener al menos un numero';
+    }
+    return null;
+  }
+
+  // 4) Repetir contraseña: debe ser igual a la primera
+  //    Recibe 2 datos: lo escrito y la contraseña original
+  static String? confirmar(String? valor, String original) {
+    final error = obligatorio(valor);
+    if (error != null) return error;
+
+    if (valor != original) {
+      return 'Las contraseñas no coinciden';
+    }
+    return null;
+  }
+}</code></pre>
+      </div>
+
+      <div class="info">
+        <div class="ic">🔎</div>
+        <p><b>¿Que correos acepta el molde?</b> <code class="ic">juan@gmail.com</code> ✅ &nbsp; <code class="ic">ana@ucvvirtual.edu.pe</code> ✅ &nbsp; <code class="ic">juan@gmail</code> ❌ &nbsp; <code class="ic">juan.gmail.com</code> ❌. La parte <code class="ic">{2,4}</code> significa que la terminacion (<i>.pe</i>, <i>.com</i>, <i>.info</i>) debe tener entre 2 y 4 letras.</p>
+      </div>
+
+      <!-- Paso 4 -->
+      <div class="codeblock">
+        <div class="bar"><span class="fname"><span class="tag tag-new">NUEVO</span> lib/presentation/widgets/app_button.dart</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+<pre><code>import 'package:flutter/material.dart';
+import 'package:app_flutter/core/theme.dart';
+
+// ======================================================
+// Boton reutilizable de la app.
+// Lo creamos UNA vez y lo usamos en Login y Registro.
+// Si cambiamos su diseño aqui, cambia en toda la app.
+// ======================================================
+
+class AppButton extends StatelessWidget {
+  // Constructor: los datos que hay que darle al boton
+  const AppButton({super.key, required this.label, this.onPress});
+
+  final String label;             // texto del boton (obligatorio: required)
+  final void Function()? onPress; // que hacer al tocarlo (opcional: tiene ?)
+
+  @override
+  Widget build(BuildContext context) {
+    return FilledButton(
+      style: FilledButton.styleFrom(
+        backgroundColor: AppColors.primario, // color desde core/theme.dart
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8), // esquinas redondeadas
+        ),
+        padding: const EdgeInsets.symmetric(horizontal: 42), // boton mas ancho
+      ),
+      onPressed: onPress, // si onPress es null, el boton sale desactivado (gris)
+      child: Text(label),
+    );
+  }
+}</code></pre>
+      </div>
+
+      <!-- Paso 5 -->
+      <div class="codeblock">
+        <div class="bar"><span class="fname"><span class="tag tag-new">NUEVO</span> lib/presentation/auth/header_auth.dart</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+<pre><code>import 'package:flutter/material.dart';
+
+// ======================================================
+// Cabecera de las pantallas de acceso: logo + titulo.
+// La usan LoginScreen y RegisterScreen.
+// Es StatelessWidget porque NADA cambia aqui.
+// ======================================================
+
+class HeaderAuth extends StatelessWidget {
+  const HeaderAuth({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min, // la columna ocupa solo el alto necesario
+      children: [
+        const SizedBox(height: 62), // espacio arriba (deja libre la barra de estado)
+
+        // Card = tarjeta blanca con sombra alrededor del logo
+        Card(
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            // La imagen DEBE estar declarada en pubspec.yaml
+            child: Image.asset('assets/logo/logo.png', height: 150),
+          ),
+        ),
+
+        const Text(
+          'Inventario MiBodega',
+          style: TextStyle(
+            fontSize: 28,
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    );
+  }
+}</code></pre>
+      </div>
+
+      <!-- Paso 6 -->
+      <p class="txt"><b>El archivo mas importante del bloque.</b> Es <code class="ic">StatefulWidget</code> porque algo <b>cambia</b> en pantalla: el ojito que muestra u oculta la contraseña. Lean los comentarios con calma.</p>
+
+      <div class="codeblock">
+        <div class="bar"><span class="fname"><span class="tag tag-new">NUEVO</span> lib/presentation/auth/form_login.dart</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+<pre><code>import 'package:flutter/material.dart';
+import 'package:app_flutter/core/theme.dart';
+import 'package:app_flutter/core/validators.dart';
+import 'package:app_flutter/presentation/widgets/app_button.dart';
+
+// ======================================================
+// Formulario de ingreso (la tarjeta blanca del Login).
+// ======================================================
+
+// PARTE 1: el widget. Solo recibe datos del "padre".
+class FormLogin extends StatefulWidget {
+  const FormLogin({super.key, this.onTap});
+
+  // Funcion que nos envia LoginScreen.
+  // Se ejecuta cuando el usuario toca una caja de texto.
+  final void Function()? onTap;
+
+  @override
+  State&lt;FormLogin&gt; createState() => _FormLoginState(); // conecta con su estado
+}
+
+// PARTE 2: el estado. Aqui viven las variables que cambian.
+// El "_" al inicio significa: privado, solo se usa en este archivo.
+class _FormLoginState extends State&lt;FormLogin&gt; {
+  // Llave del formulario: nos deja preguntar "¿todo esta bien?"
+  final formKey = GlobalKey&lt;FormState&gt;();
+
+  // Controladores: guardan lo que el usuario escribe
+  final emailController = TextEditingController();
+  final passController = TextEditingController();
+
+  // true = contraseña oculta (••••••)
+  bool hidePassword = true;
+
+  // dispose() se ejecuta al cerrar la pantalla.
+  // Liberamos los controladores para no gastar memoria.
+  @override
+  void dispose() {
+    emailController.dispose();
+    passController.dispose();
+    super.dispose();
+  }
+
+  // Se ejecuta al presionar "Ingresar"
+  void ingresar() {
+    // validate() ejecuta TODOS los validator del formulario
+    if (formKey.currentState!.validate()) {
+      // TODO (Bloque 2): aqui iremos a la pantalla Home
+      mostrarMensaje('Bienvenido ${emailController.text}', Colors.green);
+    } else {
+      mostrarMensaje('Formulario invalido', Colors.red);
+    }
+  }
+
+  // Muestra un mensaje flotante abajo (SnackBar)
+  void mostrarMensaje(String texto, Color color) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(texto, style: const TextStyle(color: Colors.white)),
+        backgroundColor: color,
+        behavior: SnackBarBehavior.floating, // flota sobre la pantalla
+        showCloseIcon: true,                 // muestra una X para cerrarlo
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: formKey, // conectamos la llave con este formulario
+      child: Card(
+        color: Colors.white,
+        margin: EdgeInsets.zero, // sin margen: pegado a los bordes
+        // Solo redondeamos las 2 esquinas de arriba
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(32),
+            topRight: Radius.circular(32),
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Ingreso',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
+                  color: AppColors.texto,
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // ---------- CAJA 1: CORREO ----------
+              TextFormField(
+                controller: emailController,              // guarda lo escrito
+                keyboardType: TextInputType.emailAddress, // teclado con @
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),           // borde alrededor
+                  isDense: true,                          // caja mas compacta
+                  icon: Icon(Icons.email_outlined),       // icono a la izquierda
+                  labelText: 'Correo electronico',
+                ),
+                // "widget." para leer datos de la PARTE 1 (el StatefulWidget)
+                onTap: widget.onTap,
+                // Cuando sale el teclado, sube la pantalla 400 px
+                scrollPadding: const EdgeInsets.only(bottom: 400),
+                // Sin parentesis: le PASAMOS la funcion, no la ejecutamos
+                validator: Validators.email,
+              ),
+              const SizedBox(height: 12),
+
+              // ---------- CAJA 2: CONTRASEÑA ----------
+              TextFormField(
+                controller: passController,
+                obscureText: hidePassword, // true = oculta el texto
+                keyboardType: TextInputType.visiblePassword,
+                decoration: InputDecoration(
+                  border: const OutlineInputBorder(),
+                  isDense: true,
+                  icon: const Icon(Icons.lock_open_outlined),
+                  labelText: 'Contraseña',
+                  // suffixIcon = icono a la DERECHA (dentro de la caja)
+                  suffixIcon: IconButton(
+                    onPressed: () {
+                      // setState = "cambie algo, vuelve a dibujar"
+                      setState(() {
+                        hidePassword = !hidePassword; // true -> false -> true ...
+                      });
+                    },
+                    // Operador ternario:  condicion ? siVerdad : siFalso
+                    icon: Icon(
+                      hidePassword ? Icons.visibility_off : Icons.visibility,
+                    ),
+                  ),
+                ),
+                onTap: widget.onTap,
+                scrollPadding: const EdgeInsets.only(bottom: 400),
+                // En el Login solo revisamos que no este vacia
+                validator: Validators.obligatorio,
+              ),
+              const SizedBox(height: 16),
+
+              // Nuestro boton reutilizable
+              AppButton(label: 'Ingresar', onPress: ingresar),
+
+              // Linea separadora con 28 px de espacio a cada lado
+              const Divider(indent: 28, endIndent: 28),
+
+              TextButton(
+                onPressed: () {
+                  // TODO (Bloque 2): ir a la pantalla de Registro
+                },
+                child: const Text('No tienes una cuenta, creala aqui.'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}</code></pre>
+      </div>
+
+      <div class="tip">
+        <div class="ic">💡</div>
+        <p><b>¿Por que <code class="ic">validator: Validators.email</code> va sin parentesis?</b> Porque no queremos ejecutar la funcion ahora: se la <b>entregamos</b> al TextFormField para que <b>el</b> la ejecute cuando se llame a <code class="ic">validate()</code>. Es como darle tu numero a alguien para que te llame despues.</p>
+      </div>
+
+      <!-- Paso 7 -->
+      <div class="codeblock">
+        <div class="bar"><span class="fname"><span class="tag tag-new">NUEVO</span> lib/presentation/auth/login_screen.dart</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+<pre><code>import 'dart:developer'; // para usar log() y ver mensajes en la consola
+
+import 'package:flutter/material.dart';
+import 'package:app_flutter/core/theme.dart';
+import 'package:app_flutter/presentation/auth/form_login.dart';
+import 'package:app_flutter/presentation/auth/header_auth.dart';
+
+// ======================================================
+// Pantalla de Login: el fondo azul que JUNTA las piezas
+// HeaderAuth (arriba) + FormLogin (abajo).
+// ======================================================
+
+class LoginScreen extends StatelessWidget {
+  const LoginScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    // Tamaño de la pantalla del celular (ancho y alto)
+    final size = MediaQuery.sizeOf(context);
+
+    return Scaffold(
+      backgroundColor: AppColors.primario,
+      // Permite deslizar la pantalla cuando aparece el teclado
+      body: SingleChildScrollView(
+        child: SizedBox(
+          width: size.width,
+          height: size.height, // ocupamos todo el alto de la pantalla
+          child: Column(
+            children: [
+              const HeaderAuth(), // 1) logo + titulo
+              const Spacer(),     //    ocupa el espacio libre y empuja hacia abajo
+              FormLogin(          // 2) formulario
+                // Le enviamos una funcion. log() escribe en DEBUG CONSOLE
+                onTap: () => log('El usuario toco una caja de texto'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}</code></pre>
+      </div>
+
+      <!-- Paso 8 -->
+      <div class="codeblock">
+        <div class="bar"><span class="fname"><span class="tag tag-edit">EDITAR</span> lib/main.dart</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+<pre><code>import 'package:flutter/material.dart';
+import 'package:app_flutter/core/theme.dart';
+import 'package:app_flutter/presentation/auth/login_screen.dart';
+
+// main() es lo PRIMERO que se ejecuta al abrir la app
+void main() {
+  runApp(const MainApp());
+}
+
+// main.dart solo ARRANCA la app. Las pantallas viven en otros archivos.
+class MainApp extends StatelessWidget {
+  const MainApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false, // quita la cinta roja "DEBUG"
+      title: 'MiBodega',
+      theme: ThemeData(
+        // Genera toda la paleta de colores a partir de nuestro azul
+        colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primario),
+      ),
+      home: const LoginScreen(), // primera pantalla que se muestra
+    );
+  }
+}</code></pre>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-label">EJERCICIO · 20 MIN</div>
+        <h4>Prueben las validaciones</h4>
+        <p>Ejecuten la app y comprueben cada caso:</p>
+        <ul class="check-list">
+          <li><input type="checkbox" id="e1-1"><label for="e1-1">Presionar "Ingresar" con todo vacio → aparecen 2 mensajes en rojo</label></li>
+          <li><input type="checkbox" id="e1-2"><label for="e1-2">Escribir <code class="ic">juan</code> en el correo → "Correo electronico invalido"</label></li>
+          <li><input type="checkbox" id="e1-3"><label for="e1-3">Tocar el ojito → la contraseña se ve y se oculta</label></li>
+          <li><input type="checkbox" id="e1-4"><label for="e1-4">Datos correctos → SnackBar verde con el correo escrito</label></li>
+          <li><input type="checkbox" id="e1-5"><label for="e1-5"><b>Reto:</b> agreguen en <code class="ic">validators.dart</code> una regla para que el correo no tenga menos de 6 caracteres</label></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- =========================================================
+         BLOQUE 2
+         ========================================================= -->
+    <div class="block" id="b2">
+      <h2 class="block-title"><span class="block-num">2</span> Registro y navegacion entre pantallas</h2>
+      <span class="block-time">55 minutos · ir, volver y enviar datos</span>
+
+      <p class="txt">Flutter guarda las pantallas como una <b>pila de platos</b>: la pantalla que ves es el plato de arriba. Para navegar usamos <code class="ic">Navigator</code> y solo necesitamos 3 instrucciones:</p>
+
+      <div class="nav-stacks">
+        <div class="nav-col">
+          <div class="nc-t">push()</div>
+          <div class="nc-d">Pone una pantalla <b>encima</b>. Se puede volver.</div>
+          <div class="pila">
+            <div class="scr">Login</div>
+            <div class="scr top">Registro ⬆</div>
+          </div>
+        </div>
+        <div class="nav-col">
+          <div class="nc-t">pop()</div>
+          <div class="nc-d">Quita la pantalla de arriba. <b>Regresa</b> a la anterior.</div>
+          <div class="pila">
+            <div class="scr top">Login</div>
+            <div class="scr gone">Registro</div>
+          </div>
+        </div>
+        <div class="nav-col">
+          <div class="nc-t">pushReplacement()</div>
+          <div class="nc-d"><b>Cambia</b> la pantalla actual por otra. No se puede volver.</div>
+          <div class="pila">
+            <div class="scr gone">Login</div>
+            <div class="scr top">Home ⬆</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="compare-wrap">
+        <table class="compare-table">
+          <thead><tr><th>Accion en MiBodega</th><th>Instruccion</th><th>¿Por que?</th></tr></thead>
+          <tbody>
+            <tr><td>Login → Registro</td><td><code class="ic">push</code></td><td>El usuario puede arrepentirse y volver al Login.</td></tr>
+            <tr><td>Registro → Login</td><td><code class="ic">pop</code></td><td>Solo cerramos el Registro; el Login seguia debajo.</td></tr>
+            <tr><td>Login → Home</td><td><code class="ic">pushReplacement</code></td><td>Ya ingreso: el boton "atras" no debe regresar al Login.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="sub">Paso 1 · Una pantalla Home sencilla (temporal)</h3>
+      <p class="txt">Necesitamos un destino para el Login. Por ahora el Home solo mostrara el correo que recibe. Fijense en <code class="ic">required this.email</code>: asi una pantalla <b>recibe datos</b> de otra.</p>
+
+      <div class="codeblock">
+        <div class="bar"><span class="fname"><span class="tag tag-new">NUEVO</span> lib/presentation/home/home_screen.dart (version 1)</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+<pre><code>import 'package:flutter/material.dart';
+
+// Version 1 (temporal). En el Bloque 3 la reemplazamos.
+class HomeScreen extends StatelessWidget {
+  const HomeScreen({super.key, required this.email});
+
+  // Dato que llega desde el Login.
+  // "required" = es obligatorio enviarlo al crear la pantalla.
+  final String email;
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text('Inventario MiBodega')),
+      body: Center(
+        child: Text(
+          'Bienvenido\n$email', // \n = salto de linea; $email inserta la variable
+          textAlign: TextAlign.center,
+          style: const TextStyle(fontSize: 22),
+        ),
+      ),
+    );
+  }
+}</code></pre>
+      </div>
+
+      <h3 class="sub">Paso 2 · El formulario de Registro</h3>
+      <p class="txt">Es muy parecido al Login, pero con 4 cajas. Aqui se nota la ventaja de <code class="ic">core/validators.dart</code>: <b>reutilizamos</b> las mismas reglas sin copiarlas.</p>
+
+      <div class="codeblock">
+        <div class="bar"><span class="fname"><span class="tag tag-new">NUEVO</span> lib/presentation/auth/form_register.dart</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+<pre><code>import 'package:flutter/material.dart';
+import 'package:app_flutter/core/theme.dart';
+import 'package:app_flutter/core/validators.dart';
+import 'package:app_flutter/presentation/widgets/app_button.dart';
+
+// ======================================================
+// Formulario de registro (4 cajas de texto).
+// ======================================================
+
+class FormRegister extends StatefulWidget {
+  const FormRegister({super.key, this.onTap});
+
+  final void Function()? onTap;
+
+  @override
+  State&lt;FormRegister&gt; createState() => _FormRegisterState();
+}
+
+class _FormRegisterState extends State&lt;FormRegister&gt; {
+  final formKey = GlobalKey&lt;FormState&gt;();
+
+  // Un controlador por cada caja
+  final nombreController = TextEditingController();
+  final emailController = TextEditingController();
+  final passController = TextEditingController();
+  final pass2Controller = TextEditingController();
+
+  bool hidePassword = true; // controla las DOS cajas de contraseña
+
+  @override
+  void dispose() {
+    nombreController.dispose();
+    emailController.dispose();
+    passController.dispose();
+    pass2Controller.dispose();
+    super.dispose();
+  }
+
+  void registrar() {
+    // Si algun validator devuelve error, no hacemos nada
+    if (!formKey.currentState!.validate()) return;
+
+    // Todo bien: mostramos un mensaje...
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('Cuenta creada para ${nombreController.text}'),
+        backgroundColor: Colors.green,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+
+    // ...y volvemos al Login (quitamos Registro de la pila)
+    Navigator.pop(context);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: formKey,
+      child: Card(
+        color: Colors.white,
+        margin: EdgeInsets.zero,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(32),
+            topRight: Radius.circular(32),
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Registro',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
+                  color: AppColors.texto,
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // ---------- NOMBRE ----------
+              TextFormField(
+                controller: nombreController,
+                keyboardType: TextInputType.name,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  isDense: true,
+                  icon: Icon(Icons.person_outline),
+                  labelText: 'Nombre completo',
+                ),
+                onTap: widget.onTap,
+                validator: Validators.obligatorio, // misma regla del Login
+              ),
+              const SizedBox(height: 12),
+
+              // ---------- CORREO ----------
+              TextFormField(
+                controller: emailController,
+                keyboardType: TextInputType.emailAddress,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  isDense: true,
+                  icon: Icon(Icons.email_outlined),
+                  labelText: 'Correo electronico',
+                  hintText: 'mi.correo@mibodega.com', // texto de ejemplo gris
+                ),
+                onTap: widget.onTap,
+                validator: Validators.email,
+              ),
+              const SizedBox(height: 12),
+
+              // ---------- CONTRASEÑA ----------
+              TextFormField(
+                controller: passController,
+                obscureText: hidePassword,
+                decoration: InputDecoration(
+                  border: const OutlineInputBorder(),
+                  isDense: true,
+                  icon: const Icon(Icons.lock_open_outlined),
+                  labelText: 'Contraseña',
+                  helperText: 'Minimo 8 caracteres, 1 mayuscula y 1 numero',
+                  suffixIcon: IconButton(
+                    onPressed: () => setState(() => hidePassword = !hidePassword),
+                    icon: Icon(
+                      hidePassword ? Icons.visibility_off : Icons.visibility,
+                    ),
+                  ),
+                ),
+                onTap: widget.onTap,
+                validator: Validators.password, // regla de contraseña segura
+              ),
+              const SizedBox(height: 12),
+
+              // ---------- REPETIR CONTRASEÑA ----------
+              TextFormField(
+                controller: pass2Controller,
+                obscureText: hidePassword,
+                decoration: const InputDecoration(
+                  border: OutlineInputBorder(),
+                  isDense: true,
+                  icon: Icon(Icons.lock_outline),
+                  labelText: 'Repita la contraseña',
+                ),
+                onTap: widget.onTap,
+                // Aqui SI usamos una funcion flecha (=>), porque
+                // necesitamos enviar un dato extra: la 1ra contraseña
+                validator: (valor) => Validators.confirmar(valor, passController.text),
+              ),
+              const SizedBox(height: 16),
+
+              AppButton(label: 'Registrar', onPress: registrar),
+
+              TextButton(
+                // pop = volver a la pantalla anterior (el Login)
+                onPressed: () => Navigator.pop(context),
+                child: const Text('Ya tengo cuenta, ingresar'),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}</code></pre>
+      </div>
+
+      <h3 class="sub">Paso 3 · La pantalla de Registro</h3>
+      <p class="txt">Para variar, aqui no usamos <code class="ic">Column</code> + <code class="ic">Spacer</code> como en el Login, sino <code class="ic">Stack</code> + <code class="ic">Align</code>. Asi conocen las dos formas.</p>
+
+      <div class="compare-wrap">
+        <table class="compare-table">
+          <thead><tr><th>Login (Column)</th><th>Registro (Stack)</th></tr></thead>
+          <tbody>
+            <tr>
+              <td>Pone los hijos <b>uno debajo del otro</b>. El <code class="ic">Spacer</code> rellena el espacio del medio.</td>
+              <td>Pone los hijos <b>uno encima del otro</b> (como hojas apiladas). Cada <code class="ic">Align</code> decide donde se ubica.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="codeblock">
+        <div class="bar"><span class="fname"><span class="tag tag-new">NUEVO</span> lib/presentation/auth/register_screen.dart</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+<pre><code>import 'dart:developer';
+
+import 'package:flutter/material.dart';
+import 'package:app_flutter/core/theme.dart';
+import 'package:app_flutter/presentation/auth/form_register.dart';
+import 'package:app_flutter/presentation/auth/header_auth.dart';
+
+class RegisterScreen extends StatelessWidget {
+  const RegisterScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: AppColors.secundario, // azul mas claro que el Login
+      // Stack = capas una ENCIMA de otra
+      body: Stack(
+        children: [
+          // Capa 1: cabecera pegada ARRIBA al centro
+          const Align(
+            alignment: Alignment.topCenter,
+            child: HeaderAuth(),
+          ),
+          // Capa 2: formulario pegado ABAJO al centro
+          Align(
+            alignment: Alignment.bottomCenter,
+            // Si el formulario no entra (pantalla pequeña), se puede deslizar
+            child: SingleChildScrollView(
+              child: FormRegister(
+                onTap: () => log('Tocaron una caja del registro'),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}</code></pre>
+      </div>
+
+      <h3 class="sub">Paso 4 · Conectar el Login con las otras pantallas</h3>
+      <p class="txt">Volvemos a <code class="ic">form_login.dart</code> y completamos los dos <b>TODO</b> que dejamos. Hagan <b>3 cambios</b>:</p>
+
+      <div class="codeblock">
+        <div class="bar"><span class="fname"><span class="tag tag-edit">EDITAR</span> lib/presentation/auth/form_login.dart — cambio 1: agregar imports arriba</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+<pre><code>// Agreguen estas 2 lineas debajo de los imports que ya tienen
+import 'package:app_flutter/presentation/auth/register_screen.dart';
+import 'package:app_flutter/presentation/home/home_screen.dart';</code></pre>
+      </div>
+
+      <div class="codeblock">
+        <div class="bar"><span class="fname"><span class="tag tag-edit">EDITAR</span> form_login.dart — cambio 2: reemplazar el metodo ingresar()</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+<pre><code>  void ingresar() {
+    if (formKey.currentState!.validate()) {
+      // pushReplacement: va al Home y SACA el Login de la pila.
+      // Asi el boton "atras" del celular no regresa al Login.
+      Navigator.of(context).pushReplacement(
+        MaterialPageRoute(
+          // Le ENVIAMOS al Home el correo que escribio el usuario
+          builder: (_) => HomeScreen(email: emailController.text),
+        ),
+      );
+    } else {
+      mostrarMensaje('Formulario invalido', Colors.red);
+    }
+  }</code></pre>
+      </div>
+
+      <div class="codeblock">
+        <div class="bar"><span class="fname"><span class="tag tag-edit">EDITAR</span> form_login.dart — cambio 3: reemplazar el TextButton del final</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+<pre><code>              TextButton(
+                onPressed: () {
+                  // push: abre Registro ENCIMA del Login (se puede volver)
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (_) => const RegisterScreen()),
+                  );
+                },
+                child: const Text('No tienes una cuenta, creala aqui.'),
+              ),</code></pre>
+      </div>
+
+      <div class="tip">
+        <div class="ic">💡</div>
+        <p><b>¿Que es <code class="ic">MaterialPageRoute</code>?</b> Es la "animacion de transicion" entre pantallas. Su <code class="ic">builder</code> es una funcion que construye la pantalla nueva. El <code class="ic">_</code> en <code class="ic">(_) =&gt;</code> significa "recibo un dato pero no lo voy a usar".</p>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-label">EJERCICIO · 15 MIN</div>
+        <h4>Recorran todo el flujo</h4>
+        <ul class="check-list">
+          <li><input type="checkbox" id="e2-1"><label for="e2-1">Login → "creala aqui" → se abre Registro</label></li>
+          <li><input type="checkbox" id="e2-2"><label for="e2-2">En Registro, contraseñas distintas → "Las contraseñas no coinciden"</label></li>
+          <li><input type="checkbox" id="e2-3"><label for="e2-3">Registro correcto → vuelve al Login con mensaje verde</label></li>
+          <li><input type="checkbox" id="e2-4"><label for="e2-4">Login correcto → Home muestra el correo escrito</label></li>
+          <li><input type="checkbox" id="e2-5"><label for="e2-5">En Home, presionar "atras" del celular → la app se cierra (no vuelve al Login)</label></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- =========================================================
+         BLOQUE 3
+         ========================================================= -->
+    <div class="block" id="b3">
+      <h2 class="block-title"><span class="block-num">3</span> Home con menu inferior y lista de productos</h2>
+      <span class="block-time">60 minutos · NavigationBar + ListView.builder</span>
+
+      <p class="txt">Ahora el Home se vuelve la pantalla principal del inventario. Tendra un <b>menu inferior</b> con 3 pestañas. Es la primera vez que usamos la carpeta <code class="ic">data/</code>.</p>
+
+      <div class="anatomy">
+        <div class="phone">
+          <div class="screen home">
+            <div class="ph-appbar">Inventario MiBodega</div>
+            <div class="ph-list">
+              <div class="ph-item"><div class="ph-av">A</div><div class="ph-it">Arroz Costeño 1kg<small>Abarrotes · S/ 4.50</small></div><span class="ph-chip">8 und</span></div>
+              <div class="ph-item"><div class="ph-av">L</div><div class="ph-it">Leche Gloria<small>Lacteos · S/ 3.80</small></div><span class="ph-chip low">3 und</span></div>
+              <div class="ph-item"><div class="ph-av">A</div><div class="ph-it">Aceite Primor 1L<small>Abarrotes · S/ 9.90</small></div><span class="ph-chip">12 und</span></div>
+              <div class="ph-item"><div class="ph-av">A</div><div class="ph-it">Azucar Rubia 1kg<small>Abarrotes · S/ 3.60</small></div><span class="ph-chip low">2 und</span></div>
+              <div class="ph-item"><div class="ph-av">G</div><div class="ph-it">Galletas Soda<small>Snacks · S/ 0.80</small></div><span class="ph-chip">30 und</span></div>
+            </div>
+            <div class="ph-fab">+</div>
+            <div class="ph-nav">
+              <div class="on"><b><span>📦</span></b>Productos</div>
+              <div><span>⚠️</span></div>
+              <div><span>👤</span></div>
+            </div>
+          </div>
+        </div>
+        <ul class="anat-list">
+          <li><span class="pin" style="background:var(--green);">D</span><div><b>data/models/producto.dart</b> — define como es un producto y trae una lista de prueba.</div></li>
+          <li><span class="pin" style="background:var(--flutter);">V</span><div><b>ProductosView</b> — dibuja la lista. La usamos <b>2 veces</b>: para todos los productos y para los de stock bajo.</div></li>
+          <li><span class="pin" style="background:var(--flutter);">P</span><div><b>PerfilView</b> — muestra el correo y el boton "Cerrar sesion".</div></li>
+          <li><span class="pin" style="background:#7CC0FF;">H</span><div><b>HomeScreen</b> — tiene el menu inferior y decide <b>cual vista</b> mostrar.</div></li>
+        </ul>
+      </div>
+
+      <h3 class="sub">Paso 1 · El modelo Producto</h3>
+      <p class="txt">Un <b>modelo</b> es como una <b>ficha</b> con casilleros fijos. Todos los productos tienen nombre, categoria, precio y stock. En vez de usar textos sueltos, creamos una clase.</p>
+
+      <div class="codeblock">
+        <div class="bar"><span class="fname"><span class="tag tag-new">NUEVO</span> lib/data/models/producto.dart</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+<pre><code>// ======================================================
+// data/models/producto.dart
+// MODELO: describe COMO es un producto de la bodega.
+// No dibuja nada en pantalla, solo guarda datos.
+// ======================================================
+
+class Producto {
+  // Los "casilleros" de la ficha
+  final String nombre;
+  final String categoria;
+  final double precio; // double = numero con decimales
+  final int stock;     // int = numero entero (unidades)
+
+  // Constructor con parametros con nombre: Producto(nombre: ..., precio: ...)
+  const Producto({
+    required this.nombre,
+    required this.categoria,
+    required this.precio,
+    required this.stock,
+  });
+
+  // Getter = dato CALCULADO. Se usa como variable: producto.stockBajo
+  // Devuelve true si quedan menos de 5 unidades.
+  bool get stockBajo => stock &lt; 5;
+}
+
+// ------------------------------------------------------
+// Datos de prueba EN MEMORIA.
+// Se pierden al cerrar la app. En la Sesion 3 vendran
+// de una base de datos o de una API.
+// ------------------------------------------------------
+const List&lt;Producto&gt; productosDemo = [
+  Producto(nombre: 'Arroz Costeño 1kg', categoria: 'Abarrotes', precio: 4.50, stock: 8),
+  Producto(nombre: 'Leche Gloria', categoria: 'Lacteos', precio: 3.80, stock: 3),
+  Producto(nombre: 'Aceite Primor 1L', categoria: 'Abarrotes', precio: 9.90, stock: 12),
+  Producto(nombre: 'Azucar Rubia 1kg', categoria: 'Abarrotes', precio: 3.60, stock: 2),
+  Producto(nombre: 'Galletas Soda', categoria: 'Snacks', precio: 0.80, stock: 30),
+  Producto(nombre: 'Detergente Bolivar', categoria: 'Limpieza', precio: 6.50, stock: 4),
+];</code></pre>
+      </div>
+
+      <h3 class="sub">Paso 2 · La vista de la lista</h3>
+      <p class="txt"><code class="ic">ListView.builder</code> funciona como un <b>bucle for</b> que dibuja: le decimos <b>cuantos</b> elementos hay (<code class="ic">itemCount</code>) y <b>como</b> dibujar cada uno (<code class="ic">itemBuilder</code>). Flutter llama a <code class="ic">itemBuilder</code> con <code class="ic">index = 0, 1, 2...</code></p>
+
+      <div class="codeblock">
+        <div class="bar"><span class="fname"><span class="tag tag-new">NUEVO</span> lib/presentation/home/productos_view.dart</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+<pre><code>import 'package:flutter/material.dart';
+import 'package:app_flutter/core/theme.dart';
+import 'package:app_flutter/data/models/producto.dart';
+
+// ======================================================
+// Dibuja una lista de productos.
+// NO sabe de donde vienen: los RECIBE por el constructor.
+// Por eso podemos reutilizarla con cualquier lista.
+// ======================================================
+
+class ProductosView extends StatelessWidget {
+  const ProductosView({super.key, required this.productos});
+
+  final List&lt;Producto&gt; productos; // la lista que nos envian
+
+  @override
+  Widget build(BuildContext context) {
+    // Si la lista esta vacia, mostramos un mensaje y terminamos aqui
+    if (productos.isEmpty) {
+      return const Center(child: Text('No hay productos para mostrar'));
+    }
+
+    return ListView.builder(
+      padding: const EdgeInsets.all(8),
+      itemCount: productos.length, // ¿cuantos elementos?
+      // ¿como dibujo el elemento numero "index"?
+      itemBuilder: (context, index) {
+        final producto = productos[index]; // tomamos el producto de esa posicion
+
+        return Card(
+          child: ListTile(
+            // leading = a la IZQUIERDA: circulo con la primera letra
+            leading: CircleAvatar(
+              backgroundColor: AppColors.secundario,
+              foregroundColor: Colors.white,
+              child: Text(producto.nombre[0]), // [0] = primera letra
+            ),
+            title: Text(producto.nombre),
+            // toStringAsFixed(2) = siempre 2 decimales: 0.8 -> "0.80"
+            subtitle: Text(
+              '${producto.categoria} · S/ ${producto.precio.toStringAsFixed(2)}',
+            ),
+            // trailing = a la DERECHA: etiqueta con el stock
+            trailing: Chip(
+              label: Text('${producto.stock} und'),
+              // Rojo si hay poco stock, verde si hay suficiente
+              backgroundColor: producto.stockBajo
+                  ? Colors.red.shade100
+                  : Colors.green.shade100,
+            ),
+          ),
+        );
+      },
+    );
+  }
+}</code></pre>
+      </div>
+
+      <h3 class="sub">Paso 3 · La vista de Perfil</h3>
+
+      <div class="codeblock">
+        <div class="bar"><span class="fname"><span class="tag tag-new">NUEVO</span> lib/presentation/home/perfil_view.dart</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+<pre><code>import 'package:flutter/material.dart';
+import 'package:app_flutter/core/theme.dart';
+import 'package:app_flutter/presentation/auth/login_screen.dart';
+
+// Muestra los datos del usuario y permite cerrar sesion
+class PerfilView extends StatelessWidget {
+  const PerfilView({super.key, required this.email});
+
+  final String email;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Column(
+        mainAxisSize: MainAxisSize.min, // la columna se centra verticalmente
+        children: [
+          const CircleAvatar(
+            radius: 48, // tamaño del circulo
+            backgroundColor: AppColors.primario,
+            child: Icon(Icons.person, size: 48, color: Colors.white),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            email,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 24),
+
+          // Boton con icono + texto
+          OutlinedButton.icon(
+            onPressed: () {
+              // Cerrar sesion = volver al Login SIN poder regresar al Home
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(builder: (_) => const LoginScreen()),
+              );
+            },
+            icon: const Icon(Icons.logout),
+            label: const Text('Cerrar sesion'),
+          ),
+        ],
+      ),
+    );
+  }
+}</code></pre>
+      </div>
+
+      <h3 class="sub">Paso 4 · El Home definitivo</h3>
+      <p class="txt">Reemplacen <b>todo</b> el contenido de <code class="ic">home_screen.dart</code>. Ahora es <code class="ic">StatefulWidget</code> porque cambian dos cosas: la <b>pestaña elegida</b> y la <b>lista</b> (cuando agregamos productos con el boton +).</p>
+
+      <div class="codeblock">
+        <div class="bar"><span class="fname"><span class="tag tag-edit">REEMPLAZAR</span> lib/presentation/home/home_screen.dart (version final)</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+<pre><code>import 'package:flutter/material.dart';
+import 'package:app_flutter/core/theme.dart';
+import 'package:app_flutter/data/models/producto.dart';
+import 'package:app_flutter/presentation/home/perfil_view.dart';
+import 'package:app_flutter/presentation/home/productos_view.dart';
+
+class HomeScreen extends StatefulWidget {
+  const HomeScreen({super.key, required this.email});
+
+  final String email; // sigue llegando desde el Login
+
+  @override
+  State&lt;HomeScreen&gt; createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State&lt;HomeScreen&gt; {
+  // Pestaña seleccionada: 0 = Productos, 1 = Stock bajo, 2 = Perfil
+  int currentScreenIndex = 0;
+
+  // Copia de la lista de prueba. Los [...] crean una lista NUEVA
+  // que si podemos modificar (la original es const).
+  final List&lt;Producto&gt; productos = [...productosDemo];
+
+  // Se ejecuta al presionar el boton +
+  void agregarProducto() {
+    setState(() {
+      productos.add(
+        Producto(
+          nombre: 'Producto nuevo ${productos.length + 1}',
+          categoria: 'Varios',
+          precio: 1.00,
+          stock: 1,
+        ),
+      );
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // where() = FILTRAR. Nos quedamos solo con los de stock bajo.
+    final productosBajos = productos.where((p) => p.stockBajo).toList();
+
+    // Una vista por cada pestaña (mismo orden que el menu)
+    final vistas = [
+      ProductosView(productos: productos),       // 0
+      ProductosView(productos: productosBajos),  // 1  (¡misma vista, otra lista!)
+      PerfilView(email: widget.email),           // 2
+    ];
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Inventario MiBodega'),
+        backgroundColor: AppColors.primario,
+        foregroundColor: Colors.white, // color del texto e iconos
+      ),
+
+      // Mostramos solo la vista de la pestaña elegida
+      body: vistas[currentScreenIndex],
+
+      // ---------- MENU INFERIOR ----------
+      bottomNavigationBar: NavigationBar(
+        selectedIndex: currentScreenIndex, // cual se ve "encendida"
+        onDestinationSelected: (index) {
+          // index = la pestaña que toco el usuario
+          setState(() {
+            currentScreenIndex = index;
+          });
+        },
+        // Solo muestra el texto de la pestaña seleccionada
+        labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+        destinations: [
+          const NavigationDestination(
+            icon: Icon(Icons.inventory_2_outlined),
+            label: 'Productos',
+          ),
+          NavigationDestination(
+            // Badge = globito con un numero encima del icono
+            icon: Badge(
+              label: Text('${productosBajos.length}'),
+              child: const Icon(Icons.warning_amber_outlined),
+            ),
+            label: 'Stock bajo',
+          ),
+          const NavigationDestination(
+            icon: Icon(Icons.person_outline),
+            label: 'Perfil',
+          ),
+        ],
+      ),
+
+      // El boton + solo aparece en la pestaña Productos (index 0).
+      // Si la condicion es falsa, ponemos null = no hay boton.
+      floatingActionButton: currentScreenIndex == 0
+          ? FloatingActionButton(
+              onPressed: agregarProducto,
+              child: const Icon(Icons.add),
+            )
+          : null,
+    );
+  }
+}</code></pre>
+      </div>
+
+      <div class="tip">
+        <div class="ic">💡</div>
+        <p><b>La idea clave del bloque:</b> <code class="ic">ProductosView</code> no sabe si le envian <i>todos</i> los productos o solo los de stock bajo. Solo dibuja lo que recibe. Eso es <b>reutilizar</b> un widget: una sola pieza, dos usos.</p>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-label">EJERCICIO · 20 MIN</div>
+        <h4>Hagan crecer el inventario</h4>
+        <ul class="check-list">
+          <li><input type="checkbox" id="e3-1"><label for="e3-1">Agreguen 3 productos de su bodega en <code class="ic">productosDemo</code></label></li>
+          <li><input type="checkbox" id="e3-2"><label for="e3-2">Presionen + varias veces → los nuevos tienen stock 1, asi que tambien aparecen en "Stock bajo" y el globito sube</label></li>
+          <li><input type="checkbox" id="e3-3"><label for="e3-3">Cambien el limite de <code class="ic">stockBajo</code> de 5 a 10 y observen el cambio</label></li>
+          <li><input type="checkbox" id="e3-4"><label for="e3-4"><b>Reto:</b> agreguen una 4ta pestaña "Abarrotes" que muestre solo esa categoria (pista: <code class="ic">where((p) =&gt; p.categoria == 'Abarrotes')</code>)</label></li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- =========================================================
+         BLOQUE 4
+         ========================================================= -->
+    <div class="block" id="b4">
+      <h2 class="block-title"><span class="block-num">4</span> Tema central y cierre</h2>
+      <span class="block-time">25 minutos · que toda la app se vea igual</span>
+
+      <p class="txt">Hasta ahora repetimos cosas como <code class="ic">border: OutlineInputBorder()</code> en <b>cada</b> caja de texto y el color del AppBar en el Home. Con un <b>tema</b> le decimos a Flutter una sola vez: "todas las cajas y todos los AppBar se ven asi".</p>
+
+      <div class="codeblock">
+        <div class="bar"><span class="fname"><span class="tag tag-edit">EDITAR</span> lib/core/theme.dart — agregar la clase AppTheme al final</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+<pre><code>// (AppColors se queda igual, arriba)
+
+// ======================================================
+// Tema general de la app. Lo usa MaterialApp en main.dart
+// ======================================================
+class AppTheme {
+  static ThemeData tema() {
+    return ThemeData(
+      useMaterial3: true, // estilo moderno de Google (Material 3)
+
+      // A partir de UN color, Flutter genera toda la paleta
+      colorScheme: ColorScheme.fromSeed(seedColor: AppColors.primario),
+
+      // Estilo para TODOS los AppBar de la app
+      appBarTheme: const AppBarTheme(
+        backgroundColor: AppColors.primario,
+        foregroundColor: Colors.white,
+        centerTitle: true, // titulo al centro
+      ),
+
+      // Estilo para TODAS las cajas de texto
+      inputDecorationTheme: const InputDecorationTheme(
+        border: OutlineInputBorder(),
+        isDense: true,
+      ),
+    );
+  }
+}</code></pre>
+      </div>
+
+      <div class="codeblock">
+        <div class="bar"><span class="fname"><span class="tag tag-edit">EDITAR</span> lib/main.dart (version final)</span>
+          <div class="dots"><span style="background:#FF5F57;"></span><span style="background:#FEBC2E;"></span><span style="background:#28C840;"></span></div>
+        </div>
+<pre><code>import 'package:flutter/material.dart';
+import 'package:app_flutter/core/theme.dart';
+import 'package:app_flutter/presentation/auth/login_screen.dart';
+
+void main() {
+  runApp(const MainApp());
+}
+
+class MainApp extends StatelessWidget {
+  const MainApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      debugShowCheckedModeBanner: false,
+      title: 'MiBodega',
+      theme: AppTheme.tema(),    // ← ahora el tema viene de core/theme.dart
+      home: const LoginScreen(),
+    );
+  }
+}</code></pre>
+      </div>
+
+      <div class="tip">
+        <div class="ic">💡</div>
+        <p><b>Limpieza opcional:</b> como el tema ya define el borde y el <code class="ic">isDense</code>, pueden borrar <code class="ic">border: OutlineInputBorder(),</code> e <code class="ic">isDense: true,</code> de cada TextFormField, y <code class="ic">backgroundColor</code>/<code class="ic">foregroundColor</code> del AppBar en el Home. La app se vera igual, con menos codigo.</p>
+      </div>
+
+      <h3 class="sub">Errores comunes (y como resolverlos)</h3>
+      <div class="compare-wrap">
+        <table class="compare-table">
+          <thead><tr><th>Lo que ven</th><th>Por que pasa</th><th>Solucion</th></tr></thead>
+          <tbody>
+            <tr><td><b>Target of URI doesn't exist</b></td><td>El import apunta a un archivo que no existe o esta mal escrito.</td><td>Revisen la ruta y que el archivo este en la carpeta correcta.</td></tr>
+            <tr><td><b>Unable to load asset</b></td><td>La imagen no esta declarada en <code class="ic">pubspec.yaml</code>.</td><td>Declararla, ejecutar <code class="ic">flutter pub get</code> y volver a ejecutar la app (no solo Hot Reload).</td></tr>
+            <tr><td><b>Franja amarilla y negra</b> (overflow)</td><td>El contenido no entra en la pantalla.</td><td>Envolver con <code class="ic">SingleChildScrollView</code>.</td></tr>
+            <tr><td>El ojito <b>no cambia</b></td><td>Se cambio la variable pero sin <code class="ic">setState</code>.</td><td>Cambiar la variable <b>dentro</b> de <code class="ic">setState(() { ... })</code>.</td></tr>
+            <tr><td><b>Null check operator used on a null value</b></td><td>El <code class="ic">Form</code> no tiene <code class="ic">key: formKey</code>.</td><td>Agregar <code class="ic">key: formKey</code> al widget Form.</td></tr>
+            <tr><td>El boton se ve <b>gris</b> y no responde</td><td><code class="ic">onPress</code> llego como <code class="ic">null</code>.</td><td>Enviarle una funcion: <code class="ic">onPress: ingresar</code>.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <h3 class="sub">Resumen: ¿que hace cada archivo?</h3>
+      <div class="compare-wrap">
+        <table class="compare-table">
+          <thead><tr><th>Archivo</th><th>Capa</th><th>Responsabilidad (en una frase)</th></tr></thead>
+          <tbody>
+            <tr><td><b>main.dart</b></td><td>—</td><td>Arranca la app y aplica el tema.</td></tr>
+            <tr><td><b>theme.dart</b></td><td style="color:#7CC0FF;">core</td><td>Colores y estilo general.</td></tr>
+            <tr><td><b>validators.dart</b></td><td style="color:#7CC0FF;">core</td><td>Reglas para revisar formularios.</td></tr>
+            <tr><td><b>producto.dart</b></td><td style="color:var(--green);">data</td><td>Como es un producto + datos de prueba.</td></tr>
+            <tr><td><b>login / register_screen</b></td><td style="color:var(--flutter);">presentation</td><td>Arman la pantalla con sus piezas.</td></tr>
+            <tr><td><b>form_login / form_register</b></td><td style="color:var(--flutter);">presentation</td><td>Capturan y validan datos.</td></tr>
+            <tr><td><b>home_screen</b></td><td style="color:var(--flutter);">presentation</td><td>Menu inferior: decide que vista mostrar.</td></tr>
+            <tr><td><b>productos_view / perfil_view</b></td><td style="color:var(--flutter);">presentation</td><td>Muestran la lista y el perfil.</td></tr>
+            <tr><td><b>app_button / header_auth</b></td><td style="color:var(--flutter);">presentation</td><td>Piezas reutilizables.</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="exercise">
+        <div class="ex-label">EJERCICIO FINAL · 15 MIN</div>
+        <h4>Personalicen su bodega</h4>
+        <ul class="check-list">
+          <li><input type="checkbox" id="e4-1"><label for="e4-1">Cambien <code class="ic">AppColors.primario</code> por otro color y verifiquen que cambia en Login, botones y AppBar</label></li>
+          <li><input type="checkbox" id="e4-2"><label for="e4-2">Pongan el logo y el nombre de su propia bodega</label></li>
+          <li><input type="checkbox" id="e4-3"><label for="e4-3">Expliquen en voz alta: ¿en que carpeta pondrian un nuevo widget <code class="ic">ProductoCard</code>? ¿y un modelo <code class="ic">Categoria</code>?</label></li>
+          <li><input type="checkbox" id="e4-4"><label for="e4-4">Recorran el flujo completo: Login → Registro → Login → Home → Perfil → Cerrar sesion</label></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="checkpoint">
+      <div class="ck-label">CHECKPOINT DE CIERRE</div>
+      <h3>Al final de esta sesion tendran:</h3>
+      <p>La app <b>Inventario MiBodega</b> con login y registro validados, navegacion con <code class="ic">push</code>, <code class="ic">pop</code> y <code class="ic">pushReplacement</code>, un Home con menu inferior y una lista de productos en memoria. Todo ordenado en <b>presentation / core / data</b>. En la Sesion 3, la lista dejara de estar en memoria: bastara con agregar <code class="ic">data/services/</code> para traer los productos de una base de datos o de una API, <b>sin tocar las pantallas</b>.</p>
+    </div>
+
+  </div>
+  <script>
+    (() => {
+      // ---------- Resaltado de sintaxis Dart ----------
+      const KEYWORDS = new Set(('import class extends return final const void if else true false null new ' +
+        'super this required static get var late for in with async await').split(' '));
+      const LOWER_TYPES = new Set(['bool', 'int', 'double', 'dynamic']);
+      const TOKENS = /(\/\/[^\n]*)|(r?'(?:\\.|[^'\\\n])*'|r?"(?:\\.|[^"\\\n])*")|(@\w+)|(\b\d+(?:\.\d+)?\b|\b0x[0-9A-Fa-f]+\b)|([A-Za-z_]\w*)/g;
+      const esc = (s) => s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+      const wrap = (cls, s) => '<span class="tk-' + cls + '">' + esc(s) + '</span>';
+
+      const highlight = (src) => {
+        let out = '';
+        let last = 0;
+        let m;
+        TOKENS.lastIndex = 0;
+        while ((m = TOKENS.exec(src)) !== null) {
+          out += esc(src.slice(last, m.index));
+          const [tok, com, str, ann, num, id] = m;
+          if (com) out += wrap('com', tok);
+          else if (str) out += wrap('str', tok);
+          else if (ann) out += wrap('key', tok);
+          else if (num) out += wrap('num', tok);
+          else if (id) {
+            const next = src.slice(TOKENS.lastIndex).match(/^\s*(\S)/);
+            const callsFn = next && next[1] === '(';
+            if (KEYWORDS.has(id)) out += wrap('key', tok);
+            else if (LOWER_TYPES.has(id)) out += wrap('type', tok);
+            else if (callsFn) out += wrap('fn', tok);
+            else if (/^[A-Z]/.test(id)) out += wrap('type', tok);
+            else out += esc(tok);
+          }
+          last = TOKENS.lastIndex;
+        }
+        return out + esc(src.slice(last));
+      };
+
+      document.querySelectorAll('.codeblock pre code:not(.plain)').forEach((el) => {
+        el.innerHTML = highlight(el.textContent);
+      });
+
+      // ---------- Boton "Copiar" en todos los bloques de codigo ----------
+      const copiarTexto = (texto) => {
+        if (navigator.clipboard && window.isSecureContext) {
+          return navigator.clipboard.writeText(texto);
+        }
+        // Respaldo para cuando la guia se abre como archivo local
+        return new Promise((resolve, reject) => {
+          const area = document.createElement('textarea');
+          area.value = texto;
+          area.style.position = 'fixed';
+          area.style.opacity = '0';
+          document.body.appendChild(area);
+          area.select();
+          const ok = document.execCommand('copy');
+          document.body.removeChild(area);
+          ok ? resolve() : reject();
+        });
+      };
+
+      document.querySelectorAll('.codeblock').forEach((block) => {
+        const bar = block.querySelector('.bar');
+        const code = block.querySelector('pre, .tree');
+        if (!bar || !code) return;
+
+        const dots = bar.querySelector('.dots');
+        const right = document.createElement('div');
+        right.className = 'bar-right';
+
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'copy-btn';
+        btn.textContent = 'Copiar';
+        btn.setAttribute('aria-label', 'Copiar codigo');
+
+        btn.addEventListener('click', () => {
+          const texto = code.innerText.replace(/\s+$/, '') + '\n';
+          copiarTexto(texto)
+            .then(() => {
+              btn.textContent = '¡Copiado!';
+              btn.classList.add('copied');
+            })
+            .catch(() => {
+              btn.textContent = 'Error';
+            })
+            .finally(() => {
+              setTimeout(() => {
+                btn.textContent = 'Copiar';
+                btn.classList.remove('copied');
+              }, 1600);
+            });
+        });
+
+        right.appendChild(btn);
+        if (dots) right.appendChild(dots);
+        bar.appendChild(right);
+      });
+    })();
+  </script>
+</body>
+</html>
